@@ -1,0 +1,51 @@
+---
+description: TEC.ERP core engineering discipline — vertical delivery, Approval Gates, stack, QA
+alwaysApply: true
+---
+
+# TEC.ERP Engineering
+
+Consult `.cursor/context/TEC_ERP_PROJECT_CONTEXT.md` and `docs/19_CURSOR_MASTER_BUILD_SPECIFICATION.md` before implementing.
+
+## Vertical Delivery
+
+Each feature is a complete vertical slice (`docs/19` §6–7):
+
+Architecture → Backend → Frontend → Simulation → Testing → Documentation → Validation → Production Readiness
+
+Incomplete slices must not be merged.
+
+## Definition of Complete
+
+A feature is done only when functionality, business rules, UI, API docs, tests, documentation, and deployment validation all pass (`docs/19` §7).
+
+## Approval Gate (mandatory)
+
+Before commit or next phase, validate (`docs/19` §9):
+
+Business Rules · UI · Backend · Simulation · Database · API · Testing · Documentation · Production Readiness
+
+If any item fails, the phase stays open. Never continue after a failed gate (BUILD-005).
+
+## Stack Constraints
+
+- **TypeScript** strict mode — no `any`, explicit interfaces (`docs/19` §36)
+- **React** functional, small, composable components (`docs/19` §37)
+- **Express** business-oriented REST endpoints (`docs/18` §2)
+- **Prisma + PostgreSQL** — versioned, tested migrations (`docs/19` §79, `docs/17`)
+- **Railway** — all decisions must remain deployable (`docs/19` §77.1, `docs/25`)
+
+## Quality & Testing
+
+- Business and educational value before technical complexity (ENG-007, `docs/22` §4)
+- EduQA: verify mission quality and learning outcomes (`docs/22` §24)
+- Risk-based testing with evidence for release (`docs/23` §3–4)
+- Security-by-design on every change (`docs/26` §3)
+
+## BUILD Rules
+
+BUILD-001 Never skip documentation · BUILD-002 Never implement without architecture · BUILD-003 Never merge failing tests · BUILD-004 Never duplicate business rules · BUILD-005 Never continue after failed gate · BUILD-006 Always leave repo buildable (`docs/19` §15)
+
+## Structural Changes
+
+Before architectural changes, evaluate impact per `docs/19` §95: Business → Educational → Database → API → Frontend → Simulation → Testing → Deployment → Documentation.

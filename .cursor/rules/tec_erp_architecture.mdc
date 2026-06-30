@@ -1,0 +1,46 @@
+---
+description: TEC.ERP enterprise architecture — layers, business-first design, missions
+alwaysApply: true
+---
+
+# TEC.ERP Architecture
+
+Read `docs/13_SYSTEM_ARCHITECTURE.md` and the relevant spec (15–18) before designing or implementing.
+
+## Core Principle
+
+**Business before software.** Students learn through Business Missions and decisions — transactions are tools, not the goal (`docs/15` §2, EP-002).
+
+## Six Layers
+
+Presentation → Application → Simulation Engine → Business Services → Data → Infrastructure (`docs/13` §Architectural Layers)
+
+Business services never depend on the UI. Persistence stays independent of UI implementation.
+
+## Business-First Modeling
+
+- **API:** endpoints express business intent (`POST /missions/start`), not table operations (`docs/18` §2–3)
+- **Database:** business entities and relationships, normalized, traceable learning history (`docs/17` §2–3)
+- **UI:** global layout — top nav, left sidebar, main content, contextual right panel (`docs/16` §4)
+
+## Modular ERP Domains
+
+Independent but integrated modules: Foundations, Master Data, Procure-to-Pay, Order-to-Cash, Supply Chain, Finance, CRM, Governance, BI & AI, Capstone (`docs/13` §Modular Architecture).
+
+Each module owns missions, dashboards, KPIs, and assessments.
+
+## Business Mission Driven Learning
+
+Every activity starts with a business situation requiring analysis, execution, decision, consequence evaluation, and reflection (`docs/15` §2). Do not build isolated CRUD screens disconnected from missions.
+
+## UI Direction
+
+Enterprise credibility with pedagogical guidance. Inspired by Fiori clarity and modular simplicity — preserve TEC institutional identity (`docs/16` §2–3).
+
+## Simulation Engine
+
+Business decisions trigger KPI changes and cross-module consequences (`docs/06_SIMULATION_ENGINE.md`, `docs/13` Layer 3). Simulation logic lives in the engine, not in UI components.
+
+## Reuse
+
+Prefer shared components and services over duplication (EP-004, ENG-006). Consult existing patterns before creating new abstractions.

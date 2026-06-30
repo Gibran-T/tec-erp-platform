@@ -1,0 +1,42 @@
+---
+description: TEC.ERP continuous documentation — sync specs with implementation, protect docs/
+alwaysApply: true
+---
+
+# TEC.ERP Documentation
+
+See `docs/00_ENGINEERING_PRINCIPLES.md` EP-003 and `docs/19` §94, §2521.
+
+## Documentation Before Development
+
+No implementation starts before consulting the relevant official specification. Read the doc, then code.
+
+## Continuous Documentation
+
+Documentation and implementation evolve together (QUALITY-003, `docs/19` §94). When code changes affect:
+
+| Change type | Consult / align with |
+|-------------|---------------------|
+| Business logic | `docs/15_ERP_FUNCTIONAL_SPECIFICATION.md` |
+| UI screens | `docs/16_UI_BLUEPRINT.md` |
+| Data model | `docs/17_DATABASE_SCHEMA.md` |
+| API endpoints | `docs/18_API_SPECIFICATION.md` |
+| Engineering process | `docs/19_CURSOR_MASTER_BUILD_SPECIFICATION.md` |
+| Sprint scope | `docs/20_MVP_IMPLEMENTATION_BACKLOG.md` |
+
+## Protecting Official Docs
+
+- **Never modify `docs/`** without explicit user approval
+- If implementation reveals a spec gap, **flag it** and propose a doc update — do not silently drift
+- Research and market analysis stay separate from official product docs (EP-005)
+
+## What to Document in Code Work
+
+- Meaningful commit messages describing the logical change (`docs/19` §13)
+- PR summary: objective, impacted modules, testing evidence, doc alignment (`docs/19` §14)
+- Approval Gate report for completed phases (`docs/19` §61)
+- Database migrations documented and tested before production (`docs/19` §79)
+
+## Allowed Write Targets
+
+Source code, tests, configuration, and engineering notes outside `docs/` — unless the user explicitly requests an official doc update.

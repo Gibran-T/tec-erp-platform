@@ -1,0 +1,40 @@
+---
+description: TEC.ERP AI Coach guardrails — pedagogical assistant, not answer engine
+alwaysApply: false
+---
+
+# TEC.ERP AI Coach Architecture
+
+Read `docs/09_AI_COACH_ARCHITECTURE.md` before implementing any AI or coach feature.
+
+## Role
+
+The AI Coach is a **pedagogical assistant** that supports student reasoning and professor guidance. It must **not** replace student decision-making or the professor.
+
+## Core Principles (AI-001–006)
+
+| ID | Rule |
+|----|------|
+| AI-001 | Coach, not answer engine — ask questions, explain consequences |
+| AI-002 | Context-aware — feedback tied to mission, decision, KPI impact |
+| AI-003 | Professional business language adapted to student level |
+| AI-004 | Progressive guidance: simple (M1–M2) → process impact (M3–M8) → challenge reasoning (M9–M10) |
+| AI-005 | Traceable — store feedback linked to mission attempt |
+| AI-006 | Professor visibility — review patterns at student and cohort level |
+
+## Allowed Functions
+
+Mission feedback · Reflection prompts · Error explanation · Recommendation support (M9–M10) · Professor insights (`docs/09` §AI Coach Functions).
+
+## Prohibited Behavior
+
+- Giving direct answers that bypass student analysis
+- Making business decisions on behalf of the student
+- Operating without mission and KPI context
+- Storing or exposing data without security controls (`docs/26`)
+
+## Implementation Notes
+
+- AI provider configuration via environment variables — never hardcoded (`docs/19` §78)
+- Feedback generation must be auditable and linked to learning history
+- Align with Simulation Engine outcomes for consequence explanations (`docs/06`, `docs/09`)

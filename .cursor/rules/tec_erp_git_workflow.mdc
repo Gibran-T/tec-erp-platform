@@ -1,0 +1,51 @@
+---
+description: TEC.ERP git, release, and Railway deployment workflow
+alwaysApply: true
+---
+
+# TEC.ERP Git & Release Workflow
+
+See `docs/19` §8–15, `docs/24_RELEASE_MANAGEMENT.md`, and `docs/25_DEPLOYMENT_GUIDE.md`.
+
+## Approval Gate Before Commit
+
+Every phase ends with a passed Approval Gate before git commit (`docs/19` §8–9, BUILD-005). Gate validates: Business Rules · UI · Backend · Simulation · Database · API · Testing · Documentation · Production Readiness.
+
+## Commit Standards
+
+Each commit must (`docs/19` §13):
+
+- Represent one logical change
+- Compile successfully and pass tests
+- Use a meaningful message: `feat:`, `fix:`, `docs:` prefixes
+
+**Only commit when the user explicitly requests it.**
+
+## Pull Request Standards
+
+Every PR includes (`docs/19` §14):
+
+- Objective and implementation summary
+- Impacted modules
+- Testing evidence and screenshots (if UI changed)
+- Documentation alignment status
+- Approval Gate status
+
+## Release Flow
+
+Planning → Implementation → Testing → Documentation → Approval Gate → Deployment → Smoke Test → Monitoring → Release Closure (`docs/24` §3).
+
+A release is an institutional decision supported by evidence — not just a deployment.
+
+## Railway Requirements
+
+- Every PR must remain deployable to Railway (`docs/19` §77.1)
+- Production validation includes Railway deployment verification
+- Review deployment logs after every production deploy
+- Environment variables documented and synced — never committed to git (`docs/19` §78, `docs/26`)
+
+## Repository Hygiene
+
+- Always leave the repository in a buildable state (BUILD-006)
+- No secrets, credentials, or `.env` files in git
+- Migration failures block deployment (`docs/19` §79)
