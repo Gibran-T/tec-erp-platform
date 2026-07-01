@@ -1,21 +1,58 @@
 # TEC.ERP — Architecture Review Board Templates
 
-## Purpose of the Architecture Review Board
+## Purpose
 
-The Architecture Review Board (ARB) is the permanent governance workspace for TEC.ERP engineering decisions.
+This folder contains reusable markdown templates for Architecture Review Board (ARB) sessions.
 
-It provides a controlled environment where architectural proposals are reviewed, debated, documented and approved before they influence official documentation in `docs/` or production implementation.
+Each template provides a standardized structure: purpose, scope, required inputs, output format, placeholder sections, approval status and constraints.
 
-The ARB ensures that TEC.ERP architectural evolution remains:
+Templates are copied into numbered working folders (`architecture-board/30/` – `35/`) for each review cycle.
 
-- aligned with Enterprise Educational Intelligence principles;
-- consistent with the official documentation hierarchy (`docs/01–29`);
-- governed by institutional standards (Approval Gates, EduQA, Railway-first);
-- traceable through decision records and consensus reports.
+Templates in this folder remain pristine — working copies absorb session content.
 
-The ARB workspace is separate from official product documentation.
+---
 
-Working artifacts live here until promoted through formal governance.
+## Template Index
+
+| Template | Role |
+|----------|------|
+| `ArchitectureBrief.md` | Initiate ARB session — problem, scope, stakeholders |
+| `DomainArchitecture.md` | Business domain and pedagogical architecture review |
+| `PlatformReview.md` | Platform integration and service boundary review |
+| `KnowledgeReview.md` | Data architecture and persistence review |
+| `GovernanceReview.md` | Security, QA, compliance and Approval Gate review |
+| `LLMReview.md` | AI/LLM boundary and provider independence review |
+| `ArchitectureConsensusReport.md` | Consolidate all reviews into consensus |
+| `ArchitectureDecisionPackage.md` | Package approved outcome for promotion |
+| `ADR.md` | Record a single architectural decision |
+| `DAR.md` | Document resulting technical architecture |
+
+---
+
+## Scope
+
+These templates govern the ARB working process only.
+
+They do not replace official documentation in `docs/`.
+
+---
+
+## Required Inputs (All Sessions)
+
+| Input | Description |
+|-------|-------------|
+| Review topic | Defined in Architecture Brief |
+| Target folder | `architecture-board/30/` – `35/` |
+| Official doc references | Applicable `docs/` specifications |
+| Stakeholder assignments | Reviewer roles per perspective |
+
+---
+
+## Output Format
+
+Each completed template is saved in the target working folder with its standard filename.
+
+Decision records use numbered filenames: `ADR-NNN-<title>.md`, `DAR-NNN-<title>.md`.
 
 ---
 
@@ -23,53 +60,46 @@ Working artifacts live here until promoted through formal governance.
 
 ```text
 architecture-board/
-├── templates/          Reusable markdown templates for review sessions
-├── 30/                 Working area — Document 30 reviews
-├── 31/                 Working area — Document 31 reviews
-├── 32/                 Working area — Document 32 reviews
-├── 33/                 Working area — Document 33 reviews
-├── 34/                 Working area — Document 34 reviews
-└── 35/                 Working area — Document 35 reviews
+├── templates/     ← This folder (pristine templates)
+├── 30/            ← Working area
+├── 31/
+├── 32/
+├── 33/
+├── 34/
+└── 35/
 ```
-
-| Location | Role |
-|----------|------|
-| `templates/` | Blank templates copied into numbered working folders for each review cycle |
-| `30/` – `35/` | Session-specific working directories for Architecture Review Board deliberations |
-
-Official documents are **not** created directly in this workspace.
-
-Approved outcomes are promoted to `docs/` through a separate governed process.
 
 ---
 
 ## Artifact Lifecycle
 
 ```text
-1. Initiate
-   Copy relevant templates from templates/ into the target folder (30–35).
-
-2. Draft
-   Complete working artifacts during Architecture Review Board sessions.
-
-3. Review
-   Domain, platform, knowledge, governance and LLM perspectives review drafts.
-
-4. Consensus
-   Produce ArchitectureConsensusReport and ArchitectureDecisionPackage.
-
-5. Record
-   Finalize ADR and/or DAR for institutional traceability.
-
-6. Promote
-   Approved content moves to official docs/ — not committed from this workspace without Approval Gate.
-
-7. Archive
-   Working folder retains session history for audit and future reference.
+1. Copy templates → target folder
+2. Complete ArchitectureBrief
+3. Run perspective reviews (Domain, Platform, Knowledge, Governance, LLM)
+4. Produce ArchitectureConsensusReport
+5. Package outcome → ArchitectureDecisionPackage
+6. Record → ADR + DAR
+7. Promote approved content to docs/ (separate governed process)
+8. Archive working folder
 ```
 
-Templates remain unchanged in `templates/`.
+---
 
-Each review cycle operates on copies within the numbered folder.
+## Approval / Status
 
-Nothing in `architecture-board/` replaces official `docs/` until explicitly promoted and approved.
+| Field | Value |
+|-------|-------|
+| Template Version | 1.0 |
+| Status | Standardized |
+| Last Updated | 2026 |
+
+---
+
+## Do Not
+
+- Do not edit templates in place during a review session — copy first.
+- Do not treat working artifacts as official `docs/` documents.
+- Do not mark decisions as Accepted without ARB consensus.
+- Do not reference unapproved decisions as final.
+- Do not commit working folder content without Approval Gate authorization.
