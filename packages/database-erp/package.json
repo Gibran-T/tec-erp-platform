@@ -1,0 +1,33 @@
+{
+  "name": "@tec-platform/database-erp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "prisma generate && tsc -p tsconfig.json",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "prisma generate && tsc --noEmit -p tsconfig.json",
+    "test": "echo \"No tests for database-erp foundation package\""
+  },
+  "dependencies": {
+    "@prisma/client": "^6.9.0",
+    "@tec-platform/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@tec-platform/config": "workspace:*",
+    "@typescript-eslint/eslint-plugin": "^8.34.0",
+    "@typescript-eslint/parser": "^8.34.0",
+    "@types/node": "^22.15.32",
+    "eslint": "^8.57.1",
+    "prisma": "^6.9.0",
+    "typescript": "^5.8.3"
+  }
+}
