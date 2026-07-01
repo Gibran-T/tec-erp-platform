@@ -1,0 +1,9 @@
+{
+  "extends": "@tec-platform/config/typescript/react",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist"
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "tailwind.preset.ts"],
+  "exclude": ["src/**/__tests__/**"]
+}
