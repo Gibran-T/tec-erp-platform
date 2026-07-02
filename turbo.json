@@ -9,7 +9,7 @@
       "dependsOn": ["^lint"]
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"]
+      "dependsOn": ["^build"]
     },
     "test": {
       "dependsOn": ["^build", "build"]
@@ -17,6 +17,9 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "erp-web#typecheck": {
+      "dependsOn": ["@tec-platform/ui#build", "@tec-platform/contracts#build"]
     }
   }
 }
