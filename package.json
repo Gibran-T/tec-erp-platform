@@ -11,9 +11,14 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "dev": "turbo run dev"
+    "dev": "turbo run dev",
+    "env:check": "tsx scripts/validate-env.ts",
+    "dev:bootstrap": "tsx scripts/dev-bootstrap.ts",
+    "migrate:deploy": "tsx scripts/migrate-deploy.ts",
+    "smoke:test": "tsx scripts/smoke-test.ts"
   },
   "devDependencies": {
+    "tsx": "^4.20.3",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"
   }
