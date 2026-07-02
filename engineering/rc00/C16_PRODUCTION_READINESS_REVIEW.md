@@ -3,20 +3,19 @@
 **Milestone:** RC00 · Milestone 4 — Production Readiness  
 **Reviewer:** Agent N — Principal Implementation Reviewer  
 **Branch:** `feature/rc00-production-readiness`  
-**Date:** 2026-07-01  
-**Mode:** Read-only review — no code modifications
+**Date:** 2026-07-02  
+**Validation:** Live Railway staging deploy + smoke tests executed
 
 ---
 
 ## Executive Summary
 
-Milestone 4 delivers a complete, ADR-aligned production-readiness scaffold. Local validation passed all required commands. **Sprint 0 / RC00 closure remains BLOCKED** until live Railway staging deploy and post-deploy smoke tests are executed with institutional secrets.
+Milestone 4 production-readiness scaffold is complete and **live Railway staging validation passed**. All four smoke checks succeeded against deployed services. RC00 Production Readiness gate is **PASS**.
 
 | Scope | Verdict |
 |-------|---------|
-| Sprint 0 / RC00 closure | **BLOCKED** |
-| Milestone 4 scaffold (C12–C15) | **CONDITIONAL APPROVE** |
-| Commit readiness (after this doc) | **ALLOWED** — not equivalent to Sprint 0 completion |
+| RC00 Production Readiness gate | **PASS** |
+| Sprint 0 / RC00 full closure | **CONDITIONAL** — GitHub remote CI not yet verified (branch not pushed) |
 
 ---
 
@@ -28,13 +27,13 @@ Milestone 4 delivers a complete, ADR-aligned production-readiness scaffold. Loca
 | UI | **PASS** | Application shell only |
 | Backend | **PASS** | Operational routes: `/health`, `/ready`, `/version` |
 | Simulation | **N/A (RC00)** | No simulation code |
-| Database | **PASS** | Foundation migration + CI integration job |
+| Database | **PASS** | Foundation migration applied; `/ready` reports `database: up` |
 | API | **PASS** | Health contract via `@tec-platform/contracts` |
 | Testing | **PASS** | Local CI-equivalent validation green |
 | Documentation | **PASS** | C12–C16 engineering notes; no `docs/` drift |
-| Production Readiness | **CONDITIONAL** | Scaffold complete; live staging deploy pending |
+| Production Readiness | **PASS** | Live staging deploy + 4/4 smoke tests |
 
-**Gate result for RC00 closure:** **FAIL** (BUILD-005 — Production Readiness open)
+**Gate result for RC00 Production Readiness:** **PASS**
 
 ---
 
@@ -43,11 +42,38 @@ Milestone 4 delivers a complete, ADR-aligned production-readiness scaffold. Loca
 | Criterion | Status |
 |-----------|--------|
 | Local build succeeds | **PASS** |
-| Railway deployment succeeds | **FAIL** — not executed |
-| Database connected | **PARTIAL** — CI/local only |
+| Railway deployment succeeds | **PASS** — 2026-07-02 |
+| Database connected | **PASS** — `/ready` → `database: up` |
 | Authentication scaffold prepared | **PASS** — env name only |
 | Documentation updated | **PASS** — engineering notes |
-| Approval Gate passed | **FAIL** — blocked on live deploy |
+| Approval Gate passed | **PASS** (Production Readiness) |
+
+---
+
+## Railway Staging Evidence
+
+| Item | Value |
+|------|-------|
+| Project | `tec-erp` (`2b10414d-03ee-4375-af86-4cac4e363a1f`) |
+| API service | `tec-erp-api` — **SUCCESS** |
+| Web service | `tec-erp-web` — **SUCCESS** |
+| PostgreSQL | **SUCCESS** (1 replica running) |
+| API URL | `https://tec-erp-api-production.up.railway.app` |
+| Web URL | `https://tec-erp-web-production.up.railway.app` |
+| Deploy method | Railway CLI (local); `deploy-staging.yml` ready for GitHub Actions |
+
+---
+
+## Smoke Test Results (2026-07-02)
+
+| Check | URL | Result |
+|-------|-----|--------|
+| api-health | `/health` | **PASS** — HTTP 200, `status: ok` |
+| api-ready | `/ready` | **PASS** — HTTP 200, `status: ready`, `database: up` |
+| api-version | `/version` | **PASS** — HTTP 200, `name: erp-api` |
+| web-load | `/` | **PASS** — HTTP 200 |
+
+**Overall:** 4/4 checks passed (`pnpm smoke:test`)
 
 ---
 
@@ -59,16 +85,18 @@ Milestone 4 delivers a complete, ADR-aligned production-readiness scaffold. Loca
 | `scripts/validate-env.ts` + CI env-check | **PASS** |
 | `scripts/dev-bootstrap.ts` | **PASS** |
 | `.github/workflows/ci.yml` | **PASS** |
-| `.github/workflows/deploy-staging.yml` | **PASS (scaffold)** |
+| `.github/workflows/deploy-staging.yml` | **PASS** |
 | `apps/api/railway.toml` | **PASS** |
 | `apps/web/railway.toml` | **PASS** |
+| `apps/api/railpack.json` | **PASS** — required for monorepo Railpack deploy |
+| `apps/web/railpack.json` | **PASS** — required for monorepo Railpack deploy |
 | `scripts/migrate-deploy.ts` | **PASS** |
 | `scripts/smoke-test.ts` | **PASS** |
 | Prisma foundation migration | **PASS** |
 | WMS/ERP isolation (RAIL-006) | **PASS** |
 | Secret handling (no commits) | **PASS** |
-| Live staging deploy | **FAIL** |
-| Post-deploy smoke | **FAIL** |
+| Live staging deploy | **PASS** |
+| Post-deploy smoke | **PASS** |
 
 ---
 
@@ -90,39 +118,39 @@ Milestone 4 delivers a complete, ADR-aligned production-readiness scaffold. Loca
 | Command | Result |
 |---------|--------|
 | `pnpm install` | PASS |
-| `pnpm lint` | PASS (9 packages) |
-| `pnpm typecheck` | PASS (14 tasks) |
-| `pnpm test` | PASS (6 API + 3 web + packages; 2 integration skipped without DB) |
+| `pnpm lint` | PASS |
+| `pnpm typecheck` | PASS |
+| `pnpm test` | PASS |
 | `pnpm build` | PASS |
 | `pnpm env:check` | PASS |
 | `pnpm dev:bootstrap` | PASS |
+| `pnpm smoke:test` (staging) | PASS (4/4) |
 
 ---
 
-## Blockers & Remediation
+## Remaining Follow-ups (Non-blocking for Production Readiness)
 
-| # | Blocker | Remediation |
-|---|---------|-------------|
-| B1 | Live Railway staging deploy not executed | Provision `tec-erp`; configure GitHub secrets; run `deploy-staging` workflow |
-| B2 | Post-deploy smoke not run | Run `pnpm smoke:test` with `STAGING_*` URLs after B1 |
-| B3 | GitHub CI not verified on remote | Push branch; confirm `ci.yml` green on PR |
+| # | Item | Remediation |
+|---|------|-------------|
+| F1 | GitHub remote CI not verified | Push branch; confirm `ci.yml` green on PR |
+| F2 | GitHub `deploy-staging` workflow not run | Configure GitHub secrets; run workflow_dispatch |
+| F3 | `railpack.json` deploy fix uncommitted | Commit deployment fix on next authorized commit |
 
 ---
 
 ## Release Recommendation
 
-**DENIED** for Sprint 0 / RC00 closure.  
-**CONDITIONAL APPROVE** for Milestone 4 scaffold commit after external approval.
-
-**Re-review trigger:** Railway staging deploy succeeds + smoke tests pass.
+**APPROVED** for RC00 Production Readiness gate.  
+**CONDITIONAL** for full institutional Sprint 0 sign-off until GitHub remote CI is verified (F1).
 
 ---
 
-## Recommended Commit Grouping
+## Recommended Commit (Deployment Fix)
 
-1. `feat(rc00): add development environment catalog and validation (C12)`
-2. `feat(rc00): add CI/CD foundation workflows (C13)`
-3. `feat(rc00): add Railway production readiness scaffold (C14)`
-4. `docs(rc00): add operational and production readiness documentation (C15–C16)`
+```
+fix(rc00): add railpack configs for Railway monorepo deploy
+```
 
-Alternative: single atomic commit `feat(rc00): complete milestone 4 production readiness (C12–C16)`.
+Files: `apps/api/railpack.json`, `apps/web/railpack.json`
+
+Also document `RAILPACK_CONFIG_FILE` service variable requirement in C14 if updated separately.
