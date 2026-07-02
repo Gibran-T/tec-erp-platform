@@ -1,0 +1,11 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "steps": {
+    "build": {
+      "commands": ["...", "pnpm turbo build --filter=erp-api"]
+    }
+  },
+  "deploy": {
+    "startCommand": "pnpm migrate:deploy && node apps/api/dist/index.js"
+  }
+}
