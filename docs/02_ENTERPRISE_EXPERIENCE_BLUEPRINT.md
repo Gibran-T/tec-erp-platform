@@ -1,49 +1,37 @@
 # TEC.ERP — Enterprise Experience Blueprint
 
 **Document:** Enterprise Experience Blueprint  
-**Version:** 1.0  
-**Status:** Official Experience Architecture — Bridge Document  
+**Version:** 1.0 — The Student's Professional Journey  
+**Status:** Official Operational Guide — Bridge Document  
 **Project:** TEC.ERP — Analyste ERP et Processus d'Affaires  
 **Pilot Institution:** Collège de la Concorde  
+**Programme Owner Objective:** Deliver the course as soon as possible without compromising institutional quality *(Nadia / institutional mandate)*
 
 ---
 
-> *This document is the operational bridge between the Living Enterprise and software implementation.*  
-> *Constitutional authority: `docs/00_ENTERPRISE_UNIVERSE_BIBLE.md` — do not contradict.*  
-> *Students progress through a career, not through modules.*
-
----
-
-# Document Authority & Hierarchy
-
-| Priority | Document | Role |
-|---|---|---|
-| 1 | `docs/00_ENTERPRISE_UNIVERSE_BIBLE.md` | Living world — immutable narrative, people, time, memory |
-| 2 | `docs/00_LEARNING_PHILOSOPHY.md` | Pedagogical principles |
-| 3 | **This document** | Experience architecture bridge |
-| 4 | `docs/01_LEARNING_BLUEPRINT.md` | Module structure |
-| 5 | `docs/03_SCENARIO_LIBRARY.md` | Scenario canon (extend via this blueprint) |
-| 6 | `docs/04_COMPETENCY_MATRIX.md` | Competency framework |
-| 7 | `docs/10_CERTIFICATION_FRAMEWORK.md` | Certification rules |
-| 8 | `docs/07_UI_UX_ARCHITECTURE.md` | Visual learning architecture |
-| 9 | Implementation specs (15–20) | Engineering execution |
+> *Constitutional authority: `docs/00_ENTERPRISE_UNIVERSE_BIBLE.md` — immutable. Do not modify.*  
+> *The student does NOT progress through lessons. The student progresses through a career.*  
+> *The educational journey is invisible. The professional journey is visible.*
 
 **Bridge flow:**
 
 ```text
-Living Enterprise (Universe Bible)
+Enterprise Universe Bible (immutable)
         ↓
-Educational Experience (this document)
+Student Experience (this document)
         ↓
-Scenario Architecture (Part 3 + Scenario Library)
+Learning Architecture
         ↓
-Implementation (RC waves → engineering)
+Scenario Execution
+        ↓
+Future Software Implementation
 ```
 
 ---
 
 # Table of Contents
 
+- [Part 0 — The Complete Professional Journey](#part-0--the-complete-professional-journey)
 - [Part 1 — Enterprise Learning Journey](#part-1--enterprise-learning-journey)
 - [Part 2 — Complete Module Architecture](#part-2--complete-module-architecture)
 - [Part 3 — Complete Scenario Architecture](#part-3--complete-scenario-architecture)
@@ -58,9 +46,137 @@ Implementation (RC waves → engineering)
 - [Part 12 — Release Mapping](#part-12--release-mapping)
 - [Part 13 — Production MVP Definition](#part-13--production-mvp-definition)
 
+- [Part 13 — Production MVP Definition](#part-13--production-mvp-definition)
+- [Part 14 — Professional Growth Architecture](#part-14--professional-growth-architecture)
+- [Part 15 — AI Enterprise Participation (Day 1 → Year End)](#part-15--ai-enterprise-participation-day-1--year-end)
+- [Part 16 — Human Interaction Playbook](#part-16--human-interaction-playbook)
+- [Part 17 — Scenario Chapters (Narrative Experience)](#part-17--scenario-chapters-narrative-experience)
+- [Part 18 — Module Experience Maps (Complete)](#part-18--module-experience-maps-complete)
+
 ---
 
-# Part 1 — Enterprise Learning Journey
+# Document Authority & Hierarchy
+
+| Priority | Document | Role |
+|---|---|---|
+| 1 | `docs/00_ENTERPRISE_UNIVERSE_BIBLE.md` | Living world — immutable |
+| 2 | **This document** | Student experience operational guide |
+| 3 | `docs/00_LEARNING_PHILOSOPHY.md` | Pedagogical principles |
+| 4 | `docs/01_LEARNING_BLUEPRINT.md` | Module structure |
+| 5 | `docs/03_SCENARIO_LIBRARY.md` | Scenario canon |
+| 6 | Architecture Board ADRs | Platform decisions |
+| 7 | Implementation specs (15–20) | Engineering execution |
+
+**Audience:** Software Engineers · Scenario Designers · UX Designers · Instructional Designers · AI Engineers · Professors · QA · Architecture Board
+
+---
+
+# Part 0 — The Complete Professional Journey
+
+*From offer letter to future career. The student never sees a syllabus — they live a hire.*
+
+## 0.1 Journey Arc (Canonical)
+
+```text
+OFFER LETTER          Sophie Bergeron — Employee #NHE-XXXX assigned
+      ↓
+HIRING                Panel remembered; Claire chose you for questions, not answers
+      ↓
+ONBOARDING            Policies, benefits, Rémy video — "C'est la fondation"
+      ↓
+FIRST DAY             Badge, MFA, Claire: "This is not about ERP"
+      ↓
+FIRST MISSION         Tom's 40 vs 36 — before any transaction
+      ↓
+TRAINING              Learning Center — because work requires it, not because course requires it
+      ↓
+BUSINESS RESPONSIBILITY  ThermoControl PO — your recommendation, your consequence
+      ↓
+DEPARTMENT ROTATION   Gemba (Ops) → Procurement → CS → Finance → BI — through crises, not tours
+      ↓
+STRATEGIC PARTICIPATION  Steering committee, S&OP, competitive task force
+      ↓
+ENTERPRISE TRANSFORMATION  Projet Équinoxe go-live — hypercare at 01:00
+      ↓
+PERFORMANCE REVIEW    Sophie + Claire — "Who have you become?"
+      ↓
+END OF PROBATION      HR Portal: Confirmed
+      ↓
+RECOGNITION           Isabelle town hall; Claire's maple pin
+      ↓
+FUTURE CAREER         Business Analyst I; Career Portal BA II posting; 90-day portfolio access
+```
+
+## 0.2 Phase Detail — What the Student Experiences
+
+### Offer Letter → Hiring
+
+| Element | Experience |
+|---|---|
+| **Student sees** | PDF from Sophie; salary range; Projet Équinoxe mentioned; Claire named as manager |
+| **Student feels** | Hired — not enrolled |
+| **Company state** | NordHabitat hiring for Équinoxe; 2,380 employees; June go-live target |
+| **Invisible learning** | Institutional entry; employment framing |
+
+### Onboarding → First Day
+
+| Element | Experience |
+|---|---|
+| **Student sees** | HR circle-not-rows; Amélie video; Alex MFA; Lucas coffee tip |
+| **Student feels** | Fear → first warmth (Sophie, Lucas) |
+| **Teaching** | Security culture; bilingual courtesy; Claire's three rules |
+| **Canonical** | Universe Bible §23 — minute-by-minute |
+
+### First Mission → Training
+
+| Element | Experience |
+|---|---|
+| **Student sees** | Mission Center: *Discover the Company* — not "M1-M01" |
+| **Student feels** | Responsibility without permission to break production |
+| **Teaching** | Observation before ERP; Tom's message as foreshadowing |
+| **Training trigger** | Learning Center unlocks when ERP access level requires it |
+
+### Business Responsibility → Department Rotation
+
+| Element | Experience |
+|---|---|
+| **Student sees** | PO-88421; gemba; hospital thread; S&OP |
+| **Student feels** | Stress → achievement → trust |
+| **Rotation model** | Not scheduled tours — **crisis pulls you into each department** |
+| **Maturity** | Observer → Accountable Analyst |
+
+### Strategic Participation → Transformation
+
+| Element | Experience |
+|---|---|
+| **Student sees** | Steering presentation; go-live bridge; BuildTech response |
+| **Student feels** | Recognition; exhaustion; pride |
+| **Teaching** | Executive communication; hypercare reality |
+
+### Performance Review → Future Career
+
+| Element | Experience |
+|---|---|
+| **Student sees** | Evidence portfolio; probation pass; Gold certificate as footnote |
+| **Student feels** | *"I truly became part of this company"* |
+| **Future** | BA I title; LinkedIn credential; portfolio for job interviews |
+
+## 0.3 What the Student Never Sees
+
+- Module numbers (M1–M10) in Mission Center UI
+- Quiz buttons as primary navigation
+- "Simulation" or "Learner" labels
+- Grades — only competency evidence and employment milestones
+- Instructor slides as primary content path
+
+## 0.4 What the Professor Sees (Supporting the Journey)
+
+- Enterprise Timeline — cohort pacing
+- Mission Control — who is stuck at ThermoControl decision
+- At-risk signals — trust < 40%, mission stall 2× duration
+- **Not:** slide deck delivery system
+
+---
 
 *One simulated corporate year. Thirty classroom hours. Zero module consciousness.*
 
@@ -1735,24 +1851,28 @@ Every scenario below includes: Timeline · Trigger · Departments · People · P
 ## 7.1 Canonical Flow (Replaces Slides → Quiz → Next)
 
 ```text
-CONTEXT          Mission Center opens chapter; people, trigger, stakes
-    ↓
-COMMUNICATION    Email/Teams/phone arrives — student triages
-    ↓
-OBSERVATION      Documents, meetings, gemba — no ERP clicks yet
-    ↓
-INVESTIGATION  Student analyzes; personas ask; mentor available
-    ↓
-ERP ACTION       Transaction when justified — not before
-    ↓
-BUSINESS DECISION Student commits recommendation in system
-    ↓
-CONSEQUENCE      KPIs shift; emails arrive; trust updates
-    ↓
-REFLECTION       Journal + Claire/persona prompt
-    ↓
-PROFESSIONAL GROWTH Competency evidence logged; Mission complete
+BUSINESS CONTEXT       Mission chapter opens — stakes, people, trigger (not slides)
+        ↓
+CORPORATE COMMUNICATION Email · Teams · phone — student triages like Day 1
+        ↓
+OBSERVATION            Documents · meetings · gemba — ERP closed until justified
+        ↓
+DISCUSSION             Teams threads · 1:1 · meeting — peer and mentor (not lecture)
+        ↓
+ERP ACTION             Transaction when process demands — supervised → solo
+        ↓
+BUSINESS ANALYSIS      Investigate data · personas ask · mentor silent when ready
+        ↓
+DECISION               Student commits in system — owns recommendation
+        ↓
+BUSINESS CONSEQUENCE   KPIs shift · emails arrive · trust updates · company remembers
+        ↓
+REFLECTION             Journal · Claire · persona prompt — never graded harshly
+        ↓
+CAREER GROWTH          Responsibility level ↑ · evidence logged · probation portfolio
 ```
+
+**The student must feel that work itself teaches.**
 
 ## 7.2 Anti-Patterns (Forbidden)
 
@@ -2045,7 +2165,7 @@ SCN-M3-M02 partial receipt
 |---|---|
 | **Educational objectives** | Professor monitors cohort; session pacing |
 | **Technical objectives** | Teacher portal; Mission Control; cohort analytics |
-| **Scope** | `docs/11`; TEC.WMS playbook patterns |
+| **Scope** | `docs/11`; proven institutional playbook patterns |
 | **Dependencies** | RC05 minimum |
 | **Acceptance criteria** | Professor can run 3-hour session without engineering support |
 | **Priority** | P0 for Concorde |
@@ -2102,7 +2222,7 @@ Launch the **minimum unforgettable year** for one founding cohort at Collège de
 - Multi-language beyond FR/EN institutional
 - Second company universe
 - Professor-authored scenarios
-- TEC.WMS cross-link (shared student identity)
+- Institutional cross-product learning pattern (shared student identity)
 - Mobile app
 - Blockchain verification
 
@@ -2141,22 +2261,22 @@ RC01 Day 1 → RC02 M1 → RC03 M2 Silver → RC04-05 P2P+GoLive
 | Scope creep | RC gates; MVP feature lock at RC08 |
 | AI overreach | Persona refusal rules Part 6 |
 | Emotional safety | Recovery missions; Claire always available peak stress |
-| Railway outage | `docs/21` playbook; professor pre-class verify (WMS pattern) |
+| Railway outage | `docs/21` playbook; professor pre-class verify (institutional pattern) |
 | Cohort data loss | Enterprise Memory backup; student portfolio export |
 
-## 13.9 TEC.WMS Reuse Opportunities
+## 13.9 Institutional Pattern Reuse Opportunities
 
-| WMS asset | ERP adaptation |
+| Institutional pattern | ERP adaptation |
 |---|---|
 | Mission Control pacing UI | Enterprise Timeline + professor monitor |
-| Cohorte Fondatrice policy | Concorde founding cohort — permanent records |
+| Pilot cohort policy | Institutional founding cohort — permanent records |
 | Pre-class verification workflow | 30-min Railway health check |
-| James Timothy demo pattern | Official professor demo employee #NHE-DEMO |
+| demo account pattern | Official professor demo employee #NHE-DEMO |
 | Session run report | End-of-class learning + operational report |
 | Instructor analytics | At-risk student detection via trust/mission stall |
-| Operational playbook structure | `engineering/rc16` → ERP Concorde playbook clone |
+| Operational playbook structure | instructor operational playbook → ERP Concorde playbook clone |
 
-**Isolation rule preserved:** TEC.WMS and TEC.ERP never share database (RAIL-006). Reuse patterns and UI conventions only.
+**Isolation rule preserved:** Each product maintains an independent database and student record boundary (RAIL-006). Reuse patterns and UI conventions only.
 
 ## 13.10 Concorde Launch Acceptance
 
@@ -2190,12 +2310,707 @@ Engineering sprints in `docs/20` map to RC waves:
 
 ---
 
-**End of Enterprise Experience Blueprint v1.0**
+---
 
-*Students progress through a career at NordHabitat.*  
-*Engineering progresses through RC waves.*  
-*The Universe Bible remains immutable.*  
-*This document translates living enterprise into designed experience.*
+# Part 14 — Professional Growth Architecture
+
+*Growth is invisible to the student. Visible to the company as employment maturity.*
+
+## 14.1 Growth Dimensions — Year Progression
+
+| Dimension | Month 1 | Month 6 | Month 12 |
+|---|---|---|---|
+| **Knowledge** | Company names, departments | P2P end-to-end, go-live | Cross-module integration |
+| **Confidence** | Afraid to click ERP | Hypercare contributor | Leads steering section |
+| **Autonomy** | Read-only | Solo PO with review | Capstone owner |
+| **Communication** | Receive email | Reply to Marc with numbers | Executive presentation |
+| **Decision quality** | Recommendations only | Partial receipt — owns consequence | Integrated crisis resolution |
+| **Business vision** | "Why ERP?" | "Why hospital allocation?" | "Why margin vs price war?" |
+| **Leadership** | None | Coordinate DC transfer | S&OP + capstone |
+| **Analytical thinking** | Map problems | MAPE, freight cost | Dashboard + competitor model |
+| **ERP mastery** | Navigation | Phase 1 transactional | Full workspace fluency |
+| **AI collaboration** | None | Claire persona | Full suite — knows boundaries |
+| **Professional identity** | "New hire" | "Équinoxe team" | "Business Analyst I" |
+
+## 14.2 Growth Evidence Sources (Not Grades)
+
+- Mission Center completion quality
+- Enterprise Memory decision log
+- Trust matrix by department
+- Performance Reviews portfolio
+- Mentor observation flags (Claire)
+- Executive CC events (Marc, Isabelle)
+
+## 14.3 Regression & Recovery
+
+Growth is not linear. Failed phishing click, wrong PO recommendation, weak steering prep — all recoverable via work, not retakes labeled "quiz 2."
+
+---
+
+# Part 15 — AI Enterprise Participation (Day 1 → Year End)
+
+*Enterprise Intelligence exists from Day 1. Students work inside an AI-powered enterprise — they do not "use AI."*
+
+## 15.1 AI by Function — Always-On Support Model
+
+| Function | AI role | Day 1 | Month 6 | Month 12 | Human owns |
+|---|---|---|---|---|---|
+| **HR** | Sophie persona: policy FAQ, probation reminders | Background | Active | Confirmation | Hiring decisions, probation pass |
+| **IT** | Alex persona: MFA, ticket status | Active | Hypercare triage | Access review help | Security exceptions |
+| **ERP** | Process hints via Claire/Julie personas | Silent | P2P guidance | Full process map | All postings |
+| **Finance** | Marc persona: variance questions | Silent | Match challenges | Margin analysis | Payment release |
+| **Procurement** | Julie persona: ASL, PO rules | Week 2 | ThermoControl | Scorecard | Supplier selection |
+| **BI** | Karim persona: KPI definitions | Silent | Static views | Live dashboard | Metric ownership |
+| **Executives** | Isabelle persona: rare strategic framing | Silent | Go-live message | Town hall prep | All commitments |
+| **Mentors** | Claire persona: Socratic coach | Week 2 | Hypercare | Release | Judgment, trust |
+| **Customers** | Élodie persona: urgency context | Silent | Hospital | Case tone | Promises |
+| **Suppliers** | Martin persona: delivery facts | Silent | Delay | Recovery | Relationship |
+
+## 15.2 EIC Visibility — Student Never Sees
+
+Context Engine · Learning Intelligence · Operational Intelligence · Reasoning Orchestrator · Mission Control · Enterprise Memory · Knowledge Graph · Simulation Engine
+
+## 15.3 Student Accountability Rule
+
+**Every business decision** logged against Employee #NHE-XXXX — never against "AI suggestion ID."
+
+---
+
+# Part 16 — Human Interaction Playbook
+
+## 16.1 Student ↔ Claire (Mentor)
+
+| Attribute | Definition |
+|---|---|
+| **Purpose** | Socratic development; never solve |
+| **Frequency** | Daily → Weekly → Shadow → Release |
+| **Professional evolution** | Manager formally only at probation |
+| **Trust evolution** | 40 → 95 |
+| **Communication maturity** | Student learns to bring hypothesis, not questions |
+| **Teaching moments** | Day 1 coffee; Month 3 steering prep; Month 6 "go sleep"; Month 12 maple pin |
+| **Silence teaches** | Month 9 steering — Claire nods once, says nothing — student learns they lead now |
+
+## 16.2 Student ↔ Julie (Procurement)
+
+| Attribute | Definition |
+|---|---|
+| **Purpose** | Process discipline; real P2P standards |
+| **Frequency** | Weekly Months 4–6; nomination Month 11 |
+| **Trust evolution** | 35 → 90 |
+| **Teaching moments** | Lunch Month 1; PO-88421; *"Renée ne t'a pas aimé — moi si."* |
+| **Silence teaches** | Julie goes very polite — student learns danger |
+
+## 16.3 Student ↔ Marc (CFO)
+
+| Attribute | Definition |
+|---|---|
+| **Purpose** | Financial truth; numbers before narrative |
+| **Frequency** | 6–8 touchpoints/year |
+| **Trust evolution** | 30 → 85 |
+| **Teaching moments** | *"Convince me"* Month 3; 3-line variance Month 9 |
+| **Silence teaches** | Marc closes door — returns with one-page summary — student learns preparation standard |
+
+## 16.4 Student ↔ Isabelle (CEO)
+
+| Attribute | Definition |
+|---|---|
+| **Purpose** | Strategic altitude; belonging climax |
+| **Frequency** | 3–4/year |
+| **Trust evolution** | 20 → 80 |
+| **Teaching moments** | Town hall Month 12 |
+| **Silence teaches** | Month 3 — one nod in steering — more valuable than praise |
+
+## 16.5 Student ↔ Denise / Tom (Operations / Warehouse)
+
+| Attribute | Definition |
+|---|---|
+| **Purpose** | Floor truth before screen |
+| **Frequency** | Gemba Month 4; S&OP Month 8 |
+| **Teaching moments** | *"Le système dit 40. L'étagère dit 36."* |
+| **Silence teaches** | Tom shows shelf — doesn't explain — student must observe |
+
+## 16.6 Student ↔ Élodie / Dr. Meunier (Customer)
+
+| Attribute | Definition |
+|---|---|
+| **Purpose** | Customer urgency — pediatric wing |
+| **Frequency** | Crisis Month 7 |
+| **Teaching moments** | Élodie phone owner assignment |
+| **Silence teaches** | Dr. Meunier gratitude email — no names — student learns invisible impact |
+
+## 16.7 Student ↔ Martin Kowalski (Supplier)
+
+| Attribute | Definition |
+|---|---|
+| **Purpose** | Supplier as human; contract reality |
+| **Teaching moments** | 36/40 apology; scorecard Month 9 |
+| **Silence teaches** | Delay email — no excuse accepted without plan |
+
+## 16.8 Student ↔ Lucas (Colleague)
+
+| Attribute | Definition |
+|---|---|
+| **Purpose** | Peer normalization; rivalry → friendship |
+| **Teaching moments** | Day 1 tips; 01:00 go-live coffee |
+| **Silence teaches** | Lucas stops sending tips Month 8 — trust assumed |
+
+## 16.9 Student ↔ AI Personas
+
+| Attribute | Definition |
+|---|---|
+| **Purpose** | Amplify humans — never replace |
+| **Rule** | Persona defers on: PO approve, payment, promise, hold bypass |
+| **Silence teaches** | Capstone 30-min window — all personas silent |
+
+---
+
+# Part 17 — Scenario Chapters (Narrative Experience)
+
+*Every scenario is a chapter. Never an exercise. Template applied to all 30.*
+
+## 17.0 Chapter Template
+
+1. **Narrative introduction** — story hook  
+2. **Business trigger** — why today  
+3. **Corporate communication** — email/Teams/phone  
+4. **Meetings** — if any  
+5. **Documents** — what to read  
+6. **ERP activities** — when justified  
+7. **Business investigation** — observation first  
+8. **Decision** — student commits  
+9. **Consequence** — company responds  
+10. **Memory / relationship / KPI updates**  
+11. **Reflection** — Claire or journal  
+12. **Career progression** — responsibility level change  
+13. **What changed in the company**  
+14. **What changed in the student**  
+15. **Connection to future chapters**
+
+---
+
+## 17.1 CH-01 — *The Email That Starts Everything* (SCN-M1-M01)
+
+**Narrative introduction:** You are not in class. You are in the parking lot at 800 boulevard Marcel-Laurin, holding a badge that doesn't work yet, reading an email from Sophie that says *"You've got this."*
+
+**Business trigger:** NordHabitat needs analysts who understand the company before configuring Projet Équinoxe. Tom reports 40 vs 36 again.
+
+**Communications:** Sophie welcome · Claire mission · Tom Teams · Corporate News Q4
+
+**Decision:** Which departments suffer most from fragmentation?
+
+**Consequence:** Steering committee reads your analysis Month 3.
+
+**Company change:** ERP CoE knows your name.
+
+**Student change:** Employee → Observer-Analyst.
+
+**Future:** Every module assumes you know who Tom is.
+
+---
+
+## 17.2 CH-08 — *Forty Becomes Thirty-Six* (SCN-M3-M02 — pivotal)
+
+**Narrative introduction:** Julie forwards Martin's email without comment. That silence is louder than shouting.
+
+**Business trigger:** PO-88421; 36/40 units; pediatric wing SKU overlap.
+
+**Communications:** Martin apology · Julie verification · Renée HOLD preview
+
+**Decision:** Accept partial vs wait for balance.
+
+**Consequence:** **Hospital allocation Month 7 · Martin scorecard · Marc margin question Month 9 · Capstone reference Month 12**
+
+**Company change:** Inventory short 4 units canonical.
+
+**Student change:** Contributing → Accountable Analyst.
+
+**Future:** Élodie phone call traces to this moment.
+
+---
+
+## 17.3 CH-09 — *The Pediatric Wing* (SCN-M4-M01–M03)
+
+**Narrative introduction:** Élodie's voice on the phone: *"Tu es le owner jusqu'à nouvel ordre."* You are twenty-six years old and a hospital pediatric wing waits.
+
+**Business trigger:** Hôpital du Sacré-Cœur delivery; allocation conflict from May.
+
+**Decision:** Cross-DC transfer vs expedite supplier balance.
+
+**Consequence:** Freight cost · NPS recovery · Dr. Meunier gratitude.
+
+**Company change:** NordHabitat proves institutional reliability under pressure.
+
+**Student change:** Trusted Analyst — cross-functional owner.
+
+**Future:** S&OP references allocation pattern.
+
+---
+
+## 17.4 CH-18 — *Equinoxe* (SCN-M10-M02 — capstone)
+
+**Narrative introduction:** Everything happens at once — because that's what integration means. Martin delays. Hospital backup order. TRT stockout. Invoice blocked. The company doesn't pause for you to finish Module 10.
+
+**Business trigger:** Integrated crisis — all consequence chains converge.
+
+**Decision:** Prioritize without silos.
+
+**Consequence:** Gold eligibility · executive trust maximum.
+
+**Company change:** Year transformation validated.
+
+**Student change:** Business Analyst I.
+
+**Future:** Career Portal · next cohort hiring tease.
+
+---
+
+## 17.5 CH-19 — *You Don't Need Me Anymore* (SCN-M10-M03)
+
+**Narrative introduction:** Claire's office. No slides. No Teams. A maple pin on the desk.
+
+**Business trigger:** Probation confirmed. Town hall in one hour.
+
+**Communications:** Isabelle thanks · Sophie confirmation · team channel welcome
+
+**Decision:** None — acceptance.
+
+**Consequence:** Gold certificate — institutional epilogue.
+
+**Company change:** Employee #NHE-XXXX permanent in registry.
+
+**Student change:** Professional identity complete.
+
+**Future:** 90-day portfolio · BA II path.
+
+---
+
+## 17.6 Remaining Chapters (Summary Index)
+
+| Ch | Title | Scenario | Pivotal change |
+|---|---|---|---|
+| CH-02 | *The Module Map* | M1-M02 | Integration thinking |
+| CH-03 | *The Readiness Question* | M1-M03 | Marc test |
+| CH-04 | *Org Chart Is Destiny* | M2-M01 | Structure |
+| CH-05 | *Three Records, One Truth* | M2-M02 | MDM |
+| CH-06 | *The Duplicate Customer* | M2-M03 | Silver |
+| CH-07 | Gemba prelude | M3-M01 | Floor truth |
+| CH-10 | *Empty Shelf Mississauga* | M5-* | S&OP |
+| CH-11 | *Three-Way Match* | M6-* | Finance voice |
+| CH-12 | *Angry Facility Director* | M7-* | CRM |
+| CH-13 | *Who Can Approve?* | M8-* | Governance |
+| CH-14 | *Dashboard Changed Meeting* | M9-M02 | Recognition |
+| CH-15 | *Competitor's Price* | M9-M03 | Market |
+| CH-16 | *Board Slide* | M10-M01 | Executive |
+| CH-17 | *Probation* | M8-M03 | HR milestone |
+
+*Full scenario field definitions: Part 3. Narrative canon: Universe Bible §18.*
+
+---
+
+# Part 18 — Module Experience Maps (Complete)
+
+*Internal reference M1–M10. Student-facing titles only in UI.*
+
+## 18.1 M1 — Discovery Quarter
+
+| Field | Content |
+|---|---|
+| **Business process** | Business discovery, process observation, readiness assessment |
+| **Professional goal** | Junior BA — understand client organization before ERP config |
+| **Student responsibility** | Map org; connect processes to modules; classify readiness |
+| **Departments** | All major — Executive, Finance, Ops, Sales, Procurement, IT |
+| **Primary mentor** | Claire Fontaine |
+| **Secondary actors** | Lucas, Marc, Tom (Teams), Sophie |
+| **Executive involvement** | Marc challenge Month 3; Isabelle distant |
+| **ERP functions** | Org views, process map, readiness checklist (read-only) |
+| **Workspace apps** | Mission Center, Email, Teams, Documents, ERP read, Enterprise Timeline |
+| **Business documents** | Company profile, dept list, readiness checklist |
+| **KPIs** | Readiness score, fragmentation index |
+| **Professional competencies** | C-BUS, C-ORG, C-PROC, C-GOV |
+| **ERP competencies** | Module identification, org structure literacy |
+| **Business decisions** | Readiness classification; dept-problem mapping |
+| **Business consequences** | Steering committee agenda; Phase 1 scope clarity |
+| **Reflection moments** | Day 1 journal; readiness defense |
+| **Previous module** | Onboarding |
+| **Next module** | Foundation month (M2) |
+| **SAP equivalent** | SAP Activate Discover, S/4 module overview |
+| **Oracle equivalent** | Fusion scoping, Implementation Project |
+| **Dynamics equivalent** | FastTrack Discover, D365 module map |
+| **Odoo equivalent** | Apps model, company setup overview |
+| **Market terminology** | ERP, integration, go-live, UAT, business process, stakeholder |
+| **Business value** | Prevents failed transformation; aligns investment |
+| **Expected maturity** | Can explain NordHabitat without software jargon |
+
+**Student-facing title:** *Discovery quarter*
+
+---
+
+## 18.2 M2 — Foundation Month
+
+| Field | Content |
+|---|---|
+| **Business process** | MDM, org setup, data governance, duplicate resolution |
+| **Professional goal** | Establish reliable ERP foundation |
+| **Student responsibility** | Validate/create master data; fix quality issues |
+| **Departments** | Finance, Sales, Procurement, ERP CoE |
+| **Primary mentor** | Claire Fontaine |
+| **Secondary actors** | Julie, Marc, Renée, Élodie (duplicate customer) |
+| **Executive involvement** | None direct |
+| **ERP functions** | Org units, BP master, material/customer/supplier MD |
+| **Workspace apps** | ERP MDM, Approvals, Knowledge Base, Learning Center (phishing) |
+| **Business documents** | MDM policy, duplicate report, validation matrix |
+| **KPIs** | MD completeness, duplicate rate |
+| **Professional competencies** | C-MDM, C-QLT, C-GOV |
+| **ERP competencies** | Master data create/validate, governance workflow |
+| **Business decisions** | Approve/reject records; merge duplicates |
+| **Business consequences** | Silver cert; hospital customer golden record |
+| **Reflection moments** | *"Who suffered from bad data?"* |
+| **Previous module** | M1 |
+| **Next module** | Procurement responsibility (M3) |
+| **SAP equivalent** | BP model, LSMW, material master |
+| **Oracle equivalent** | FBDI, Trading Community Architecture |
+| **Dynamics equivalent** | Data management framework, legal entities |
+| **Odoo equivalent** | Contacts, products, deduplication |
+| **Market terminology** | MDM, golden record, data steward, data quality |
+| **Business value** | Transaction accuracy; audit integrity |
+| **Expected maturity** | Data steward mindset |
+
+**Student-facing title:** *Foundation month*
+
+---
+
+## 18.3 M3 — Procurement Responsibility
+
+| Field | Content |
+|---|---|
+| **Business process** | P2P: requisition → PO → GR → invoice prep |
+| **Professional goal** | Execute procurement with compliance |
+| **Student responsibility** | PR, PO, GR; partial receipt recommendation |
+| **Departments** | Procurement, Warehouse, Finance, Quality |
+| **Primary mentor** | Claire Fontaine |
+| **Secondary actors** | Julie, Tom, Renée, Martin, Marc, Denise |
+| **Executive involvement** | Denise gemba; Isabelle go-live thanks |
+| **ERP functions** | MM-PUR equivalent: PR, PO, GR, quality hold |
+| **Workspace apps** | ERP Purchasing, Inventory, Approvals, Teams, IT Help Desk (go-live) |
+| **Business documents** | PO-88421, contract §4.2, packing slip, scorecard |
+| **KPIs** | PO cycle, OTIF, receiving accuracy |
+| **Professional competencies** | C-P2P, C-DEC, C-QLT |
+| **ERP competencies** | End-to-end P2P posting |
+| **Business decisions** | **Partial vs wait — canonical consequence anchor** |
+| **Business consequences** | Hospital Month 7; scorecard Month 9 |
+| **Reflection moments** | *"Who pays for my recommendation?"* |
+| **Previous module** | M2 |
+| **Next module** | Hospital (M4) |
+| **SAP equivalent** | ME21N, MIGO, MIRO pathway |
+| **Oracle equivalent** | Procurement, Receiving, Payables |
+| **Dynamics equivalent** | PO, product receipt |
+| **Odoo equivalent** | Purchase → Receipt → Bill |
+| **Market terminology** | P2P, OTIF, maverick spend, three-way match prep |
+| **Business value** | Supply continuity; cost control |
+| **Expected maturity** | Accountable Analyst |
+
+**Student-facing title:** *Procurement responsibility* / *Forty becomes thirty-six*
+
+---
+
+## 18.4 M4 — The Hospital Cannot Wait
+
+| Field | Content |
+|---|---|
+| **Business process** | O2C: quote-to-order, ATP, allocation, delivery |
+| **Professional goal** | Deliver institutional commitment |
+| **Student responsibility** | SO, allocation, cross-DC coordination |
+| **Departments** | Sales, CS, Operations, Logistics, Finance |
+| **Primary mentor** | Claire (shadow begins) |
+| **Secondary actors** | Élodie, Patrick, Dr. Meunier, Denise, Tom |
+| **Executive involvement** | Patrick priority; Isabelle aware |
+| **ERP functions** | Sales order, ATP, transfer, delivery |
+| **Workspace apps** | ERP Sales, CRM, Teams `#sacre-coeur-urgent`, Calendar |
+| **Business documents** | SO, case, delivery note, transfer request |
+| **KPIs** | NPS, OTIF, perfect order |
+| **Professional competencies** | C-O2C, C-CRM, C-LEAD, C-COM |
+| **ERP competencies** | Order promising, allocation |
+| **Business decisions** | Transfer vs expedite; promise integrity |
+| **Business consequences** | NPS recovery; freight cost chain |
+| **Reflection moments** | *"What does Thursday mean in pediatric wing?"* |
+| **Previous module** | M3 partial receipt |
+| **Next module** | S&OP (M5) |
+| **SAP equivalent** | SD order-to-cash, ATP |
+| **Oracle equivalent** | Order Management, Promising |
+| **Dynamics equivalent** | Sales order, reservation |
+| **Odoo equivalent** | Sales → Delivery |
+| **Market terminology** | O2C, ATP, OTIF, institutional account |
+| **Business value** | Revenue; clinical trust |
+| **Expected maturity** | Trusted Analyst |
+
+---
+
+## 18.5 M5 — Inventory Is a Lie Until Counted
+
+| Field | Content |
+|---|---|
+| **Business process** | S&OP, replenishment, inter-DC transfer |
+| **Professional goal** | Balance service vs inventory investment |
+| **Student responsibility** | Replenishment proposal; S&OP presentation |
+| **Departments** | Supply Chain, Warehouse, Finance, Sales |
+| **Primary mentor** | Claire (silent at S&OP) |
+| **Secondary actors** | Denise, Karim, Tom, Marc, Patrick |
+| **Executive involvement** | S&OP forum |
+| **ERP functions** | Inventory, transfer orders, planning views |
+| **Workspace apps** | Power BI, ERP Inventory, Calendar, Documents |
+| **Business documents** | S&OP pack, freight quote, aging report |
+| **KPIs** | Fill rate, MAPE, inventory accuracy |
+| **Professional competencies** | C-SC, C-ANL, C-BI |
+| **ERP competencies** | Transfer orders, stock analysis |
+| **Business decisions** | Replenishment + transfer recommendation |
+| **Business consequences** | 98.5% accuracy path; margin freight |
+| **Reflection moments** | *"Claire didn't speak. Why?"* |
+| **Previous module** | M4 |
+| **Next module** | Three-way match (M6) |
+| **SAP equivalent** | IBP/S&OP, STO |
+| **Oracle equivalent** | Supply Planning, Inventory |
+| **Dynamics equivalent** | Planning, transfer orders |
+| **Odoo equivalent** | Reordering rules, inter-warehouse |
+| **Market terminology** | S&OP, fill rate, safety stock, MAPE |
+| **Business value** | Stockout prevention; working capital |
+| **Expected maturity** | Presents to executives |
+
+---
+
+## 18.6 M6 — Three-Way Match
+
+| Field | Content |
+|---|---|
+| **Business process** | AP invoice matching, variance resolution |
+| **Professional goal** | Protect financial integrity |
+| **Student responsibility** | Match exception resolution; explain to Marc |
+| **Departments** | Finance, Procurement, Warehouse |
+| **Primary mentor** | Claire |
+| **Secondary actors** | Marc, Julie, Renée |
+| **Executive involvement** | Marc direct; CC student if strong |
+| **ERP functions** | AP invoice, three-way match, payment block |
+| **Workspace apps** | ERP Finance, Approvals, Email |
+| **Business documents** | Invoice, PO, GR, variance narrative |
+| **KPIs** | Match exception rate, DPO |
+| **Professional competencies** | C-FIN, C-P2P, C-COM |
+| **ERP competencies** | MIRO-equivalent matching |
+| **Business decisions** | Pay/hold; variance explanation |
+| **Business consequences** | Payment release; executive visibility |
+| **Reflection moments** | *"Trace error to a person"* |
+| **Previous module** | M5 |
+| **Next module** | CRM case (M7) |
+| **SAP equivalent** | MIRO, F110 |
+| **Oracle equivalent** | Invoice validation |
+| **Dynamics equivalent** | Vendor invoice matching |
+| **Odoo equivalent** | Vendor bill from PO |
+| **Market terminology** | Three-way match, variance, DPO |
+| **Business value** | Fraud prevention; accurate liabilities |
+| **Expected maturity** | Speaks Finance language |
+
+---
+
+## 18.7 M7 — The Angry Facility Director
+
+| Field | Content |
+|---|---|
+| **Business process** | Case management, escalation, RMA, service recovery |
+| **Professional goal** | Protect institutional relationship |
+| **Student responsibility** | Case priority, cross-functional resolution |
+| **Departments** | CRM, CS, Engineering, Quality |
+| **Primary mentor** | Claire |
+| **Secondary actors** | Élodie, Dr. Meunier, Renée, Patrick |
+| **Executive involvement** | Patrick background |
+| **ERP functions** | Case, RMA, quality link |
+| **Workspace apps** | CRM, Teams, Email, ERP order history |
+| **Business documents** | Case, NCR, RMA, closure report |
+| **KPIs** | NPS, case resolution time |
+| **Professional competencies** | C-CRM, C-COM, C-QLT |
+| **ERP competencies** | Case-to-order traceability |
+| **Business decisions** | Escalation path; fix vs replace |
+| **Business consequences** | NPS +2; gratitude email |
+| **Reflection moments** | *"Anger before anger — what happened?"* |
+| **Previous module** | M4 hospital thread |
+| **Next module** | Governance (M8) |
+| **SAP equivalent** | C4C Service Cloud |
+| **Oracle equivalent** | Service Cloud |
+| **Dynamics equivalent** | Customer Service |
+| **Odoo equivalent** | Helpdesk |
+| **Market terminology** | NPS, SLA, escalation, RMA |
+| **Business value** | Retention; reference accounts |
+| **Expected maturity** | Service recovery leader |
+
+---
+
+## 18.8 M8 — Performance Has a Name
+
+| Field | Content |
+|---|---|
+| **Business process** | Approval matrix, SoD, access review, probation |
+| **Professional goal** | Demonstrate governance and professional maturity |
+| **Student responsibility** | Correct approval routing; self-assessment |
+| **Departments** | HR, Legal, Compliance, Finance, IT |
+| **Primary mentor** | Claire + Sophie (HR) |
+| **Secondary actors** | Julie, Alex, David Chen |
+| **Executive involvement** | None — HR milestone |
+| **ERP functions** | Workflow, security roles, approval chains |
+| **Workspace apps** | HR Portal, Approvals, Performance Reviews, Knowledge Base |
+| **Business documents** | Delegation matrix, probation form, portfolio |
+| **KPIs** | Engagement, access review completion |
+| **Professional competencies** | C-GOV, C-SEC, C-PRO |
+| **ERP competencies** | SoD, approval workflow |
+| **Business decisions** | Reject bypass; honest self-assessment |
+| **Business consequences** | Probation pass → BA I track |
+| **Reflection moments** | *"Who have I become since Day 1?"* |
+| **Previous module** | M7 |
+| **Next module** | BI/AI (M9) |
+| **SAP equivalent** | GRC, PFCG |
+| **Oracle equivalent** | SOX controls |
+| **Dynamics equivalent** | Security roles |
+| **Odoo equivalent** | Access rights |
+| **Market terminology** | SoD, delegation of authority, probation |
+| **Business value** | Compliance; fraud prevention |
+| **Expected maturity** | Self-aware professional |
+
+---
+
+## 18.9 M9 — One Version of the Truth
+
+| Field | Content |
+|---|---|
+| **Business process** | KPI management, BI, AI governance, competitive analysis |
+| **Professional goal** | Data-informed recommendation |
+| **Student responsibility** | KPI definitions; dashboard; margin analysis |
+| **Departments** | BI, ATO, Finance, Sales |
+| **Primary mentor** | Karim + Claire |
+| **Secondary actors** | Marc, Emmanuel, Patrick, Isabelle |
+| **Executive involvement** | Steering committee — student leads |
+| **ERP functions** | Analytics, embedded BI |
+| **Workspace apps** | Power BI, ERP analytics, Digital Personas, Corporate News |
+| **Business documents** | KPI catalog, dashboard spec, competitor brief |
+| **KPIs** | Dashboard adoption, gross margin |
+| **Professional competencies** | C-BI, C-AI, C-ANL, C-EXEC |
+| **ERP competencies** | KPI-linked reporting |
+| **Business decisions** | Metric definitions; price war response |
+| **Business consequences** | Executive visibility; quote strategy change |
+| **Reflection moments** | *"When did I ask persona vs person?"* |
+| **Previous module** | M8 |
+| **Next module** | Capstone (M10) |
+| **SAP equivalent** | SAC, embedded analytics |
+| **Oracle equivalent** | OTBI, Fusion Analytics |
+| **Dynamics equivalent** | Power BI, Copilot boundaries |
+| **Odoo equivalent** | Spreadsheet/BI |
+| **Market terminology** | OTIF vs perfect order, MAPE, augmentation |
+| **Business value** | Decision speed; margin protection |
+| **Expected maturity** | Executive presenter |
+
+---
+
+## 18.10 M10 — Equinoxe Final Challenge
+
+| Field | Content |
+|---|---|
+| **Business process** | Integrated cross-module crisis |
+| **Professional goal** | Prove Junior BA → BA I readiness |
+| **Student responsibility** | Capstone owner; integrated resolution |
+| **Departments** | All |
+| **Primary mentor** | Claire (release) |
+| **Secondary actors** | Full cast |
+| **Executive involvement** | Isabelle town hall; steering capstone |
+| **ERP functions** | All Phase 1 modules |
+| **Workspace apps** | Full Digital Workplace |
+| **Business documents** | Capstone plan, board slide, Gold certificate |
+| **KPIs** | Composite business score |
+| **Professional competencies** | All Gold set integrated |
+| **ERP competencies** | Cross-module fluency |
+| **Business decisions** | Prioritize under multi-crisis |
+| **Business consequences** | Gold; employment confirmed |
+| **Reflection moments** | *"You don't need me anymore."* |
+| **Previous module** | All prior chains |
+| **Next module** | Career — BA II path |
+| **SAP equivalent** | Cross-module integration scenario |
+| **Oracle equivalent** | End-to-end Cloud scenario |
+| **Dynamics equivalent** | Cross-app process |
+| **Odoo equivalent** | Full stack scenario |
+| **Market terminology** | Integrated business planning |
+| **Business value** | Transformation ROI proof |
+| **Expected maturity** | Business Analyst I |
+
+**Student-facing title:** *Equinoxe* / *You are NordHabitat*
+
+---
+
+# Part 4 Supplement — Workspace Teaching Model
+
+*How each application teaches naturally — expanded from Part 4.*
+
+| Application | Why employees use it | How it teaches | Scenarios |
+|---|---|---|---|
+| **ERP** | System of record | Consequences visible in inventory, finance, orders | All transactional |
+| **Email** | Official audit trail | Teaches async professionalism, approval chains | Marc, Julie, Dr. Meunier |
+| **Teams** | Speed + culture | Teaches urgency vs formality; Tom's 40 vs 36 | All crises |
+| **Power BI** | Decisions need data | Karim: *"What decision does this support?"* | M5, M9 |
+| **Approvals** | Authority is real | Wrong approver = compliance failure | M3, M8 |
+| **Calendar** | Time is corporate | S&OP rhythm; probation date | M8, M5 |
+| **Corporate Portal** | Strategy visibility | Go-live countdown; ESG campaigns | Month 6 |
+| **HR Portal** | Employment is real | Probation clock — not course progress | M8, M12 |
+| **IT Help Desk** | Systems break | P1 hypercare — ERP is not magic | Month 6 |
+| **Knowledge Base** | Process outlives people | Student contributes Month 11 — full circle | M2, M11 |
+| **Documents** | Evidence for decisions | Board packs, contracts | All |
+| **Reports** | Period close | Q1/Q3 pressure | M1, M6 |
+| **Notifications** | Triage skill | Month 6–7 flood — not all equal | Hypercare, hospital |
+| **Mission Center** | Work assignments | Never labeled LMS | All 30 |
+| **Career Center** | Growth path | BA II posting — future self | M11 |
+| **Employee Profile** | Identity + trust | Badge confirmed Month 12 | Day 1, M12 |
+| **Performance Reviews** | Company evaluates | Portfolio not grades | M11 |
+| **Enterprise Timeline** | Corporate time | January in hour 1 — December in hour 30 | All |
+
+---
+
+# Part 12 Supplement — RC Roadmap (Effort & Nadia Priority)
+
+*Nadia's mandate: fastest path to Concorde production without quality compromise.*
+
+| RC | Educational objective | Technical objective | Deliverables | Deps | Effort | Priority |
+|---|---|---|---|---|---|---|
+| **RC01** | Day 1 belonging | Auth, workspace shell, comms mock | Day 1 playable 30 min | S0–S1 | L | P0 |
+| **RC02** | Discovery quarter | Mission engine, timeline, docs | M1 3 chapters | RC01 | L | P0 |
+| **RC03** | Silver / foundation | MDM sandbox, assessment evidence | M2 + Silver | RC02 | L | P0 |
+| **RC04** | P2P + memory | ERP P2P write, trust, EIC seed | M3 + consequence chain | RC03 | XL | P0 |
+| **RC05** | Go-live experience | Simulation P1, notifications | Hypercare narrative | RC04 | L | P0 |
+| **RC06** | Hospital O2C | Sales, CRM, crisis channel | M4 chapters | RC05 | L | P0 |
+| **RC07** | S&OP | Power BI embed, transfer orders | M5 + presentation UI | RC06 | L | P0 |
+| **RC08** | Finance + CRM | AP match, cases | M6–M7 | RC07 | L | P0 |
+| **RC09** | BI, AI, probation | Personas bounded, HR portal | M8–M9 | RC08 | XL | P0 |
+| **RC10** | Gold capstone | Capstone orchestrator, cert engine | M10 + finale | RC09 | L | P0 |
+| **RC11** | Professor ops | Teacher portal, Mission Control | Concorde session run | RC05 min | M | P0 |
+| **RC12** | Production launch | Railway hardening, playbook | Concorde sign-off | RC10–11 | M | P0 |
+
+**Approval Gate (every RC):** Business Rules · UI · Backend · Simulation · Database · API · Testing · Documentation · Production Readiness
+
+**V2 wait:** Multi-cohort replay · Career Center full · Volunteer branch · Mobile · shared institutional identity model
+
+**Reuse proven institutional patterns:** certification governance, pilot cohort policy, demo account pattern → `#NHE-DEMO`
+
+**New development:** Enterprise Memory · Trust matrix · Narrative Mission Center · Persona boundaries · Consequence chain engine
+
+---
+
+# Part 13 Supplement — MVP for Collège de la Concorde (Nadia Matrix)
+
+| Category | Items |
+|---|---|
+| **Must exist before first class** | RC01–RC03: Day 1, M1, M2, Silver, Email/Teams, Mission Center, read-only→MDM ERP |
+| **Must exist before mid-course (Hour 10)** | RC04–RC05: P2P, memory, go-live |
+| **Must exist before Gold (Hour 25)** | RC06–RC10: full year |
+| **Professor minimum** | RC11 Mission Control |
+| **Production** | RC12 |
+| **V2** | Full persona suite(10+), Career Center, 90-day replay, volunteer event |
+| **Highest educational value / lowest cost** | Day 1 + ThermoControl chain + Claire arc + Gold moment |
+| **Critical path** | RC01→RC03→RC04→RC05→RC06→RC10→RC12 |
+
+---
+
+**End of Enterprise Experience Blueprint v1.0 — The Student's Professional Journey**
 
 ---
 
