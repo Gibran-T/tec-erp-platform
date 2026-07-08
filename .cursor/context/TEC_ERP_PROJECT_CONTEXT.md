@@ -23,9 +23,9 @@ See `docs/13_SYSTEM_ARCHITECTURE.md` and `docs/19_CURSOR_MASTER_BUILD_SPECIFICAT
 
 When documents conflict, follow this order (`docs/19` §4):
 
-1. Product Vision → 2. Learning Philosophy → 3. Learning Blueprint →  
-4. ERP Functional Specification → 5. UI Blueprint → 6. Database Schema →  
-7. API Specification → 8. Cursor Master Build Specification → 9. Source Code
+1. Enterprise Universe Bible → 2. Enterprise Experience Blueprint → 3. Product Vision → 4. Learning Philosophy → 5. Learning Blueprint →  
+6. ERP Functional Specification → 7. UI Blueprint → 8. Database Schema →  
+9. API Specification → 10. Cursor Master Build Specification → 11. Source Code
 
 Source code must never contradict higher-level documentation.
 
@@ -36,6 +36,8 @@ Source code must never contradict higher-level documentation.
 ### Foundation (upstream)
 | Doc | Purpose |
 |-----|---------|
+| `docs/00_ENTERPRISE_UNIVERSE_BIBLE.md` | Living enterprise — constitutional world |
+| `docs/02_ENTERPRISE_EXPERIENCE_BLUEPRINT.md` | Experience architecture bridge (Universe → implementation) |
 | `docs/00_PRODUCT_VISION.md` | Product mission and scope |
 | `docs/00_ENGINEERING_PRINCIPLES.md` | EP-001–005 engineering rules |
 | `docs/01_LEARNING_BLUEPRINT.md` | Pedagogical structure |
