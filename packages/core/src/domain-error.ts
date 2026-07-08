@@ -1,6 +1,7 @@
 export type DomainErrorCode =
   | "NOT_FOUND"
   | "VALIDATION"
+  | "UNAUTHORIZED"
   | "FORBIDDEN"
   | "CONFLICT"
   | "INTERNAL";
@@ -30,6 +31,10 @@ export class DomainError extends Error {
 
   static validation(message: string, context?: DomainErrorContext): DomainError {
     return new DomainError("VALIDATION", message, context);
+  }
+
+  static unauthorized(message: string, context?: DomainErrorContext): DomainError {
+    return new DomainError("UNAUTHORIZED", message, context);
   }
 
   static forbidden(message: string, context?: DomainErrorContext): DomainError {

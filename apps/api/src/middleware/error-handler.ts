@@ -9,6 +9,7 @@ import { getRequestId } from "./request-id.js";
 const DOMAIN_ERROR_STATUS: Record<DomainError["code"], number> = {
   NOT_FOUND: 404,
   VALIDATION: 400,
+  UNAUTHORIZED: 401,
   FORBIDDEN: 403,
   CONFLICT: 409,
   INTERNAL: 500,
