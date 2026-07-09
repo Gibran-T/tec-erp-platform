@@ -6,11 +6,16 @@ import type { AppConfig } from "./config.js";
 import { createLogger } from "./logger.js";
 import { probeDatabaseReadiness } from "./infrastructure/database-readiness.js";
 import { createErrorHandler, notFoundHandler } from "./middleware/error-handler.js";
+import { createRequireEmployee } from "./middleware/require-employee.js";
 import { requestIdMiddleware } from "./middleware/request-id.js";
 import { createAuthRouter } from "./modules/auth/auth.routes.js";
 import { createPrismaEmployeeRepository } from "./modules/auth/auth.repository.js";
 import { createAuthService } from "./modules/auth/auth.service.js";
 import type { EmployeeRepository } from "./modules/auth/auth.types.js";
+import { createPrismaFirstDayStateRepository } from "./modules/first-day/first-day.repository.js";
+import { createMeRouter } from "./modules/first-day/first-day.routes.js";
+import { createFirstDayService } from "./modules/first-day/first-day.service.js";
+import type { FirstDayStateRepository } from "./modules/first-day/first-day.types.js";
 import { createApiV1Router } from "./routes/api-v1.js";
 import { createOperationalRouter } from "./routes/operational.js";
 
@@ -21,6 +26,7 @@ export interface AppDependencies {
   }>;
   /** Injectable for tests; defaults to the Prisma-backed repository. */
   readonly employeeRepository?: EmployeeRepository;
+  readonly firstDayStateRepository?: FirstDayStateRepository;
 }
 
 const defaultDependencies: AppDependencies = {
@@ -73,8 +79,15 @@ export function createApp(
     },
   });
 
+  const firstDayStateRepository =
+    dependencies.firstDayStateRepository ?? createPrismaFirstDayStateRepository();
+
+  const firstDayService = createFirstDayService({ stateRepository: firstDayStateRepository });
+  const requireEmployee = createRequireEmployee(authService);
+
   app.use(createOperationalRouter(dependencies));
   app.use("/api/v1/auth", createAuthRouter(authService));
+  app.use("/api/v1/me", requireEmployee, createMeRouter(firstDayService));
   app.use("/api/v1", createApiV1Router());
 
   app.use(notFoundHandler);

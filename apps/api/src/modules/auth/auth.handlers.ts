@@ -10,17 +10,7 @@ import {
 import type { NextFunction, Request, Response } from "express";
 
 import type { AuthService } from "./auth.service.js";
-
-function extractBearerToken(req: Request): string | null {
-  const header = req.header("authorization");
-
-  if (!header || !header.toLowerCase().startsWith("bearer ")) {
-    return null;
-  }
-
-  const token = header.slice("bearer ".length).trim();
-  return token.length > 0 ? token : null;
-}
+import { extractBearerToken } from "./bearer-token.js";
 
 export interface AuthHandlers {
   login(req: Request, res: Response, next: NextFunction): Promise<void>;

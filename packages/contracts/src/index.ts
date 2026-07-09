@@ -19,6 +19,26 @@ export {
   type SessionResponse,
 } from "./auth.js";
 export {
+  CompleteTaskResponseSchema,
+  EmployeeTaskSchema,
+  InboxMessageSchema,
+  InboxResponseSchema,
+  MarkMessageReadResponseSchema,
+  MessageKeySchema,
+  TaskKeySchema,
+  TaskStatusSchema,
+  TasksResponseSchema,
+  type CompleteTaskResponse,
+  type EmployeeTask,
+  type InboxMessage,
+  type InboxResponse,
+  type MarkMessageReadResponse,
+  type MessageKey,
+  type TaskKey,
+  type TaskStatus,
+  type TasksResponse,
+} from "./first-day.js";
+export {
   ApiErrorCodeSchema,
   ApiErrorEnvelopeSchema,
   isDomainErrorCode,
