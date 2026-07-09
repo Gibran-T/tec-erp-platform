@@ -16,3 +16,45 @@ model PlatformSchemaMetadata {
 
   @@map("platform_schema_metadata")
 }
+
+/// Institutional role granted to an employee identity.
+/// RC01 defines a single role; broader RBAC is deferred to later releases.
+enum EmployeeRole {
+  JR_BUSINESS_ANALYST
+}
+
+/// The employing organization of the simulated enterprise universe
+/// (NordHabitat). Introduced in RC01 — Identity & First Day.
+model Company {
+  id        String   @id @default(cuid())
+  /// Stable business key (e.g. "NORDHABITAT") — safe for idempotent seeding.
+  code      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  employees Employee[]
+
+  @@map("company")
+}
+
+/// An employee identity and its authentication credentials.
+/// The student is modelled as an employee, never as a "learner".
+model Employee {
+  id             String       @id @default(cuid())
+  /// Corporate employee number, e.g. "#NHE-DEMO" or "#NHE-2847".
+  employeeNumber String       @unique
+  email          String       @unique
+  displayName    String
+  /// scrypt-format credential hash (see @tec-platform/core Password). Never a plaintext password.
+  passwordHash   String
+  role           EmployeeRole @default(JR_BUSINESS_ANALYST)
+  companyId      String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
+  @@map("employee")
+}

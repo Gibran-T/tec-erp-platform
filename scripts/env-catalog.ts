@@ -59,7 +59,25 @@ export const ENV_CATALOG: readonly EnvVariableDefinition[] = [
     key: "JWT_ACCESS_SECRET",
     classification: "server_secret",
     requiredInExample: false,
-    description: "JWT signing secret scaffold (commented in example)",
+    description: "JWT access-token signing secret (required in production)",
+  },
+  {
+    key: "JWT_REFRESH_SECRET",
+    classification: "server_secret",
+    requiredInExample: false,
+    description: "JWT refresh-token signing secret (required in production)",
+  },
+  {
+    key: "JWT_ACCESS_TTL_SECONDS",
+    classification: "server_config",
+    requiredInExample: false,
+    description: "Access-token lifetime in seconds (default 900)",
+  },
+  {
+    key: "JWT_REFRESH_TTL_SECONDS",
+    classification: "server_config",
+    requiredInExample: false,
+    description: "Refresh-token lifetime in seconds (default 1209600)",
   },
 ] as const;
 

@@ -16,7 +16,11 @@
     "lint": "eslint src --ext .ts",
     "typecheck": "prisma generate && tsc --noEmit -p tsconfig.json",
     "test": "echo \"No tests for database-erp foundation package\"",
-    "migrate:deploy": "prisma migrate deploy"
+    "migrate:deploy": "prisma migrate deploy",
+    "seed": "prisma db seed"
+  },
+  "prisma": {
+    "seed": "pnpm exec tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",

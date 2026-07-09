@@ -6,6 +6,7 @@ export { Either, type Left, type Right } from "./either.js";
 export type { Either as EitherType } from "./either.js";
 export { Entity } from "./entity.js";
 export type { Logger, LogLevel, LogMeta, LoggerFactory } from "./logger.js";
+export { Password } from "./password.js";
 export type { Repository } from "./repository.js";
 export { Result, type Failure, type Success } from "./result.js";
 export type { Result as ResultType } from "./result.js";

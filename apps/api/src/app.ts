@@ -7,6 +7,10 @@ import { createLogger } from "./logger.js";
 import { probeDatabaseReadiness } from "./infrastructure/database-readiness.js";
 import { createErrorHandler, notFoundHandler } from "./middleware/error-handler.js";
 import { requestIdMiddleware } from "./middleware/request-id.js";
+import { createAuthRouter } from "./modules/auth/auth.routes.js";
+import { createPrismaEmployeeRepository } from "./modules/auth/auth.repository.js";
+import { createAuthService } from "./modules/auth/auth.service.js";
+import type { EmployeeRepository } from "./modules/auth/auth.types.js";
 import { createApiV1Router } from "./routes/api-v1.js";
 import { createOperationalRouter } from "./routes/operational.js";
 
@@ -15,6 +19,8 @@ export interface AppDependencies {
     readonly isReady: boolean;
     readonly detail: "up" | "down";
   }>;
+  /** Injectable for tests; defaults to the Prisma-backed repository. */
+  readonly employeeRepository?: EmployeeRepository;
 }
 
 const defaultDependencies: AppDependencies = {
@@ -54,7 +60,21 @@ export function createApp(
     next();
   });
 
+  const employeeRepository =
+    dependencies.employeeRepository ?? createPrismaEmployeeRepository();
+
+  const authService = createAuthService({
+    employeeRepository,
+    config: {
+      jwtAccessSecret: config.jwtAccessSecret,
+      jwtRefreshSecret: config.jwtRefreshSecret,
+      accessTokenTtlSeconds: config.accessTokenTtlSeconds,
+      refreshTokenTtlSeconds: config.refreshTokenTtlSeconds,
+    },
+  });
+
   app.use(createOperationalRouter(dependencies));
+  app.use("/api/v1/auth", createAuthRouter(authService));
   app.use("/api/v1", createApiV1Router());
 
   app.use(notFoundHandler);

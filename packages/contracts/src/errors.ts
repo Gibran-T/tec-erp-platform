@@ -5,6 +5,7 @@ import type { DomainError, DomainErrorCode } from "@tec-platform/core";
 export const ApiErrorCodeSchema = z.enum([
   "NOT_FOUND",
   "VALIDATION",
+  "UNAUTHORIZED",
   "FORBIDDEN",
   "CONFLICT",
   "INTERNAL",
