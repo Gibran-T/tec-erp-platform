@@ -14,7 +14,7 @@ export function LoginPage(): ReactNode {
 
   useEffect(() => {
     if (status === "authenticated") {
-      navigate("/", { replace: true });
+      navigate("/workspace", { replace: true });
     }
   }, [status, navigate]);
 
@@ -25,7 +25,7 @@ export function LoginPage(): ReactNode {
 
     try {
       await login(email, password);
-      navigate("/", { replace: true });
+      navigate("/workspace", { replace: true });
     } catch (submitError) {
       const message =
         submitError instanceof Error ? submitError.message : "Sign-in failed.";

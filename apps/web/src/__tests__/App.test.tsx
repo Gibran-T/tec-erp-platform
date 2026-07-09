@@ -1,7 +1,7 @@
 import type { AuthenticatedEmployee } from "@tec-platform/contracts";
 import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { AppRoutes } from "../App.js";
 import { AuthProvider } from "../auth/AuthContext.js";
@@ -32,36 +32,28 @@ function renderApp(
 }
 
 describe("App routing", () => {
-  it("renders the home page inside the workplace shell when authenticated", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          status: "ok",
-          timestamp: new Date().toISOString(),
-          version: "0.1.0",
-          apiVersion: "v1",
-          platformVersion: "0.1.0",
-        }),
-      }),
-    );
+  it("renders the workspace home inside the enterprise shell when authenticated", async () => {
+    renderApp("/workspace", demoEmployee);
 
-    renderApp("/", demoEmployee);
-
-    expect(screen.getByTestId("home-page")).toBeInTheDocument();
-    expect(screen.getByTestId("tec-app-shell")).toBeInTheDocument();
-    expect(screen.getByTestId("first-day-welcome")).toBeInTheDocument();
+    expect(screen.getByTestId("workspace-home-page")).toBeInTheDocument();
+    expect(screen.getByTestId("workspace-shell")).toBeInTheDocument();
+    expect(screen.getByTestId("workspace-context-panel")).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByTestId("api-health-status")).toBeInTheDocument();
+      expect(screen.getByTestId("workspace-welcome-message")).toBeInTheDocument();
     });
+  });
 
-    vi.unstubAllGlobals();
+  it("redirects root to workspace for authenticated employees", async () => {
+    renderApp("/", demoEmployee);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("workspace-home-page")).toBeInTheDocument();
+    });
   });
 
   it("redirects to the sign-in page when unauthenticated", () => {
-    renderApp("/", null);
+    renderApp("/workspace", null);
 
     expect(screen.getByTestId("login-page")).toBeInTheDocument();
   });
