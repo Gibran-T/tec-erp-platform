@@ -5,7 +5,17 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { AppRoutes } from "../App.js";
 import { AuthProvider } from "../auth/AuthContext.js";
+import { saveStoredTokens } from "../api/auth.js";
 import { WORKSPACE_APPS } from "../workspace/appRegistry.js";
+
+function buildTestTokens() {
+  return {
+    accessToken: "access-token",
+    refreshToken: "refresh-token",
+    accessTokenExpiresAt: new Date(Date.now() + 900_000).toISOString(),
+    refreshTokenExpiresAt: new Date(Date.now() + 1_000_000).toISOString(),
+  };
+}
 
 const FORBIDDEN_VOCABULARY =
   /\b(course|cours|lms|simulation|learner|apprenant|student|étudiant|leçon|module)\b/i;
@@ -23,6 +33,46 @@ function renderWorkspace(
   initialEntry: string,
   employee: AuthenticatedEmployee | null = demoEmployee,
 ): void {
+  if (employee) {
+    saveStoredTokens(buildTestTokens());
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input);
+        const method = init?.method ?? "GET";
+
+        if (url.endsWith("/api/v1/me/inbox") && method === "GET") {
+          return {
+            ok: true,
+            json: async () => ({
+              messages: [
+                {
+                  messageKey: "premier-message-gestionnaire",
+                  fromName: "Claire Fontaine",
+                  subject: "Bienvenue chez NordHabitat — votre première journée",
+                  preview: "Bonjour et bienvenue au sein du Centre d'excellence ERP.",
+                  body: "Bonjour et bienvenue au sein du Centre d'excellence ERP.",
+                  readAt: null,
+                },
+              ],
+              unreadCount: 1,
+            }),
+          } as Response;
+        }
+
+        if (url.endsWith("/api/v1/me/tasks") && method === "GET") {
+          return {
+            ok: true,
+            json: async () => ({ tasks: [] }),
+          } as Response;
+        }
+
+        throw new Error(`Unexpected request in workspace-shell test: ${method} ${url}`);
+      }),
+    );
+  }
+
   render(
     <AuthProvider skipRestore initialEmployee={employee}>
       <MemoryRouter initialEntries={[initialEntry]}>
@@ -103,15 +153,15 @@ describe("navigation and placeholders", () => {
     }
   });
 
-  it("renders honest empty states on placeholder app pages", async () => {
+  it("renders the manager inbox on the boîte de réception app page", async () => {
     renderWorkspace("/workspace/apps/boite-reception");
 
     await waitFor(() => {
-      expect(screen.getByTestId("workspace-empty-state")).toBeInTheDocument();
+      expect(screen.getByTestId("inbox-app-page")).toBeInTheDocument();
     });
 
-    expect(screen.getByTestId("workspace-empty-state")).toHaveTextContent(
-      "Votre boîte de réception est vide",
+    expect(screen.getByTestId("inbox-message-premier-message-gestionnaire")).toHaveTextContent(
+      "Claire Fontaine",
     );
   });
 

@@ -17,10 +17,9 @@ export const ACCESS_PREPARING_LABEL = "Accès en préparation";
 
 export const CONTEXT_PANEL_TITLE = "Votre première journée";
 
-export const CONTEXT_PANEL_CHECKLIST = [
+export const CONTEXT_PANEL_CHECKLIST_BASE = [
   "Badge employé activé",
   "Poste de travail numérique provisionné",
-  "En attente : premier message de votre gestionnaire",
 ] as const;
 
 export const DASHBOARD_PREVIEW_TITLE = "Aperçu des indicateurs";
@@ -38,16 +37,6 @@ export function buildWelcomeMessage(displayName: string): string {
 }
 
 export const EMPTY_STATE_COPY: Record<string, { title: string; description: string }> = {
-  "boite-reception": {
-    title: "Boîte de réception",
-    description:
-      "Votre boîte de réception est vide pour le moment. Aucun message professionnel n'a encore été reçu — c'est attendu lors d'une première journée.",
-  },
-  taches: {
-    title: "Tâches",
-    description:
-      "Aucune tâche ne vous est assignée pour l'instant. Votre gestionnaire vous transmettra vos premières responsabilités sous peu.",
-  },
   documents: {
     title: "Documents",
     description:

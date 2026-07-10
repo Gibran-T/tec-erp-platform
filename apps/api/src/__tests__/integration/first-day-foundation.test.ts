@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { getPrismaClient, disconnectPrismaClient } from "@tec-platform/database-erp";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -32,54 +34,80 @@ describeIntegration("first-day foundation database integration", () => {
 
   it("enforces unique employee/message and employee/task pairs", async () => {
     const client = getPrismaClient();
-    const employee = await client.employee.findFirst();
+    const suffix = randomUUID();
+    const messageKey = `itest-message-${suffix}`;
+    const taskKey = `itest-task-${suffix}`;
 
-    expect(employee).not.toBeNull();
-
-    const readAt = new Date("2026-07-09T12:00:00.000Z");
-    const completedAt = new Date("2026-07-09T13:00:00.000Z");
-
-    await client.employeeMessageState.create({
-      data: {
-        employeeId: employee!.id,
-        messageKey: "premier-message-gestionnaire",
-        readAt,
-      },
+    const company = await client.company.findUnique({
+      where: { code: "NORDHABITAT" },
     });
+    expect(company).not.toBeNull();
 
-    await expect(
-      client.employeeMessageState.create({
+    let employeeId: string | null = null;
+
+    try {
+      const employee = await client.employee.create({
         data: {
-          employeeId: employee!.id,
-          messageKey: "premier-message-gestionnaire",
+          employeeNumber: `#ITEST-${suffix}`,
+          email: `itest.${suffix}@example.test`,
+          displayName: `Integration Test Employee ${suffix}`,
+          passwordHash: "scrypt$itest$not-a-real-credential",
+          role: "JR_BUSINESS_ANALYST",
+          companyId: company!.id,
+        },
+      });
+      employeeId = employee.id;
+
+      const readAt = new Date("2026-07-09T12:00:00.000Z");
+      const completedAt = new Date("2026-07-09T13:00:00.000Z");
+
+      await client.employeeMessageState.create({
+        data: {
+          employeeId,
+          messageKey,
           readAt,
         },
-      }),
-    ).rejects.toThrow();
+      });
 
-    await client.employeeTaskState.create({
-      data: {
-        employeeId: employee!.id,
-        taskKey: "decouvrir-nordhabitat",
-        completedAt,
-      },
-    });
+      await expect(
+        client.employeeMessageState.create({
+          data: {
+            employeeId,
+            messageKey,
+            readAt,
+          },
+        }),
+      ).rejects.toThrow();
 
-    await expect(
-      client.employeeTaskState.create({
+      await client.employeeTaskState.create({
         data: {
-          employeeId: employee!.id,
-          taskKey: "decouvrir-nordhabitat",
+          employeeId,
+          taskKey,
           completedAt,
         },
-      }),
-    ).rejects.toThrow();
+      });
 
-    await client.employeeMessageState.deleteMany({
-      where: { employeeId: employee!.id, messageKey: "premier-message-gestionnaire" },
-    });
-    await client.employeeTaskState.deleteMany({
-      where: { employeeId: employee!.id, taskKey: "decouvrir-nordhabitat" },
-    });
+      await expect(
+        client.employeeTaskState.create({
+          data: {
+            employeeId,
+            taskKey,
+            completedAt,
+          },
+        }),
+      ).rejects.toThrow();
+    } finally {
+      if (employeeId !== null) {
+        await client.employeeMessageState.deleteMany({
+          where: { employeeId, messageKey },
+        });
+        await client.employeeTaskState.deleteMany({
+          where: { employeeId, taskKey },
+        });
+        await client.employee.delete({
+          where: { id: employeeId },
+        });
+      }
+    }
   });
 });

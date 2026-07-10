@@ -9,6 +9,8 @@ import {
   PREPARING_ACCESS_DESCRIPTION,
 } from "../../workspace/workspaceCopy.js";
 import { EmployeeProfilePage } from "./EmployeeProfilePage.js";
+import { InboxAppPage } from "./InboxAppPage.js";
+import { TasksAppPage } from "./TasksAppPage.js";
 
 export function WorkspaceAppPage(): ReactNode {
   const { appId } = useParams<{ appId: string }>();
@@ -19,6 +21,14 @@ export function WorkspaceAppPage(): ReactNode {
 
   if (appId === "profil") {
     return <EmployeeProfilePage />;
+  }
+
+  if (appId === "boite-reception") {
+    return <InboxAppPage />;
+  }
+
+  if (appId === "taches") {
+    return <TasksAppPage />;
   }
 
   const app = getWorkspaceApp(appId);

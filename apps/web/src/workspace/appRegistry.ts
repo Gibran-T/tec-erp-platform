@@ -17,7 +17,7 @@ export const WORKSPACE_APPS: readonly WorkspaceAppDefinition[] = [
     sidebarOrder: 2,
     launcherOrder: 2,
   },
-  { id: "taches", label: "Tâches", access: "preparing", sidebarOrder: 3, launcherOrder: 3 },
+  { id: "taches", label: "Tâches", access: "day1", sidebarOrder: 3, launcherOrder: 3 },
   { id: "documents", label: "Documents", access: "day1", sidebarOrder: 4, launcherOrder: 4 },
   {
     id: "centre-mission",
