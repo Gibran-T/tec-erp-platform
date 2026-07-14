@@ -1,0 +1,109 @@
+import { z } from "zod";
+
+/**
+ * RC01 Slice D — Mission Center and enterprise discovery contracts.
+ * Mission content is static in API code; only per-employee attempt state crosses the boundary.
+ * Allowed department/problem relationships are never exposed to clients.
+ */
+
+export const MissionKeySchema = z.enum(["m1-m01-decouvrir-entreprise"]);
+export type MissionKey = z.infer<typeof MissionKeySchema>;
+
+export const MissionStatusSchema = z.enum([
+  "locked",
+  "available",
+  "in_progress",
+  "completed",
+]);
+export type MissionStatus = z.infer<typeof MissionStatusSchema>;
+
+export const DepartmentProblemMappingSchema = z.object({
+  departmentKey: z.string().min(1),
+  problemKey: z.string().min(1),
+});
+export type DepartmentProblemMapping = z.infer<typeof DepartmentProblemMappingSchema>;
+
+export const MissionSummarySchema = z.object({
+  missionKey: MissionKeySchema,
+  title: z.string().min(1),
+  status: MissionStatusSchema,
+  preview: z.string().min(1),
+  unlockExplanation: z.string().min(1).nullable(),
+});
+export type MissionSummary = z.infer<typeof MissionSummarySchema>;
+
+export const MissionsResponseSchema = z.object({
+  missions: z.array(MissionSummarySchema),
+});
+export type MissionsResponse = z.infer<typeof MissionsResponseSchema>;
+
+export const DiscoveryContextItemSchema = z.object({
+  key: z.string().min(1),
+  title: z.string().min(1),
+  body: z.string().min(1),
+  required: z.boolean(),
+});
+export type DiscoveryContextItem = z.infer<typeof DiscoveryContextItemSchema>;
+
+export const DepartmentOptionSchema = z.object({
+  key: z.string().min(1),
+  label: z.string().min(1),
+  description: z.string().min(1),
+});
+export type DepartmentOption = z.infer<typeof DepartmentOptionSchema>;
+
+export const ProblemOptionSchema = z.object({
+  key: z.string().min(1),
+  label: z.string().min(1),
+  description: z.string().min(1),
+});
+export type ProblemOption = z.infer<typeof ProblemOptionSchema>;
+
+export const MissionAttemptStateSchema = z.object({
+  status: z.enum(["in_progress", "completed"]),
+  startedAt: z.string().datetime(),
+  completedAt: z.string().datetime().nullable(),
+  acknowledgedInputKeys: z.array(z.string().min(1)),
+  departmentProblemMappings: z.array(DepartmentProblemMappingSchema),
+  justification: z.string().nullable(),
+  feedbackKey: z.string().nullable(),
+  feedbackBody: z.string().nullable(),
+});
+export type MissionAttemptState = z.infer<typeof MissionAttemptStateSchema>;
+
+export const MissionDetailSchema = z.object({
+  missionKey: MissionKeySchema,
+  title: z.string().min(1),
+  status: MissionStatusSchema,
+  preview: z.string().min(1),
+  unlockExplanation: z.string().min(1).nullable(),
+  briefing: z.string().nullable(),
+  contextItems: z.array(DiscoveryContextItemSchema).nullable(),
+  departments: z.array(DepartmentOptionSchema).nullable(),
+  problems: z.array(ProblemOptionSchema).nullable(),
+  attempt: MissionAttemptStateSchema.nullable(),
+});
+export type MissionDetail = z.infer<typeof MissionDetailSchema>;
+
+export const MissionSubmitRequestSchema = z.object({
+  acknowledgedInputKeys: z.array(z.string().trim().min(1)).min(1),
+  departmentProblemMappings: z.array(DepartmentProblemMappingSchema).min(2),
+  justification: z
+    .string()
+    .transform((value) => value.trim())
+    .pipe(z.string().min(40).max(1000)),
+});
+export type MissionSubmitRequest = z.infer<typeof MissionSubmitRequestSchema>;
+
+export const MissionSubmitResponseSchema = z.object({
+  missionKey: MissionKeySchema,
+  attempt: MissionAttemptStateSchema,
+});
+export type MissionSubmitResponse = z.infer<typeof MissionSubmitResponseSchema>;
+
+export const MissionStartResponseSchema = z.object({
+  missionKey: MissionKeySchema,
+  attempt: MissionAttemptStateSchema,
+  created: z.boolean(),
+});
+export type MissionStartResponse = z.infer<typeof MissionStartResponseSchema>;

@@ -22,7 +22,7 @@ export const WORKSPACE_APPS: readonly WorkspaceAppDefinition[] = [
   {
     id: "centre-mission",
     label: "Centre de mission",
-    access: "preparing",
+    access: "day1",
     sidebarOrder: 5,
     launcherOrder: 5,
   },

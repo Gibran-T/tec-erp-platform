@@ -181,6 +181,98 @@ function mockFirstDayFetch(options: MockOptions = {}): ReturnType<typeof vi.fn> 
       });
     }
 
+    if (url.endsWith("/api/v1/me/missions") && method === "GET") {
+      const unlocked = messageRead && taskStatus === "terminee";
+      return jsonResponse({
+        missions: [
+          {
+            missionKey: "m1-m01-decouvrir-entreprise",
+            title: "Découvrir l’entreprise",
+            status: unlocked ? "available" : "locked",
+            preview:
+              "Claire Fontaine vous confie une première découverte : comprendre comment NordHabitat organise l’information.",
+            unlockExplanation: unlocked
+              ? null
+              : "Terminez d’abord votre première journée : lisez le message de Claire Fontaine et complétez votre première responsabilité opérationnelle.",
+          },
+        ],
+      });
+    }
+
+    if (
+      url.includes("/api/v1/me/missions/") &&
+      method === "GET" &&
+      !url.endsWith("/start") &&
+      !url.endsWith("/submit")
+    ) {
+      const unlocked = messageRead && taskStatus === "terminee";
+      if (!unlocked) {
+        return jsonResponse({
+          missionKey: "m1-m01-decouvrir-entreprise",
+          title: "Découvrir l’entreprise",
+          status: "locked",
+          preview:
+            "Claire Fontaine vous confie une première découverte : comprendre comment NordHabitat organise l’information.",
+          unlockExplanation:
+            "Terminez d’abord votre première journée : lisez le message de Claire Fontaine et complétez votre première responsabilité opérationnelle.",
+          briefing: null,
+          contextItems: null,
+          departments: null,
+          problems: null,
+          attempt: null,
+        });
+      }
+
+      return jsonResponse({
+        missionKey: "m1-m01-decouvrir-entreprise",
+        title: "Découvrir l’entreprise",
+        status: "available",
+        preview:
+          "Claire Fontaine vous confie une première découverte : comprendre comment NordHabitat organise l’information.",
+        unlockExplanation: null,
+        briefing: "Briefing Claire",
+        contextItems: [
+          {
+            key: "ctx-nordhabitat-overview",
+            title: "NordHabitat",
+            body: "Vue d’ensemble",
+            required: true,
+          },
+          {
+            key: "ctx-tom-40-36",
+            title: "Signal Tom",
+            body: "Système 40, observation 36.",
+            required: true,
+          },
+        ],
+        departments: [
+          {
+            key: "dept-entrepot",
+            label: "Entrepôt",
+            description: "Stocks physiques",
+          },
+          {
+            key: "dept-ti",
+            label: "TI",
+            description: "Données",
+          },
+        ],
+        problems: [
+          {
+            key: "prob-inventaire-divergent",
+            label: "Inventaire divergent",
+            description: "Écart stock",
+          },
+          {
+            key: "prob-coherence-donnees",
+            label: "Cohérence des données",
+            description: "Données fragmentées",
+          },
+        ],
+        attempt: null,
+      });
+    }
+
     throw new Error(`Unexpected request: ${method} ${url}`);
   });
 

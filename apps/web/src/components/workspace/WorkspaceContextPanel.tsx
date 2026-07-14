@@ -1,14 +1,23 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 
 import { useFirstDayData } from "../../first-day/FirstDayDataContext.js";
+import { useMissionData } from "../../mission/MissionDataContext.js";
+import {
+  MISSION_ACTUELLE_TITLE,
+  MISSION_PANEL_LABELS,
+  OPEN_MISSION_CENTER_LABEL,
+} from "../../mission/missionCopy.js";
 import {
   CONTEXT_PANEL_CHECKLIST_BASE,
   CONTEXT_PANEL_TITLE,
   MANAGER_NAME,
 } from "../../workspace/workspaceCopy.js";
+import { getAppPath } from "../../workspace/appRegistry.js";
 
 export function WorkspaceContextPanel(): ReactNode {
   const { inbox, tasks, initialLoading, refreshing } = useFirstDayData();
+  const { summaryStatus, initialLoading: missionLoading } = useMissionData();
 
   const managerMessageRead =
     inbox?.messages.some((message) => message.readAt !== null) ?? false;
@@ -29,6 +38,10 @@ export function WorkspaceContextPanel(): ReactNode {
   ];
 
   const showInitialLoading = initialLoading && inbox === null;
+  const missionLabel =
+    summaryStatus === null
+      ? MISSION_PANEL_LABELS.none
+      : MISSION_PANEL_LABELS[summaryStatus];
 
   return (
     <aside className="workspace-context-panel" data-testid="workspace-context-panel">
@@ -49,6 +62,28 @@ export function WorkspaceContextPanel(): ReactNode {
           ) : null}
         </>
       )}
+
+      <section
+        className="workspace-context-panel__mission"
+        data-testid="workspace-context-mission"
+        aria-labelledby="mission-actuelle-heading"
+      >
+        <h3 id="mission-actuelle-heading">{MISSION_ACTUELLE_TITLE}</h3>
+        {missionLoading && summaryStatus === null ? (
+          <p className="workspace-context-panel__status">Chargement de la mission…</p>
+        ) : (
+          <>
+            <p data-testid="workspace-context-mission-status">{missionLabel}</p>
+            <Link
+              className="workspace-context-panel__mission-link"
+              to={getAppPath("centre-mission")}
+              data-testid="workspace-context-mission-link"
+            >
+              {OPEN_MISSION_CENTER_LABEL}
+            </Link>
+          </>
+        )}
+      </section>
     </aside>
   );
 }
