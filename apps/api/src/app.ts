@@ -16,6 +16,11 @@ import { createPrismaFirstDayStateRepository } from "./modules/first-day/first-d
 import { createMeRouter } from "./modules/first-day/first-day.routes.js";
 import { createFirstDayService } from "./modules/first-day/first-day.service.js";
 import type { FirstDayStateRepository } from "./modules/first-day/first-day.types.js";
+import { createPrismaMissionAttemptRepository } from "./modules/mission/mission.repository.js";
+import { createMissionMeRouter } from "./modules/mission/mission.routes.js";
+import { createMissionService } from "./modules/mission/mission.service.js";
+import type { MissionAttemptRepository } from "./modules/mission/mission.types.js";
+import { createMissionUnlockStateReader } from "./modules/mission/mission.unlock.js";
 import { createApiV1Router } from "./routes/api-v1.js";
 import { createOperationalRouter } from "./routes/operational.js";
 
@@ -27,6 +32,7 @@ export interface AppDependencies {
   /** Injectable for tests; defaults to the Prisma-backed repository. */
   readonly employeeRepository?: EmployeeRepository;
   readonly firstDayStateRepository?: FirstDayStateRepository;
+  readonly missionAttemptRepository?: MissionAttemptRepository;
 }
 
 const defaultDependencies: AppDependencies = {
@@ -83,11 +89,18 @@ export function createApp(
     dependencies.firstDayStateRepository ?? createPrismaFirstDayStateRepository();
 
   const firstDayService = createFirstDayService({ stateRepository: firstDayStateRepository });
+  const missionAttemptRepository =
+    dependencies.missionAttemptRepository ?? createPrismaMissionAttemptRepository();
+  const missionService = createMissionService({
+    attemptRepository: missionAttemptRepository,
+    unlockReader: createMissionUnlockStateReader(firstDayStateRepository),
+  });
   const requireEmployee = createRequireEmployee(authService);
 
   app.use(createOperationalRouter(dependencies));
   app.use("/api/v1/auth", createAuthRouter(authService));
   app.use("/api/v1/me", requireEmployee, createMeRouter(firstDayService));
+  app.use("/api/v1/me", requireEmployee, createMissionMeRouter(missionService));
   app.use("/api/v1", createApiV1Router());
 
   app.use(notFoundHandler);

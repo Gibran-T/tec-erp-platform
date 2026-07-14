@@ -57,6 +57,7 @@ model Employee {
 
   messageStates EmployeeMessageState[]
   taskStates    EmployeeTaskState[]
+  missionAttempts EmployeeMissionAttempt[]
 
   @@index([companyId])
   @@map("employee")
@@ -92,4 +93,30 @@ model EmployeeTaskState {
   @@unique([employeeId, taskKey])
   @@index([employeeId])
   @@map("employee_task_state")
+}
+
+/// Per-employee attempt state for a static mission (content lives in code).
+/// locked/available are derived; only in_progress and completed rows are persisted.
+model EmployeeMissionAttempt {
+  id                        String    @id @default(cuid())
+  employeeId                String
+  missionKey                String
+  /// Persisted values: in_progress | completed
+  status                    String
+  startedAt                 DateTime
+  completedAt               DateTime?
+  /// Context keys explicitly acknowledged in the submission (JSON string array).
+  acknowledgedInputKeys     Json      @default("[]")
+  /// Submitted department/problem pairs (JSON array of { departmentKey, problemKey }).
+  departmentProblemMappings Json      @default("[]")
+  justification             String?
+  feedbackKey               String?
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  @@unique([employeeId, missionKey])
+  @@index([employeeId])
+  @@map("employee_mission_attempt")
 }

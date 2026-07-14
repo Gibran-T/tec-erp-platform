@@ -219,6 +219,29 @@ body {
   gap: 0.5rem;
 }
 
+.workspace-context-panel__mission {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.workspace-context-panel__mission h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9375rem;
+}
+
+.workspace-context-panel__mission-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: #1d4ed8;
+  text-decoration: none;
+}
+
+.workspace-context-panel__mission-link:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
 .workspace-home__header h1 {
   margin: 0 0 0.75rem;
 }
@@ -534,6 +557,177 @@ body {
   line-height: 1.5;
 }
 
+.workspace-mission {
+  max-width: 56rem;
+  min-width: 0;
+}
+
+.workspace-mission__header h1,
+.workspace-mission h1 {
+  margin: 0 0 0.75rem;
+}
+
+.workspace-mission__header p,
+.workspace-mission__card p,
+.workspace-mission__unlock {
+  margin: 0 0 1rem;
+  line-height: 1.55;
+  color: #4b5563;
+}
+
+.workspace-mission__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.workspace-mission__card,
+.workspace-mission__detail,
+.workspace-mission__briefing,
+.workspace-mission__feedback,
+.workspace-mission__context-item {
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background: #fff;
+  min-width: 0;
+}
+
+.workspace-mission__card-header,
+.workspace-mission__detail-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.workspace-mission__status {
+  font-size: 0.8125rem;
+  color: #1f2937;
+  background: #f3f4f6;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.workspace-mission__button,
+.workspace-mission__button--secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  background: #0a6ed1;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.workspace-mission__button--secondary {
+  background: #374151;
+}
+
+.workspace-mission__button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.workspace-mission__button:focus-visible,
+.workspace-mission__link-button:focus-visible,
+.workspace-mission__checkbox input:focus-visible,
+.workspace-mission__mapping-controls select:focus-visible,
+.workspace-mission__justification textarea:focus-visible {
+  outline: 2px solid #0a6ed1;
+  outline-offset: 2px;
+}
+
+.workspace-mission__link-button {
+  border: none;
+  background: transparent;
+  color: #0a6ed1;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 0.75rem;
+}
+
+.workspace-mission__briefing-body {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: inherit;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.workspace-mission__fieldset {
+  margin: 1rem 0;
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  min-width: 0;
+}
+
+.workspace-mission__context-list,
+.workspace-mission__mapping-list {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.workspace-mission__checkbox {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin-top: 0.75rem;
+}
+
+.workspace-mission__mapping-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.workspace-mission__mapping-controls label,
+.workspace-mission__justification {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+}
+
+.workspace-mission__mapping-controls select,
+.workspace-mission__justification textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.workspace-mission__justification {
+  margin: 1rem 0;
+}
+
+.workspace-mission__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.workspace-mission__mapping-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .workspace-tasks__list {
   display: grid;
   gap: 1rem;
@@ -613,10 +807,17 @@ body {
 
   .workspace-inbox,
   .workspace-tasks,
+  .workspace-mission,
   .workspace-inbox__detail,
-  .workspace-tasks__card {
+  .workspace-tasks__card,
+  .workspace-mission__card,
+  .workspace-mission__detail {
     max-width: 100%;
     min-width: 0;
     overflow-wrap: anywhere;
+  }
+
+  .workspace-mission__mapping-controls {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

@@ -7,6 +7,7 @@ import { WorkspaceContextPanel } from "../components/workspace/WorkspaceContextP
 import { WorkspaceSidebar } from "../components/workspace/WorkspaceSidebar.js";
 import { WorkspaceTopBar } from "../components/workspace/WorkspaceTopBar.js";
 import { FirstDayDataProvider } from "../first-day/FirstDayDataContext.js";
+import { MissionDataProvider } from "../mission/MissionDataContext.js";
 
 export function WorkspaceLayout(): ReactNode {
   const { employee, logout } = useAuth();
@@ -18,13 +19,15 @@ export function WorkspaceLayout(): ReactNode {
   return (
     <div data-testid="workspace-shell">
       <FirstDayDataProvider>
-        <AppShell
-          topNav={<WorkspaceTopBar employee={employee} onLogout={() => void logout()} />}
-          sidebar={<WorkspaceSidebar />}
-          rightPanel={<WorkspaceContextPanel />}
-        >
-          <Outlet />
-        </AppShell>
+        <MissionDataProvider>
+          <AppShell
+            topNav={<WorkspaceTopBar employee={employee} onLogout={() => void logout()} />}
+            sidebar={<WorkspaceSidebar />}
+            rightPanel={<WorkspaceContextPanel />}
+          >
+            <Outlet />
+          </AppShell>
+        </MissionDataProvider>
       </FirstDayDataProvider>
     </div>
   );

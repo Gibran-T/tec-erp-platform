@@ -68,6 +68,25 @@ function renderWorkspace(
           } as Response;
         }
 
+        if (url.endsWith("/api/v1/me/missions") && method === "GET") {
+          return {
+            ok: true,
+            json: async () => ({
+              missions: [
+                {
+                  missionKey: "m1-m01-decouvrir-entreprise",
+                  title: "Découvrir l’entreprise",
+                  status: "locked",
+                  preview:
+                    "Claire Fontaine vous confie une première découverte : comprendre comment NordHabitat organise l’information.",
+                  unlockExplanation:
+                    "Terminez d’abord votre première journée : lisez le message de Claire Fontaine et complétez votre première responsabilité opérationnelle.",
+                },
+              ],
+            }),
+          } as Response;
+        }
+
         throw new Error(`Unexpected request in workspace-shell test: ${method} ${url}`);
       }),
     );
