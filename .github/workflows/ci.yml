@@ -91,5 +91,8 @@ jobs:
       - name: Apply Prisma migrations
         run: pnpm migrate:deploy
 
+      - name: Seed NORDHABITAT demo fixture
+        run: pnpm --filter @tec-platform/database-erp seed
+
       - name: Integration tests
-        run: pnpm --filter erp-api exec vitest run src/__tests__/integration/database.test.ts
+        run: pnpm --filter erp-api exec vitest run src/__tests__/integration/database.test.ts src/__tests__/integration/first-day-foundation.test.ts src/__tests__/integration/mission-discovery.test.ts
