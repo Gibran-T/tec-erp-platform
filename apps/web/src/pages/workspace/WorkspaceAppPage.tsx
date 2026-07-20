@@ -11,6 +11,7 @@ import {
 import { EmployeeProfilePage } from "./EmployeeProfilePage.js";
 import { InboxAppPage } from "./InboxAppPage.js";
 import { MissionCenterPage } from "./MissionCenterPage.js";
+import { OrganizationalErpPage } from "./OrganizationalErpPage.js";
 import { TasksAppPage } from "./TasksAppPage.js";
 
 export function WorkspaceAppPage(): ReactNode {
@@ -34,6 +35,10 @@ export function WorkspaceAppPage(): ReactNode {
 
   if (appId === "centre-mission") {
     return <MissionCenterPage />;
+  }
+
+  if (appId === "erp") {
+    return <OrganizationalErpPage />;
   }
 
   const app = getWorkspaceApp(appId);

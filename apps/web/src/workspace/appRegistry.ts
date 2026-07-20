@@ -26,7 +26,7 @@ export const WORKSPACE_APPS: readonly WorkspaceAppDefinition[] = [
     sidebarOrder: 5,
     launcherOrder: 5,
   },
-  { id: "erp", label: "ERP", access: "preparing", sidebarOrder: 6, launcherOrder: 6 },
+  { id: "erp", label: "ERP", access: "day1", sidebarOrder: 6, launcherOrder: 6 },
   {
     id: "tableaux-bord",
     label: "Tableaux de bord",
