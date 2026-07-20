@@ -87,6 +87,22 @@ function renderWorkspace(
           } as Response;
         }
 
+        if (url.endsWith("/api/v1/me/organization") && method === "GET") {
+          return {
+            ok: true,
+            json: async () => ({
+              access: "locked",
+              unlockExplanation: {
+                code: "premiere-journee-requise",
+                title: "Première journée requise",
+                description:
+                  "Terminez votre première journée avant de consulter l’organisation de l’entreprise.",
+              },
+              organization: null,
+            }),
+          } as Response;
+        }
+
         throw new Error(`Unexpected request in workspace-shell test: ${method} ${url}`);
       }),
     );
@@ -185,13 +201,23 @@ describe("navigation and placeholders", () => {
   });
 
   it("shows preparing access badge for restricted apps", async () => {
-    renderWorkspace("/workspace/apps/erp");
+    renderWorkspace("/workspace/apps/tableaux-bord");
 
     await waitFor(() => {
       expect(screen.getByTestId("workspace-empty-state-badge")).toHaveTextContent(
         "Accès en préparation",
       );
     });
+  });
+
+  it("routes the Day-1-gated ERP app to the organizational ERP page, not the preparing fallback", async () => {
+    renderWorkspace("/workspace/apps/erp");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("organization-erp-page")).toBeInTheDocument();
+    });
+
+    expect(screen.queryByTestId("workspace-empty-state-badge")).not.toBeInTheDocument();
   });
 });
 
