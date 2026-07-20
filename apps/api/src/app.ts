@@ -21,6 +21,9 @@ import { createMissionMeRouter } from "./modules/mission/mission.routes.js";
 import { createMissionService } from "./modules/mission/mission.service.js";
 import type { MissionAttemptRepository } from "./modules/mission/mission.types.js";
 import { createMissionUnlockStateReader } from "./modules/mission/mission.unlock.js";
+import { createOrganizationAccessReader } from "./modules/organization/organization.access.js";
+import { createOrganizationMeRouter } from "./modules/organization/organization.routes.js";
+import { createOrganizationService } from "./modules/organization/organization.service.js";
 import { createApiV1Router } from "./routes/api-v1.js";
 import { createOperationalRouter } from "./routes/operational.js";
 
@@ -95,12 +98,16 @@ export function createApp(
     attemptRepository: missionAttemptRepository,
     unlockReader: createMissionUnlockStateReader(firstDayStateRepository),
   });
+  const organizationService = createOrganizationService({
+    accessReader: createOrganizationAccessReader(firstDayStateRepository),
+  });
   const requireEmployee = createRequireEmployee(authService);
 
   app.use(createOperationalRouter(dependencies));
   app.use("/api/v1/auth", createAuthRouter(authService));
   app.use("/api/v1/me", requireEmployee, createMeRouter(firstDayService));
   app.use("/api/v1/me", requireEmployee, createMissionMeRouter(missionService));
+  app.use("/api/v1/me", requireEmployee, createOrganizationMeRouter(organizationService));
   app.use("/api/v1", createApiV1Router());
 
   app.use(notFoundHandler);
