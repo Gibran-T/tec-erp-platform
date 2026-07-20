@@ -13,6 +13,37 @@ export const ORGANIZATION_LOADING_STATUS = "Chargement de l’organisation NordH
 export const ORGANIZATION_ERROR_FALLBACK =
   "Impossible de charger l’organisation NordHabitat. Veuillez réessayer.";
 
+export const ORGANIZATION_ERROR_NETWORK =
+  "Impossible de charger les informations organisationnelles. Veuillez réessayer.";
+
+export const ORGANIZATION_ERROR_AUTH = "Authentification requise.";
+
+export const ORGANIZATION_ERROR_MALFORMED =
+  "La réponse de l’organisation est invalide. Veuillez réessayer.";
+
+/**
+ * The only French messages the organization error state may ever render.
+ * Any candidate outside this set — arbitrary server text, raw fetch/browser
+ * exception messages, technical/internal details — is replaced by
+ * ORGANIZATION_ERROR_FALLBACK before it can reach the UI. This is the single
+ * source of truth for safe organization error copy, consumed by both the
+ * API client and the page-local fetch hook.
+ */
+const ORGANIZATION_SAFE_ERROR_MESSAGES: ReadonlySet<string> = new Set([
+  ORGANIZATION_ERROR_FALLBACK,
+  ORGANIZATION_ERROR_NETWORK,
+  ORGANIZATION_ERROR_AUTH,
+  ORGANIZATION_ERROR_MALFORMED,
+]);
+
+export function toSafeOrganizationErrorMessage(candidate: unknown): string {
+  if (typeof candidate === "string" && ORGANIZATION_SAFE_ERROR_MESSAGES.has(candidate)) {
+    return candidate;
+  }
+
+  return ORGANIZATION_ERROR_FALLBACK;
+}
+
 export const ORGANIZATION_RETRY_LABEL = "Réessayer";
 
 export const ORGANIZATION_EMPTY_TITLE = "Organisation";

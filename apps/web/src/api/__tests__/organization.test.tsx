@@ -3,6 +3,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { saveStoredTokens } from "../auth.js";
 import { requestOrganization } from "../organization.js";
 
+const SAFE_SERVER_ERROR_MESSAGE = "Impossible de charger l’organisation NordHabitat. Veuillez réessayer.";
+const SAFE_NETWORK_ERROR_MESSAGE =
+  "Impossible de charger les informations organisationnelles. Veuillez réessayer.";
+const SAFE_MALFORMED_ERROR_MESSAGE =
+  "La réponse de l’organisation est invalide. Veuillez réessayer.";
+
 function jsonResponse(body: unknown, status = 200): Response {
   return {
     ok: status >= 200 && status < 300,
@@ -53,19 +59,84 @@ describe("requestOrganization", () => {
     expect(result.access).toBe("locked");
   });
 
-  it("throws a French error message on a non-ok response", async () => {
+  it("sanitizes a canonical 500 response into the fixed safe French message", async () => {
     seedAuthTokens();
     vi.stubGlobal(
       "fetch",
       vi.fn(async () =>
         jsonResponse(
-          { error: { code: "INTERNAL", message: "Erreur serveur.", requestId: "req_test" } },
+          {
+            error: {
+              code: "INTERNAL",
+              message: "An unexpected error occurred.",
+              requestId: "req_test",
+            },
+          },
           500,
         ),
       ),
     );
 
-    await expect(requestOrganization()).rejects.toThrow("Erreur serveur.");
+    await expect(requestOrganization()).rejects.toThrow(SAFE_SERVER_ERROR_MESSAGE);
+
+    try {
+      await requestOrganization();
+      expect.unreachable();
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+      expect((error as Error).message).not.toMatch(/an unexpected error occurred/i);
+    }
+  });
+
+  it("sanitizes an arbitrary internal-looking 5xx server message", async () => {
+    seedAuthTokens();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        jsonResponse(
+          {
+            error: {
+              code: "INTERNAL",
+              message: "database connection refused",
+              requestId: "req_test",
+            },
+          },
+          503,
+        ),
+      ),
+    );
+
+    let caught: Error | null = null;
+    try {
+      await requestOrganization();
+    } catch (error) {
+      caught = error as Error;
+    }
+
+    expect(caught).not.toBeNull();
+    expect(caught?.message).toBe(SAFE_SERVER_ERROR_MESSAGE);
+    expect(caught?.message).not.toMatch(/database connection refused/i);
+  });
+
+  it("sanitizes a rejected fetch (network/browser failure) into the fixed safe French message", async () => {
+    seedAuthTokens();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        throw new TypeError("Failed to fetch");
+      }),
+    );
+
+    let caught: Error | null = null;
+    try {
+      await requestOrganization();
+    } catch (error) {
+      caught = error as Error;
+    }
+
+    expect(caught).not.toBeNull();
+    expect(caught?.message).toBe(SAFE_NETWORK_ERROR_MESSAGE);
+    expect(caught?.message).not.toMatch(/failed to fetch/i);
   });
 
   it("throws defensively when the payload does not match the contract", async () => {
@@ -75,9 +146,32 @@ describe("requestOrganization", () => {
       vi.fn(async () => jsonResponse({ access: "unexpected" })),
     );
 
-    await expect(requestOrganization()).rejects.toThrow(
-      "La réponse de l’organisation est invalide. Veuillez réessayer.",
+    await expect(requestOrganization()).rejects.toThrow(SAFE_MALFORMED_ERROR_MESSAGE);
+  });
+
+  it("sanitizes a response body that fails to parse as JSON", async () => {
+    seedAuthTokens();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({
+        ok: true,
+        status: 200,
+        json: async () => {
+          throw new SyntaxError("Unexpected token in JSON at position 0");
+        },
+      })),
     );
+
+    let caught: Error | null = null;
+    try {
+      await requestOrganization();
+    } catch (error) {
+      caught = error as Error;
+    }
+
+    expect(caught).not.toBeNull();
+    expect(caught?.message).toBe(SAFE_MALFORMED_ERROR_MESSAGE);
+    expect(caught?.message).not.toMatch(/unexpected token/i);
   });
 
   it("requires authentication when no token is stored", async () => {

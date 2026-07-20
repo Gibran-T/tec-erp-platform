@@ -317,6 +317,12 @@ describe("organizational ERP page — empty", () => {
   });
 });
 
+const SAFE_SERVER_ERROR_MESSAGE = "Impossible de charger l’organisation NordHabitat. Veuillez réessayer.";
+const SAFE_NETWORK_ERROR_MESSAGE =
+  "Impossible de charger les informations organisationnelles. Veuillez réessayer.";
+const SAFE_MALFORMED_ERROR_MESSAGE =
+  "La réponse de l’organisation est invalide. Veuillez réessayer.";
+
 describe("organizational ERP page — error and retry", () => {
   it("shows a French error message with a working retry action", async () => {
     seedAuthTokens();
@@ -352,6 +358,125 @@ describe("organizational ERP page — error and retry", () => {
     });
 
     expect(callCount).toBe(2);
+  });
+
+  it("shows a safe French message when fetch itself rejects, never the raw exception text", async () => {
+    seedAuthTokens();
+    mockOrganizationFetch(() => {
+      throw new TypeError("Failed to fetch");
+    });
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("organization-error-state")).toBeInTheDocument();
+    });
+
+    const message = screen.getByTestId("organization-error-message");
+    expect(message).toHaveTextContent(SAFE_NETWORK_ERROR_MESSAGE);
+    expect(message.textContent ?? "").not.toMatch(/failed to fetch/i);
+    expect(screen.getByTestId("organization-retry-button")).toBeInTheDocument();
+  });
+
+  it("shows a safe French message on a canonical 500 response, never the English server message", async () => {
+    seedAuthTokens();
+    mockOrganizationFetch(() =>
+      jsonResponse(
+        {
+          error: {
+            code: "INTERNAL",
+            message: "An unexpected error occurred.",
+            requestId: "req_test",
+          },
+        },
+        500,
+      ),
+    );
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("organization-error-state")).toBeInTheDocument();
+    });
+
+    const message = screen.getByTestId("organization-error-message");
+    expect(message).toHaveTextContent(SAFE_SERVER_ERROR_MESSAGE);
+    expect(message.textContent ?? "").not.toMatch(/an unexpected error occurred/i);
+  });
+
+  it("shows a safe French message on an arbitrary internal-looking 5xx message", async () => {
+    seedAuthTokens();
+    mockOrganizationFetch(() =>
+      jsonResponse(
+        {
+          error: {
+            code: "INTERNAL",
+            message: "database connection refused",
+            requestId: "req_test",
+          },
+        },
+        503,
+      ),
+    );
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("organization-error-state")).toBeInTheDocument();
+    });
+
+    const message = screen.getByTestId("organization-error-message");
+    expect(message).toHaveTextContent(SAFE_SERVER_ERROR_MESSAGE);
+    expect(message.textContent ?? "").not.toMatch(/database connection refused/i);
+  });
+
+  it("shows a safe French message on a malformed response, never parser/schema details", async () => {
+    seedAuthTokens();
+    mockOrganizationFetch(() => jsonResponse({ access: "unexpected" }));
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("organization-error-state")).toBeInTheDocument();
+    });
+
+    const message = screen.getByTestId("organization-error-message");
+    expect(message).toHaveTextContent(SAFE_MALFORMED_ERROR_MESSAGE);
+    expect(message.textContent ?? "").not.toMatch(/zod|schema|parse|invalid_/i);
+  });
+
+  it("performs a new GET and renders the available state after retry following a safe error", async () => {
+    seedAuthTokens();
+    let callCount = 0;
+    const fetchMock = mockOrganizationFetch(() => {
+      callCount += 1;
+      if (callCount === 1) {
+        throw new TypeError("Failed to fetch");
+      }
+      return jsonResponse({
+        access: "available",
+        unlockExplanation: null,
+        organization: buildOrganizationPayload(),
+      });
+    });
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("organization-error-state")).toBeInTheDocument();
+    });
+    expect(screen.getByTestId("organization-error-message")).toHaveTextContent(
+      SAFE_NETWORK_ERROR_MESSAGE,
+    );
+
+    fireEvent.click(screen.getByTestId("organization-retry-button"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("organization-company-profile")).toBeInTheDocument();
+    });
+
+    expect(callCount).toBe(2);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });
 

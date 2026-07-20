@@ -2,7 +2,7 @@ import type { OrganizationResponse } from "@tec-platform/contracts";
 import { useCallback, useEffect, useState } from "react";
 
 import { requestOrganization } from "../../../api/organization.js";
-import { ORGANIZATION_ERROR_FALLBACK } from "./organizationCopy.js";
+import { toSafeOrganizationErrorMessage } from "./organizationCopy.js";
 
 /**
  * Page-local fetch hook for the organizational ERP page.
@@ -39,11 +39,11 @@ export function useOrganizationAccess(): UseOrganizationAccessResult {
       })
       .catch((fetchError: unknown) => {
         if (!cancelled) {
-          const message =
-            fetchError instanceof Error && fetchError.message.trim().length > 0
-              ? fetchError.message
-              : ORGANIZATION_ERROR_FALLBACK;
-          setError(message);
+          // Defense in depth: requestOrganization already throws only safe,
+          // fixed French messages, but this hook is the last line of defense
+          // before rendering — never trust an arbitrary message string here.
+          const candidate = fetchError instanceof Error ? fetchError.message : undefined;
+          setError(toSafeOrganizationErrorMessage(candidate));
         }
       })
       .finally(() => {
