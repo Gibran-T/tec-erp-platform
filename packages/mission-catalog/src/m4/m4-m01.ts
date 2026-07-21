@@ -7,105 +7,117 @@ export const M4_M01 = {
   "missionCode": "M4-M01",
   "moduleCode": "M4",
   "title": "Saisir la commande institutionnelle",
-  "preview": "Creez la commande Sacre-Coeur avec controle credit et ATP.",
-  "briefing": "Bonjour,\n\nCreez la commande Sacre-Coeur avec controle credit et ATP.\n\nContexte NordHabitat — completez les controles et documentez les consequences.\n\nElodie Moreau",
-  "unlockExplanation": "Completez d'abord « Module 3 ».",
+  "preview": "Creez la commande Sacre-Coeur pour l'aile pediatrique avec controle credit et ATP.",
+  "briefing": "Bonjour,\n\nL'Hopital du Sacre-Coeur confirme la commande pour l'aile pediatrique : 40 unites de SKU-HVAC-4421, livraison jeudi. Patrick insiste sur la priorite; le Dr. Meunier attend une date ferme.\n\nAvant de promettre quoi que ce soit, verifiez le credit client et la disponibilite (ATP). Rappel : la reception partielle ThermoControl (36/40) a deja tendu le stock.\n\nNe promettez pas une date que nous ne pouvons tenir. Documentez tout conflit honnetement.\n\nElodie Moreau\nVentes institutionnelles — NordHabitat",
+  "unlockExplanation": "Completez d'abord le Module 3 (reception partielle PO-88421) pour debloquer Order-to-Cash.",
   "sequence": 1,
-  "estimatedMinutes": 30,
-  "difficulty": "intro",
+  "estimatedMinutes": 35,
+  "difficulty": "intermediate",
   "competencyCodes": [
     "C-O2C-01"
   ],
   "contextItems": [
     {
-      "key": "ctx-m4-m01",
-      "title": "Contexte mission",
-      "body": "Creez la commande Sacre-Coeur avec controle credit et ATP.",
+      "key": "ctx-so-draft",
+      "title": "Commande Sacre-Coeur SO-12047",
+      "body": "Client institutionnel Sacre-Coeur; 40 x SKU-HVAC-4421 a 1 250 CAD; valeur 50 000 CAD; livraison demandee jeudi; entrepot cible DC-TRT.",
+      "required": true
+    },
+    {
+      "key": "ctx-credit",
+      "title": "Fiche credit client",
+      "body": "Limite credit 75 000 CAD; encours actuel 18 400 CAD; marge disponible 56 600 CAD. Statut : actif, paiement Net-30.",
+      "required": true
+    },
+    {
+      "key": "ctx-atp",
+      "title": "Disponibilite ATP DC-TRT",
+      "body": "SKU-HVAC-4421 : stock libre DC-TRT = 28 unites; DC-MTL = 52 unites; allocation hospitaliere en attente. Delai appro fournisseur : 14 jours.",
       "required": true
     }
   ],
   "interactions": [
     {
-      "id": "primary",
+      "id": "credit-first",
       "type": "SINGLE_CHOICE",
-      "prompt": "Quelle est la premiere action controlee ?",
+      "prompt": "Quelle verification effectuez-vous en premier avant de creer la commande de vente ?",
       "options": [
         {
-          "key": "credit",
-          "label": "credit"
+          "key": "credit-check",
+          "label": "Controle de credit client"
         },
         {
-          "key": "skip-control",
-          "label": "Ignorer les controles"
+          "key": "promise-date",
+          "label": "Promettre jeudi pour satisfaire Patrick"
         },
         {
-          "key": "random",
-          "label": "Action hors processus"
+          "key": "skip-all",
+          "label": "Creer la commande sans controle"
         }
       ],
       "scoring": {
         "maxPoints": 20,
         "correctKeys": [
-          "credit"
+          "credit-check"
         ]
       }
     },
     {
-      "id": "controls",
+      "id": "so-controls",
       "type": "MULTI_CHOICE",
-      "prompt": "Quels elements sont requis ?",
+      "prompt": "Quels elements sont obligatoires pour une commande institutionnelle valide ?",
       "options": [
         {
-          "key": "credit",
-          "label": "credit"
+          "key": "credit-ok",
+          "label": "Credit disponible confirme"
         },
         {
-          "key": "atp",
-          "label": "atp"
+          "key": "atp-check",
+          "label": "Verification ATP par article"
         },
         {
           "key": "create-so",
-          "label": "create-so"
+          "label": "Creation de la commande de vente"
         },
         {
-          "key": "flag-conflict",
-          "label": "flag-conflict"
+          "key": "false-promise",
+          "label": "Date promise sans verification stock"
         },
         {
-          "key": "ignore",
-          "label": "Aucun"
+          "key": "emoji",
+          "label": "Emoji dans le libelle client"
         }
       ],
       "scoring": {
         "maxPoints": 25,
         "correctKeys": [
-          "credit",
-          "atp",
+          "credit-ok",
+          "atp-check",
           "create-so"
         ],
-        "minimumSelections": 2
+        "minimumSelections": 3
       }
     },
     {
-      "id": "sequence",
+      "id": "o2c-flow",
       "type": "ORDERING",
-      "prompt": "Ordonnez le deroulement.",
+      "prompt": "Ordonnez le deroulement controle de la saisie de commande.",
       "options": [
         {
           "key": "credit",
-          "label": "credit"
+          "label": "Verifier le credit client"
         },
         {
           "key": "atp",
-          "label": "atp"
+          "label": "Controler la disponibilite ATP"
         },
         {
-          "key": "create-so",
-          "label": "create-so"
+          "key": "create",
+          "label": "Creer la commande de vente"
         },
         {
-          "key": "flag-conflict",
-          "label": "flag-conflict"
+          "key": "flag",
+          "label": "Signaler le conflit d'allocation si ATP insuffisant"
         }
       ],
       "scoring": {
@@ -113,34 +125,35 @@ export const M4_M01 = {
         "correctOrder": [
           "credit",
           "atp",
-          "create-so",
-          "flag-conflict"
+          "create",
+          "flag"
         ]
       }
     },
     {
-      "id": "metric",
+      "id": "atp-gap",
       "type": "NUMERIC_INPUT",
-      "prompt": "Valeur cle a retenir pour cette mission ?",
+      "prompt": "Combien d'unites manquent a DC-TRT pour couvrir la commande de 40 unites (stock libre = 28) ?",
       "scoring": {
         "maxPoints": 10,
-        "numericTarget": 1,
+        "numericTarget": 12,
         "numericTolerance": 0
       }
     },
     {
-      "id": "analysis",
-      "type": "TEXT_ANALYSIS",
-      "prompt": "Justifiez la decision et ses consequences transverses.",
+      "id": "honest-conflict",
+      "type": "DIAGNOSIS_RECOMMENDATION",
+      "prompt": "L'ATP montre 28 unites disponibles pour 40 demandees. Que recommandez-vous a Elodie : fausse promesse ou conflit documente ? Justifiez.",
       "scoring": {
         "maxPoints": 15,
         "requiredConcepts": [
-          "credit",
-          "disponibilite",
-          "commande"
+          "conflit",
+          "allocation",
+          "transparence",
+          "client"
         ]
       }
     }
   ],
-  "completionFeedback": "Mission M4-M01 completee.\n\nElodie Moreau"
+  "completionFeedback": "Commande SO-12047 creee avec conflit d'allocation documente. L'equipe logistique peut maintenant planifier le transfert inter-DC.\n\nElodie Moreau"
 } as const satisfies MissionDefinitionDocument;

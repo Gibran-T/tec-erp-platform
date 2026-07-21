@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { AssessmentSubmitRequestSchema } from "@tec-platform/contracts";
+import {
+  AssessmentDraftRequestSchema,
+  AssessmentSubmitRequestSchema,
+} from "@tec-platform/contracts";
 import { DomainError, Result } from "@tec-platform/core";
 
 import { getAuthenticatedEmployee } from "../../middleware/require-employee.js";
@@ -17,31 +20,10 @@ export function createAssessmentMeRouter(service: AssessmentService): Router {
     }
   });
 
-  router.post("/:code/start", async (req, res, next) => {
+  router.get("/certificates", async (req, res, next) => {
     try {
       const employee = getAuthenticatedEmployee(req);
-      const result = await service.start(employee.id, req.params.code ?? "");
-      if (Result.isFail(result)) {
-        throw result.error;
-      }
-      res.status(201).json(result.value);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  router.post("/:code/submit", async (req, res, next) => {
-    try {
-      const employee = getAuthenticatedEmployee(req);
-      const parsed = AssessmentSubmitRequestSchema.safeParse(req.body);
-      if (!parsed.success) {
-        throw DomainError.validation("Soumission d'evaluation invalide.");
-      }
-      const result = await service.submit(employee.id, req.params.code ?? "", parsed.data);
-      if (Result.isFail(result)) {
-        throw result.error;
-      }
-      res.status(200).json(result.value);
+      res.status(200).json({ certificates: await service.listCertificates(employee.id) });
     } catch (error) {
       next(error);
     }
@@ -60,10 +42,61 @@ export function createAssessmentMeRouter(service: AssessmentService): Router {
     }
   });
 
-  router.get("/certificates", async (req, res, next) => {
+  router.get("/:code/attempt", async (req, res, next) => {
     try {
       const employee = getAuthenticatedEmployee(req);
-      res.status(200).json({ certificates: await service.listCertificates(employee.id) });
+      const result = await service.getActiveAttempt(employee.id, req.params.code ?? "");
+      if (Result.isFail(result)) {
+        throw result.error;
+      }
+      res.status(200).json(result.value);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post("/:code/start", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      const result = await service.start(employee.id, req.params.code ?? "");
+      if (Result.isFail(result)) {
+        throw result.error;
+      }
+      res.status(201).json(result.value);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.put("/:code/draft", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      const parsed = AssessmentDraftRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        throw DomainError.validation("Brouillon d'evaluation invalide.");
+      }
+      const result = await service.saveDraft(employee.id, req.params.code ?? "", parsed.data);
+      if (Result.isFail(result)) {
+        throw result.error;
+      }
+      res.status(200).json(result.value);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post("/:code/submit", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      const parsed = AssessmentSubmitRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        throw DomainError.validation("Soumission d'evaluation invalide.");
+      }
+      const result = await service.submit(employee.id, req.params.code ?? "", parsed.data);
+      if (Result.isFail(result)) {
+        throw result.error;
+      }
+      res.status(200).json(result.value);
     } catch (error) {
       next(error);
     }

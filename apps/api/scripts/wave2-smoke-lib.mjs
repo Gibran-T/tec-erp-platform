@@ -179,6 +179,7 @@ export function buildMissionSubmitBody(missionKey) {
 
 export function buildSilverAssessmentSubmit() {
   return {
+    confirmFinalSubmission: true,
     responses: Object.entries(SILVER_ASSESSMENT_ANSWERS).map(([questionKey, value]) => ({
       questionKey,
       value,
@@ -227,6 +228,7 @@ export function createApiClient(baseUrl) {
     },
     get: (path) => request("GET", path),
     post: (path, body) => request("POST", path, body),
+    put: (path, body) => request("PUT", path, body),
   };
 }
 

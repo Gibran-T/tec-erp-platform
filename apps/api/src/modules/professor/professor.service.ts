@@ -251,6 +251,163 @@ export function createProfessorService(client = getPrismaClient()) {
       );
       return [header, ...rows].join("\n");
     },
+
+    async getStudentDetail(professorId: string, studentId: string) {
+      const allowed = await assertProfessorCohortAccess(professorId, studentId);
+      if (!allowed) {
+        return Result.fail(DomainError.forbidden("Etudiant hors cohorte assignee."));
+      }
+      const employee = await client.employee.findUnique({ where: { id: studentId } });
+      if (!employee) {
+        return Result.fail(DomainError.notFound("Etudiant introuvable."));
+      }
+      const moduleProgress = await client.employeeModuleProgress.findMany({
+        where: { employeeId: studentId },
+        include: { module: true },
+      });
+      const missionAttempts = await client.missionAttempt.findMany({
+        where: { employeeId: studentId },
+        include: { missionDefinition: true },
+        orderBy: { updatedAt: "desc" },
+      });
+      const assessmentAttempts = await client.assessmentAttempt.findMany({
+        where: { employeeId: studentId },
+        include: { assessment: true },
+        orderBy: { startedAt: "desc" },
+      });
+      const certificates = await client.certificate.findMany({
+        where: { employeeId: studentId },
+        orderBy: { issuedAt: "desc" },
+        include: { audits: { include: { actor: true }, orderBy: { createdAt: "desc" } } },
+      });
+      const pendingReviews = missionAttempts.filter(
+        (attempt) => attempt.status === "needs_review",
+      );
+      const competencyCodes = [
+        ...new Set(
+          missionAttempts
+            .filter((attempt) => attempt.status === "completed")
+            .flatMap((attempt) => {
+              const definition = attempt.missionDefinition.definitionJson as {
+                competencyCodes?: string[];
+              };
+              return definition.competencyCodes ?? [];
+            }),
+        ),
+      ];
+
+      return Result.ok({
+        employeeId: employee.id,
+        employeeNumber: employee.employeeNumber,
+        displayName: employee.displayName,
+        email: employee.email,
+        moduleProgress: moduleProgress.map((item) => ({
+          moduleCode: item.module.moduleCode,
+          status: item.status,
+          percentComplete: item.percentComplete,
+        })),
+        missions: missionAttempts.map((attempt) => ({
+          missionKey: attempt.missionDefinition.missionKey,
+          missionCode: attempt.missionDefinition.missionCode,
+          title: attempt.missionDefinition.title,
+          status: attempt.status,
+          scorePercent: attempt.scorePercent,
+          attemptNumber: attempt.attemptNumber,
+          needsReview: attempt.status === "needs_review",
+        })),
+        assessments: assessmentAttempts.map((attempt) => ({
+          code: attempt.assessment.code,
+          title: attempt.assessment.title,
+          status: attempt.status,
+          scorePercent: attempt.scorePercent,
+          attemptNumber: attempt.attemptNumber,
+        })),
+        pendingManualReviews: pendingReviews
+          .filter((attempt) => attempt.status === "needs_review")
+          .map((attempt) => ({
+            missionKey: attempt.missionDefinition.missionKey,
+            attemptNumber: attempt.attemptNumber,
+          })),
+        certificates: certificates.map((certificate) => ({
+          certificateNumber: certificate.certificateNumber,
+          certificateType: certificate.certificateType,
+          status: certificate.status,
+          verificationStatus: certificate.verificationStatus,
+          issuedAt: certificate.issuedAt.toISOString(),
+          revokedAt: certificate.revokedAt?.toISOString() ?? null,
+          revokeReason: certificate.revokeReason,
+        })),
+        competencySummary: competencyCodes,
+      });
+    },
+
+    async listCertificates(professorId: string) {
+      const students = await this.listStudents(professorId);
+      const studentIds = students.map((student) => student.employeeId);
+      const certificates = await client.certificate.findMany({
+        where: { employeeId: { in: studentIds } },
+        include: { employee: true },
+        orderBy: { issuedAt: "desc" },
+      });
+      return certificates.map((certificate) => ({
+        certificateNumber: certificate.certificateNumber,
+        certificateType: certificate.certificateType,
+        studentName: certificate.employee.displayName,
+        employeeId: certificate.employeeId,
+        status: certificate.status,
+        verificationStatus: certificate.verificationStatus,
+        issuedAt: certificate.issuedAt.toISOString(),
+        revokedAt: certificate.revokedAt?.toISOString() ?? null,
+        revokeReason: certificate.revokeReason,
+      }));
+    },
+
+    async listAuditEvents(professorId: string) {
+      const professor = await client.employee.findUnique({ where: { id: professorId } });
+      if (!professor) {
+        return [];
+      }
+      const events = await client.auditEvent.findMany({
+        where: {
+          companyId: professor.companyId,
+          OR: [
+            { actorEmployeeId: professorId },
+            { action: { startsWith: "professor." } },
+            { action: { startsWith: "certificate." } },
+          ],
+        },
+        orderBy: { createdAt: "desc" },
+        take: 100,
+        include: { actor: true },
+      });
+      return events.map((event) => ({
+        id: event.id,
+        action: event.action,
+        resourceType: event.resourceType,
+        resourceKey: event.resourceKey,
+        reason: event.reason,
+        actorName: event.actor.displayName,
+        createdAt: event.createdAt.toISOString(),
+      }));
+    },
+
+    async revokeCertificate(
+      professorId: string,
+      certificateNumber: string,
+      reason: string,
+    ): Promise<ResultType<{ ok: true }>> {
+      const certificate = await client.certificate.findUnique({
+        where: { certificateNumber },
+      });
+      if (!certificate) {
+        return Result.fail(DomainError.notFound("Certificat introuvable."));
+      }
+      const allowed = await assertProfessorCohortAccess(professorId, certificate.employeeId);
+      if (!allowed) {
+        return Result.fail(DomainError.forbidden("Certificat hors cohorte assignee."));
+      }
+      return assessments.revokeCertificate(professorId, certificateNumber, reason);
+    },
   };
 }
 

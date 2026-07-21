@@ -7,106 +7,118 @@ export const M5_M01 = {
   "missionCode": "M5-M01",
   "moduleCode": "M5",
   "title": "Analyser les stocks et le signal de reapprovisionnement",
-  "preview": "Interpretez le stockout DC-TRT et proposez le reappro.",
-  "briefing": "Bonjour,\n\nInterpretez le stockout DC-TRT et proposez le reappro.\n\nContexte NordHabitat — completez les controles et documentez les consequences.\n\nDenise Roy",
-  "unlockExplanation": "Completez d'abord « Module 4 ».",
+  "preview": "Interpretez le stockout DC-TRT sur SKU-HVAC-4421 et proposez un signal de reappro.",
+  "briefing": "Bonjour,\n\nCanicule en Ontario : la demande HVAC explose. Tom signale un stockout imminents a DC-TRT sur SKU-HVAC-4421. DC-MTL a encore du stock, mais les couvertures divergent fortement.\n\nKarim te challenge sur le MAPE de la prevision. Denise veut une proposition de reapprovisionnement avec preuves avant le S&OP de la semaine prochaine.\n\nAnalyse les rapports, identifie le signal de reappro et documente l'evidence.\n\nDenise Roy\nSupply Chain — NordHabitat",
+  "unlockExplanation": "Completez d'abord le Module 4 (cloture Sacre-Coeur) pour debloquer Supply Chain.",
   "sequence": 1,
-  "estimatedMinutes": 30,
-  "difficulty": "intro",
+  "estimatedMinutes": 35,
+  "difficulty": "intermediate",
   "competencyCodes": [
-    "C-SC-02",
-    "C-ANL-02"
+    "C-SC-01"
   ],
   "contextItems": [
     {
-      "key": "ctx-m5-m01",
-      "title": "Contexte mission",
-      "body": "Interpretez le stockout DC-TRT et proposez le reappro.",
+      "key": "ctx-stockout",
+      "title": "Alerte stock DC-TRT",
+      "body": "SKU-HVAC-4421 : stock libre DC-TRT = 0 unites (stockout). Demande hebdomadaire moyenne post-canicule : 28 unites. Seuil de reappro = 14 jours de couverture.",
+      "required": true
+    },
+    {
+      "key": "ctx-imbalance",
+      "title": "Desequilibre inter-DC",
+      "body": "DC-MTL : 47 jours de couverture (excès). DC-TRT : 0 jour (rupture). Dernier transfert STO-4408 : 12 unites pour Sacre-Coeur.",
+      "required": true
+    },
+    {
+      "key": "ctx-reorder",
+      "title": "Politique reapprovisionnement",
+      "body": "Point de commande : 14 jours de stock de securite. Lead time ThermoControl : 14 jours. Quantite economique suggeree : 40 unites.",
       "required": true
     }
   ],
   "interactions": [
     {
-      "id": "primary",
+      "id": "report-first",
       "type": "SINGLE_CHOICE",
-      "prompt": "Quelle est la premiere action controlee ?",
+      "prompt": "Quelle est la premiere source d'information pour analyser la rupture DC-TRT ?",
       "options": [
         {
-          "key": "report",
-          "label": "report"
+          "key": "stock-report",
+          "label": "Rapport de stock par entrepot (DC-MTL / DC-TRT)"
         },
         {
-          "key": "skip-control",
-          "label": "Ignorer les controles"
+          "key": "guess",
+          "label": "Estimer la demande sans donnees"
         },
         {
-          "key": "random",
-          "label": "Action hors processus"
+          "key": "email-only",
+          "label": "Se fier uniquement a l'email de Tom"
         }
       ],
       "scoring": {
         "maxPoints": 20,
         "correctKeys": [
-          "report"
+          "stock-report"
         ]
       }
     },
     {
-      "id": "controls",
+      "id": "analysis-elements",
       "type": "MULTI_CHOICE",
-      "prompt": "Quels elements sont requis ?",
+      "prompt": "Quels elements doivent figurer dans votre analyse de reapprovisionnement ?",
       "options": [
         {
-          "key": "report",
-          "label": "report"
+          "key": "stock-level",
+          "label": "Niveau de stock actuel par DC"
         },
         {
-          "key": "analyze",
-          "label": "analyze"
+          "key": "demand-trend",
+          "label": "Tendance de demande (canicule)"
         },
         {
-          "key": "propose",
-          "label": "propose"
+          "key": "reorder-qty",
+          "label": "Quantite de reappro recommandee"
         },
         {
           "key": "evidence",
-          "label": "evidence"
+          "label": "Evidence documentee pour le S&OP"
         },
         {
-          "key": "ignore",
-          "label": "Aucun"
+          "key": "ignore-trt",
+          "label": "Ignorer DC-TRT car MTL a du stock"
         }
       ],
       "scoring": {
         "maxPoints": 25,
         "correctKeys": [
-          "report",
-          "analyze",
-          "propose"
+          "stock-level",
+          "demand-trend",
+          "reorder-qty",
+          "evidence"
         ],
-        "minimumSelections": 2
+        "minimumSelections": 4
       }
     },
     {
-      "id": "sequence",
+      "id": "analysis-flow",
       "type": "ORDERING",
-      "prompt": "Ordonnez le deroulement.",
+      "prompt": "Ordonnez la demarche d'analyse inventaire et signal de reappro.",
       "options": [
         {
           "key": "report",
-          "label": "report"
+          "label": "Consulter les rapports de stock inter-DC"
         },
         {
           "key": "analyze",
-          "label": "analyze"
+          "label": "Analyser demande et couverture (14 jours)"
         },
         {
           "key": "propose",
-          "label": "propose"
+          "label": "Proposer quantite de reappro (40 unites)"
         },
         {
           "key": "evidence",
-          "label": "evidence"
+          "label": "Documenter l'evidence pour S&OP"
         }
       ],
       "scoring": {
@@ -120,28 +132,29 @@ export const M5_M01 = {
       }
     },
     {
-      "id": "metric",
+      "id": "reorder-qty",
       "type": "NUMERIC_INPUT",
-      "prompt": "Valeur cle a retenir pour cette mission ?",
+      "prompt": "Quelle quantite economique de reappro est suggeree pour SKU-HVAC-4421 ?",
       "scoring": {
         "maxPoints": 10,
-        "numericTarget": 14,
+        "numericTarget": 40,
         "numericTolerance": 0
       }
     },
     {
-      "id": "analysis",
+      "id": "mape-reflection",
       "type": "TEXT_ANALYSIS",
-      "prompt": "Justifiez la decision et ses consequences transverses.",
+      "prompt": "Pourquoi la canicule a-t-elle provoque une rupture malgre le stock disponible a DC-MTL ?",
       "scoring": {
         "maxPoints": 15,
         "requiredConcepts": [
-          "stock",
-          "seuil",
+          "prevision",
+          "desequilibre",
+          "demande",
           "reapprovisionnement"
         ]
       }
     }
   ],
-  "completionFeedback": "Mission M5-M01 completee.\n\nDenise Roy"
+  "completionFeedback": "Analyse validee. Proposition de reappro 40 unites prete pour le S&OP. Karim note la qualite de l'evidence.\n\nDenise Roy"
 } as const satisfies MissionDefinitionDocument;

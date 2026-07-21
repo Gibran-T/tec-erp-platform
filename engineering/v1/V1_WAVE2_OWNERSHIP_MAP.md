@@ -31,3 +31,17 @@ Parallel Task agents hit API limits; product implementation was consolidated on
 `integration/v1-wave2-m2-m6-silver` under Sheriff ownership. Feature worktrees remain
 at baseline SHA for lineage; exclusive ownership boundaries above still apply for
 follow-on deltas.
+
+## Feature worktree governance (PR #17 blocker closure)
+
+| Branch | Status | Action |
+|--------|--------|--------|
+| `feature/v1-m2-master-data` | Superseded — baseline only | Do not merge; preserve history |
+| `feature/v1-m3-m4-transactions` | Superseded — baseline only | Do not merge; preserve history |
+| `feature/v1-m5-m6-inventory-finance` | Superseded — baseline only | Do not merge; preserve history |
+| `feature/v1-professor-assessment-silver` | Superseded — baseline only | Do not merge; preserve history |
+| `feature/v1-student-wave2-runtime` | Superseded — baseline only | Do not merge; preserve history |
+| `qa/v1-wave2` | Superseded — baseline only | Do not merge; preserve history |
+| `integration/v1-wave2-m2-m6-silver` | **Authoritative product line** | All Wave 2 code lives here |
+
+No force-deletion of superseded branches in this task.

@@ -36,3 +36,11 @@ export const ProfessorOverrideRequestSchema = z.object({
   reviewDecision: z.enum(["approved", "rejected", "needs_revision"]).optional(),
 });
 export type ProfessorOverrideRequest = z.infer<typeof ProfessorOverrideRequestSchema>;
+
+export const ProfessorRevokeCertificateRequestSchema = z.object({
+  reason: z.string().trim().min(8).max(500),
+  confirm: z.literal(true),
+});
+export type ProfessorRevokeCertificateRequest = z.infer<
+  typeof ProfessorRevokeCertificateRequestSchema
+>;

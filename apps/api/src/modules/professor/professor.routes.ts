@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { ProfessorOverrideRequestSchema } from "@tec-platform/contracts";
+import {
+  ProfessorOverrideRequestSchema,
+  ProfessorRevokeCertificateRequestSchema,
+} from "@tec-platform/contracts";
 import { DomainError, Result } from "@tec-platform/core";
 
 import { getAuthenticatedEmployee } from "../../middleware/require-employee.js";
@@ -26,6 +29,37 @@ export function createProfessorRouter(service: ProfessorService): Router {
     }
   });
 
+  router.get("/students/:studentId", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      const result = await service.getStudentDetail(employee.id, req.params.studentId ?? "");
+      if (Result.isFail(result)) {
+        throw result.error;
+      }
+      res.status(200).json(result.value);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get("/certificates", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      res.status(200).json({ certificates: await service.listCertificates(employee.id) });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get("/audit", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      res.status(200).json({ events: await service.listAuditEvents(employee.id) });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   router.get("/export.csv", async (req, res, next) => {
     try {
       const employee = getAuthenticatedEmployee(req);
@@ -47,6 +81,27 @@ export function createProfessorRouter(service: ProfessorService): Router {
         employee.id,
         req.params.studentId ?? "",
         parsed.data,
+      );
+      if (Result.isFail(result)) {
+        throw result.error;
+      }
+      res.status(200).json(result.value);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post("/certificates/:certificateNumber/revoke", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      const parsed = ProfessorRevokeCertificateRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        throw DomainError.validation("Revocation invalide — raison et confirmation requises.");
+      }
+      const result = await service.revokeCertificate(
+        employee.id,
+        req.params.certificateNumber ?? "",
+        parsed.data.reason,
       );
       if (Result.isFail(result)) {
         throw result.error;

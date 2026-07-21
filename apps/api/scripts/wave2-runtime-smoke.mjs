@@ -108,9 +108,26 @@ async function runStudentAFlow(api, checklist) {
   }
   checklist.pass("Student A: start Silver assessment");
 
+  const draftBody = buildSilverAssessmentSubmit();
+  const draft = await api.put("/api/v1/me/assessments/SILVER_M1_M2/draft", {
+    responses: draftBody.responses,
+  });
+  if (draft.status !== 200) {
+    checklist.fail("Student A: save Silver draft", `status ${draft.status}`);
+  } else {
+    checklist.pass("Student A: save Silver draft (selection persistence)");
+  }
+
+  const resume = await api.get("/api/v1/me/assessments/SILVER_M1_M2/attempt");
+  if (resume.status !== 200 || !resume.body.questions?.length) {
+    checklist.fail("Student A: resume Silver attempt after refresh", `status ${resume.status}`);
+  } else {
+    checklist.pass("Student A: resume Silver attempt (stable shuffle)");
+  }
+
   const submitSilver = await api.post(
     "/api/v1/me/assessments/SILVER_M1_M2/submit",
-    buildSilverAssessmentSubmit(),
+    draftBody,
   );
   if (submitSilver.status !== 200 || !submitSilver.body.passed) {
     checklist.fail(
@@ -127,6 +144,21 @@ async function runStudentAFlow(api, checklist) {
     return false;
   }
   checklist.pass(`Student A: Silver certificate ${issue.body.certificateNumber}`);
+
+  const txDocs = await api.get("/api/v1/me/transactions/documents");
+  if (txDocs.status !== 200) {
+    checklist.fail("Student A: transactional documents UI API", `status ${txDocs.status}`);
+  } else {
+    checklist.pass("Student A: transactional documents API");
+  }
+  const inventory = await api.get("/api/v1/me/transactions/inventory");
+  const finance = await api.get("/api/v1/me/transactions/finance");
+  if (inventory.status === 200 && finance.status === 200) {
+    checklist.pass("Student A: inventory + finance transactional views");
+  } else {
+    checklist.fail("Student A: inventory/finance transactional views");
+  }
+
   return true;
 }
 
@@ -175,6 +207,37 @@ async function runStudentBIsolation(api, checklist, studentACompletedMissions) {
     checklist.fail("Student B: professor endpoint forbidden", `status ${professorProbe.status}`);
   } else {
     checklist.pass("Student B: professor endpoint forbidden (403)");
+  }
+
+  const blockedPo = await api.post("/api/v1/me/transactions/actions", {
+    action: "p2p.create_po",
+    payload: {
+      supplierKey: "BLOCKED-SUPPLIER",
+      materialKey: "SKU-HVAC-4421",
+      quantity: 10,
+      unitPrice: 100,
+    },
+  });
+  if (blockedPo.status >= 400) {
+    checklist.pass("Student B: blocked P2P supplier rejected");
+  } else {
+    checklist.fail("Student B: blocked P2P should reject", `status ${blockedPo.status}`);
+  }
+
+  const negativeStock = await api.post("/api/v1/me/transactions/actions", {
+    action: "o2c.deliver",
+    payload: {
+      salesOrderDocumentId: "missing",
+      materialKey: "SKU-HVAC-4421",
+      locationKey: "DC-TRT",
+      quantity: 99999,
+      postingKey: `smoke-neg-${Date.now()}`,
+    },
+  });
+  if (negativeStock.status >= 400) {
+    checklist.pass("Student B: negative/insufficient stock rejected");
+  } else {
+    checklist.fail("Student B: stock over-issue should reject", `status ${negativeStock.status}`);
   }
 
   return true;
@@ -246,6 +309,30 @@ async function runProfessorFlow(api, checklist, studentBId) {
     checklist.pass("Professor: reset attempt override");
   }
 
+  const review = await api.post(`/api/v1/professor/students/${studentA.employeeId}/override`, {
+    action: "review_analytical",
+    missionKey: "m2-m03-corriger-qualite-donnees",
+    reviewDecision: "approved",
+    reason: "Smoke test — revue analytique approuvee",
+  });
+  if (review.status !== 200) {
+    checklist.fail("Professor: review analytical", `status ${review.status}`);
+  } else {
+    checklist.pass("Professor: review analytical response");
+  }
+
+  const override = await api.post(`/api/v1/professor/students/${studentBId}/override`, {
+    action: "override_score",
+    missionKey: "m1-m01-decouvrir-entreprise",
+    scorePercent: 80,
+    reason: "Smoke test — override score with mandatory reason",
+  });
+  if (override.status !== 200) {
+    checklist.fail("Professor: override score", `status ${override.status}`);
+  } else {
+    checklist.pass("Professor: override score with reason");
+  }
+
   const csv = await api.get("/api/v1/professor/export.csv");
   if (csv.status !== 200 || typeof csv.body !== "string") {
     checklist.fail("Professor: export CSV", `status ${csv.status}`);
@@ -253,6 +340,51 @@ async function runProfessorFlow(api, checklist, studentBId) {
     checklist.fail("Professor: export CSV contains Student A");
   } else {
     checklist.pass("Professor: export CSV");
+  }
+
+  const detail = await api.get(`/api/v1/professor/students/${studentA.employeeId}`);
+  if (detail.status !== 200) {
+    checklist.fail("Professor: student detail", `status ${detail.status}`);
+  } else {
+    checklist.pass("Professor: student detail workflow");
+  }
+
+  const certs = await api.get("/api/v1/professor/certificates");
+  const issued = certs.body.certificates?.find((item) => item.status === "issued");
+  if (!issued) {
+    checklist.fail("Professor: issued Silver certificate listed");
+  } else {
+    const revoke = await api.post(
+      `/api/v1/professor/certificates/${encodeURIComponent(issued.certificateNumber)}/revoke`,
+      {
+        reason: "Smoke test — revocation pedagogique obligatoire",
+        confirm: true,
+      },
+    );
+    if (revoke.status !== 200) {
+      checklist.fail("Professor: revoke Silver", `status ${revoke.status}`);
+    } else {
+      checklist.pass("Professor: revoke Silver certificate");
+    }
+    const revokeAgain = await api.post(
+      `/api/v1/professor/certificates/${encodeURIComponent(issued.certificateNumber)}/revoke`,
+      {
+        reason: "Smoke test — duplicate revoke",
+        confirm: true,
+      },
+    );
+    if (revokeAgain.status >= 400) {
+      checklist.pass("Professor: duplicate revoke rejected safely");
+    } else {
+      checklist.fail("Professor: duplicate revoke should fail");
+    }
+  }
+
+  const audit = await api.get("/api/v1/professor/audit");
+  if (audit.status === 200 && (audit.body.events?.length ?? 0) > 0) {
+    checklist.pass("Professor: audit history visible");
+  } else {
+    checklist.fail("Professor: audit history");
   }
 
   if (studentA.silverStatus === "issued" || studentA.silverStatus === "eligible") {

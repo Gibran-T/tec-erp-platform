@@ -7,40 +7,52 @@ export const M6_M01 = {
   "missionCode": "M6-M01",
   "moduleCode": "M6",
   "title": "Receptionner la facture fournisseur",
-  "preview": "Saisissez la facture ThermoControl et preparez le rapprochement.",
-  "briefing": "Bonjour,\n\nSaisissez la facture ThermoControl et preparez le rapprochement.\n\nContexte NordHabitat — completez les controles et documentez les consequences.\n\nMarc Tremblay",
-  "unlockExplanation": "Completez d'abord « Module 5 ».",
+  "preview": "Saisissez la facture ThermoControl pour PO-88421 et preparez le rapprochement trois voies.",
+  "briefing": "Bonjour,\n\nThermoControl a envoye sa facture INV-TC-88421 pour la livraison partielle liee a PO-88421. Julie a deja valide la reception de 36 unites sur 40 commandees.\n\nAvant de poster quoi que ce soit, saisis la facture et lance l'apercu de rapprochement (match preview). Je bloque tout paiement sans controle.\n\nIdentifie le statut de match avant la prochaine etape.\n\nMarc Tremblay\nFinance — NordHabitat",
+  "unlockExplanation": "Completez d'abord le Module 5 (decision S&OP) pour debloquer Finance.",
   "sequence": 1,
   "estimatedMinutes": 30,
-  "difficulty": "intro",
+  "difficulty": "intermediate",
   "competencyCodes": [
-    "C-FIN-02"
+    "C-FIN-01"
   ],
   "contextItems": [
     {
-      "key": "ctx-m6-m01",
-      "title": "Contexte mission",
-      "body": "Saisissez la facture ThermoControl et preparez le rapprochement.",
+      "key": "ctx-invoice",
+      "title": "Facture INV-TC-88421",
+      "body": "Fournisseur ThermoControl; reference PO-88421; 36 unites SKU-HVAC-4421 a 125 CAD; montant 4 500 CAD; date facture 5 septembre.",
+      "required": true
+    },
+    {
+      "key": "ctx-po-gr",
+      "title": "PO et reception GR-88421",
+      "body": "PO-88421 : 40 unites commandees a 125 CAD (5 000 CAD). GR-88421 : 36 unites recues le 15 mai. 4 unites en attente fournisseur.",
+      "required": true
+    },
+    {
+      "key": "ctx-match-policy",
+      "title": "Politique rapprochement AP",
+      "body": "Rapprochement trois voies obligatoire : PO + GR + facture. Tolerance quantite : 0 %. Tolerance prix : 2 %. Paiement bloque si exception non resolue.",
       "required": true
     }
   ],
   "interactions": [
     {
-      "id": "primary",
+      "id": "receive-first",
       "type": "SINGLE_CHOICE",
-      "prompt": "Quelle est la premiere action controlee ?",
+      "prompt": "Quelle est la premiere etape dans le traitement de la facture fournisseur ?",
       "options": [
         {
           "key": "receive",
-          "label": "receive"
+          "label": "Receptionner et enregistrer la facture"
         },
         {
-          "key": "skip-control",
-          "label": "Ignorer les controles"
+          "key": "pay",
+          "label": "Declencher le paiement immediat"
         },
         {
-          "key": "random",
-          "label": "Action hors processus"
+          "key": "discard",
+          "label": "Rejeter la facture sans analyse"
         }
       ],
       "scoring": {
@@ -51,61 +63,62 @@ export const M6_M01 = {
       }
     },
     {
-      "id": "controls",
+      "id": "ap-elements",
       "type": "MULTI_CHOICE",
-      "prompt": "Quels elements sont requis ?",
+      "prompt": "Quels controles AP sont requis avant validation du paiement ?",
       "options": [
         {
-          "key": "receive",
-          "label": "receive"
+          "key": "enter-invoice",
+          "label": "Saisie facture avec reference PO-88421"
         },
         {
-          "key": "enter",
-          "label": "enter"
+          "key": "match-preview",
+          "label": "Apercu rapprochement trois voies"
         },
         {
-          "key": "preview",
-          "label": "preview"
+          "key": "flag-exception",
+          "label": "Signaler exception si ecart detecte"
         },
         {
-          "key": "flag",
-          "label": "flag"
+          "key": "verify-gr",
+          "label": "Verifier GR-88421 (36 unites)"
         },
         {
-          "key": "ignore",
-          "label": "Aucun"
+          "key": "blind-post",
+          "label": "Poster sans apercu de match"
         }
       ],
       "scoring": {
         "maxPoints": 25,
         "correctKeys": [
-          "receive",
-          "enter",
-          "preview"
+          "enter-invoice",
+          "match-preview",
+          "flag-exception",
+          "verify-gr"
         ],
-        "minimumSelections": 2
+        "minimumSelections": 4
       }
     },
     {
-      "id": "sequence",
+      "id": "ap-flow",
       "type": "ORDERING",
-      "prompt": "Ordonnez le deroulement.",
+      "prompt": "Ordonnez le workflow de reception facture fournisseur.",
       "options": [
         {
           "key": "receive",
-          "label": "receive"
+          "label": "Receptionner la facture INV-TC-88421"
         },
         {
           "key": "enter",
-          "label": "enter"
+          "label": "Saisir montant et reference PO"
         },
         {
           "key": "preview",
-          "label": "preview"
+          "label": "Lancer l'apercu rapprochement trois voies"
         },
         {
           "key": "flag",
-          "label": "flag"
+          "label": "Signaler l'exception quantite (36 vs 40 PO)"
         }
       ],
       "scoring": {
@@ -119,9 +132,9 @@ export const M6_M01 = {
       }
     },
     {
-      "id": "metric",
+      "id": "invoice-qty",
       "type": "NUMERIC_INPUT",
-      "prompt": "Valeur cle a retenir pour cette mission ?",
+      "prompt": "Combien d'unites figurent sur la facture INV-TC-88421 ?",
       "scoring": {
         "maxPoints": 10,
         "numericTarget": 36,
@@ -129,18 +142,19 @@ export const M6_M01 = {
       }
     },
     {
-      "id": "analysis",
+      "id": "match-rationale",
       "type": "TEXT_ANALYSIS",
-      "prompt": "Justifiez la decision et ses consequences transverses.",
+      "prompt": "Pourquoi Marc exige un apercu de rapprochement avant tout paiement sur PO-88421 ?",
       "scoring": {
         "maxPoints": 15,
         "requiredConcepts": [
-          "facture",
           "rapprochement",
-          "payable"
+          "controle",
+          "facture",
+          "paiement"
         ]
       }
     }
   ],
-  "completionFeedback": "Mission M6-M01 completee.\n\nMarc Tremblay"
+  "completionFeedback": "Facture INV-TC-88421 saisie. Exception quantite signalee : facture 36 unites alignee sur GR, PO reste a 40. Pret pour resolution.\n\nMarc Tremblay"
 } as const satisfies MissionDefinitionDocument;

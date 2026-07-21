@@ -36,6 +36,8 @@ import { createAssessmentMeRouter } from "./modules/assessment/assessment.routes
 import { createAssessmentService } from "./modules/assessment/assessment.service.js";
 import { createMasterDataMeRouter } from "./modules/master-data/master-data.routes.js";
 import { createMasterDataService } from "./modules/master-data/master-data.service.js";
+import { createTransactionsMeRouter } from "./modules/transactions/transactions.routes.js";
+import { createTransactionsService } from "./modules/transactions/transactions.service.js";
 import { createProfessorRouter } from "./modules/professor/professor.routes.js";
 import { createProfessorService } from "./modules/professor/professor.service.js";
 import { requireProfessor } from "./middleware/require-professor.js";
@@ -134,6 +136,7 @@ export function createApp(
   const requireEmployee = createRequireEmployee(authService);
   const assessmentService = createAssessmentService();
   const masterDataService = createMasterDataService();
+  const transactionsService = createTransactionsService();
   const professorService = createProfessorService();
 
   app.use(createOperationalRouter(dependencies));
@@ -144,6 +147,11 @@ export function createApp(
   app.use("/api/v1/me", requireEmployee, createOrganizationMeRouter(organizationService));
   app.use("/api/v1/me/assessments", requireEmployee, createAssessmentMeRouter(assessmentService));
   app.use("/api/v1/me/master-data", requireEmployee, createMasterDataMeRouter(masterDataService));
+  app.use(
+    "/api/v1/me/transactions",
+    requireEmployee,
+    createTransactionsMeRouter(transactionsService),
+  );
   app.use(
     "/api/v1/professor",
     requireEmployee,

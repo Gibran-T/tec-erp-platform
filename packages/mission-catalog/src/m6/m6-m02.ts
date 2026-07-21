@@ -7,41 +7,52 @@ export const M6_M02 = {
   "missionCode": "M6-M02",
   "moduleCode": "M6",
   "title": "Traiter l'exception de rapprochement trois voies",
-  "preview": "Resolvez l'ecart PO/GR/facture avant paiement.",
-  "briefing": "Bonjour,\n\nResolvez l'ecart PO/GR/facture avant paiement.\n\nContexte NordHabitat — completez les controles et documentez les consequences.\n\nMarc Tremblay",
-  "unlockExplanation": "Completez d'abord « Receptionner la facture fournisseur ».",
+  "preview": "Resolvez l'ecart PO (40) / GR (36) / facture (36) avant de debloquer le paiement.",
+  "briefing": "Bonjour,\n\nL'exception est confirmee : PO-88421 commandait 40 unites, GR-88421 n'en a recu que 36, et la facture ThermoControl couvre 36 unites. Le paiement est bloque.\n\nJulie connait l'historique : ThermoControl a livre partiellement en mai. Renee veut une explication claire avant que je signe.\n\nIdentifie la cause racine, propose l'action corrective et decide : payer les 36 ou maintenir le blocage.\n\nMarc Tremblay\nFinance — NordHabitat",
+  "unlockExplanation": "Completez d'abord « Receptionner la facture fournisseur » (exception signalee sur INV-TC-88421).",
   "sequence": 2,
-  "estimatedMinutes": 35,
+  "estimatedMinutes": 40,
   "difficulty": "intermediate",
   "competencyCodes": [
-    "C-FIN-03",
-    "C-P2P-04"
+    "C-FIN-02"
   ],
   "contextItems": [
     {
-      "key": "ctx-m6-m02",
-      "title": "Contexte mission",
-      "body": "Resolvez l'ecart PO/GR/facture avant paiement.",
+      "key": "ctx-variance",
+      "title": "Rapport exception match",
+      "body": "PO-88421 : 40 unites x 125 CAD = 5 000 CAD. GR-88421 : 36 unites recues. Facture INV-TC-88421 : 36 unites = 4 500 CAD. Ecart PO-GR : 4 unites.",
+      "required": true
+    },
+    {
+      "key": "ctx-root-cause",
+      "title": "Historique livraison partielle",
+      "body": "ThermoControl a confirme livraison partielle 36/40 en mai. Julie a accepte avec reserve. 4 unites en reliquat — bon de livraison partiel signe par Tom.",
+      "required": true
+    },
+    {
+      "key": "ctx-policy",
+      "title": "Politique resolution exception",
+      "body": "Payer uniquement quantite recue et facturee (36). PO ouverte pour reliquat 4 unites. Debit note requis si surfacturation. Approbation Marc pour tout ecart > 0 CAD.",
       "required": true
     }
   ],
   "interactions": [
     {
-      "id": "primary",
+      "id": "detect-first",
       "type": "SINGLE_CHOICE",
-      "prompt": "Quelle est la premiere action controlee ?",
+      "prompt": "Quelle est la premiere action face a l'exception de rapprochement ?",
       "options": [
         {
           "key": "detect",
-          "label": "detect"
+          "label": "Analyser l'ecart PO (40) vs GR/facture (36)"
         },
         {
-          "key": "skip-control",
-          "label": "Ignorer les controles"
+          "key": "pay-40",
+          "label": "Payer 40 unites pour fermer rapidement"
         },
         {
-          "key": "random",
-          "label": "Action hors processus"
+          "key": "ignore",
+          "label": "Ignorer l'exception et poster le paiement"
         }
       ],
       "scoring": {
@@ -52,61 +63,62 @@ export const M6_M02 = {
       }
     },
     {
-      "id": "controls",
+      "id": "exception-elements",
       "type": "MULTI_CHOICE",
-      "prompt": "Quels elements sont requis ?",
+      "prompt": "Quels elements sont requis pour resoudre l'exception trois voies ?",
       "options": [
         {
-          "key": "detect",
-          "label": "detect"
+          "key": "root-cause",
+          "label": "Cause racine documentee (livraison partielle)"
         },
         {
-          "key": "explain",
-          "label": "explain"
+          "key": "correct-action",
+          "label": "Action corrective (payer 36, PO ouverte pour 4)"
         },
         {
-          "key": "correct",
-          "label": "correct"
+          "key": "julie-confirm",
+          "label": "Confirmation Julie sur reliquat fournisseur"
         },
         {
-          "key": "release-or-hold",
-          "label": "release-or-hold"
+          "key": "release-hold",
+          "label": "Decision payer/maintenir blocage justifiee"
         },
         {
-          "key": "ignore",
-          "label": "Aucun"
+          "key": "pay-full",
+          "label": "Payer 5 000 CAD sans verification GR"
         }
       ],
       "scoring": {
         "maxPoints": 25,
         "correctKeys": [
-          "detect",
-          "explain",
-          "correct"
+          "root-cause",
+          "correct-action",
+          "julie-confirm",
+          "release-hold"
         ],
-        "minimumSelections": 2
+        "minimumSelections": 4
       }
     },
     {
-      "id": "sequence",
+      "id": "exception-flow",
       "type": "ORDERING",
-      "prompt": "Ordonnez le deroulement.",
+      "prompt": "Ordonnez la resolution de l'exception rapprochement PO-88421.",
       "options": [
         {
           "key": "detect",
-          "label": "detect"
+          "label": "Detecter ecart 4 unites (40 PO vs 36 GR)"
         },
         {
           "key": "explain",
-          "label": "explain"
+          "label": "Expliquer cause racine (livraison partielle mai)"
         },
         {
           "key": "correct",
-          "label": "correct"
+          "label": "Corriger : payer 4 500 CAD pour 36 unites"
         },
         {
-          "key": "release-or-hold",
-          "label": "release-or-hold"
+          "key": "release",
+          "label": "Debloquer paiement avec PO ouverte pour reliquat"
         }
       ],
       "scoring": {
@@ -115,14 +127,14 @@ export const M6_M02 = {
           "detect",
           "explain",
           "correct",
-          "release-or-hold"
+          "release"
         ]
       }
     },
     {
-      "id": "metric",
+      "id": "unit-gap",
       "type": "NUMERIC_INPUT",
-      "prompt": "Valeur cle a retenir pour cette mission ?",
+      "prompt": "Combien d'unites d'ecart entre la PO (40) et le GR/facture (36) ?",
       "scoring": {
         "maxPoints": 10,
         "numericTarget": 4,
@@ -130,18 +142,19 @@ export const M6_M02 = {
       }
     },
     {
-      "id": "analysis",
-      "type": "TEXT_ANALYSIS",
-      "prompt": "Justifiez la decision et ses consequences transverses.",
+      "id": "variance-diagnosis",
+      "type": "DIAGNOSIS_RECOMMENDATION",
+      "prompt": "Diagnostiquez l'exception et recommandez : payer 4 500 CAD (36 unites) ou bloquer en attendant les 4 unites restantes ?",
       "scoring": {
         "maxPoints": 15,
         "requiredConcepts": [
           "ecart",
-          "trois",
-          "paiement"
+          "partiel",
+          "paiement",
+          "politique"
         ]
       }
     }
   ],
-  "completionFeedback": "Mission M6-M02 completee.\n\nMarc Tremblay"
+  "completionFeedback": "Exception resolue. Paiement 4 500 CAD debloque pour 36 unites. PO-88421 reste ouverte pour reliquat 4 unites.\n\nJulie Chen — Approvisionnements"
 } as const satisfies MissionDefinitionDocument;

@@ -7,41 +7,52 @@ export const M5_M02 = {
   "missionCode": "M5-M02",
   "moduleCode": "M5",
   "title": "Decider un transfert inter-DC",
-  "preview": "Approuvez un transfert MTL-TRT avec impact fret.",
-  "briefing": "Bonjour,\n\nApprouvez un transfert MTL-TRT avec impact fret.\n\nContexte NordHabitat — completez les controles et documentez les consequences.\n\nDenise Roy",
+  "preview": "Approuvez un transfert MTL-TRT pour equilibrer les stocks avec impact fret documente.",
+  "briefing": "Bonjour,\n\nTon analyse confirme le desequilibre : DC-MTL a 47 jours de couverture, DC-TRT est en rupture. Avant de commander 40 unites a ThermoControl (14 jours de delai), nous devons servir les clients cette semaine.\n\nTom propose un transfert de 20 unites MTL vers TRT. Marc veut connaitre l'impact tresorerie du fret d'urgence vs le delai standard.\n\nPrends la decision de transfert et documente le cout.\n\nDenise Roy\nSupply Chain — NordHabitat",
   "unlockExplanation": "Completez d'abord « Analyser les stocks et le signal de reapprovisionnement ».",
   "sequence": 2,
-  "estimatedMinutes": 35,
+  "estimatedMinutes": 40,
   "difficulty": "intermediate",
   "competencyCodes": [
-    "C-SC-03",
-    "C-FIN-01"
+    "C-SC-02"
   ],
   "contextItems": [
     {
-      "key": "ctx-m5-m02",
-      "title": "Contexte mission",
-      "body": "Approuvez un transfert MTL-TRT avec impact fret.",
+      "key": "ctx-coverage",
+      "title": "Couverture stock inter-DC",
+      "body": "DC-MTL : 52 unites, couverture 47 jours. DC-TRT : 0 unite, couverture 0 jour. Demande TRT : 20 unites/semaine post-canicule.",
+      "required": true
+    },
+    {
+      "key": "ctx-transfer-request",
+      "title": "Demande transfert STO-4512",
+      "body": "Transfert propose : 20 unites SKU-HVAC-4421 DC-MTL vers DC-TRT. Tom confirme disponibilite physique au comptage gemba.",
+      "required": true
+    },
+    {
+      "key": "ctx-freight-options",
+      "title": "Options fret et tresorerie",
+      "body": "Express 24 h : 680 CAD (impact tresorerie immediat). Standard 3 jours : 290 CAD (risque 2 clients en attente). Marc : plafond urgence 750 CAD sans comite.",
       "required": true
     }
   ],
   "interactions": [
     {
-      "id": "primary",
+      "id": "balance-first",
       "type": "SINGLE_CHOICE",
-      "prompt": "Quelle est la premiere action controlee ?",
+      "prompt": "Quelle analyse precede la decision de transfert inter-DC ?",
       "options": [
         {
           "key": "balance",
-          "label": "balance"
+          "label": "Equilibrer couverture MTL (47 j) vs TRT (0 j)"
         },
         {
-          "key": "skip-control",
-          "label": "Ignorer les controles"
+          "key": "order-only",
+          "label": "Commander directement 40 unites sans transfert"
         },
         {
-          "key": "random",
-          "label": "Action hors processus"
+          "key": "wait",
+          "label": "Attendre le reappro ThermoControl (14 jours)"
         }
       ],
       "scoring": {
@@ -52,61 +63,62 @@ export const M5_M02 = {
       }
     },
     {
-      "id": "controls",
+      "id": "transfer-controls",
       "type": "MULTI_CHOICE",
-      "prompt": "Quels elements sont requis ?",
+      "prompt": "Quels elements sont requis pour un transfert inter-DC approuve ?",
       "options": [
         {
-          "key": "balance",
-          "label": "balance"
+          "key": "qty-verified",
+          "label": "Quantite verifiee par Tom (gemba)"
         },
         {
-          "key": "quote",
-          "label": "quote"
+          "key": "freight-quote",
+          "label": "Devis fret documente"
         },
         {
-          "key": "approve",
-          "label": "approve"
+          "key": "approval",
+          "label": "Approbation selon plafond Marc (750 CAD)"
         },
         {
-          "key": "post",
-          "label": "post"
+          "key": "sto-post",
+          "label": "Creation et suivi de l'ordre STO"
         },
         {
-          "key": "ignore",
-          "label": "Aucun"
+          "key": "skip-finance",
+          "label": "Approuver sans informer Finance"
         }
       ],
       "scoring": {
         "maxPoints": 25,
         "correctKeys": [
-          "balance",
-          "quote",
-          "approve"
+          "qty-verified",
+          "freight-quote",
+          "approval",
+          "sto-post"
         ],
-        "minimumSelections": 2
+        "minimumSelections": 4
       }
     },
     {
-      "id": "sequence",
+      "id": "transfer-flow",
       "type": "ORDERING",
-      "prompt": "Ordonnez le deroulement.",
+      "prompt": "Ordonnez le workflow de decision de transfert inter-DC.",
       "options": [
         {
           "key": "balance",
-          "label": "balance"
+          "label": "Analyser desequilibre couverture inter-DC"
         },
         {
           "key": "quote",
-          "label": "quote"
+          "label": "Obtenir devis fret (express vs standard)"
         },
         {
           "key": "approve",
-          "label": "approve"
+          "label": "Obtenir approbation (Marc / plafond 750 CAD)"
         },
         {
           "key": "post",
-          "label": "post"
+          "label": "Creer et suivre STO-4512"
         }
       ],
       "scoring": {
@@ -120,9 +132,9 @@ export const M5_M02 = {
       }
     },
     {
-      "id": "metric",
+      "id": "mtl-coverage",
       "type": "NUMERIC_INPUT",
-      "prompt": "Valeur cle a retenir pour cette mission ?",
+      "prompt": "Combien de jours de couverture DC-MTL avait-on avant transfert (selon contexte) ?",
       "scoring": {
         "maxPoints": 10,
         "numericTarget": 47,
@@ -130,18 +142,19 @@ export const M5_M02 = {
       }
     },
     {
-      "id": "analysis",
-      "type": "TEXT_ANALYSIS",
-      "prompt": "Justifiez la decision et ses consequences transverses.",
+      "id": "cash-tradeoff",
+      "type": "DIAGNOSIS_RECOMMENDATION",
+      "prompt": "Recommandez-vous le fret express (680 CAD) ou standard (290 CAD) pour STO-4512. Justifiez l'arbitrage service client vs tresorerie.",
       "scoring": {
         "maxPoints": 15,
         "requiredConcepts": [
-          "transfert",
           "fret",
-          "stock"
+          "tresorerie",
+          "service",
+          "transfert"
         ]
       }
     }
   ],
-  "completionFeedback": "Mission M5-M02 completee.\n\nDenise Roy"
+  "completionFeedback": "STO-4512 approuve avec fret express 680 CAD. Tom lance la preparation; TRT sera reapprovisionne demain.\n\nTom Leclerc — Entrepot DC-MTL"
 } as const satisfies MissionDefinitionDocument;
