@@ -7,12 +7,14 @@ import {
   type ModuleCatalogEntry,
 } from "./schema.js";
 import { WAVE2_MISSIONS, WAVE2_MODULES } from "./wave2.js";
+import { WAVE3_MISSIONS, WAVE3_MODULES } from "./wave3.js";
 
 const MISSIONS: readonly MissionDefinitionDocument[] = [
   MissionDefinitionDocumentSchema.parse(M1_M01),
   MissionDefinitionDocumentSchema.parse(M1_M02),
   MissionDefinitionDocumentSchema.parse(M1_M03),
   ...WAVE2_MISSIONS.map((mission) => MissionDefinitionDocumentSchema.parse(mission)),
+  ...WAVE3_MISSIONS.map((mission) => MissionDefinitionDocumentSchema.parse(mission)),
 ];
 
 const MODULES: readonly ModuleCatalogEntry[] = [
@@ -25,6 +27,7 @@ const MODULES: readonly ModuleCatalogEntry[] = [
     ),
   },
   ...WAVE2_MODULES,
+  ...WAVE3_MODULES,
 ];
 
 const byKey = new Map(MISSIONS.map((mission) => [mission.missionKey, mission]));

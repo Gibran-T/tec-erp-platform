@@ -22,6 +22,7 @@ model PlatformSchemaMetadata {
 enum EmployeeRole {
   JR_BUSINESS_ANALYST
   PROFESSOR
+  ADMIN
 }
 
 /// The employing organization of the simulated enterprise universe
@@ -44,6 +45,12 @@ model Company {
   transactionEvents    TransactionEvent[]
   auditEvents          AuditEvent[]
   simulationSnapshots  SimulationSnapshot[]
+  configuration        CompanyConfiguration?
+  aiPolicy             AiPolicy?
+  kpiRecords           KpiRecord[]
+  aiInteractions       AiInteraction[]
+  integrationConnections IntegrationConnection[]
+  featureFlags         FeatureFlag[]
 
   @@map("company")
 }
@@ -80,6 +87,13 @@ model Employee {
   certificates         Certificate[]
   certificateAudits    CertificateAudit[]
   auditEventsActed     AuditEvent[]              @relation("AuditActor")
+  aiInteractions       AiInteraction[]
+  capstoneSubmission   CapstoneSubmission?
+  missionDrafts        MissionDraft[]
+  missionVersions      MissionVersion[]          @relation("MissionVersionPublisher")
+  scenarioPublications ScenarioPublication[]
+  predictionRecords    PredictionRecord[]        @relation("PredictionStudent")
+  automationExecutions AutomationExecution[]
 
   @@index([companyId])
   @@map("employee")
@@ -627,10 +641,301 @@ model Certificate {
 
   employee Employee           @relation(fields: [employeeId], references: [id])
   cohort   Cohort?            @relation(fields: [cohortId], references: [id])
-  audits   CertificateAudit[]
+  audits                CertificateAudit[]
+  verificationTokens    PublicVerificationToken[]
 
   @@index([employeeId])
   @@map("certificate")
+}
+
+model CompanyConfiguration {
+  id           String   @id @default(cuid())
+  companyId    String   @unique
+  settingsJson Json     @default("{}")
+  aiEnabled    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@map("company_configuration")
+}
+
+model DashboardDefinition {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  title       String
+  description String
+  category    String
+  layoutJson  Json     @default("{}")
+  kpiKeys     Json     @default("[]")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("dashboard_definition")
+}
+
+model KpiFormulaVersion {
+  id          String   @id @default(cuid())
+  kpiKey      String
+  version     Int
+  formulaJson Json
+  createdAt   DateTime @default(now())
+
+  @@unique([kpiKey, version])
+  @@map("kpi_formula_version")
+}
+
+model KpiRecord {
+  id           String   @id @default(cuid())
+  companyId    String
+  kpiKey       String
+  value        Float?
+  unit         String?
+  stale        Boolean  @default(false)
+  snapshotJson Json
+  recordedAt   DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@index([companyId, kpiKey, recordedAt])
+  @@map("kpi_record")
+}
+
+model AiPolicy {
+  id         String   @id @default(cuid())
+  companyId  String   @unique
+  aiEnabled  Boolean  @default(true)
+  policyJson Json     @default("{}")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@map("ai_policy")
+}
+
+model AiInteraction {
+  id           String   @id @default(cuid())
+  employeeId   String
+  companyId    String
+  question     String
+  answer       String
+  refused      Boolean  @default(false)
+  metadataJson Json     @default("{}")
+  createdAt    DateTime @default(now())
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+  company  Company  @relation(fields: [companyId], references: [id])
+
+  @@index([employeeId, createdAt])
+  @@map("ai_interaction")
+}
+
+model PredictionRecord {
+  id           String   @id @default(cuid())
+  studentId    String
+  professorId  String?
+  modelVersion String
+  payloadJson  Json
+  createdAt    DateTime @default(now())
+
+  student Employee @relation("PredictionStudent", fields: [studentId], references: [id])
+
+  @@index([studentId, createdAt])
+  @@map("prediction_record")
+}
+
+model CapstoneSubmission {
+  id                  String    @id @default(cuid())
+  employeeId          String    @unique
+  missionKey          String    @default("m10-m03-presentation-capstone-or")
+  status              String    @default("draft")
+  diagnose            String?
+  prioritize          String?
+  execute             String?
+  analyze             String?
+  recommend           String?
+  executiveSummary    String?
+  submittedAt         DateTime?
+  reviewStatus        String?
+  professorApproved   Boolean   @default(false)
+  professorNotes      String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  employee Employee           @relation(fields: [employeeId], references: [id])
+  evidence CapstoneEvidence[]
+
+  @@map("capstone_submission")
+}
+
+model CapstoneEvidence {
+  id           String   @id @default(cuid())
+  submissionId String
+  kind         String
+  payloadJson  Json
+  createdAt    DateTime @default(now())
+
+  submission CapstoneSubmission @relation(fields: [submissionId], references: [id])
+
+  @@index([submissionId])
+  @@map("capstone_evidence")
+}
+
+model MissionDraft {
+  id               String   @id @default(cuid())
+  missionKey       String
+  authorEmployeeId String
+  status           String   @default("draft")
+  draftJson        Json
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  author   Employee         @relation(fields: [authorEmployeeId], references: [id])
+  versions MissionVersion[]
+
+  @@index([missionKey])
+  @@map("mission_draft")
+}
+
+model MissionVersion {
+  id                    String   @id @default(cuid())
+  draftId               String?
+  missionKey            String
+  versionNumber         Int
+  definitionJson        Json
+  publishedAt           DateTime
+  publishedByEmployeeId String
+  status                String   @default("published")
+
+  draft        MissionDraft?         @relation(fields: [draftId], references: [id])
+  publisher    Employee              @relation("MissionVersionPublisher", fields: [publishedByEmployeeId], references: [id])
+  publications ScenarioPublication[]
+
+  @@unique([missionKey, versionNumber])
+  @@map("mission_version")
+}
+
+model ScenarioPublication {
+  id               String   @id @default(cuid())
+  missionVersionId String
+  action           String
+  actorEmployeeId  String
+  reason           String?
+  createdAt        DateTime @default(now())
+
+  missionVersion MissionVersion @relation(fields: [missionVersionId], references: [id])
+  actor          Employee       @relation(fields: [actorEmployeeId], references: [id])
+
+  @@index([missionVersionId])
+  @@map("scenario_publication")
+}
+
+model IntegrationConnection {
+  id         String   @id @default(cuid())
+  companyId  String
+  adapterKey String
+  name       String
+  configJson Json     @default("{}")
+  secretRef  String?
+  status     String   @default("active")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  company Company          @relation(fields: [companyId], references: [id])
+  runs    IntegrationRun[]
+
+  @@index([companyId])
+  @@map("integration_connection")
+}
+
+model IntegrationRun {
+  id             String    @id @default(cuid())
+  connectionId   String
+  idempotencyKey String    @unique
+  status         String
+  retryCount     Int       @default(0)
+  resultJson     Json?
+  startedAt      DateTime  @default(now())
+  completedAt    DateTime?
+
+  connection IntegrationConnection @relation(fields: [connectionId], references: [id])
+  events       IntegrationEvent[]
+
+  @@index([connectionId, startedAt])
+  @@map("integration_run")
+}
+
+model IntegrationEvent {
+  id          String   @id @default(cuid())
+  runId       String
+  eventType   String
+  payloadJson Json
+  createdAt   DateTime @default(now())
+
+  run IntegrationRun @relation(fields: [runId], references: [id])
+
+  @@index([runId])
+  @@map("integration_event")
+}
+
+model AutomationRule {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  name        String
+  description String
+  enabled     Boolean  @default(true)
+  configJson  Json     @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  executions AutomationExecution[]
+
+  @@map("automation_rule")
+}
+
+model AutomationExecution {
+  id         String   @id @default(cuid())
+  ruleId     String
+  companyId  String?
+  employeeId String?
+  status     String
+  resultJson Json?
+  createdAt  DateTime @default(now())
+
+  rule     AutomationRule @relation(fields: [ruleId], references: [id])
+  employee Employee?      @relation(fields: [employeeId], references: [id])
+
+  @@index([ruleId, createdAt])
+  @@map("automation_execution")
+}
+
+model PublicVerificationToken {
+  id            String   @id @default(cuid())
+  tokenHash     String   @unique
+  certificateId String
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+
+  certificate Certificate @relation(fields: [certificateId], references: [id])
+
+  @@index([certificateId])
+  @@map("public_verification_token")
+}
+
+model FeatureFlag {
+  id        String   @id @default(cuid())
+  key       String
+  companyId String?
+  enabled   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company? @relation(fields: [companyId], references: [id])
+
+  @@unique([key, companyId])
+  @@map("feature_flag")
 }
 
 model CertificateAudit {

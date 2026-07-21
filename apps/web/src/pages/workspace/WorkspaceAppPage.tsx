@@ -8,10 +8,15 @@ import {
   EMPTY_STATE_COPY,
   PREPARING_ACCESS_DESCRIPTION,
 } from "../../workspace/workspaceCopy.js";
+import { AdminPortalPage } from "../admin/AdminPortalPage.js";
+import { ProfessorPortalPage } from "../professor/ProfessorPortalPage.js";
+import { AiCoachPage } from "./AiCoachPage.js";
+import { AssessmentCenterPage } from "./AssessmentCenterPage.js";
+import { CapstonePage } from "./CapstonePage.js";
+import { CertificatesPage } from "./CertificatesPage.js";
+import { DashboardPage } from "./DashboardPage.js";
 import { EmployeeProfilePage } from "./EmployeeProfilePage.js";
 import { InboxAppPage } from "./InboxAppPage.js";
-import { ProfessorPortalPage } from "../professor/ProfessorPortalPage.js";
-import { AssessmentCenterPage } from "./AssessmentCenterPage.js";
 import { MissionCenterPage } from "./MissionCenterPage.js";
 import { OrganizationalErpPage } from "./OrganizationalErpPage.js";
 import { TasksAppPage } from "./TasksAppPage.js";
@@ -54,6 +59,26 @@ export function WorkspaceAppPage(): ReactNode {
 
   if (appId === "documents") {
     return <TransactionWorkspacePage />;
+  }
+
+  if (appId === "tableaux-bord") {
+    return <DashboardPage />;
+  }
+
+  if (appId === "coach-ia") {
+    return <AiCoachPage />;
+  }
+
+  if (appId === "capstone") {
+    return <CapstonePage />;
+  }
+
+  if (appId === "certificats") {
+    return <CertificatesPage />;
+  }
+
+  if (appId === "administration") {
+    return <AdminPortalPage />;
   }
 
   const app = getWorkspaceApp(appId);

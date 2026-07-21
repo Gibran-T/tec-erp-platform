@@ -7,6 +7,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary.js";
 import { WorkspaceLayout } from "./layouts/WorkspaceLayout.js";
 import { LoginPage } from "./pages/LoginPage.js";
 import { NotFoundPage } from "./pages/NotFoundPage.js";
+import { CertificateVerifyPage } from "./pages/public/CertificateVerifyPage.js";
 import { WorkspaceAppPage } from "./pages/workspace/WorkspaceAppPage.js";
 import { WorkspaceHomePage } from "./pages/workspace/WorkspaceHomePage.js";
 
@@ -14,6 +15,7 @@ export function AppRoutes(): ReactNode {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/verify/:token" element={<CertificateVerifyPage />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<WorkspaceLayout />}>
           <Route index element={<Navigate to="/workspace" replace />} />

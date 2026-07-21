@@ -243,7 +243,7 @@ describe("navigation and placeholders", () => {
   });
 
   it("shows preparing access badge for restricted apps", async () => {
-    renderWorkspace("/workspace/apps/tableaux-bord");
+    renderWorkspace("/workspace/apps/calendrier");
 
     await waitFor(() => {
       expect(screen.getByTestId("workspace-empty-state-badge")).toHaveTextContent(

@@ -119,7 +119,7 @@ describe("me mission routes", () => {
       .set("Authorization", `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body.missions).toHaveLength(18);
+    expect(response.body.missions).toHaveLength(30);
     expect(response.body.missions[0]).toMatchObject({
       missionKey: ENTERPRISE_DISCOVERY_MISSION_KEY,
       status: "locked",

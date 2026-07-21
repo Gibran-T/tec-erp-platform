@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /**
- * Mission Center contracts — Wave 1 + Wave 2 mission keys.
+ * Mission Center contracts — Wave 1 + Wave 2 + Wave 3 mission keys.
  * Mission content is code-owned; per-employee attempt state crosses the boundary.
  */
 
@@ -24,6 +24,18 @@ export const MissionKeySchema = z.enum([
   "m6-m01-reception-facture",
   "m6-m02-exception-rapprochement-trois-voies",
   "m6-m03-expliquer-ecart-finance",
+  "m7-m01-ouvrir-dossier-client",
+  "m7-m02-coordonner-escalade",
+  "m7-m03-cloturer-cas-nps",
+  "m8-m01-matrice-approbation-pression",
+  "m8-m02-revue-acces-sod",
+  "m8-m03-autoevaluation-probation",
+  "m9-m01-atelier-definition-kpi",
+  "m9-m02-tableau-bord-comite",
+  "m9-m03-analyse-concurrentielle-ia",
+  "m10-m01-diapositive-conseil",
+  "m10-m02-defi-final-equinoxe",
+  "m10-m03-presentation-capstone-or",
 ]);
 export type MissionKey = z.infer<typeof MissionKeySchema>;
 

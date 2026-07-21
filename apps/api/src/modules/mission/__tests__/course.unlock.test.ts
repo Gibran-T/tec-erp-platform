@@ -46,7 +46,7 @@ describe("course unlock ordering", () => {
     });
 
     const initial = await service.listMissions("emp_1");
-    expect(initial.missions).toHaveLength(18);
+    expect(initial.missions).toHaveLength(30);
     expect(initial.missions.slice(0, 3).map((mission) => mission.status)).toEqual([
       "available",
       "locked",

@@ -77,6 +77,9 @@ describe("mission migration mapper", () => {
     expect(nextUnlockKeyAfterMission("m1-m03-diagnostiquer-preparation")).toBe(
       "m2-m01-structurer-organisation",
     );
-    expect(nextUnlockKeyAfterMission("m6-m03-expliquer-ecart-finance")).toBeNull();
+    expect(nextUnlockKeyAfterMission("m6-m03-expliquer-ecart-finance")).toBe(
+      "m7-m01-ouvrir-dossier-client",
+    );
+    expect(nextUnlockKeyAfterMission("m10-m03-presentation-capstone-or")).toBeNull();
   });
 });

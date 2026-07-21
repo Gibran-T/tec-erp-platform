@@ -34,6 +34,29 @@ import { createOrganizationMeRouter } from "./modules/organization/organization.
 import { createOrganizationService } from "./modules/organization/organization.service.js";
 import { createAssessmentMeRouter } from "./modules/assessment/assessment.routes.js";
 import { createAssessmentService } from "./modules/assessment/assessment.service.js";
+import { createAnalyticsMeRouter } from "./modules/analytics/analytics.routes.js";
+import { createAnalyticsService } from "./modules/analytics/analytics.service.js";
+import { createAiCoachMeRouter, createAiCoachProfessorRouter } from "./modules/ai-coach/ai-coach.routes.js";
+import { createAiCoachService } from "./modules/ai-coach/ai-coach.service.js";
+import { createPredictionsProfessorRouter } from "./modules/predictions/predictions.routes.js";
+import { createPredictionsService } from "./modules/predictions/predictions.service.js";
+import { createCapstoneMeRouter, createCapstoneProfessorRouter } from "./modules/capstone/capstone.routes.js";
+import { createCapstoneService } from "./modules/capstone/capstone.service.js";
+import {
+  createCertificationMeRouter,
+  createCertificationProfessorRouter,
+  createCertificationPublicRouter,
+} from "./modules/certification/certification.routes.js";
+import { createCertificationService } from "./modules/certification/certification.service.js";
+import { createAdminRouter } from "./modules/admin/admin.routes.js";
+import { createAdminService } from "./modules/admin/admin.service.js";
+import { createScenarioAdminRouter } from "./modules/scenario/scenario.routes.js";
+import { createScenarioService } from "./modules/scenario/scenario.service.js";
+import { createIntegrationAdminRouter } from "./modules/integration/integration.routes.js";
+import { createIntegrationService } from "./modules/integration/integration.service.js";
+import { createAutomationAdminRouter } from "./modules/automation/automation.routes.js";
+import { createAutomationService } from "./modules/automation/automation.service.js";
+import { requireAdmin } from "./middleware/require-admin.js";
 import { createMasterDataMeRouter } from "./modules/master-data/master-data.routes.js";
 import { createMasterDataService } from "./modules/master-data/master-data.service.js";
 import { createTransactionsMeRouter } from "./modules/transactions/transactions.routes.js";
@@ -138,6 +161,15 @@ export function createApp(
   const masterDataService = createMasterDataService();
   const transactionsService = createTransactionsService();
   const professorService = createProfessorService();
+  const analyticsService = createAnalyticsService();
+  const aiCoachService = createAiCoachService();
+  const predictionsService = createPredictionsService();
+  const capstoneService = createCapstoneService();
+  const certificationService = createCertificationService();
+  const adminService = createAdminService();
+  const scenarioService = createScenarioService();
+  const integrationService = createIntegrationService();
+  const automationService = createAutomationService();
 
   app.use(createOperationalRouter(dependencies));
   app.use("/api/v1/auth", createAuthRouter(authService));
@@ -157,6 +189,54 @@ export function createApp(
     requireEmployee,
     requireProfessor,
     createProfessorRouter(professorService),
+  );
+  app.use(
+    "/api/v1/professor",
+    requireEmployee,
+    requireProfessor,
+    createAiCoachProfessorRouter(aiCoachService),
+  );
+  app.use(
+    "/api/v1/professor",
+    requireEmployee,
+    requireProfessor,
+    createPredictionsProfessorRouter(predictionsService),
+  );
+  app.use(
+    "/api/v1/professor",
+    requireEmployee,
+    requireProfessor,
+    createCapstoneProfessorRouter(capstoneService),
+  );
+  app.use(
+    "/api/v1/professor",
+    requireEmployee,
+    requireProfessor,
+    createCertificationProfessorRouter(certificationService),
+  );
+  app.use("/api/v1/me/analytics", requireEmployee, createAnalyticsMeRouter(analyticsService));
+  app.use("/api/v1/me/ai-coach", requireEmployee, createAiCoachMeRouter(aiCoachService));
+  app.use("/api/v1/me/capstone", requireEmployee, createCapstoneMeRouter(capstoneService));
+  app.use("/api/v1/me/certificates", requireEmployee, createCertificationMeRouter(certificationService));
+  app.use("/api/v1/public", createCertificationPublicRouter(certificationService));
+  app.use("/api/v1/admin", requireEmployee, requireAdmin, createAdminRouter(adminService));
+  app.use(
+    "/api/v1/admin/scenarios",
+    requireEmployee,
+    requireAdmin,
+    createScenarioAdminRouter(scenarioService),
+  );
+  app.use(
+    "/api/v1/admin/integration",
+    requireEmployee,
+    requireAdmin,
+    createIntegrationAdminRouter(integrationService),
+  );
+  app.use(
+    "/api/v1/admin/automation",
+    requireEmployee,
+    requireAdmin,
+    createAutomationAdminRouter(automationService),
   );
   app.use("/api/v1", createApiV1Router());
 
