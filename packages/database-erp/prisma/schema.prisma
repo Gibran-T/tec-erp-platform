@@ -21,6 +21,7 @@ model PlatformSchemaMetadata {
 /// RC01 defines a single role; broader RBAC is deferred to later releases.
 enum EmployeeRole {
   JR_BUSINESS_ANALYST
+  PROFESSOR
 }
 
 /// The employing organization of the simulated enterprise universe
@@ -33,7 +34,16 @@ model Company {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  employees Employee[]
+  employees            Employee[]
+  cohorts              Cohort[]
+  masterDataRecords    MasterDataRecord[]
+  businessDocuments    BusinessDocument[]
+  inventoryMovements   InventoryMovement[]
+  financialPostings    FinancialPosting[]
+  openItems            OpenItem[]
+  transactionEvents    TransactionEvent[]
+  auditEvents          AuditEvent[]
+  simulationSnapshots  SimulationSnapshot[]
 
   @@map("company")
 }
@@ -59,10 +69,17 @@ model Employee {
   taskStates    EmployeeTaskState[]
   missionAttempts EmployeeMissionAttempt[]
 
-  courseProgress      EmployeeCourseProgress[]
-  moduleProgress      EmployeeModuleProgress[]
-  v1MissionAttempts   MissionAttempt[]
-  unlockStates        UnlockState[]
+  courseProgress       EmployeeCourseProgress[]
+  moduleProgress       EmployeeModuleProgress[]
+  v1MissionAttempts    MissionAttempt[]
+  unlockStates         UnlockState[]
+  cohortMemberships    CohortMembership[]
+  masterDataAudits     MasterDataAudit[]
+  approvalDecisions    ApprovalDecision[]
+  assessmentAttempts   AssessmentAttempt[]
+  certificates         Certificate[]
+  certificateAudits    CertificateAudit[]
+  auditEventsActed     AuditEvent[]              @relation("AuditActor")
 
   @@index([companyId])
   @@map("employee")
@@ -314,4 +331,319 @@ model FeedbackRecord {
 
   @@index([attemptId])
   @@map("feedback_record")
+}
+
+/// Wave 2 — cohort / professor scoping
+model Cohort {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  companyId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company     Company            @relation(fields: [companyId], references: [id])
+  memberships CohortMembership[]
+  certificates Certificate[]
+
+  @@index([companyId])
+  @@map("cohort")
+}
+
+model CohortMembership {
+  id           String   @id @default(cuid())
+  cohortId     String
+  employeeId   String
+  roleInCohort String
+  createdAt    DateTime @default(now())
+
+  cohort   Cohort   @relation(fields: [cohortId], references: [id])
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  @@unique([cohortId, employeeId])
+  @@index([employeeId])
+  @@map("cohort_membership")
+}
+
+model MasterDataRecord {
+  id           String   @id @default(cuid())
+  companyId    String
+  entityType   String
+  businessKey  String
+  payloadJson  Json
+  status       String   @default("active")
+  qualityScore Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  company Company           @relation(fields: [companyId], references: [id])
+  audits  MasterDataAudit[]
+
+  @@unique([companyId, entityType, businessKey])
+  @@index([companyId])
+  @@map("master_data_record")
+}
+
+model MasterDataAudit {
+  id         String   @id @default(cuid())
+  recordId   String
+  employeeId String
+  action     String
+  beforeJson Json?
+  afterJson  Json?
+  createdAt  DateTime @default(now())
+
+  record   MasterDataRecord @relation(fields: [recordId], references: [id])
+  employee Employee         @relation(fields: [employeeId], references: [id])
+
+  @@index([recordId])
+  @@map("master_data_audit")
+}
+
+model BusinessDocument {
+  id              String   @id @default(cuid())
+  companyId       String
+  employeeId      String?
+  documentType    String
+  documentNumber  String
+  status          String
+  payloadJson     Json
+  missionKey      String?
+  missionAttemptId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  company    Company            @relation(fields: [companyId], references: [id])
+  lines      DocumentLine[]
+  approvals  ApprovalDecision[]
+  movements  InventoryMovement[]
+  postings   FinancialPosting[]
+  openItems  OpenItem[]
+
+  @@unique([companyId, documentType, documentNumber])
+  @@index([companyId])
+  @@index([missionKey])
+  @@map("business_document")
+}
+
+model DocumentLine {
+  id          String @id @default(cuid())
+  documentId  String
+  lineNumber  Int
+  payloadJson Json
+
+  document BusinessDocument @relation(fields: [documentId], references: [id])
+
+  @@unique([documentId, lineNumber])
+  @@map("document_line")
+}
+
+model ApprovalDecision {
+  id         String   @id @default(cuid())
+  documentId String
+  employeeId String
+  decision   String
+  reason     String?
+  decidedAt  DateTime
+
+  document BusinessDocument @relation(fields: [documentId], references: [id])
+  employee Employee         @relation(fields: [employeeId], references: [id])
+
+  @@index([documentId])
+  @@map("approval_decision")
+}
+
+model InventoryMovement {
+  id               String   @id @default(cuid())
+  companyId        String
+  materialKey      String
+  locationKey      String
+  quantity         Float
+  direction        String
+  sourceDocumentId String?
+  missionAttemptId String?
+  postingKey       String   @unique
+  createdAt        DateTime @default(now())
+
+  company        Company           @relation(fields: [companyId], references: [id])
+  sourceDocument BusinessDocument? @relation(fields: [sourceDocumentId], references: [id])
+
+  @@index([companyId, materialKey, locationKey])
+  @@map("inventory_movement")
+}
+
+model FinancialPosting {
+  id               String   @id @default(cuid())
+  companyId        String
+  accountCode      String
+  debit            Float    @default(0)
+  credit           Float    @default(0)
+  currency         String   @default("CAD")
+  sourceDocumentId String?
+  missionAttemptId String?
+  postingKey       String   @unique
+  createdAt        DateTime @default(now())
+
+  company        Company           @relation(fields: [companyId], references: [id])
+  sourceDocument BusinessDocument? @relation(fields: [sourceDocumentId], references: [id])
+
+  @@index([companyId, accountCode])
+  @@map("financial_posting")
+}
+
+model OpenItem {
+  id          String   @id @default(cuid())
+  companyId   String
+  kind        String
+  documentId  String
+  amount      Float
+  openAmount  Float
+  status      String   @default("open")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company  Company          @relation(fields: [companyId], references: [id])
+  document BusinessDocument @relation(fields: [documentId], references: [id])
+
+  @@index([companyId, status])
+  @@map("open_item")
+}
+
+model TransactionEvent {
+  id         String   @id @default(cuid())
+  companyId  String
+  employeeId String?
+  eventType  String
+  payloadJson Json
+  sequence   Int
+  createdAt  DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@unique([companyId, sequence])
+  @@index([companyId])
+  @@map("transaction_event")
+}
+
+model AuditEvent {
+  id               String   @id @default(cuid())
+  companyId        String
+  actorEmployeeId  String
+  action           String
+  resourceType     String
+  resourceKey      String
+  reason           String?
+  payloadJson      Json?
+  createdAt        DateTime @default(now())
+
+  company Company  @relation(fields: [companyId], references: [id])
+  actor   Employee @relation("AuditActor", fields: [actorEmployeeId], references: [id])
+
+  @@index([companyId, createdAt])
+  @@map("audit_event")
+}
+
+model SimulationSnapshot {
+  id          String   @id @default(cuid())
+  companyId   String
+  employeeId  String
+  label       String
+  payloadJson Json
+  createdAt   DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@index([companyId, employeeId])
+  @@map("simulation_snapshot")
+}
+
+model AssessmentDefinition {
+  id                   String   @id @default(cuid())
+  code                 String   @unique
+  title                String
+  moduleScope          String
+  passThresholdPercent Int      @default(70)
+  maxAttempts          Int      @default(2)
+  timeLimitSeconds     Int?
+  definitionJson       Json
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  questions AssessmentQuestion[]
+  attempts  AssessmentAttempt[]
+
+  @@map("assessment_definition")
+}
+
+model AssessmentQuestion {
+  id           String @id @default(cuid())
+  assessmentId String
+  questionKey  String
+  sequence     Int
+  type         String
+  prompt       String
+  optionsJson  Json
+  scoringJson  Json
+
+  assessment AssessmentDefinition @relation(fields: [assessmentId], references: [id])
+
+  @@unique([assessmentId, questionKey])
+  @@index([assessmentId])
+  @@map("assessment_question")
+}
+
+model AssessmentAttempt {
+  id            String    @id @default(cuid())
+  employeeId    String
+  assessmentId  String
+  attemptNumber Int
+  status        String
+  startedAt     DateTime
+  submittedAt   DateTime?
+  scorePercent  Float?
+  responsesJson Json      @default("{}")
+  feedbackJson  Json?
+
+  employee   Employee             @relation(fields: [employeeId], references: [id])
+  assessment AssessmentDefinition @relation(fields: [assessmentId], references: [id])
+
+  @@unique([employeeId, assessmentId, attemptNumber])
+  @@index([employeeId])
+  @@map("assessment_attempt")
+}
+
+model Certificate {
+  id                 String    @id @default(cuid())
+  employeeId         String
+  cohortId           String?
+  certificateType    String
+  certificateNumber  String    @unique
+  issuedAt           DateTime
+  status             String    @default("issued")
+  competencySummaryJson Json
+  verificationStatus String    @default("valid")
+  revokedAt          DateTime?
+  revokeReason       String?
+
+  employee Employee           @relation(fields: [employeeId], references: [id])
+  cohort   Cohort?            @relation(fields: [cohortId], references: [id])
+  audits   CertificateAudit[]
+
+  @@index([employeeId])
+  @@map("certificate")
+}
+
+model CertificateAudit {
+  id               String   @id @default(cuid())
+  certificateId    String
+  actorEmployeeId  String
+  action           String
+  reason           String?
+  createdAt        DateTime @default(now())
+
+  certificate Certificate @relation(fields: [certificateId], references: [id])
+  actor       Employee    @relation(fields: [actorEmployeeId], references: [id])
+
+  @@index([certificateId])
+  @@map("certificate_audit")
 }

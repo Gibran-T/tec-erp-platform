@@ -1,11 +1,22 @@
-import { listMissionsForModule } from "@tec-platform/mission-catalog";
+import { listMissionsForModule, listModules } from "@tec-platform/mission-catalog";
 
-import { nextUnlockKeyAfterMission } from "./mission.migration-mapper.js";
+import { moduleCodeForMission, nextUnlockKeyAfterMission } from "./mission.migration-mapper.js";
 import type {
   CourseProgressRepository,
   MissionAttemptRepository,
   UnlockStateRepository,
 } from "./mission.types.js";
+
+function nextModuleCode(moduleCode: string): string | null {
+  const modules = listModules()
+    .slice()
+    .sort((left, right) => left.sequence - right.sequence);
+  const index = modules.findIndex((module) => module.moduleCode === moduleCode);
+  if (index < 0 || index >= modules.length - 1) {
+    return null;
+  }
+  return modules[index + 1]?.moduleCode ?? null;
+}
 
 export async function applyMissionCompletionUnlocks(input: {
   readonly employeeId: string;
@@ -20,7 +31,8 @@ export async function applyMissionCompletionUnlocks(input: {
     await input.unlockStates.unlock(input.employeeId, "mission", nextKey, input.completedAt);
   }
 
-  const moduleMissions = listMissionsForModule("M1");
+  const moduleCode = moduleCodeForMission(input.missionKey) ?? "M1";
+  const moduleMissions = listMissionsForModule(moduleCode);
   const attempts = input.attemptRepository.listAttemptsForEmployee
     ? await input.attemptRepository.listAttemptsForEmployee(input.employeeId)
     : [];
@@ -47,21 +59,43 @@ export async function applyMissionCompletionUnlocks(input: {
 
   await input.courseProgress.upsertModuleProgress({
     employeeId: input.employeeId,
-    moduleCode: "M1",
+    moduleCode,
     percentComplete,
     status: moduleStatus,
   });
 
+  const allModules = listModules();
+  let courseCompletedMissions = 0;
+  let courseTotalMissions = 0;
+  for (const module of allModules) {
+    const missions = listMissionsForModule(module.moduleCode);
+    courseTotalMissions += missions.length;
+    courseCompletedMissions += missions.filter((mission) =>
+      completedKeys.has(mission.missionKey),
+    ).length;
+  }
+  const coursePercent =
+    courseTotalMissions === 0
+      ? 0
+      : Math.round((courseCompletedMissions / courseTotalMissions) * 10000) / 100;
+
   await input.courseProgress.upsertCourseProgress({
     employeeId: input.employeeId,
     courseCode: "TEC_ERP_V1",
-    percentComplete,
-    status: moduleStatus === "completed" ? "in_progress" : moduleStatus,
+    percentComplete: coursePercent,
+    status: coursePercent >= 100 ? "completed" : "in_progress",
   });
 
   if (moduleStatus === "completed") {
-    // Module 2 is marked ready but remains locked for content until institutional open.
-    await input.unlockStates.unlock(input.employeeId, "module", "M2", input.completedAt);
-    await input.unlockStates.unlock(input.employeeId, "module_ready", "M2", input.completedAt);
+    const following = nextModuleCode(moduleCode);
+    if (following) {
+      await input.unlockStates.unlock(input.employeeId, "module", following, input.completedAt);
+      await input.unlockStates.unlock(
+        input.employeeId,
+        "module_ready",
+        following,
+        input.completedAt,
+      );
+    }
   }
 }

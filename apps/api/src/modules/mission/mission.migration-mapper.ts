@@ -1,6 +1,6 @@
 /**
  * Maps RC01 employee_mission_attempt rows into V1 mission_attempt payloads.
- * Used by migration SQL and unit-tested for compatibility.
+ * Also owns the canonical sequential unlock chain for M1–M6.
  */
 
 export interface LegacyEmployeeMissionAttemptRow {
@@ -38,6 +38,39 @@ export const M1_M01_DEFINITION_ID = "md_m1_m01";
 export const M1_M01_MISSION_KEY = "m1-m01-decouvrir-entreprise";
 export const M1_M02_MISSION_KEY = "m1-m02-connecter-departements";
 
+/** Canonical mission sequence across Modules 1–6 (Wave 2). */
+export const COURSE_MISSION_SEQUENCE: readonly string[] = [
+  "m1-m01-decouvrir-entreprise",
+  "m1-m02-connecter-departements",
+  "m1-m03-diagnostiquer-preparation",
+  "m2-m01-structurer-organisation",
+  "m2-m02-creer-donnees-reference",
+  "m2-m03-corriger-qualite-donnees",
+  "m3-m01-identifier-besoin-achat",
+  "m3-m02-creer-traiter-commande-achat",
+  "m3-m03-receptionner-analyser-fournisseur",
+  "m4-m01-saisir-commande-institutionnelle",
+  "m4-m02-allocation-inter-entrepots",
+  "m4-m03-confirmer-livraison-cloture",
+  "m5-m01-analyser-stock-reappro",
+  "m5-m02-decision-transfert-inter-dc",
+  "m5-m03-presentation-sop",
+  "m6-m01-reception-facture",
+  "m6-m02-exception-rapprochement-trois-voies",
+  "m6-m03-expliquer-ecart-finance",
+];
+
+const MODULE_BY_MISSION: Readonly<Record<string, string>> = Object.fromEntries(
+  COURSE_MISSION_SEQUENCE.map((key) => {
+    const moduleCode = key.slice(0, 2).toUpperCase();
+    return [key, moduleCode];
+  }),
+);
+
+export function moduleCodeForMission(missionKey: string): string | undefined {
+  return MODULE_BY_MISSION[missionKey];
+}
+
 export function mapLegacyAttemptToV1(
   row: LegacyEmployeeMissionAttemptRow,
   missionDefinitionId: string = M1_M01_DEFINITION_ID,
@@ -68,11 +101,9 @@ export function mapLegacyAttemptToV1(
 }
 
 export function nextUnlockKeyAfterMission(missionKey: string): string | null {
-  if (missionKey === M1_M01_MISSION_KEY) {
-    return M1_M02_MISSION_KEY;
+  const index = COURSE_MISSION_SEQUENCE.indexOf(missionKey);
+  if (index < 0 || index >= COURSE_MISSION_SEQUENCE.length - 1) {
+    return null;
   }
-  if (missionKey === M1_M02_MISSION_KEY) {
-    return "m1-m03-diagnostiquer-preparation";
-  }
-  return null;
+  return COURSE_MISSION_SEQUENCE[index + 1] ?? null;
 }

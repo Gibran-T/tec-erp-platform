@@ -11,6 +11,7 @@ export const IT_CONTACT_REFERENCE = "Équipe des technologies de l'information";
 
 export const ROLE_LABELS: Record<EmployeeRole, string> = {
   JR_BUSINESS_ANALYST: "Analyste d'affaires junior",
+  PROFESSOR: "Professeur",
 };
 
 export const ACCESS_PREPARING_LABEL = "Accès en préparation";

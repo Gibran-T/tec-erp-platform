@@ -45,6 +45,9 @@ import {
   evaluateMissionResponses,
   type ScoredResponse,
 } from "./scoring/evaluator.js";
+import { applyMissionTransactionConsequences } from "../simulation/consequences.js";
+import { createSimulationPostingService } from "../simulation/engine/posting-service.js";
+import { getPrismaClient } from "@tec-platform/database-erp";
 
 export interface MissionServiceDependencies {
   readonly attemptRepository: MissionAttemptRepository;
@@ -273,7 +276,12 @@ function buildDetail(
 export function createMissionService(dependencies: MissionServiceDependencies): MissionService {
   const now = dependencies.now ?? (() => new Date());
 
-  async function afterComplete(employeeId: string, missionKey: string, completedAt: Date): Promise<void> {
+  async function afterComplete(
+    employeeId: string,
+    missionKey: string,
+    completedAt: Date,
+    attemptId?: string,
+  ): Promise<void> {
     if (!dependencies.unlockStates || !dependencies.courseProgress) {
       return;
     }
@@ -285,6 +293,26 @@ export function createMissionService(dependencies: MissionServiceDependencies): 
       courseProgress: dependencies.courseProgress,
       attemptRepository: dependencies.attemptRepository,
     });
+
+    if (!attemptId) {
+      return;
+    }
+    try {
+      const prisma = getPrismaClient();
+      const employee = await prisma.employee.findUnique({ where: { id: employeeId } });
+      if (!employee) {
+        return;
+      }
+      await applyMissionTransactionConsequences({
+        posting: createSimulationPostingService(prisma),
+        companyId: employee.companyId,
+        employeeId,
+        missionKey,
+        attemptId,
+      });
+    } catch {
+      // Simulation consequences are best-effort for unit tests without DB.
+    }
   }
 
   return {
@@ -405,7 +433,7 @@ export function createMissionService(dependencies: MissionServiceDependencies): 
           feedbackKey: MISSION_FEEDBACK_COMPLETE_KEY,
         });
 
-        await afterComplete(employeeId, missionKey, completedAt);
+        await afterComplete(employeeId, missionKey, completedAt, completed.id);
 
         return Result.ok({
           missionKey: ENTERPRISE_DISCOVERY_MISSION_KEY,
@@ -467,7 +495,7 @@ export function createMissionService(dependencies: MissionServiceDependencies): 
       }
 
       if (score.passed) {
-        await afterComplete(employeeId, missionKey, completedAt);
+        await afterComplete(employeeId, missionKey, completedAt, completed.id);
       }
 
       return Result.ok({

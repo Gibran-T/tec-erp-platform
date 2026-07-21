@@ -12,15 +12,16 @@ import {
 } from "../mission.catalog.js";
 
 describe("mission catalog", () => {
-  it("contains the three Module 1 missions from the registry", () => {
-    expect(MISSION_CATALOG).toHaveLength(3);
+  it("contains Modules 1–6 missions from the registry", () => {
+    expect(MISSION_CATALOG).toHaveLength(18);
     expect(MISSION_CATALOG[0]?.missionKey).toBe(ENTERPRISE_DISCOVERY_MISSION_KEY);
-    expect(MISSION_CATALOG.map((mission) => mission.missionKey)).toEqual([
+    expect(MISSION_CATALOG.map((mission) => mission.missionKey).slice(0, 3)).toEqual([
       "m1-m01-decouvrir-entreprise",
       "m1-m02-connecter-departements",
       "m1-m03-diagnostiquer-preparation",
     ]);
     expect(MISSION_CATALOG[0]?.competencyCodes).toEqual(["C-ORG-01", "C-BUS-01"]);
+    expect(MISSION_CATALOG.some((mission) => mission.missionKey.startsWith("m6-"))).toBe(true);
   });
 
   it("requires overview and Tom 40-versus-36 acknowledgments", () => {

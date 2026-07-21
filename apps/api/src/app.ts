@@ -32,6 +32,15 @@ import { createPrismaUnlockStateRepository } from "./modules/mission/unlock-stat
 import { createOrganizationAccessReader } from "./modules/organization/organization.access.js";
 import { createOrganizationMeRouter } from "./modules/organization/organization.routes.js";
 import { createOrganizationService } from "./modules/organization/organization.service.js";
+import { createAssessmentMeRouter } from "./modules/assessment/assessment.routes.js";
+import { createAssessmentService } from "./modules/assessment/assessment.service.js";
+import { createMasterDataMeRouter } from "./modules/master-data/master-data.routes.js";
+import { createMasterDataService } from "./modules/master-data/master-data.service.js";
+import { createTransactionsMeRouter } from "./modules/transactions/transactions.routes.js";
+import { createTransactionsService } from "./modules/transactions/transactions.service.js";
+import { createProfessorRouter } from "./modules/professor/professor.routes.js";
+import { createProfessorService } from "./modules/professor/professor.service.js";
+import { requireProfessor } from "./middleware/require-professor.js";
 import { createApiV1Router } from "./routes/api-v1.js";
 import { createOperationalRouter } from "./routes/operational.js";
 
@@ -125,6 +134,10 @@ export function createApp(
     accessReader: createOrganizationAccessReader(firstDayStateRepository),
   });
   const requireEmployee = createRequireEmployee(authService);
+  const assessmentService = createAssessmentService();
+  const masterDataService = createMasterDataService();
+  const transactionsService = createTransactionsService();
+  const professorService = createProfessorService();
 
   app.use(createOperationalRouter(dependencies));
   app.use("/api/v1/auth", createAuthRouter(authService));
@@ -132,6 +145,19 @@ export function createApp(
   app.use("/api/v1/me", requireEmployee, createMissionMeRouter(missionService));
   app.use("/api/v1/me", requireEmployee, createCourseMeRouter(courseService));
   app.use("/api/v1/me", requireEmployee, createOrganizationMeRouter(organizationService));
+  app.use("/api/v1/me/assessments", requireEmployee, createAssessmentMeRouter(assessmentService));
+  app.use("/api/v1/me/master-data", requireEmployee, createMasterDataMeRouter(masterDataService));
+  app.use(
+    "/api/v1/me/transactions",
+    requireEmployee,
+    createTransactionsMeRouter(transactionsService),
+  );
+  app.use(
+    "/api/v1/professor",
+    requireEmployee,
+    requireProfessor,
+    createProfessorRouter(professorService),
+  );
   app.use("/api/v1", createApiV1Router());
 
   app.use(notFoundHandler);

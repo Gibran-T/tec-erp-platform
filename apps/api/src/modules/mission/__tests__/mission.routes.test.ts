@@ -119,14 +119,15 @@ describe("me mission routes", () => {
       .set("Authorization", `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body.missions).toHaveLength(3);
+    expect(response.body.missions).toHaveLength(18);
     expect(response.body.missions[0]).toMatchObject({
       missionKey: ENTERPRISE_DISCOVERY_MISSION_KEY,
       status: "locked",
     });
     expect(response.body.missions[0].unlockExplanation).toContain("première journée");
-    expect(response.body.missions[1].status).toBe("locked");
-    expect(response.body.missions[2].status).toBe("locked");
+    expect(response.body.missions.every((mission: { status: string }) => mission.status === "locked")).toBe(
+      true,
+    );
   });
 
   it("hides briefing and mapping tools while locked", async () => {

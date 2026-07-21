@@ -124,17 +124,17 @@ export function createPrismaMissionAttemptRepository(): MissionAttemptRepository
   return {
     async findAttempt(employeeId, missionKey) {
       const prisma = getPrismaClient();
-      const definitionId = DEFINITION_ID_BY_KEY[missionKey];
 
-      if (definitionId) {
-        const row = await prisma.missionAttempt.findFirst({
-          where: { employeeId, missionDefinitionId: definitionId },
-          orderBy: { attemptNumber: "desc" },
-          include: { missionDefinition: true },
-        });
-        if (row) {
-          return mapV1RowToLegacy(row);
-        }
+      const row = await prisma.missionAttempt.findFirst({
+        where: {
+          employeeId,
+          missionDefinition: { missionKey },
+        },
+        orderBy: { attemptNumber: "desc" },
+        include: { missionDefinition: true },
+      });
+      if (row) {
+        return mapV1RowToLegacy(row);
       }
 
       // Fallback for environments where V1 migration has not yet run for this row.
