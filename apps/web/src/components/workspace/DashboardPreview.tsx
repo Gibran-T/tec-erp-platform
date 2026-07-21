@@ -5,7 +5,7 @@ import { DASHBOARD_PREVIEW_COPY, DASHBOARD_PREVIEW_TITLE } from "../../workspace
 export function DashboardPreview(): ReactNode {
   return (
     <section className="workspace-dashboard-preview" data-testid="workspace-dashboard-preview">
-      <h3>{DASHBOARD_PREVIEW_TITLE}</h3>
+      <h2>{DASHBOARD_PREVIEW_TITLE}</h2>
       <div className="workspace-dashboard-preview__placeholder" aria-hidden="true">
         <span />
         <span />

@@ -13,6 +13,7 @@ import {
 
 import { loadStoredTokens } from "./auth.js";
 import { getApiBaseUrl } from "./health.js";
+import { safeFetch } from "./http.js";
 
 async function readErrorMessage(response: Response, fallback: string): Promise<string> {
   try {
@@ -39,7 +40,7 @@ function requireAccessToken(): string {
 
 export async function requestMissions(accessToken?: string): Promise<MissionsResponse> {
   const token = accessToken ?? requireAccessToken();
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/me/missions`, {
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/me/missions`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -65,7 +66,7 @@ export async function requestMissionDetail(
   accessToken?: string,
 ): Promise<MissionDetail> {
   const token = accessToken ?? requireAccessToken();
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/me/missions/${missionKey}`, {
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/me/missions/${missionKey}`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -88,7 +89,7 @@ export async function requestStartMission(
   accessToken?: string,
 ): Promise<MissionStartResponse> {
   const token = accessToken ?? requireAccessToken();
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/me/missions/${missionKey}/start`, {
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/me/missions/${missionKey}/start`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -115,7 +116,7 @@ export async function requestSubmitMission(
   accessToken?: string,
 ): Promise<MissionSubmitResponse> {
   const token = accessToken ?? requireAccessToken();
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/me/missions/${missionKey}/submit`, {
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/me/missions/${missionKey}/submit`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,

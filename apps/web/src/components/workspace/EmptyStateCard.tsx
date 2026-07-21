@@ -14,7 +14,7 @@ export function EmptyStateCard({ title, description, badge }: EmptyStateCardProp
           {badge}
         </span>
       ) : null}
-      <h2>{title}</h2>
+      <h1>{title}</h1>
       <p>{description}</p>
     </section>
   );

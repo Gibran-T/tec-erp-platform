@@ -47,7 +47,9 @@ export function WorkspaceContextPanel(): ReactNode {
     <aside className="workspace-context-panel" data-testid="workspace-context-panel">
       <h2>{CONTEXT_PANEL_TITLE}</h2>
       {showInitialLoading ? (
-        <p className="workspace-context-panel__status">Mise à jour de votre progression…</p>
+        <p className="workspace-context-panel__status" role="status">
+          Mise à jour de votre progression…
+        </p>
       ) : (
         <>
           <ul className="workspace-context-panel__checklist" data-testid="workspace-context-checklist">
@@ -56,7 +58,11 @@ export function WorkspaceContextPanel(): ReactNode {
             ))}
           </ul>
           {refreshing ? (
-            <p className="workspace-context-panel__status" data-testid="workspace-context-refreshing">
+            <p
+              className="workspace-context-panel__status"
+              role="status"
+              data-testid="workspace-context-refreshing"
+            >
               Actualisation…
             </p>
           ) : null}
@@ -70,7 +76,9 @@ export function WorkspaceContextPanel(): ReactNode {
       >
         <h3 id="mission-actuelle-heading">{MISSION_ACTUELLE_TITLE}</h3>
         {missionLoading && summaryStatus === null ? (
-          <p className="workspace-context-panel__status">Chargement de la mission…</p>
+          <p className="workspace-context-panel__status" role="status">
+            Chargement de la mission…
+          </p>
         ) : (
           <>
             <p data-testid="workspace-context-mission-status">{missionLabel}</p>

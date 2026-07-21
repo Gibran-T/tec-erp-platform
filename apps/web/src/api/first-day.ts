@@ -12,6 +12,7 @@ import {
 
 import { loadStoredTokens } from "./auth.js";
 import { getApiBaseUrl } from "./health.js";
+import { safeFetch } from "./http.js";
 
 async function readErrorMessage(response: Response, fallback: string): Promise<string> {
   try {
@@ -38,7 +39,7 @@ function requireAccessToken(): string {
 
 export async function requestInbox(accessToken?: string): Promise<InboxResponse> {
   const token = accessToken ?? requireAccessToken();
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/me/inbox`, {
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/me/inbox`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -64,7 +65,7 @@ export async function requestMarkMessageRead(
   accessToken?: string,
 ): Promise<MarkMessageReadResponse> {
   const token = accessToken ?? requireAccessToken();
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/me/inbox/${messageKey}/read`, {
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/me/inbox/${messageKey}/read`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -87,7 +88,7 @@ export async function requestMarkMessageRead(
 
 export async function requestTasks(accessToken?: string): Promise<TasksResponse> {
   const token = accessToken ?? requireAccessToken();
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/me/tasks`, {
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/me/tasks`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -110,7 +111,7 @@ export async function requestCompleteTask(
   accessToken?: string,
 ): Promise<CompleteTaskResponse> {
   const token = accessToken ?? requireAccessToken();
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/me/tasks/${taskKey}/complete`, {
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/me/tasks/${taskKey}/complete`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });

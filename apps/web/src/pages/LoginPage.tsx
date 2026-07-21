@@ -28,7 +28,9 @@ export function LoginPage(): ReactNode {
       navigate("/workspace", { replace: true });
     } catch (submitError) {
       const message =
-        submitError instanceof Error ? submitError.message : "Sign-in failed.";
+        submitError instanceof Error
+          ? submitError.message
+          : "Échec de la connexion. Veuillez réessayer.";
       setError(message);
     } finally {
       setSubmitting(false);

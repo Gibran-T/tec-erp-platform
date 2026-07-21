@@ -9,6 +9,22 @@ const LogLevelSchema = z.enum(["debug", "info", "warn", "error"]);
 const DEV_ACCESS_SECRET = "dev-access-secret-not-for-production";
 const DEV_REFRESH_SECRET = "dev-refresh-secret-not-for-production";
 
+/**
+ * Minimum entropy for HS256 signing secrets in production. A 256-bit key is the
+ * HMAC-SHA256 block size; 32 characters is the smallest length that keeps the
+ * key from being trivially brute-forceable. Enforced only in production so the
+ * developer/test fallbacks stay ergonomic.
+ */
+const MIN_PRODUCTION_SECRET_LENGTH = 32;
+
+/** Raised when configuration is missing or unsafe. Message never echoes secret values. */
+export class ConfigurationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ConfigurationError";
+  }
+}
+
 const ConfigSchema = z
   .object({
     nodeEnv: z.enum(["development", "test", "production"]).default("development"),
@@ -26,19 +42,45 @@ const ConfigSchema = z
       return;
     }
 
-    if (config.jwtAccessSecret === DEV_ACCESS_SECRET) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["jwtAccessSecret"],
-        message: "JWT_ACCESS_SECRET must be set to a real secret in production.",
-      });
+    const secretRules = [
+      {
+        path: "jwtAccessSecret",
+        envName: "JWT_ACCESS_SECRET",
+        value: config.jwtAccessSecret,
+        devFallback: DEV_ACCESS_SECRET,
+      },
+      {
+        path: "jwtRefreshSecret",
+        envName: "JWT_REFRESH_SECRET",
+        value: config.jwtRefreshSecret,
+        devFallback: DEV_REFRESH_SECRET,
+      },
+    ] as const;
+
+    for (const rule of secretRules) {
+      if (rule.value === rule.devFallback) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [rule.path],
+          message: `${rule.envName} must be set to a real secret in production.`,
+        });
+        continue;
+      }
+
+      if (rule.value.length < MIN_PRODUCTION_SECRET_LENGTH) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [rule.path],
+          message: `${rule.envName} must be at least ${MIN_PRODUCTION_SECRET_LENGTH} characters in production.`,
+        });
+      }
     }
 
-    if (config.jwtRefreshSecret === DEV_REFRESH_SECRET) {
+    if (config.jwtAccessSecret === config.jwtRefreshSecret) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["jwtRefreshSecret"],
-        message: "JWT_REFRESH_SECRET must be set to a real secret in production.",
+        message: "JWT_REFRESH_SECRET must differ from JWT_ACCESS_SECRET in production.",
       });
     }
   });
@@ -46,7 +88,7 @@ const ConfigSchema = z
 export type AppConfig = z.infer<typeof ConfigSchema>;
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
-  return ConfigSchema.parse({
+  const result = ConfigSchema.safeParse({
     nodeEnv: env.NODE_ENV,
     port: env.PORT,
     corsOrigin: env.CORS_ORIGIN,
@@ -57,4 +99,19 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     accessTokenTtlSeconds: env.JWT_ACCESS_TTL_SECONDS,
     refreshTokenTtlSeconds: env.JWT_REFRESH_TTL_SECONDS,
   });
+
+  if (!result.success) {
+    // Fail closed with a controlled message: report which variables are invalid
+    // without ever echoing the offending values (secrets stay out of logs).
+    const details = result.error.issues
+      .map((issue) => {
+        const field = issue.path.join(".") || "config";
+        return `${field}: ${issue.message}`;
+      })
+      .join("; ");
+
+    throw new ConfigurationError(`Invalid API configuration: ${details}`);
+  }
+
+  return result.data;
 }
