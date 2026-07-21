@@ -91,7 +91,15 @@ See `engineering/v1/V1_EMERGENCY_OWNERSHIP_MAP.md`.
 
 - `b671cd5` feat(v1): add course and mission engines with Module 1 foundation
 - `19c1ea8` feat(web): generalize student mission runtime for Module 1
-- (plus checkpoint commit on this branch)
+- `6106830` docs(v1): record emergency foundation checkpoint for Module 1
+
+## PR
+
+- Target: base `main` ← head `integration/v1-emergency-completion`
+- Title: `TEC.ERP V1 — Core Engines and Complete Module 1`
+- Create URL (gh CLI unauthenticated in this environment):
+  https://github.com/Gibran-T/tec-erp-platform/compare/main...integration/v1-emergency-completion?expand=1
+- Do not merge automatically · Do not deploy production
 
 ---
 
