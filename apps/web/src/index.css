@@ -664,9 +664,49 @@ body {
 .workspace-mission__link-button:focus-visible,
 .workspace-mission__checkbox input:focus-visible,
 .workspace-mission__mapping-controls select:focus-visible,
-.workspace-mission__justification textarea:focus-visible {
+.workspace-mission__justification textarea:focus-visible,
+.workspace-mission__numeric-input:focus-visible {
   outline: 2px solid #0a6ed1;
   outline-offset: 2px;
+}
+
+.workspace-mission__progress {
+  margin: 0 0 1rem;
+  color: #374151;
+  font-weight: 600;
+}
+
+.workspace-mission__choice-list,
+.workspace-mission__ordering-list,
+.workspace-mission__competency-list {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.workspace-mission__ordering-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.workspace-mission__ordering-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.workspace-mission__numeric-input {
+  width: 100%;
+  max-width: 12rem;
+  box-sizing: border-box;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
 }
 
 .workspace-mission__link-button {

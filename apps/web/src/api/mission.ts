@@ -4,6 +4,7 @@ import {
   MissionStartResponseSchema,
   MissionSubmitResponseSchema,
   MissionsResponseSchema,
+  type GenericMissionSubmitRequest,
   type MissionDetail,
   type MissionStartResponse,
   type MissionSubmitRequest,
@@ -14,6 +15,8 @@ import {
 import { loadStoredTokens } from "./auth.js";
 import { getApiBaseUrl } from "./health.js";
 import { safeFetch } from "./http.js";
+
+export type MissionSubmitBody = MissionSubmitRequest | GenericMissionSubmitRequest;
 
 async function readErrorMessage(response: Response, fallback: string): Promise<string> {
   try {
@@ -112,7 +115,7 @@ export async function requestStartMission(
 
 export async function requestSubmitMission(
   missionKey: string,
-  body: MissionSubmitRequest,
+  body: MissionSubmitBody,
   accessToken?: string,
 ): Promise<MissionSubmitResponse> {
   const token = accessToken ?? requireAccessToken();
