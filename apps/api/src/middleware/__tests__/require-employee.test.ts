@@ -141,4 +141,61 @@ describe("requireEmployee middleware", () => {
       employeeNumber: "#NHE-DEMO",
     });
   });
+
+  it("derives identity from the token only and ignores spoofed request input", async () => {
+    const attacker = {
+      ...demoRecord,
+      id: "emp_attacker",
+      email: "attacker@example.com",
+      employeeNumber: "#NHE-ATK",
+    };
+    const { requireEmployee } = createMiddlewareStack([demoRecord, attacker]);
+    const token = issueToken(
+      { sub: demoRecord.id, typ: "access" },
+      authConfig.jwtAccessSecret,
+      authConfig.accessTokenTtlSeconds,
+    );
+
+    const spoofed = {
+      header: (name: string) =>
+        name.toLowerCase() === "authorization"
+          ? `Bearer ${token.token}`
+          : "emp_attacker",
+      body: { employee: { id: "emp_attacker" }, sub: "emp_attacker" },
+      query: { sub: "emp_attacker", employeeId: "emp_attacker" },
+      // Pre-set employee must be overwritten by the token-derived identity.
+      employee: attacker,
+    } as unknown as Partial<Request>;
+
+    const outcome = await invokeMiddleware(requireEmployee, spoofed);
+
+    expect(outcome.error).toBeUndefined();
+    expect(outcome.employee?.id).toBe(demoRecord.id);
+    expect(outcome.employee?.email).toBe(demoRecord.email);
+  });
+
+  it("resolves the identity of the token subject, not a spoofed subject claim", async () => {
+    const other = {
+      ...demoRecord,
+      id: "emp_other",
+      email: "other@example.com",
+      employeeNumber: "#NHE-OTHER",
+    };
+    const { requireEmployee } = createMiddlewareStack([demoRecord, other]);
+    const token = issueToken(
+      { sub: other.id, typ: "access" },
+      authConfig.jwtAccessSecret,
+      authConfig.accessTokenTtlSeconds,
+    );
+
+    const outcome = await invokeMiddleware(requireEmployee, {
+      header: (name: string) =>
+        name.toLowerCase() === "authorization"
+          ? `Bearer ${token.token}`
+          : "emp_demo",
+      body: { sub: demoRecord.id },
+    } as unknown as Partial<Request>);
+
+    expect(outcome.employee?.id).toBe(other.id);
+  });
 });
