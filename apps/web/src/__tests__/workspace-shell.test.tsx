@@ -143,6 +143,48 @@ describe("workspace shell access", () => {
   });
 });
 
+describe("workspace shell accessibility", () => {
+  it("exposes a skip link that targets the main content region", async () => {
+    renderWorkspace("/workspace");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("workspace-shell")).toBeInTheDocument();
+    });
+
+    const skipLink = screen.getByTestId("skip-to-content-link");
+    expect(skipLink).toHaveTextContent("Passer au contenu principal");
+    expect(skipLink).toHaveAttribute("href", "#contenu-principal");
+
+    const mainTarget = document.getElementById("contenu-principal");
+    expect(mainTarget).not.toBeNull();
+    expect(mainTarget).toHaveAttribute("tabindex", "-1");
+  });
+
+  it("renders the core banner, navigation and main landmarks", async () => {
+    renderWorkspace("/workspace");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("workspace-home-page")).toBeInTheDocument();
+    });
+
+    expect(screen.getAllByRole("banner").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole("main")).toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: "Applications" }),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps a single top-level heading on the workspace home view", async () => {
+    renderWorkspace("/workspace");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("workspace-home-page")).toBeInTheDocument();
+    });
+
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+  });
+});
+
 describe("employee identity from session", () => {
   it("renders employee identity from session data in the badge", async () => {
     renderWorkspace("/workspace");

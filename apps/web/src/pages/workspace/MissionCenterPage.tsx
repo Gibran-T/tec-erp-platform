@@ -450,7 +450,9 @@ export function MissionCenterPage(): ReactNode {
     return (
       <section className="workspace-mission" data-testid="mission-center-loading">
         <h1>{MISSION_CENTER_TITLE}</h1>
-        <p className="workspace-first-day__status">Chargement du Centre de mission…</p>
+        <p className="workspace-first-day__status" role="status">
+          Chargement du Centre de mission…
+        </p>
       </section>
     );
   }
@@ -471,7 +473,7 @@ export function MissionCenterPage(): ReactNode {
       <section className="workspace-mission" data-testid="mission-center-page">
         <h1>{MISSION_CENTER_TITLE}</h1>
         {refreshing ? (
-          <p className="workspace-first-day__status" data-testid="mission-refreshing">
+          <p className="workspace-first-day__status" role="status" data-testid="mission-refreshing">
             Actualisation…
           </p>
         ) : null}
@@ -491,7 +493,7 @@ export function MissionCenterPage(): ReactNode {
         </p>
       </header>
       {refreshing ? (
-        <p className="workspace-first-day__status" data-testid="mission-refreshing">
+        <p className="workspace-first-day__status" role="status" data-testid="mission-refreshing">
           Actualisation…
         </p>
       ) : null}

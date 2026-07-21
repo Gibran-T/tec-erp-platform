@@ -16,6 +16,31 @@ body {
   overflow-x: hidden;
 }
 
+/* Accessibility — skip link revealed only on keyboard focus. */
+.tec-skip-link {
+  position: absolute;
+  left: 0.5rem;
+  top: -3rem;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  background: #0a6ed1;
+  color: #ffffff;
+  border-radius: 0 0 0.375rem 0.375rem;
+  text-decoration: none;
+  transition: top 0.15s ease-in-out;
+}
+
+.tec-skip-link:focus,
+.tec-skip-link:focus-visible {
+  top: 0;
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.workspace-main-content:focus {
+  outline: none;
+}
+
 .tec-app-shell__top-nav {
   border-bottom: 1px solid #d1d5db;
   background: #ffffff;
@@ -261,7 +286,7 @@ body {
   background: #f9fafb;
 }
 
-.workspace-dashboard-preview h3 {
+.workspace-dashboard-preview h2 {
   margin: 0 0 0.75rem;
   font-size: 0.875rem;
   color: #6b7280;
@@ -348,7 +373,7 @@ body {
   color: #6b7280;
 }
 
-.workspace-empty-state h2 {
+.workspace-empty-state h1 {
   margin: 0 0 0.5rem;
 }
 

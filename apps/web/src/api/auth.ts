@@ -10,6 +10,7 @@ import {
 } from "@tec-platform/contracts";
 
 import { getApiBaseUrl } from "./health.js";
+import { safeFetch } from "./http.js";
 
 const TOKEN_STORAGE_KEY = "tec.erp.auth.tokens";
 
@@ -52,41 +53,45 @@ export async function requestLogin(
   email: string,
   password: string,
 ): Promise<LoginResponse> {
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/auth/login`, {
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
 
   if (!response.ok) {
-    throw new Error(await readErrorMessage(response, "Sign-in failed."));
+    throw new Error(
+      await readErrorMessage(response, "Échec de la connexion. Veuillez réessayer."),
+    );
   }
 
   return LoginResponseSchema.parse(await response.json());
 }
 
 export async function requestRefresh(refreshToken: string): Promise<AuthTokens> {
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/auth/refresh`, {
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/auth/refresh`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ refreshToken }),
   });
 
   if (!response.ok) {
-    throw new Error(await readErrorMessage(response, "Session refresh failed."));
+    throw new Error(
+      await readErrorMessage(response, "Le renouvellement de la session a échoué."),
+    );
   }
 
   return RefreshResponseSchema.parse(await response.json()).tokens;
 }
 
 export async function requestSession(accessToken: string): Promise<AuthenticatedEmployee> {
-  const response = await fetch(`${getApiBaseUrl()}/api/v1/auth/session`, {
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/auth/session`, {
     method: "GET",
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 
   if (!response.ok) {
-    throw new Error(await readErrorMessage(response, "Session is not valid."));
+    throw new Error(await readErrorMessage(response, "La session n’est pas valide."));
   }
 
   return SessionResponseSchema.parse(await response.json()).employee;

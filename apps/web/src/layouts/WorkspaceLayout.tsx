@@ -18,6 +18,9 @@ export function WorkspaceLayout(): ReactNode {
 
   return (
     <div data-testid="workspace-shell">
+      <a className="tec-skip-link" href="#contenu-principal" data-testid="skip-to-content-link">
+        Passer au contenu principal
+      </a>
       <FirstDayDataProvider>
         <MissionDataProvider>
           <AppShell
@@ -25,7 +28,9 @@ export function WorkspaceLayout(): ReactNode {
             sidebar={<WorkspaceSidebar />}
             rightPanel={<WorkspaceContextPanel />}
           >
-            <Outlet />
+            <div id="contenu-principal" tabIndex={-1} className="workspace-main-content">
+              <Outlet />
+            </div>
           </AppShell>
         </MissionDataProvider>
       </FirstDayDataProvider>

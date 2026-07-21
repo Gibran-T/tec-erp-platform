@@ -86,7 +86,11 @@ export function TasksAppPage(): ReactNode {
   if (initialLoading && tasks === null) {
     return (
       <section data-testid="tasks-app-page">
-        <p className="workspace-first-day__status" data-testid="tasks-initial-loading">
+        <p
+          className="workspace-first-day__status"
+          role="status"
+          data-testid="tasks-initial-loading"
+        >
           Chargement de vos responsabilités…
         </p>
       </section>

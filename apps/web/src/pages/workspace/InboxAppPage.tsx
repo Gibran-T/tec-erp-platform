@@ -112,7 +112,11 @@ export function InboxAppPage(): ReactNode {
   if (initialLoading && inbox === null) {
     return (
       <section data-testid="inbox-app-page">
-        <p className="workspace-first-day__status" data-testid="inbox-initial-loading">
+        <p
+          className="workspace-first-day__status"
+          role="status"
+          data-testid="inbox-initial-loading"
+        >
           Chargement de votre boîte de réception…
         </p>
       </section>
