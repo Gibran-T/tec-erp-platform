@@ -59,6 +59,11 @@ model Employee {
   taskStates    EmployeeTaskState[]
   missionAttempts EmployeeMissionAttempt[]
 
+  courseProgress      EmployeeCourseProgress[]
+  moduleProgress      EmployeeModuleProgress[]
+  v1MissionAttempts   MissionAttempt[]
+  unlockStates        UnlockState[]
+
   @@index([companyId])
   @@map("employee")
 }
@@ -119,4 +124,194 @@ model EmployeeMissionAttempt {
   @@unique([employeeId, missionKey])
   @@index([employeeId])
   @@map("employee_mission_attempt")
+}
+
+/// V1 course catalog entry (code-registered content mirrored in DB).
+model Course {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  title     String
+  version   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  modules  CourseModule[]
+  progress EmployeeCourseProgress[]
+
+  @@map("course")
+}
+
+model CourseModule {
+  id         String   @id @default(cuid())
+  courseId   String
+  moduleCode String   @unique
+  title      String
+  sequence   Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  course    Course                   @relation(fields: [courseId], references: [id])
+  missions  MissionDefinition[]
+  progress  EmployeeModuleProgress[]
+
+  @@index([courseId])
+  @@map("course_module")
+}
+
+model MissionDefinition {
+  id                   String   @id @default(cuid())
+  moduleId             String
+  missionCode          String   @unique
+  missionKey           String   @unique
+  title                String
+  sequence             Int
+  maxAttempts          Int      @default(2)
+  passThresholdPercent Int      @default(70)
+  estimatedMinutes     Int?
+  difficulty           String?
+  definitionJson       Json
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  module       CourseModule         @relation(fields: [moduleId], references: [id])
+  competencies MissionCompetency[]
+  attempts     MissionAttempt[]
+
+  @@index([moduleId])
+  @@map("mission_definition")
+}
+
+model Competency {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  missions MissionCompetency[]
+
+  @@map("competency")
+}
+
+model MissionCompetency {
+  id                  String @id @default(cuid())
+  missionDefinitionId String
+  competencyId        String
+  weight              Float  @default(1)
+
+  missionDefinition MissionDefinition @relation(fields: [missionDefinitionId], references: [id])
+  competency        Competency        @relation(fields: [competencyId], references: [id])
+
+  @@unique([missionDefinitionId, competencyId])
+  @@index([missionDefinitionId])
+  @@index([competencyId])
+  @@map("mission_competency")
+}
+
+model EmployeeCourseProgress {
+  id              String   @id @default(cuid())
+  employeeId      String
+  courseId        String
+  percentComplete Float    @default(0)
+  status          String   @default("locked")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+  course   Course   @relation(fields: [courseId], references: [id])
+
+  @@unique([employeeId, courseId])
+  @@index([employeeId])
+  @@index([courseId])
+  @@map("employee_course_progress")
+}
+
+model EmployeeModuleProgress {
+  id              String   @id @default(cuid())
+  employeeId      String
+  moduleId        String
+  percentComplete Float    @default(0)
+  status          String   @default("locked")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  employee Employee     @relation(fields: [employeeId], references: [id])
+  module   CourseModule @relation(fields: [moduleId], references: [id])
+
+  @@unique([employeeId, moduleId])
+  @@index([employeeId])
+  @@index([moduleId])
+  @@map("employee_module_progress")
+}
+
+/// Persisted attempt lifecycle. locked/available are derived, never stored.
+model MissionAttempt {
+  id                  String    @id @default(cuid())
+  employeeId          String
+  missionDefinitionId String
+  attemptNumber       Int
+  /// Persisted: in_progress | submitted | completed | needs_review | failed
+  status              String
+  startedAt           DateTime
+  submittedAt         DateTime?
+  completedAt         DateTime?
+  responsesJson       Json      @default("{}")
+  scorePercent        Float?
+  earnedPoints        Float?
+  maxPoints           Float?
+  feedbackJson        Json?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  employee          Employee          @relation(fields: [employeeId], references: [id])
+  missionDefinition MissionDefinition @relation(fields: [missionDefinitionId], references: [id])
+  evidence          MissionEvidence[]
+  feedbackRecords   FeedbackRecord[]
+
+  @@unique([employeeId, missionDefinitionId, attemptNumber])
+  @@index([employeeId])
+  @@index([missionDefinitionId])
+  @@map("mission_attempt")
+}
+
+model MissionEvidence {
+  id          String   @id @default(cuid())
+  attemptId   String
+  kind        String
+  payloadJson Json
+  createdAt   DateTime @default(now())
+
+  attempt MissionAttempt @relation(fields: [attemptId], references: [id])
+
+  @@index([attemptId])
+  @@map("mission_evidence")
+}
+
+model UnlockState {
+  id           String   @id @default(cuid())
+  employeeId   String
+  resourceType String
+  resourceKey  String
+  unlockedAt   DateTime
+  createdAt    DateTime @default(now())
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  @@unique([employeeId, resourceType, resourceKey])
+  @@index([employeeId])
+  @@map("unlock_state")
+}
+
+model FeedbackRecord {
+  id        String   @id @default(cuid())
+  attemptId String
+  scope     String
+  message   String
+  createdAt DateTime @default(now())
+
+  attempt MissionAttempt @relation(fields: [attemptId], references: [id])
+
+  @@index([attemptId])
+  @@map("feedback_record")
 }

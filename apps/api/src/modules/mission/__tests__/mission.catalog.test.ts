@@ -12,9 +12,14 @@ import {
 } from "../mission.catalog.js";
 
 describe("mission catalog", () => {
-  it("contains exactly one production mission", () => {
-    expect(MISSION_CATALOG).toHaveLength(1);
+  it("contains the three Module 1 missions from the registry", () => {
+    expect(MISSION_CATALOG).toHaveLength(3);
     expect(MISSION_CATALOG[0]?.missionKey).toBe(ENTERPRISE_DISCOVERY_MISSION_KEY);
+    expect(MISSION_CATALOG.map((mission) => mission.missionKey)).toEqual([
+      "m1-m01-decouvrir-entreprise",
+      "m1-m02-connecter-departements",
+      "m1-m03-diagnostiquer-preparation",
+    ]);
     expect(MISSION_CATALOG[0]?.competencyCodes).toEqual(["C-ORG-01", "C-BUS-01"]);
   });
 

@@ -1,7 +1,8 @@
 import type {
+  CourseOverviewResponse,
   MissionDetail,
+  MissionScoreSummary,
   MissionStatus,
-  MissionSubmitRequest,
   MissionsResponse,
 } from "@tec-platform/contracts";
 import {
@@ -14,11 +15,13 @@ import {
   type ReactNode,
 } from "react";
 
+import { requestCourse } from "../api/course.js";
 import {
   requestMissionDetail,
   requestMissions,
   requestStartMission,
   requestSubmitMission,
+  type MissionSubmitBody,
 } from "../api/mission.js";
 
 const FALLBACK_LOAD_ERROR =
@@ -27,9 +30,15 @@ const FALLBACK_START_ERROR = "Impossible de démarrer la mission. Veuillez rées
 const FALLBACK_SUBMIT_ERROR =
   "Impossible de soumettre votre découverte. Veuillez réessayer.";
 
+function toMissionListStatus(attemptStatus: string): MissionStatus {
+  return attemptStatus === "completed" ? "completed" : "in_progress";
+}
+
 export interface MissionDataContextValue {
+  readonly course: CourseOverviewResponse | null;
   readonly missions: MissionsResponse | null;
   readonly selectedMission: MissionDetail | null;
+  readonly lastScore: MissionScoreSummary | null;
   readonly summaryStatus: MissionStatus | null;
   readonly initialLoading: boolean;
   readonly refreshing: boolean;
@@ -42,12 +51,10 @@ export interface MissionDataContextValue {
   readonly selectMission: (missionKey: string) => Promise<void>;
   readonly clearSelectedMission: () => void;
   readonly startMission: (missionKey: string) => Promise<boolean>;
-  readonly submitMission: (
-    missionKey: string,
-    body: MissionSubmitRequest,
-  ) => Promise<boolean>;
+  readonly submitMission: (missionKey: string, body: MissionSubmitBody) => Promise<boolean>;
   readonly clearStartError: () => void;
   readonly clearSubmitError: () => void;
+  readonly clearLastScore: () => void;
 }
 
 const MissionDataContext = createContext<MissionDataContextValue | null>(null);
@@ -57,8 +64,10 @@ export interface MissionDataProviderProps {
 }
 
 export function MissionDataProvider({ children }: MissionDataProviderProps): ReactNode {
+  const [course, setCourse] = useState<CourseOverviewResponse | null>(null);
   const [missions, setMissions] = useState<MissionsResponse | null>(null);
   const [selectedMission, setSelectedMission] = useState<MissionDetail | null>(null);
+  const [lastScore, setLastScore] = useState<MissionScoreSummary | null>(null);
   const [initialLoading, setInitialLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -78,8 +87,12 @@ export function MissionDataProvider({ children }: MissionDataProviderProps): Rea
     }
 
     try {
-      const missionsResponse = await requestMissions();
+      const [missionsResponse, courseResponse] = await Promise.all([
+        requestMissions(),
+        requestCourse(),
+      ]);
       setMissions(missionsResponse);
+      setCourse(courseResponse);
 
       let detailKey: string | null = null;
       setSelectedMission((current) => {
@@ -113,6 +126,7 @@ export function MissionDataProvider({ children }: MissionDataProviderProps): Rea
 
   const selectMission = useCallback(async (missionKey: string) => {
     setLoadError(null);
+    setLastScore(null);
 
     try {
       const detail = await requestMissionDetail(missionKey);
@@ -125,59 +139,80 @@ export function MissionDataProvider({ children }: MissionDataProviderProps): Rea
 
   const clearSelectedMission = useCallback(() => {
     setSelectedMission(null);
+    setLastScore(null);
   }, []);
 
-  const startMission = useCallback(
-    async (missionKey: string): Promise<boolean> => {
-      setStarting(true);
-      setStartError(null);
+  const startMission = useCallback(async (missionKey: string): Promise<boolean> => {
+    setStarting(true);
+    setStartError(null);
+    setLastScore(null);
 
-      try {
-        const started = await requestStartMission(missionKey);
-        setSelectedMission((current) =>
-          current
-            ? {
-                ...current,
-                status: started.attempt.status === "completed" ? "completed" : "in_progress",
-                attempt: started.attempt,
-              }
-            : current,
-        );
-        const missionsResponse = await requestMissions();
-        setMissions(missionsResponse);
-        return true;
-      } catch (error) {
-        const message =
-          error instanceof Error && error.message.trim().length > 0
-            ? error.message
-            : FALLBACK_START_ERROR;
-        setStartError(message);
-        return false;
-      } finally {
-        setStarting(false);
-      }
-    },
-    [],
-  );
+    try {
+      const started = await requestStartMission(missionKey);
+      setSelectedMission((current) =>
+        current
+          ? {
+              ...current,
+              status: toMissionListStatus(started.attempt.status),
+              attempt: started.attempt,
+            }
+          : current,
+      );
+      const [missionsResponse, courseResponse] = await Promise.all([
+        requestMissions(),
+        requestCourse(),
+      ]);
+      setMissions(missionsResponse);
+      setCourse(courseResponse);
+      return true;
+    } catch (error) {
+      const message =
+        error instanceof Error && error.message.trim().length > 0
+          ? error.message
+          : FALLBACK_START_ERROR;
+      setStartError(message);
+      return false;
+    } finally {
+      setStarting(false);
+    }
+  }, []);
 
   const submitMission = useCallback(
-    async (missionKey: string, body: MissionSubmitRequest): Promise<boolean> => {
+    async (missionKey: string, body: MissionSubmitBody): Promise<boolean> => {
       setSubmitting(true);
       setSubmitError(null);
 
       try {
         const submitted = await requestSubmitMission(missionKey, body);
+        const nextStatus =
+          submitted.score?.passed === false
+            ? "in_progress"
+            : submitted.attempt.status === "completed"
+              ? "completed"
+              : "in_progress";
+
         setSelectedMission((current) =>
           current
             ? {
                 ...current,
-                status: "completed",
+                status: nextStatus,
                 attempt: submitted.attempt,
               }
             : current,
         );
-        const missionsResponse = await requestMissions();
-        setMissions(missionsResponse);
+        setLastScore(submitted.score ?? null);
+
+        try {
+          const [missionsResponse, courseResponse] = await Promise.all([
+            requestMissions(),
+            requestCourse(),
+          ]);
+          setMissions(missionsResponse);
+          setCourse(courseResponse);
+        } catch {
+          // Submission already succeeded; list refresh is best-effort.
+        }
+
         return true;
       } catch (error) {
         const message =
@@ -195,8 +230,10 @@ export function MissionDataProvider({ children }: MissionDataProviderProps): Rea
 
   const value = useMemo<MissionDataContextValue>(
     () => ({
+      course,
       missions,
       selectedMission,
+      lastScore,
       summaryStatus: missions?.missions[0]?.status ?? null,
       initialLoading,
       refreshing,
@@ -212,10 +249,13 @@ export function MissionDataProvider({ children }: MissionDataProviderProps): Rea
       submitMission,
       clearStartError: () => setStartError(null),
       clearSubmitError: () => setSubmitError(null),
+      clearLastScore: () => setLastScore(null),
     }),
     [
+      course,
       missions,
       selectedMission,
+      lastScore,
       initialLoading,
       refreshing,
       loadError,

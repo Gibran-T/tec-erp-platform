@@ -6,15 +6,27 @@ import type {
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 
+import {
+  buildGenericResponses,
+  MissionInteractionRenderer,
+  type InteractionResponses,
+} from "../../mission/MissionInteractions.js";
 import { useMissionData } from "../../mission/MissionDataContext.js";
 import {
   ACKNOWLEDGE_INPUTS_LEGEND,
+  COMPETENCIES_LABEL,
   JUSTIFICATION_HINT,
   MAPPING_LEGEND,
   MISSION_CENTER_TITLE,
   MISSION_STATUS_LABELS,
+  OBJECTIVE_LABEL,
+  PROGRESS_LABEL,
+  RESULT_PASSED_LABEL,
+  RESULT_RETRY_LABEL,
+  RETRY_MISSION_LABEL,
   START_MISSION_LABEL,
   SUBMIT_MISSION_LABEL,
+  SUBMIT_RESPONSES_LABEL,
 } from "../../mission/missionCopy.js";
 
 const JUSTIFICATION_MIN = 40;
@@ -23,6 +35,14 @@ const MINIMUM_MAPPINGS = 2;
 
 function pairKey(departmentKey: string, problemKey: string): string {
   return `${departmentKey}::${problemKey}`;
+}
+
+function usesLegacyProcessMap(detail: MissionDetail): boolean {
+  return Boolean(
+    detail.contextItems?.length &&
+      detail.departments?.length &&
+      detail.problems?.length,
+  );
 }
 
 function MissionSummaryCard({
@@ -222,6 +242,40 @@ function MappingEditor({
   );
 }
 
+function MissionMeta({ detail }: { detail: MissionDetail }): ReactNode {
+  const competencyCodes =
+    "competencyCodes" in detail && Array.isArray(detail.competencyCodes)
+      ? detail.competencyCodes.filter((item): item is string => typeof item === "string")
+      : [];
+
+  return (
+    <>
+      {detail.preview ? (
+        <article className="workspace-mission__briefing" data-testid="mission-objective">
+          <h3>{OBJECTIVE_LABEL}</h3>
+          <p>{detail.preview}</p>
+        </article>
+      ) : null}
+      {competencyCodes.length > 0 ? (
+        <article className="workspace-mission__briefing" data-testid="mission-competencies">
+          <h3>{COMPETENCIES_LABEL}</h3>
+          <ul className="workspace-mission__competency-list">
+            {competencyCodes.map((code) => (
+              <li key={code}>{code}</li>
+            ))}
+          </ul>
+        </article>
+      ) : null}
+      {detail.briefing ? (
+        <article className="workspace-mission__briefing" data-testid="mission-briefing">
+          <h3>Briefing de Claire Fontaine</h3>
+          <pre className="workspace-mission__briefing-body">{detail.briefing}</pre>
+        </article>
+      ) : null}
+    </>
+  );
+}
+
 function MissionDetailView({
   detail,
 }: {
@@ -234,12 +288,16 @@ function MissionDetailView({
     submitting,
     startError,
     submitError,
+    lastScore,
     clearSelectedMission,
   } = useMissionData();
 
   const completed = detail.status === "completed";
   const inProgress = detail.status === "in_progress";
   const available = detail.status === "available";
+  const legacyMode = usesLegacyProcessMap(detail);
+  const interactions = detail.interactions ?? [];
+  const genericMode = !legacyMode && interactions.length > 0;
 
   const [acknowledged, setAcknowledged] = useState<Set<string>>(
     () => new Set(detail.attempt?.acknowledgedInputKeys ?? []),
@@ -248,12 +306,14 @@ function MissionDetailView({
     () => [...(detail.attempt?.departmentProblemMappings ?? [])],
   );
   const [justification, setJustification] = useState(detail.attempt?.justification ?? "");
+  const [responses, setResponses] = useState<InteractionResponses>({});
   const [clientError, setClientError] = useState<string | null>(null);
 
   useEffect(() => {
     setAcknowledged(new Set(detail.attempt?.acknowledgedInputKeys ?? []));
     setMappings([...(detail.attempt?.departmentProblemMappings ?? [])]);
     setJustification(detail.attempt?.justification ?? "");
+    setResponses({});
     setClientError(null);
   }, [detail]);
 
@@ -279,6 +339,7 @@ function MissionDetailView({
   }
 
   const canEdit = inProgress && !completed;
+  const showRetry = Boolean(lastScore && !lastScore.passed && canEdit);
 
   return (
     <section className="workspace-mission__detail" data-testid="mission-detail">
@@ -294,12 +355,8 @@ function MissionDetailView({
         <h2>{detail.title}</h2>
         <span className="workspace-mission__status">{MISSION_STATUS_LABELS[detail.status]}</span>
       </header>
-      {detail.briefing ? (
-        <article className="workspace-mission__briefing" data-testid="mission-briefing">
-          <h3>Briefing de Claire Fontaine</h3>
-          <pre className="workspace-mission__briefing-body">{detail.briefing}</pre>
-        </article>
-      ) : null}
+
+      <MissionMeta detail={detail} />
 
       {available ? (
         <div className="workspace-mission__actions">
@@ -323,7 +380,7 @@ function MissionDetailView({
         </div>
       ) : null}
 
-      {detail.contextItems ? (
+      {legacyMode && detail.contextItems ? (
         <ContextItems
           items={detail.contextItems}
           acknowledged={acknowledged}
@@ -342,7 +399,7 @@ function MissionDetailView({
         />
       ) : null}
 
-      {detail.departments && detail.problems ? (
+      {legacyMode && detail.departments && detail.problems ? (
         <MappingEditor
           departments={detail.departments}
           problems={detail.problems}
@@ -352,7 +409,7 @@ function MissionDetailView({
         />
       ) : null}
 
-      {(inProgress || completed) && (
+      {legacyMode && (inProgress || completed) ? (
         <label className="workspace-mission__justification">
           Justification
           <textarea
@@ -366,7 +423,44 @@ function MissionDetailView({
           />
           <span id="mission-justification-hint">{JUSTIFICATION_HINT}</span>
         </label>
-      )}
+      ) : null}
+
+      {genericMode
+        ? interactions.map((interaction) => (
+            <MissionInteractionRenderer
+              key={interaction.id}
+              interaction={interaction}
+              contextItems={detail.contextItems}
+              value={responses[interaction.id]}
+              disabled={!canEdit}
+              onChange={(next) => {
+                setResponses((current) => ({
+                  ...current,
+                  [interaction.id]: next,
+                }));
+              }}
+            />
+          ))
+        : null}
+
+      {/* When legacy fields and generic interactions coexist, still render interactions. */}
+      {legacyMode && interactions.length > 0
+        ? interactions.map((interaction) => (
+            <MissionInteractionRenderer
+              key={interaction.id}
+              interaction={interaction}
+              contextItems={detail.contextItems}
+              value={responses[interaction.id]}
+              disabled={!canEdit}
+              onChange={(next) => {
+                setResponses((current) => ({
+                  ...current,
+                  [interaction.id]: next,
+                }));
+              }}
+            />
+          ))
+        : null}
 
       {canEdit ? (
         <div className="workspace-mission__actions">
@@ -379,38 +473,90 @@ function MissionDetailView({
             onClick={() => {
               setClientError(null);
 
-              for (const requiredKey of requiredKeys) {
-                if (!acknowledged.has(requiredKey)) {
+              if (legacyMode) {
+                for (const requiredKey of requiredKeys) {
+                  if (!acknowledged.has(requiredKey)) {
+                    setClientError(
+                      "Reconnaissez tous les contextes requis avant de soumettre.",
+                    );
+                    return;
+                  }
+                }
+
+                if (mappings.length < MINIMUM_MAPPINGS) {
                   setClientError(
-                    "Reconnaissez tous les contextes requis avant de soumettre.",
+                    `Ajoutez au moins ${MINIMUM_MAPPINGS} associations département/problème.`,
                   );
+                  return;
+                }
+
+                const trimmed = justification.trim();
+                if (trimmed.length < JUSTIFICATION_MIN || trimmed.length > JUSTIFICATION_MAX) {
+                  setClientError(
+                    `La justification doit contenir entre ${JUSTIFICATION_MIN} et ${JUSTIFICATION_MAX} caractères.`,
+                  );
+                  return;
+                }
+
+                void submitMission(detail.missionKey, {
+                  acknowledgedInputKeys: [...acknowledged],
+                  departmentProblemMappings: mappings,
+                  justification: trimmed,
+                });
+                return;
+              }
+
+              for (const interaction of interactions) {
+                const current = responses[interaction.id];
+                if (interaction.type === "SINGLE_CHOICE" && typeof current !== "string") {
+                  setClientError("Complétez toutes les questions avant de soumettre.");
+                  return;
+                }
+                if (
+                  interaction.type === "NUMERIC_INPUT" &&
+                  (typeof current !== "number" || !Number.isFinite(current))
+                ) {
+                  setClientError("Indiquez une valeur numérique valide avant de soumettre.");
+                  return;
+                }
+                if (
+                  interaction.type === "TEXT_ANALYSIS" &&
+                  (typeof current !== "string" || current.trim().length < 20)
+                ) {
+                  setClientError("Rédigez une analyse textuelle avant de soumettre.");
+                  return;
+                }
+                if (
+                  (interaction.type === "MULTI_CHOICE" ||
+                    interaction.type === "PROCESS_MAP_ACKNOWLEDGEMENT") &&
+                  (!Array.isArray(current) ||
+                    !current.every((item) => typeof item === "string") ||
+                    current.length === 0)
+                ) {
+                  setClientError("Sélectionnez au moins une option avant de soumettre.");
+                  return;
+                }
+                if (
+                  interaction.type === "DIAGNOSIS_RECOMMENDATION" &&
+                  (!Array.isArray(current) || current.length === 0)
+                ) {
+                  setClientError("Ajoutez au moins une association avant de soumettre.");
                   return;
                 }
               }
 
-              if (mappings.length < MINIMUM_MAPPINGS) {
-                setClientError(
-                  `Ajoutez au moins ${MINIMUM_MAPPINGS} associations département/problème.`,
-                );
-                return;
-              }
-
-              const trimmed = justification.trim();
-              if (trimmed.length < JUSTIFICATION_MIN || trimmed.length > JUSTIFICATION_MAX) {
-                setClientError(
-                  `La justification doit contenir entre ${JUSTIFICATION_MIN} et ${JUSTIFICATION_MAX} caractères.`,
-                );
-                return;
-              }
-
               void submitMission(detail.missionKey, {
-                acknowledgedInputKeys: [...acknowledged],
-                departmentProblemMappings: mappings,
-                justification: trimmed,
+                responses: buildGenericResponses(interactions, responses),
               });
             }}
           >
-            {submitting ? "Soumission…" : SUBMIT_MISSION_LABEL}
+            {submitting
+              ? "Soumission…"
+              : showRetry
+                ? RETRY_MISSION_LABEL
+                : genericMode
+                  ? SUBMIT_RESPONSES_LABEL
+                  : SUBMIT_MISSION_LABEL}
           </button>
         </div>
       ) : null}
@@ -426,7 +572,15 @@ function MissionDetailView({
         </p>
       ) : null}
 
-      {completed && detail.attempt?.feedbackBody ? (
+      {lastScore ? (
+        <article className="workspace-mission__feedback" data-testid="mission-result">
+          <h3>{lastScore.passed ? RESULT_PASSED_LABEL : RESULT_RETRY_LABEL}</h3>
+          <p data-testid="mission-result-percent">{lastScore.scorePercent} %</p>
+          <pre className="workspace-mission__briefing-body">{lastScore.feedback}</pre>
+        </article>
+      ) : null}
+
+      {detail.attempt?.feedbackBody ? (
         <article className="workspace-mission__feedback" data-testid="mission-feedback">
           <h3>Retour de Claire Fontaine</h3>
           <pre className="workspace-mission__briefing-body">{detail.attempt.feedbackBody}</pre>
@@ -438,6 +592,7 @@ function MissionDetailView({
 
 export function MissionCenterPage(): ReactNode {
   const {
+    course,
     missions,
     selectedMission,
     initialLoading,
@@ -483,6 +638,7 @@ export function MissionCenterPage(): ReactNode {
   }
 
   const summaries = missions?.missions ?? [];
+  const primaryModule = course?.modules[0] ?? null;
 
   return (
     <section className="workspace-mission" data-testid="mission-center-page">
@@ -492,6 +648,11 @@ export function MissionCenterPage(): ReactNode {
           Consultez les responsabilités confiées par votre gestionnaire après votre première journée.
         </p>
       </header>
+      {primaryModule ? (
+        <p className="workspace-mission__progress" data-testid="mission-course-progress">
+          {PROGRESS_LABEL} : {Math.round(primaryModule.percentComplete)} %
+        </p>
+      ) : null}
       {refreshing ? (
         <p className="workspace-first-day__status" role="status" data-testid="mission-refreshing">
           Actualisation…

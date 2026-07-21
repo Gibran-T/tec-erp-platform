@@ -16,7 +16,11 @@ import {
   MISSION_FEEDBACK_COMPLETE_KEY,
   REQUIRED_ACKNOWLEDGED_INPUT_KEYS,
 } from "../mission.catalog.js";
-import { createInMemoryMissionAttemptRepository } from "./mission.fixtures.js";
+import {
+  createInMemoryCourseProgressRepository,
+  createInMemoryMissionAttemptRepository,
+  createInMemoryUnlockStateRepository,
+} from "./mission.fixtures.js";
 
 const testConfig = loadConfig({
   NODE_ENV: "test",
@@ -66,6 +70,8 @@ function createTestApp(
     employeeRepository: createInMemoryEmployeeRepository(employees),
     firstDayStateRepository: firstDayState,
     missionAttemptRepository: missionAttempts,
+    unlockStateRepository: createInMemoryUnlockStateRepository(),
+    courseProgressRepository: createInMemoryCourseProgressRepository(),
   });
 }
 
@@ -113,12 +119,14 @@ describe("me mission routes", () => {
       .set("Authorization", `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body.missions).toHaveLength(1);
+    expect(response.body.missions).toHaveLength(3);
     expect(response.body.missions[0]).toMatchObject({
       missionKey: ENTERPRISE_DISCOVERY_MISSION_KEY,
       status: "locked",
     });
     expect(response.body.missions[0].unlockExplanation).toContain("première journée");
+    expect(response.body.missions[1].status).toBe("locked");
+    expect(response.body.missions[2].status).toBe("locked");
   });
 
   it("hides briefing and mapping tools while locked", async () => {
@@ -152,6 +160,8 @@ describe("me mission routes", () => {
 
     expect(response.body.missions[0].status).toBe("available");
     expect(response.body.missions[0].unlockExplanation).toBeNull();
+    expect(response.body.missions[1].status).toBe("locked");
+    expect(response.body.missions[2].status).toBe("locked");
   });
 
   it("creates an attempt on start and is idempotent", async () => {

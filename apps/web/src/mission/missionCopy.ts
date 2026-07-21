@@ -24,8 +24,22 @@ export const START_MISSION_LABEL = "Démarrer la mission";
 
 export const SUBMIT_MISSION_LABEL = "Soumettre la découverte";
 
+export const SUBMIT_RESPONSES_LABEL = "Soumettre les réponses";
+
+export const RETRY_MISSION_LABEL = "Corriger et resoumettre";
+
 export const ACKNOWLEDGE_INPUTS_LEGEND = "Contextes reconnus";
 
 export const MAPPING_LEGEND = "Associations département / problème d’affaires";
 
 export const OPEN_MISSION_CENTER_LABEL = "Ouvrir le Centre de mission";
+
+export const OBJECTIVE_LABEL = "Objectif";
+
+export const COMPETENCIES_LABEL = "Compétences visées";
+
+export const PROGRESS_LABEL = "Avancement du parcours";
+
+export const RESULT_PASSED_LABEL = "Validé";
+
+export const RESULT_RETRY_LABEL = "À retravailler";

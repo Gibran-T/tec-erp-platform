@@ -1,5 +1,6 @@
 import { DomainError, Result } from "@tec-platform/core";
 import {
+  GenericMissionSubmitRequestSchema,
   MissionDetailSchema,
   MissionStartResponseSchema,
   MissionSubmitRequestSchema,
@@ -67,16 +68,17 @@ export function createMissionHandlers(service: MissionService): MissionHandlers 
     async submitMission(req, res, next) {
       try {
         const employee = getAuthenticatedEmployee(req);
-        const parsed = MissionSubmitRequestSchema.safeParse(req.body);
+        const legacy = MissionSubmitRequestSchema.safeParse(req.body);
+        const generic = GenericMissionSubmitRequestSchema.safeParse(req.body);
 
-        if (!parsed.success) {
+        if (!legacy.success && !generic.success) {
           throw DomainError.validation("La soumission de mission est invalide.");
         }
 
         const outcome = await service.submitMission(
           employee.id,
           req.params.missionKey ?? "",
-          parsed.data,
+          req.body,
         );
 
         if (Result.isFail(outcome)) {
