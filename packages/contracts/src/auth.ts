@@ -8,7 +8,7 @@ import { z } from "zod";
  *
  * A single institutional role is defined for RC01. Broader RBAC is deferred.
  */
-export const EmployeeRoleSchema = z.enum(["JR_BUSINESS_ANALYST", "PROFESSOR"]);
+export const EmployeeRoleSchema = z.enum(["JR_BUSINESS_ANALYST", "PROFESSOR", "ADMIN"]);
 export type EmployeeRole = z.infer<typeof EmployeeRoleSchema>;
 
 export const AuthenticatedEmployeeSchema = z.object({

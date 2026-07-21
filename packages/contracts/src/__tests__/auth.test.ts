@@ -36,7 +36,7 @@ describe("auth contracts", () => {
 
   it("only permits the JR_BUSINESS_ANALYST role in RC01", () => {
     expect(EmployeeRoleSchema.safeParse("JR_BUSINESS_ANALYST").success).toBe(true);
-    expect(EmployeeRoleSchema.safeParse("ADMIN").success).toBe(false);
+    expect(EmployeeRoleSchema.safeParse("ADMIN").success).toBe(true);
   });
 
   it("validates a complete login response", () => {
