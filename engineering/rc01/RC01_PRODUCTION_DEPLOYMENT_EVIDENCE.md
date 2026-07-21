@@ -2,142 +2,130 @@
 
 > Engineering evidence note. No secrets. Not an official `docs/` specification.
 
-## 1. Verdict (this evidence file)
+## 1. Verdict
 
-**RC01 DEPLOYED — POST-DEPLOY DEBT REMAINS**
+**RC01 PRODUCTION GREEN**
 
-Infrastructure deploy of main SHA `1de000746e3bd98f0b57987c42899acb7a555488` to Railway production succeeded (build, migrate deploy, API/Web health). Authenticated Slice D/E production smoke is **blocked** because no approved production QA/demo identity exists in the production database (seed was intentionally not executed).
+Main SHA `1de000746e3bd98f0b57987c42899acb7a555488` is deployed to Railway production. Migrations, health, non-destructive smoke, and authenticated Slice D/E/F smoke (via owner-authorized temporary QA identity) all passed. Temporary QA residue after cleanup: **0**.
 
-## 2. Pre-deploy baseline
+## 2. Pre-deploy / deploy baseline (unchanged)
 
 | Item | Result |
 |------|--------|
-| Approved main SHA | `1de000746e3bd98f0b57987c42899acb7a555488` |
-| Local main / origin/main | Match |
-| PR #14 | Merged — [RC01 — Promote release/rc01 to main](https://github.com/Gibran-T/tec-erp-platform/pull/14) |
-| CI on PR head `17397f31` | Success — [run 29839878014](https://github.com/Gibran-T/tec-erp-platform/actions/runs/29839878014) |
-| JWT config (pre-fix) | `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` were **MISSING** on `tec-erp-api` |
+| Approved / deployed SHA | `1de000746e3bd98f0b57987c42899acb7a555488` |
+| PR #14 | Merged |
+| CI on PR head `17397f31` | Success |
+| JWT secrets on `tec-erp-api` | PRESENT / VALID / DIFFERENT (configured prior; values never disclosed) |
+| API deployment ID | `5dcd7902-8a11-4759-a1d7-e792abd2ca76` (SUCCESS) |
+| Web deployment ID | `be8460cc-855d-4471-98c9-9c817d0f2026` (SUCCESS) |
+| Migration | PASS — RC01 additive migrations applied; seed not run |
+| API/Web health | PASS / PASS |
 
-## 3. JWT configuration (no values)
+## 3. Temporary production QA identity
 
-| Check | Result |
-|-------|--------|
-| Railway auth | PASS (`railway whoami`) |
-| Target | Project `tec-erp` · Environment `production` · Service `tec-erp-api` |
-| Generation | Cryptographically secure random · ≥48 bytes each · base64url encoded |
-| Set method | `railway variable set … --stdin --skip-deploys` (values never printed) |
-| `JWT_ACCESS_SECRET` | PRESENT / VALID |
-| `JWT_REFRESH_SECRET` | PRESENT / VALID |
-| Secrets different | YES |
-| Variable-set triggered deploy? | **No** (`--skip-deploys`) |
+Owner authorization: temporary QA identity creation with total cleanup after validation.
 
-Unrelated variables (`DATABASE_URL`, `CORS_ORIGIN`, `NODE_ENV`, `VITE_API_BASE_URL`) were not modified.
-
-## 4. Railway production target
-
-| Item | Value |
-|------|-------|
-| Project | `tec-erp` (`2b10414d-03ee-4375-af86-4cac4e363a1f`) |
-| Environment | `production` (`eea7ceeb-2fdc-437b-a675-e102da6aa9b8`) |
-| API service | `tec-erp-api` |
-| Web service | `tec-erp-web` |
-| Database | `Postgres` (Online) |
-| API URL | `https://tec-erp-api-production.up.railway.app` |
-| Web URL | `https://tec-erp-web-production.up.railway.app` |
-| Deploy mechanism | `railway up` from local tree at exact main SHA (services had no GitHub source connected) |
-
-## 5. Deployment IDs
-
-| Service | Deployment ID | Result | Timestamp (local) |
-|---------|---------------|--------|-------------------|
-| `tec-erp-api` | `5dcd7902-8a11-4759-a1d7-e792abd2ca76` | SUCCESS | 2026-07-21 11:04:08 -04:00 |
-| `tec-erp-web` | `be8460cc-855d-4471-98c9-9c817d0f2026` | SUCCESS | 2026-07-21 11:06:24 -04:00 |
-
-**Deployed content SHA (source tree):** `1de000746e3bd98f0b57987c42899acb7a555488`
-
-## 6. Build / migration / startup
-
-| Check | Result |
-|-------|--------|
-| Dependency install | PASS (frozen lockfile) |
-| Prisma generate (build) | PASS |
-| Application build (API/Web) | PASS |
-| Migration strategy | `pnpm migrate:deploy` in API start command only |
-| Seed in deploy | **Not executed** (not in start command) |
-| Migrations applied | PASS — 4 found; applied `rc01_auth_identity`, `rc01_first_day_foundation`, `rc01_mission_discovery` (additive CREATE only) |
-| API startup | PASS — `server_started` with `nodeEnv=production` |
-| Weak-secret bypass | None observed (production boot succeeded only after JWT secrets set) |
-| Secret leakage in reviewed logs | None observed |
-
-## 7. Non-destructive production smoke
-
-| Check | Result |
-|-------|--------|
-| Web URL loads | PASS (200) |
-| Login page French UI | PASS |
-| API `/health` | PASS (`status=ok`) |
-| Unauthenticated `/api/v1/me/organization` | PASS (401) |
-| Unauthenticated `/api/v1/me/missions` | PASS (401) |
-| Invalid bearer token | PASS (401) |
-| CORS `Access-Control-Allow-Origin` | PASS (official Web origin) |
-| Login page 320px overflow | PASS (`overflowX=false`) |
-| Login `h1` / `main` | PASS (1 h1, main present) |
-
-## 8. Slice D / E / F authenticated smoke
-
-| Area | Result |
+| Item | Result |
 |------|--------|
-| Slice D (auth journey / First Day / Mission Center) | **NOT EXECUTED** — blocked |
-| Slice E (org ERP authenticated) | **NOT EXECUTED** — blocked |
-| Slice F workspace a11y (skip-link/landmarks post-login) | **PARTIAL** — public login a11y/320px only |
+| Identities created | Exactly **1** |
+| Display name | QA RC01 Production Smoke |
+| Employee number pattern | `#QA-RC01-PROD-*` |
+| Company | NordHabitat (`NORDHABITAT`) — company row created only because production DB had zero companies post-migrate (seed never run); **not** a full seed; **no** `#NHE-DEMO` created |
+| Password | Strong temporary (never printed / not stored in git) |
+| Real-user changes | None (pre-smoke employee count = 0) |
+| Credentials in docs/git | None |
 
-### Blocker
+Recorded for cleanup (IDs only): employee id captured in session state; deleted after smoke.
 
-**USER ACTION REQUIRED — APPROVED PRODUCTION QA IDENTITY NEEDED**
-
-Canonical demo login (`demo.analyste@nordhabitat.ca`) returns controlled `401 Invalid email or password`. Production DB has RC01 schema but no approved employee identity. Seed was correctly **not** run as part of deploy. Creating an undocumented production account is prohibited.
-
-## 9. Data integrity
+## 4. Authenticated production smoke — Slice D
 
 | Check | Result |
 |-------|--------|
+| Login | PASS |
+| Protected inbox | PASS |
+| Logout effect (401 without token) | PASS |
+| Re-login | PASS |
+| First Day inbox + mark read | PASS |
+| First Day task complete | PASS |
+| Mission available after Day 1 | PASS |
+| Mission start | PASS (201) |
+| Mission interaction/detail | PASS (`in_progress`) |
+| Mission submit / completion | PASS |
+| Refresh persistence (`completed`) | PASS |
+| Logout/login persistence (`completed`) | PASS |
+| No restart CTA (API + UI) | PASS |
+| No duplicate completion row | PASS (single mission attempt for QA) |
+
+**API matrix:** 27/27 PASS (includes Slice E + security checks below).
+
+## 5. Authenticated production smoke — Slice E
+
+| Check | Result |
+|-------|--------|
+| Org available for unlocked QA | PASS |
+| Exactly seven departments | PASS |
+| Tom expected 40 / actual 36 | PASS (API + UI) |
+| Repeated GET stable / read-only | PASS |
+| Unsupported writes POST/PUT/PATCH/DELETE | PASS (404) |
+| No score/attempt progress fields on org payload | PASS |
+| ERP page UI French | PASS |
+| Mission Center soft status `Terminée` | PASS |
+
+## 6. Slice F / accessibility / responsive (production)
+
+| Check | Result |
+|-------|--------|
+| Skip-link present | PASS (`Passer au contenu principal`) |
+| Landmarks header/nav/main | PASS |
+| Desktop workspace coherent | PASS |
+| 320px ERP page overflow | PASS (`overflowX=false`) |
+| Missing / invalid token → 401 | PASS |
+| Safe errors (no stack/SQL/secret in reviewed paths) | PASS |
+
+## 7. Data integrity (before → after smoke → after cleanup)
+
+| Phase | Companies | Employees | Messages | Tasks | Missions |
+|-------|-----------|-----------|----------|-------|----------|
+| Before QA create | 0 | 0 | 0 | 0 | 0 |
+| After authenticated smoke | 1 | 1 (QA only) | 1 (QA) | 1 (QA) | 1 (QA) |
+| After QA cleanup | 1 (NordHabitat preserved) | **0** | **0** | **0** | **0** |
+
+| Check | Result |
+|-------|--------|
+| Only temporary QA records mutated during smoke | PASS |
+| Non-QA mission attempts | 0 |
+| Real employee records | None existed; none created beyond QA |
+| Unintended score / org progress persistence | None |
 | Seed rerun | No |
-| Destructive SQL / reset / truncate | No |
-| Real-user mutation | None observed (no authenticated session) |
-| Temporary QA residue | N/A — none created |
+| **QA RESIDUE** | **0** |
 
-## 10. Post-deploy observation (short window)
+## 8. Post-cleanup health
 
 | Check | Result |
 |-------|--------|
-| API/Web deployments remain SUCCESS | Yes |
-| Health remains ok | Yes |
-| Crash loop | Not observed |
-| Repeated migration execution | Not observed after initial apply |
-| 5xx pattern | Not observed in reviewed window |
-| Auth failures | Expected 401s only (missing identity / invalid token) |
+| API `/health` | PASS (`ok`) |
+| Web HTTP 200 | PASS |
+| Deployments still SUCCESS | Yes |
 
-Long-term stability is **not** claimed from this short window.
+## 9. Rollback
 
-## 11. Rollback
+Not required — production healthy; QA fully removed.
 
-| Item | Status |
-|------|--------|
-| Rollback performed? | **No** |
-| Reason | Deploy healthy; remaining debt is identity provisioning, not a crash/health defect |
+## 10. Remaining MINOR / advisory (non-blocking)
 
-## 12. Remaining debt
+- Automated 320px pixel-regression suite not in CI
+- Production fail-closed for `DATABASE_URL` / `CORS_ORIGIN` deferred
+- Unreachable HomePage/health English strings
+- Bilingual session-restore copy hygiene
 
-1. **BLOCKER for GREEN:** Provision an owner-approved production QA/demo identity (without undocumented ad-hoc accounts), then complete Slice D/E authenticated smoke.
-2. Slice F deferred MINORs (carry-forward): automated 320px pixel suite; prod fail-closed for `DATABASE_URL`/`CORS_ORIGIN`; unreachable English strings; bilingual session-restore copy hygiene.
+## 11. Security boundaries honored
 
-## 13. Security boundaries honored
-
-- No secret values printed or committed
+- No secret values in documentation or git
 - No seed / migrate reset / db push / truncate / drop / recreate
-- No product source changes on this documentation branch
+- No product source changes
 - `official_documents/site/` untouched
+- Temporary scripts/state removed after use
 
 ---
 
-*Engineering evidence · RC01 production deployment · 2026-07-21*
+*Engineering evidence · RC01 production deployment · updated after authenticated smoke*
