@@ -1,9 +1,14 @@
 # TEC.ERP V1 Wave 2 Checkpoint — M2–M6 + Professor + Silver
 
 **Date:** 2026-07-21  
-**Branch:** `integration/v1-wave2-m2-m6-silver`  
+**Branch:** `integration/v1-wave2-m2-m6-silver` @ `c0b44c1e933788a1e51bd86822f4a99a56e05cf6`  
 **Baseline:** `main` @ `fc704833e80c278b9c1624a0a9d0d1c3112cf55a` (PR #16 merged)  
 **Deadline:** Friday, 2026-07-24  
+**PR create URL (gh unauthenticated in this environment):**  
+https://github.com/Gibran-T/tec-erp-platform/compare/main...integration/v1-wave2-m2-m6-silver?expand=1  
+
+Title: `TEC.ERP V1 — Modules 2–6, Professor Portal and Silver`  
+Base: `main` · Head: `integration/v1-wave2-m2-m6-silver` · **Do not merge. Do not deploy.**
 
 ## Baseline
 
