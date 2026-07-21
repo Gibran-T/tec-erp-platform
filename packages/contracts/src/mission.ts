@@ -6,7 +6,11 @@ import { z } from "zod";
  * Allowed department/problem relationships are never exposed to clients.
  */
 
-export const MissionKeySchema = z.enum(["m1-m01-decouvrir-entreprise"]);
+export const MissionKeySchema = z.enum([
+  "m1-m01-decouvrir-entreprise",
+  "m1-m02-connecter-departements",
+  "m1-m03-diagnostiquer-preparation",
+]);
 export type MissionKey = z.infer<typeof MissionKeySchema>;
 
 export const MissionStatusSchema = z.enum([
@@ -60,7 +64,7 @@ export const ProblemOptionSchema = z.object({
 export type ProblemOption = z.infer<typeof ProblemOptionSchema>;
 
 export const MissionAttemptStateSchema = z.object({
-  status: z.enum(["in_progress", "completed"]),
+  status: z.enum(["in_progress", "completed", "submitted", "failed", "needs_review"]),
   startedAt: z.string().datetime(),
   completedAt: z.string().datetime().nullable(),
   acknowledgedInputKeys: z.array(z.string().min(1)),
@@ -68,6 +72,8 @@ export const MissionAttemptStateSchema = z.object({
   justification: z.string().nullable(),
   feedbackKey: z.string().nullable(),
   feedbackBody: z.string().nullable(),
+  scorePercent: z.number().min(0).max(100).nullable().optional(),
+  attemptNumber: z.number().int().positive().optional(),
 });
 export type MissionAttemptState = z.infer<typeof MissionAttemptStateSchema>;
 
@@ -82,6 +88,25 @@ export const MissionDetailSchema = z.object({
   departments: z.array(DepartmentOptionSchema).nullable(),
   problems: z.array(ProblemOptionSchema).nullable(),
   attempt: MissionAttemptStateSchema.nullable(),
+  interactions: z
+    .array(
+      z.object({
+        id: z.string().min(1),
+        type: z.string().min(1),
+        prompt: z.string().min(1),
+        options: z
+          .array(
+            z.object({
+              key: z.string().min(1),
+              label: z.string().min(1),
+              description: z.string().min(1).optional(),
+            }),
+          )
+          .optional(),
+      }),
+    )
+    .nullable()
+    .optional(),
 });
 export type MissionDetail = z.infer<typeof MissionDetailSchema>;
 
@@ -98,6 +123,15 @@ export type MissionSubmitRequest = z.infer<typeof MissionSubmitRequestSchema>;
 export const MissionSubmitResponseSchema = z.object({
   missionKey: MissionKeySchema,
   attempt: MissionAttemptStateSchema,
+  score: z
+    .object({
+      scorePercent: z.number().min(0).max(100),
+      earnedPoints: z.number(),
+      maxPoints: z.number(),
+      passed: z.boolean(),
+      feedback: z.string().min(1),
+    })
+    .optional(),
 });
 export type MissionSubmitResponse = z.infer<typeof MissionSubmitResponseSchema>;
 

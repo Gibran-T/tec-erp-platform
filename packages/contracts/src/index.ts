@@ -39,6 +39,24 @@ export {
   type TasksResponse,
 } from "./first-day.js";
 export {
+  CourseMissionSummarySchema,
+  CourseModuleSummarySchema,
+  CourseOverviewResponseSchema,
+  GenericMissionResponseItemSchema,
+  GenericMissionSubmitRequestSchema,
+  MissionScoreSummarySchema,
+  ModuleDetailResponseSchema,
+  ProgressStatusSchema,
+  type CourseMissionSummary,
+  type CourseModuleSummary,
+  type CourseOverviewResponse,
+  type GenericMissionResponseItem,
+  type GenericMissionSubmitRequest,
+  type MissionScoreSummary,
+  type ModuleDetailResponse,
+  type ProgressStatus,
+} from "./course.js";
+export {
   DepartmentOptionSchema,
   DepartmentProblemMappingSchema,
   DiscoveryContextItemSchema,

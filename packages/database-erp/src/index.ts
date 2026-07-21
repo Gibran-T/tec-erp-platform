@@ -4,6 +4,8 @@ export {
   PrismaClient,
 } from "./client.js";
 
+export type { Prisma, PlatformSchemaMetadata } from "@prisma/client";
+
 export {
   buildDemoSeed,
   DEMO_EMPLOYEE_DISPLAY_NAME,
@@ -16,5 +18,3 @@ export {
   type DemoEmployeeSeed,
   type DemoSeed,
 } from "./seed-data.js";
-
-export type { PlatformSchemaMetadata } from "@prisma/client";

@@ -12,15 +12,23 @@ import { createAuthRouter } from "./modules/auth/auth.routes.js";
 import { createPrismaEmployeeRepository } from "./modules/auth/auth.repository.js";
 import { createAuthService } from "./modules/auth/auth.service.js";
 import type { EmployeeRepository } from "./modules/auth/auth.types.js";
+import { createCourseMeRouter } from "./modules/course/course.routes.js";
+import { createCourseService } from "./modules/course/course.service.js";
 import { createPrismaFirstDayStateRepository } from "./modules/first-day/first-day.repository.js";
 import { createMeRouter } from "./modules/first-day/first-day.routes.js";
 import { createFirstDayService } from "./modules/first-day/first-day.service.js";
 import type { FirstDayStateRepository } from "./modules/first-day/first-day.types.js";
+import { createPrismaCourseProgressRepository } from "./modules/mission/course-progress.repository.js";
 import { createPrismaMissionAttemptRepository } from "./modules/mission/mission.repository.js";
 import { createMissionMeRouter } from "./modules/mission/mission.routes.js";
 import { createMissionService } from "./modules/mission/mission.service.js";
-import type { MissionAttemptRepository } from "./modules/mission/mission.types.js";
+import type {
+  CourseProgressRepository,
+  MissionAttemptRepository,
+  UnlockStateRepository,
+} from "./modules/mission/mission.types.js";
 import { createMissionUnlockStateReader } from "./modules/mission/mission.unlock.js";
+import { createPrismaUnlockStateRepository } from "./modules/mission/unlock-state.repository.js";
 import { createOrganizationAccessReader } from "./modules/organization/organization.access.js";
 import { createOrganizationMeRouter } from "./modules/organization/organization.routes.js";
 import { createOrganizationService } from "./modules/organization/organization.service.js";
@@ -36,6 +44,8 @@ export interface AppDependencies {
   readonly employeeRepository?: EmployeeRepository;
   readonly firstDayStateRepository?: FirstDayStateRepository;
   readonly missionAttemptRepository?: MissionAttemptRepository;
+  readonly unlockStateRepository?: UnlockStateRepository;
+  readonly courseProgressRepository?: CourseProgressRepository;
 }
 
 const defaultDependencies: AppDependencies = {
@@ -94,9 +104,22 @@ export function createApp(
   const firstDayService = createFirstDayService({ stateRepository: firstDayStateRepository });
   const missionAttemptRepository =
     dependencies.missionAttemptRepository ?? createPrismaMissionAttemptRepository();
+  const unlockStateRepository =
+    dependencies.unlockStateRepository ?? createPrismaUnlockStateRepository();
+  const courseProgressRepository =
+    dependencies.courseProgressRepository ?? createPrismaCourseProgressRepository();
+  const unlockReader = createMissionUnlockStateReader(firstDayStateRepository);
   const missionService = createMissionService({
     attemptRepository: missionAttemptRepository,
-    unlockReader: createMissionUnlockStateReader(firstDayStateRepository),
+    unlockReader,
+    unlockStates: unlockStateRepository,
+    courseProgress: courseProgressRepository,
+  });
+  const courseService = createCourseService({
+    attemptRepository: missionAttemptRepository,
+    unlockReader,
+    unlockStates: unlockStateRepository,
+    courseProgress: courseProgressRepository,
   });
   const organizationService = createOrganizationService({
     accessReader: createOrganizationAccessReader(firstDayStateRepository),
@@ -107,6 +130,7 @@ export function createApp(
   app.use("/api/v1/auth", createAuthRouter(authService));
   app.use("/api/v1/me", requireEmployee, createMeRouter(firstDayService));
   app.use("/api/v1/me", requireEmployee, createMissionMeRouter(missionService));
+  app.use("/api/v1/me", requireEmployee, createCourseMeRouter(courseService));
   app.use("/api/v1/me", requireEmployee, createOrganizationMeRouter(organizationService));
   app.use("/api/v1", createApiV1Router());
 

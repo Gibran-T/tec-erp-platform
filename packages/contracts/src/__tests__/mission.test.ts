@@ -10,8 +10,10 @@ import {
 } from "../mission.js";
 
 describe("mission contracts", () => {
-  it("accepts the RC01 enterprise discovery mission key", () => {
+  it("accepts the Module 1 mission keys", () => {
     expect(MissionKeySchema.safeParse("m1-m01-decouvrir-entreprise").success).toBe(true);
+    expect(MissionKeySchema.safeParse("m1-m02-connecter-departements").success).toBe(true);
+    expect(MissionKeySchema.safeParse("m1-m03-diagnostiquer-preparation").success).toBe(true);
     expect(MissionKeySchema.safeParse("decouvrir-nordhabitat").success).toBe(false);
     expect(MissionKeySchema.safeParse("m1-m02").success).toBe(false);
   });
