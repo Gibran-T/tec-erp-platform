@@ -9,7 +9,9 @@
     "start": "node dist/index.js",
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "smoke:wave2": "node scripts/wave2-runtime-smoke.mjs",
+    "smoke:wave2:seed": "node scripts/wave2-smoke-seed.mjs"
   },
   "dependencies": {
     "@tec-platform/contracts": "workspace:*",

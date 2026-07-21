@@ -1,15 +1,29 @@
 import { z } from "zod";
 
 /**
- * RC01 Slice D — Mission Center and enterprise discovery contracts.
- * Mission content is static in API code; only per-employee attempt state crosses the boundary.
- * Allowed department/problem relationships are never exposed to clients.
+ * Mission Center contracts — Wave 1 + Wave 2 mission keys.
+ * Mission content is code-owned; per-employee attempt state crosses the boundary.
  */
 
 export const MissionKeySchema = z.enum([
   "m1-m01-decouvrir-entreprise",
   "m1-m02-connecter-departements",
   "m1-m03-diagnostiquer-preparation",
+  "m2-m01-structurer-organisation",
+  "m2-m02-creer-donnees-reference",
+  "m2-m03-corriger-qualite-donnees",
+  "m3-m01-identifier-besoin-achat",
+  "m3-m02-creer-traiter-commande-achat",
+  "m3-m03-receptionner-analyser-fournisseur",
+  "m4-m01-saisir-commande-institutionnelle",
+  "m4-m02-allocation-inter-entrepots",
+  "m4-m03-confirmer-livraison-cloture",
+  "m5-m01-analyser-stock-reappro",
+  "m5-m02-decision-transfert-inter-dc",
+  "m5-m03-presentation-sop",
+  "m6-m01-reception-facture",
+  "m6-m02-exception-rapprochement-trois-voies",
+  "m6-m03-expliquer-ecart-finance",
 ]);
 export type MissionKey = z.infer<typeof MissionKeySchema>;
 

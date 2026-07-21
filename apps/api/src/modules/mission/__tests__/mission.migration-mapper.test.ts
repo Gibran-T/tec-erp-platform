@@ -67,13 +67,16 @@ describe("mission migration mapper", () => {
     expect(mapped.submittedAt).toBeNull();
   });
 
-  it("unlocks the next Module 1 mission in sequence", () => {
+  it("unlocks the next course mission in sequence across modules", () => {
     expect(nextUnlockKeyAfterMission("m1-m01-decouvrir-entreprise")).toBe(
       "m1-m02-connecter-departements",
     );
     expect(nextUnlockKeyAfterMission("m1-m02-connecter-departements")).toBe(
       "m1-m03-diagnostiquer-preparation",
     );
-    expect(nextUnlockKeyAfterMission("m1-m03-diagnostiquer-preparation")).toBeNull();
+    expect(nextUnlockKeyAfterMission("m1-m03-diagnostiquer-preparation")).toBe(
+      "m2-m01-structurer-organisation",
+    );
+    expect(nextUnlockKeyAfterMission("m6-m03-expliquer-ecart-finance")).toBeNull();
   });
 });

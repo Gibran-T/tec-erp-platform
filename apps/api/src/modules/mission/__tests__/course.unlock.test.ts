@@ -46,11 +46,13 @@ describe("course unlock ordering", () => {
     });
 
     const initial = await service.listMissions("emp_1");
-    expect(initial.missions.map((mission) => mission.status)).toEqual([
+    expect(initial.missions).toHaveLength(18);
+    expect(initial.missions.slice(0, 3).map((mission) => mission.status)).toEqual([
       "available",
       "locked",
       "locked",
     ]);
+    expect(initial.missions.slice(3).every((mission) => mission.status === "locked")).toBe(true);
 
     await service.startMission("emp_1", "m1-m01-decouvrir-entreprise");
     await service.submitMission("emp_1", "m1-m01-decouvrir-entreprise", {
@@ -64,11 +66,12 @@ describe("course unlock ordering", () => {
     });
 
     const afterM01 = await service.listMissions("emp_1");
-    expect(afterM01.missions.map((mission) => mission.status)).toEqual([
+    expect(afterM01.missions.slice(0, 3).map((mission) => mission.status)).toEqual([
       "completed",
       "available",
       "locked",
     ]);
+    expect(afterM01.missions.slice(3).every((mission) => mission.status === "locked")).toBe(true);
     expect(await unlockStates.isUnlocked("emp_1", "mission", "m1-m02-connecter-departements")).toBe(
       true,
     );

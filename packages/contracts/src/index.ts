@@ -137,3 +137,17 @@ export {
   type PaginationQuery,
 } from "./pagination.js";
 export { API_VERSION, PLATFORM_VERSION, type ApiVersion } from "./version.js";
+export {
+  AssessmentSubmitRequestSchema,
+  AssessmentSummarySchema,
+  CertificateViewSchema,
+  type AssessmentSubmitRequest,
+  type AssessmentSummary,
+  type CertificateView,
+} from "./assessment.js";
+export {
+  ProfessorCohortSchema,
+  ProfessorOverrideRequestSchema,
+  ProfessorStudentSummarySchema,
+  type ProfessorOverrideRequest,
+} from "./professor.js";

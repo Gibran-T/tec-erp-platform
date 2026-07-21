@@ -28,21 +28,35 @@ export const WORKSPACE_APPS: readonly WorkspaceAppDefinition[] = [
   },
   { id: "erp", label: "ERP", access: "day1", sidebarOrder: 6, launcherOrder: 6 },
   {
-    id: "tableaux-bord",
-    label: "Tableaux de bord",
-    access: "preparing",
+    id: "evaluations",
+    label: "Évaluations",
+    access: "day1",
     sidebarOrder: 7,
     launcherOrder: 7,
   },
-  { id: "calendrier", label: "Calendrier", access: "preparing", sidebarOrder: 8, launcherOrder: 8 },
   {
-    id: "centre-services-ti",
-    label: "Centre de services TI",
+    id: "portail-professeur",
+    label: "Portail professeur",
+    access: "day1",
+    sidebarOrder: 8,
+    launcherOrder: 8,
+  },
+  {
+    id: "tableaux-bord",
+    label: "Tableaux de bord",
     access: "preparing",
     sidebarOrder: 9,
     launcherOrder: 9,
   },
-  { id: "profil", label: "Mon profil", access: "day1", sidebarOrder: 10, launcherOrder: 10 },
+  { id: "calendrier", label: "Calendrier", access: "preparing", sidebarOrder: 10, launcherOrder: 10 },
+  {
+    id: "centre-services-ti",
+    label: "Centre de services TI",
+    access: "preparing",
+    sidebarOrder: 11,
+    launcherOrder: 11,
+  },
+  { id: "profil", label: "Mon profil", access: "day1", sidebarOrder: 12, launcherOrder: 12 },
 ];
 
 export function getWorkspaceApp(appId: string): WorkspaceAppDefinition | undefined {

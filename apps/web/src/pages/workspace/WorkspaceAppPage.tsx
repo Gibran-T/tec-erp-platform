@@ -10,6 +10,8 @@ import {
 } from "../../workspace/workspaceCopy.js";
 import { EmployeeProfilePage } from "./EmployeeProfilePage.js";
 import { InboxAppPage } from "./InboxAppPage.js";
+import { ProfessorPortalPage } from "../professor/ProfessorPortalPage.js";
+import { AssessmentCenterPage } from "./AssessmentCenterPage.js";
 import { MissionCenterPage } from "./MissionCenterPage.js";
 import { OrganizationalErpPage } from "./OrganizationalErpPage.js";
 import { TasksAppPage } from "./TasksAppPage.js";
@@ -35,6 +37,14 @@ export function WorkspaceAppPage(): ReactNode {
 
   if (appId === "centre-mission") {
     return <MissionCenterPage />;
+  }
+
+  if (appId === "evaluations") {
+    return <AssessmentCenterPage />;
+  }
+
+  if (appId === "portail-professeur") {
+    return <ProfessorPortalPage />;
   }
 
   if (appId === "erp") {
