@@ -31,8 +31,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       return (
         this.props.fallback ?? (
           <div role="alert" data-testid="error-boundary-fallback">
-            <h1>Something went wrong</h1>
-            <p>The application encountered an unexpected error. Please refresh the page.</p>
+            <h1>Une erreur inattendue est survenue</h1>
+            <p>
+              Une erreur inattendue est survenue. Veuillez actualiser la page, puis réessayer.
+            </p>
           </div>
         )
       );
