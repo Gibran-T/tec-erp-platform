@@ -1,6 +1,16 @@
 import { useEffect, useState, type ReactElement } from "react";
 
 import {
+  getProfessorAnalyticsHeatmap,
+  getProfessorCompetencySummary,
+} from "../../api/analytics.js";
+import { listProfessorAiInteractions } from "../../api/aiCoach.js";
+import {
+  getProfessorPredictions,
+  listProfessorCapstoneQueue,
+} from "../../api/capstone.js";
+import { issueProfessorGoldCertificate } from "../../api/certification.js";
+import {
   downloadProfessorCsv,
   getProfessorStudentDetail,
   listProfessorAudit,
@@ -16,6 +26,11 @@ type PortalTab =
   | "cohorts"
   | "roster"
   | "detail"
+  | "analytics"
+  | "ai-usage"
+  | "predictions"
+  | "capstone"
+  | "gold"
   | "certificates"
   | "audit";
 
@@ -27,6 +42,11 @@ export function ProfessorPortalPage(): ReactElement {
   const [detail, setDetail] = useState<Record<string, unknown> | null>(null);
   const [certificates, setCertificates] = useState<Array<Record<string, unknown>>>([]);
   const [audit, setAudit] = useState<Array<Record<string, unknown>>>([]);
+  const [heatmap, setHeatmap] = useState<Array<Record<string, unknown>>>([]);
+  const [competencies, setCompetencies] = useState<Array<Record<string, unknown>>>([]);
+  const [aiInteractions, setAiInteractions] = useState<Array<Record<string, unknown>>>([]);
+  const [predictions, setPredictions] = useState<Record<string, unknown> | null>(null);
+  const [capstoneQueue, setCapstoneQueue] = useState<Array<Record<string, unknown>>>([]);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
@@ -34,16 +54,33 @@ export function ProfessorPortalPage(): ReactElement {
   const [overrideScore, setOverrideScore] = useState("85");
 
   async function refresh(): Promise<void> {
-    const [cohortResponse, studentResponse, certificateResponse, auditResponse] = await Promise.all([
+    const [
+      cohortResponse,
+      studentResponse,
+      certificateResponse,
+      auditResponse,
+      heatmapResponse,
+      competencyResponse,
+      aiResponse,
+      capstoneResponse,
+    ] = await Promise.all([
       listProfessorCohorts(),
       listProfessorStudents(),
       listProfessorCertificates(),
       listProfessorAudit(),
+      getProfessorAnalyticsHeatmap(),
+      getProfessorCompetencySummary(),
+      listProfessorAiInteractions(),
+      listProfessorCapstoneQueue(),
     ]);
     setCohorts(cohortResponse.cohorts);
     setStudents(studentResponse.students);
     setCertificates(certificateResponse.certificates);
     setAudit(auditResponse.events);
+    setHeatmap(heatmapResponse.rows);
+    setCompetencies(competencyResponse.competencies);
+    setAiInteractions(aiResponse.interactions);
+    setCapstoneQueue(capstoneResponse.submissions);
   }
 
   useEffect(() => {
@@ -71,6 +108,17 @@ export function ProfessorPortalPage(): ReactElement {
       setDetail(next);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Detail indisponible");
+    }
+  }
+
+  async function loadPredictions(studentId: string): Promise<void> {
+    setSelectedStudentId(studentId);
+    setTab("predictions");
+    setError(null);
+    try {
+      setPredictions(await getProfessorPredictions(studentId));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Predictions indisponibles");
     }
   }
 
@@ -141,16 +189,33 @@ export function ProfessorPortalPage(): ReactElement {
     }
   }
 
+  async function issueGold(studentId: string): Promise<void> {
+    if (!window.confirm("Emettre le certificat Gold pour cet etudiant ?")) {
+      return;
+    }
+    if (reason.trim().length < 8) {
+      setError("Raison obligatoire pour l'emission Gold.");
+      return;
+    }
+    try {
+      await issueProfessorGoldCertificate(studentId, reason);
+      setStatus("Certificat Gold emis.");
+      await refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Emission Gold impossible");
+    }
+  }
+
   const missions = (detail?.missions as Array<Record<string, unknown>> | undefined) ?? [];
   const assessments = (detail?.assessments as Array<Record<string, unknown>> | undefined) ?? [];
   const pending = (detail?.pendingManualReviews as Array<Record<string, unknown>> | undefined) ?? [];
-  const competencies = (detail?.competencySummary as string[] | undefined) ?? [];
+  const competencySummary = (detail?.competencySummary as string[] | undefined) ?? [];
   const moduleProgress = (detail?.moduleProgress as Array<Record<string, unknown>> | undefined) ?? [];
 
   return (
     <main className="workspace-page" data-testid="professor-portal-page">
       <h1>Portail professeur</h1>
-      <p>Suivi de cohorte, detail etudiant, evaluations, certificats et audit.</p>
+      <p>Suivi de cohorte, analytics, IA, predictions, capstone, certificats et audit.</p>
       {error ? (
         <p role="alert" data-testid="professor-error">
           {error}
@@ -168,6 +233,11 @@ export function ProfessorPortalPage(): ReactElement {
             ["cohorts", "Cohortes"],
             ["roster", "Etudiants"],
             ["detail", "Detail etudiant"],
+            ["analytics", "Analytics"],
+            ["ai-usage", "Usage IA"],
+            ["predictions", "Predictions"],
+            ["capstone", "Capstone"],
+            ["gold", "Gold"],
             ["certificates", "Certificats"],
             ["audit", "Audit"],
           ] as const
@@ -188,7 +258,7 @@ export function ProfessorPortalPage(): ReactElement {
       </nav>
 
       <label>
-        Raison obligatoire (actions / revocation)
+        Raison obligatoire (actions / revocation / Gold)
         <input
           value={reason}
           onChange={(event) => setReason(event.target.value)}
@@ -224,6 +294,9 @@ export function ProfessorPortalPage(): ReactElement {
                 >
                   Ouvrir detail
                 </button>
+                <button type="button" onClick={() => void loadPredictions(String(student.employeeId))}>
+                  Predictions
+                </button>
               </li>
             ))}
           </ul>
@@ -257,7 +330,7 @@ export function ProfessorPortalPage(): ReactElement {
                 ))}
               </ul>
               <h3>Competences</h3>
-              <p>{competencies.length > 0 ? competencies.join(", ") : "Aucune pour l'instant."}</p>
+              <p>{competencySummary.length > 0 ? competencySummary.join(", ") : "Aucune pour l'instant."}</p>
               <h3>Evaluations</h3>
               <ul>
                 {assessments.map((assessment) => (
@@ -358,6 +431,107 @@ export function ProfessorPortalPage(): ReactElement {
               </button>
             </>
           ) : null}
+        </section>
+      ) : null}
+
+      {tab === "analytics" ? (
+        <section data-testid="professor-analytics">
+          <h2>Carte de chaleur</h2>
+          <ul>
+            {heatmap.map((row, index) => (
+              <li key={String(row.key ?? index)}>
+                {String(row.label ?? row.moduleCode)} — {String(row.intensity ?? row.score ?? "—")}
+              </li>
+            ))}
+          </ul>
+          <h2>Resume des competences</h2>
+          <ul>
+            {competencies.map((item, index) => (
+              <li key={String(item.competencyKey ?? index)}>
+                {String(item.label ?? item.competencyKey)} — {String(item.level ?? item.summary ?? "—")}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {tab === "ai-usage" ? (
+        <section data-testid="professor-ai-usage">
+          <h2>Usage du coach IA</h2>
+          <ul>
+            {aiInteractions.map((interaction) => (
+              <li key={String(interaction.id)}>
+                {String(interaction.createdAt)} — {String(interaction.studentName ?? interaction.employeeId)} —{" "}
+                {String(interaction.questionPreview ?? interaction.question ?? "")}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {tab === "predictions" ? (
+        <section data-testid="professor-predictions">
+          <h2>Predictions et risques</h2>
+          {!predictions ? <p>Selectionnez un etudiant pour voir les predictions.</p> : null}
+          {predictions ? (
+            <>
+              <p>Risque echec mission : {String(predictions.missionFailureRisk ?? "—")}</p>
+              <p>Risque non-completion : {String(predictions.nonCompletionRisk ?? "—")}</p>
+              <p>Faiblesse competences : {String(predictions.competencyWeakness ?? "—")}</p>
+            </>
+          ) : null}
+        </section>
+      ) : null}
+
+      {tab === "capstone" ? (
+        <section data-testid="professor-capstone-queue">
+          <h2>File capstone</h2>
+          <ul>
+            {capstoneQueue.map((submission) => (
+              <li key={String(submission.id)}>
+                {String(submission.studentName ?? submission.employeeId)} — {String(submission.status)} —{" "}
+                {String(submission.reviewStatus ?? "en attente")}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {tab === "gold" ? (
+        <section data-testid="professor-gold">
+          <h2>Emission / revocation Gold</h2>
+          <ul>
+            {students.map((student) => (
+              <li key={String(student.employeeId)}>
+                {String(student.displayName)}
+                <button
+                  type="button"
+                  onClick={() => void issueGold(String(student.employeeId))}
+                  data-testid={`professor-issue-gold-${String(student.employeeNumber)}`}
+                >
+                  Emettre Gold
+                </button>
+              </li>
+            ))}
+          </ul>
+          <h3>Revocation certificats</h3>
+          <ul>
+            {certificates.map((certificate) => (
+              <li key={String(certificate.certificateNumber)}>
+                {String(certificate.studentName)} — {String(certificate.certificateNumber)} —{" "}
+                {String(certificate.status)}
+                {certificate.status === "issued" ? (
+                  <button
+                    type="button"
+                    onClick={() => void revoke(String(certificate.certificateNumber))}
+                    data-testid={`professor-revoke-${String(certificate.certificateNumber)}`}
+                  >
+                    Revoquer
+                  </button>
+                ) : null}
+              </li>
+            ))}
+          </ul>
         </section>
       ) : null}
 

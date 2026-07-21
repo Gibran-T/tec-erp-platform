@@ -44,19 +44,47 @@ export const WORKSPACE_APPS: readonly WorkspaceAppDefinition[] = [
   {
     id: "tableaux-bord",
     label: "Tableaux de bord",
-    access: "preparing",
+    access: "day1",
     sidebarOrder: 9,
     launcherOrder: 9,
   },
-  { id: "calendrier", label: "Calendrier", access: "preparing", sidebarOrder: 10, launcherOrder: 10 },
+  {
+    id: "coach-ia",
+    label: "Coach IA",
+    access: "day1",
+    sidebarOrder: 10,
+    launcherOrder: 10,
+  },
+  {
+    id: "capstone",
+    label: "Capstone",
+    access: "day1",
+    sidebarOrder: 11,
+    launcherOrder: 11,
+  },
+  {
+    id: "certificats",
+    label: "Certificats",
+    access: "day1",
+    sidebarOrder: 12,
+    launcherOrder: 12,
+  },
+  {
+    id: "administration",
+    label: "Administration",
+    access: "day1",
+    sidebarOrder: 13,
+    launcherOrder: 13,
+  },
+  { id: "calendrier", label: "Calendrier", access: "preparing", sidebarOrder: 14, launcherOrder: 14 },
   {
     id: "centre-services-ti",
     label: "Centre de services TI",
     access: "preparing",
-    sidebarOrder: 11,
-    launcherOrder: 11,
+    sidebarOrder: 15,
+    launcherOrder: 15,
   },
-  { id: "profil", label: "Mon profil", access: "day1", sidebarOrder: 12, launcherOrder: 12 },
+  { id: "profil", label: "Mon profil", access: "day1", sidebarOrder: 16, launcherOrder: 16 },
 ];
 
 export function getWorkspaceApp(appId: string): WorkspaceAppDefinition | undefined {
