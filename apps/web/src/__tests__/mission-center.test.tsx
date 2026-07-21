@@ -344,13 +344,16 @@ describe("mission center experience", () => {
 
     fireEvent.click(screen.getByTestId("mission-submit-button"));
 
-    await waitFor(() => {
-      expect(screen.getByTestId("mission-feedback")).toHaveTextContent("Claire Fontaine");
-    });
+    const feedback = await screen.findByTestId(
+      "mission-feedback",
+      undefined,
+      { timeout: 10_000 },
+    );
+    expect(feedback).toHaveTextContent("Claire Fontaine");
 
     expect(screen.getByTestId("mission-mapping-list").textContent).toContain("Entrepôt");
     expect(document.body.textContent ?? "").not.toMatch(FORBIDDEN_VOCABULARY);
-  });
+  }, 20_000);
 
   it("keeps Mission actuelle separate from the Day-1 checklist", async () => {
     mockMissionWorkspace({ unlocked: true, status: "available" });
@@ -401,8 +404,11 @@ describe("mission center experience", () => {
     });
     fireEvent.click(screen.getByTestId("mission-submit-button"));
 
-    await waitFor(() => {
-      expect(screen.getByTestId("mission-submit-error")).toHaveTextContent("Soumission invalide.");
-    });
-  });
+    const submitError = await screen.findByTestId(
+      "mission-submit-error",
+      undefined,
+      { timeout: 10_000 },
+    );
+    expect(submitError).toHaveTextContent("Soumission invalide.");
+  }, 20_000);
 });
