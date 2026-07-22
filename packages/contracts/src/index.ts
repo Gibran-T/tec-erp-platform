@@ -161,6 +161,7 @@ export {
   type ProfessorRevokeCertificateRequest,
 } from "./professor.js";
 export {
+  AnalyticsModeSchema,
   CreatePedagogicalCourseRunRequestSchema,
   CreateProfessorInterventionRequestSchema,
   CreateStudentMissionReflectionRequestSchema,
@@ -171,11 +172,17 @@ export {
   PedagogicalRunTypeLabelFr,
   PedagogicalRunTypeSchema,
   ProfessorInterventionTypeSchema,
+  StudentMissionReflectionSchema,
   TransitionPedagogicalCourseRunRequestSchema,
+  UpdateStudentMissionReflectionRequestSchema,
+  type AnalyticsMode,
   type CreatePedagogicalCourseRunRequest,
+  type CreateStudentMissionReflectionRequest,
   type PedagogicalCourseRun,
   type PedagogicalRunComparison,
   type PedagogicalRunStatus,
   type PedagogicalRunType,
+  type StudentMissionReflection,
   type TransitionPedagogicalCourseRunRequest,
+  type UpdateStudentMissionReflectionRequest,
 } from "./pedagogical-run.js";

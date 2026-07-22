@@ -3,7 +3,9 @@ import { Router, type Request, type Response, type NextFunction } from "express"
 import {
   CreatePedagogicalCourseRunRequestSchema,
   CreateProfessorInterventionRequestSchema,
+  CreateStudentMissionReflectionRequestSchema,
   TransitionPedagogicalCourseRunRequestSchema,
+  UpdateStudentMissionReflectionRequestSchema,
 } from "@tec-platform/contracts";
 
 import { getPrismaClient } from "@tec-platform/database-erp";
@@ -53,6 +55,89 @@ export function createPedagogicalRunMeRouter(service: PedagogicalRunService): Ro
       next(error);
     }
   });
+
+  router.get("/pedagogical-course-runs/:runId/reflections", async (req, res, next) => {
+    try {
+      const actor = getAuthenticatedEmployee(req);
+      const result = await service.listReflections({
+        actorId: actor.id,
+        actorRole: actor.role,
+        actorCompanyId: await resolveActorCompanyId(actor.id),
+        runId: req.params.runId,
+      });
+      sendResult(res, result);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get("/pedagogical-course-runs/:runId/reflections/:missionKey", async (req, res, next) => {
+    try {
+      const actor = getAuthenticatedEmployee(req);
+      const result = await service.getReflection({
+        actorId: actor.id,
+        actorRole: actor.role,
+        actorCompanyId: await resolveActorCompanyId(actor.id),
+        runId: req.params.runId,
+        missionKey: req.params.missionKey,
+      });
+      sendResult(res, result);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post("/pedagogical-course-runs/:runId/reflections", async (req, res, next) => {
+    try {
+      const actor = getAuthenticatedEmployee(req);
+      const parsed = CreateStudentMissionReflectionRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ error: { code: "VALIDATION", message: "Reflexion invalide." } });
+        return;
+      }
+      const { missionKey, ...body } = parsed.data;
+      const result = await service.upsertReflection({
+        actorId: actor.id,
+        actorRole: actor.role,
+        actorCompanyId: await resolveActorCompanyId(actor.id),
+        runId: req.params.runId,
+        missionKey,
+        body,
+        isUpdate: false,
+      });
+      if (result.ok) {
+        res.status(201).json(result.value);
+        return;
+      }
+      sendResult(res, result);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.put("/pedagogical-course-runs/:runId/reflections/:missionKey", async (req, res, next) => {
+    try {
+      const actor = getAuthenticatedEmployee(req);
+      const parsed = UpdateStudentMissionReflectionRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ error: { code: "VALIDATION", message: "Reflexion invalide." } });
+        return;
+      }
+      const result = await service.upsertReflection({
+        actorId: actor.id,
+        actorRole: actor.role,
+        actorCompanyId: await resolveActorCompanyId(actor.id),
+        runId: req.params.runId,
+        missionKey: req.params.missionKey,
+        body: parsed.data,
+        isUpdate: true,
+      });
+      sendResult(res, result);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   return router;
 }
 
@@ -157,6 +242,21 @@ export function createPedagogicalRunProfessorRouter(service: PedagogicalRunServi
     }
   });
 
+  router.get("/pedagogical-course-runs/:runId/reflections", async (req, res, next) => {
+    try {
+      const actor = getAuthenticatedEmployee(req);
+      const result = await service.listReflections({
+        actorId: actor.id,
+        actorRole: actor.role,
+        actorCompanyId: await resolveActorCompanyId(actor.id),
+        runId: req.params.runId,
+      });
+      sendResult(res, result);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   return router;
 }
 
@@ -245,7 +345,22 @@ export function createPedagogicalRunAdminRouter(service: PedagogicalRunService):
       const count = await service.countDistinctStudentsForInstitutionalMetric(
         await resolveActorCompanyId(actor.id),
       );
-      res.status(200).json({ mode: "unique-student-latest-or-active", studentCount: count });
+      res.status(200).json({ mode: "OFFICIAL_COHORT_RESULT", studentCount: count });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get("/pedagogical-course-runs/:runId/reflections", async (req, res, next) => {
+    try {
+      const actor = getAuthenticatedEmployee(req);
+      const result = await service.listReflections({
+        actorId: actor.id,
+        actorRole: actor.role,
+        actorCompanyId: await resolveActorCompanyId(actor.id),
+        runId: req.params.runId,
+      });
+      sendResult(res, result);
     } catch (error) {
       next(error);
     }

@@ -44,6 +44,7 @@ export async function createAdminPedagogicalRun(input: {
   professorId?: string;
   sourceRunId?: string;
   runCode?: string;
+  reflectionsEnabled?: boolean;
 }): Promise<Record<string, unknown>> {
   const response = await safeFetch(`${getApiBaseUrl()}/api/v1/admin/pedagogical-course-runs`, {
     method: "POST",
@@ -97,6 +98,7 @@ export async function createProfessorPedagogicalRun(input: {
   reason: string;
   sourceRunId?: string;
   runCode?: string;
+  reflectionsEnabled?: boolean;
 }): Promise<Record<string, unknown>> {
   const response = await safeFetch(`${getApiBaseUrl()}/api/v1/professor/pedagogical-course-runs`, {
     method: "POST",
@@ -162,6 +164,71 @@ export async function createProfessorIntervention(
   );
   if (!response.ok) {
     throw new Error("Intervention refusée.");
+  }
+  return (await response.json()) as Record<string, unknown>;
+}
+
+export async function getMyMissionReflection(
+  runId: string,
+  missionKey: string,
+): Promise<Record<string, unknown> | null> {
+  const response = await safeFetch(
+    `${getApiBaseUrl()}/api/v1/me/pedagogical-course-runs/${encodeURIComponent(runId)}/reflections/${encodeURIComponent(missionKey)}`,
+    { headers: await authHeaders() },
+  );
+  if (response.status === 404) {
+    return null;
+  }
+  if (!response.ok) {
+    throw new Error("Impossible de charger la réflexion.");
+  }
+  return (await response.json()) as Record<string, unknown>;
+}
+
+export async function saveMyMissionReflection(input: {
+  runId: string;
+  missionKey: string;
+  isUpdate: boolean;
+  body: Record<string, unknown>;
+}): Promise<Record<string, unknown>> {
+  const url = input.isUpdate
+    ? `${getApiBaseUrl()}/api/v1/me/pedagogical-course-runs/${encodeURIComponent(input.runId)}/reflections/${encodeURIComponent(input.missionKey)}`
+    : `${getApiBaseUrl()}/api/v1/me/pedagogical-course-runs/${encodeURIComponent(input.runId)}/reflections`;
+  const response = await safeFetch(url, {
+    method: input.isUpdate ? "PUT" : "POST",
+    headers: await authHeaders(),
+    body: JSON.stringify(
+      input.isUpdate ? input.body : { ...input.body, missionKey: input.missionKey },
+    ),
+  });
+  if (!response.ok) {
+    throw new Error("Enregistrement de la réflexion refusé.");
+  }
+  return (await response.json()) as Record<string, unknown>;
+}
+
+export async function listRunReflectionsForProfessor(
+  runId: string,
+): Promise<Record<string, unknown>> {
+  const response = await safeFetch(
+    `${getApiBaseUrl()}/api/v1/professor/pedagogical-course-runs/${encodeURIComponent(runId)}/reflections`,
+    { headers: await authHeaders() },
+  );
+  if (!response.ok) {
+    throw new Error("Impossible de charger les réflexions.");
+  }
+  return (await response.json()) as Record<string, unknown>;
+}
+
+export async function listRunReflectionsForAdmin(
+  runId: string,
+): Promise<Record<string, unknown>> {
+  const response = await safeFetch(
+    `${getApiBaseUrl()}/api/v1/admin/pedagogical-course-runs/${encodeURIComponent(runId)}/reflections`,
+    { headers: await authHeaders() },
+  );
+  if (!response.ok) {
+    throw new Error("Impossible de charger les réflexions admin.");
   }
   return (await response.json()) as Record<string, unknown>;
 }

@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactElement } from "react";
 import {
   createAdminPedagogicalRun,
   listAdminPedagogicalRuns,
+  listRunReflectionsForAdmin,
   transitionAdminPedagogicalRun,
 } from "../../api/pedagogical-runs.js";
 
@@ -18,8 +19,10 @@ export function PedagogicalRunsAdminPanel(): ReactElement {
     professorId: "",
     sourceRunId: "",
     runCode: "",
+    reflectionsEnabled: false,
   });
-
+  const [reflectionRunId, setReflectionRunId] = useState("");
+  const [reflectionSummary, setReflectionSummary] = useState<Record<string, unknown> | null>(null);
   async function refresh(): Promise<void> {
     setRuns(await listAdminPedagogicalRuns());
   }
@@ -38,12 +41,22 @@ export function PedagogicalRunsAdminPanel(): ReactElement {
         professorId: form.professorId || undefined,
         sourceRunId: form.sourceRunId || undefined,
         runCode: form.runCode || undefined,
+        reflectionsEnabled: form.reflectionsEnabled,
       });
       setStatus("Parcours créé (PLANNED). Aucune progression copiée.");
       setError(null);
       await refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Création impossible.");
+    }
+  }
+
+  async function loadReflections(): Promise<void> {
+    try {
+      setReflectionSummary(await listRunReflectionsForAdmin(reflectionRunId));
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Lecture réflexions impossible.");
     }
   }
 
@@ -152,10 +165,37 @@ export function PedagogicalRunsAdminPanel(): ReactElement {
             data-testid="admin-run-code"
           />
         </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={form.reflectionsEnabled}
+            onChange={(event) =>
+              setForm((current) => ({ ...current, reflectionsEnabled: event.target.checked }))
+            }
+            data-testid="admin-run-reflections-enabled"
+          />{" "}
+          Activer les réflexions post-mission
+        </label>
         <button type="submit" data-testid="admin-run-create">
           Créer (PLANNED)
         </button>
       </form>
+
+      <section data-testid="admin-runs-reflections">
+        <h3>Inspection des réflexions (lecture seule)</h3>
+        <label>
+          Run id
+          <input value={reflectionRunId} onChange={(event) => setReflectionRunId(event.target.value)} />
+        </label>
+        <button type="button" onClick={() => void loadReflections()}>
+          Charger
+        </button>
+        {reflectionSummary ? (
+          <pre data-testid="admin-runs-reflection-summary">
+            {JSON.stringify(reflectionSummary, null, 2)}
+          </pre>
+        ) : null}
+      </section>
 
       <table data-testid="admin-runs-table">
         <thead>

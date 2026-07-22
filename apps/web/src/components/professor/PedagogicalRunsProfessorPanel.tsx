@@ -5,6 +5,7 @@ import {
   createProfessorIntervention,
   createProfessorPedagogicalRun,
   listProfessorPedagogicalRuns,
+  listRunReflectionsForProfessor,
   transitionProfessorPedagogicalRun,
 } from "../../api/pedagogical-runs.js";
 
@@ -28,6 +29,8 @@ export function PedagogicalRunsProfessorPanel(): ReactElement {
     reason: "",
     content: "",
   });
+  const [reflectionRunId, setReflectionRunId] = useState("");
+  const [reflectionSummary, setReflectionSummary] = useState<Record<string, unknown> | null>(null);
 
   async function refresh(): Promise<void> {
     setRuns(await listProfessorPedagogicalRuns());
@@ -281,6 +284,47 @@ export function PedagogicalRunsProfessorPanel(): ReactElement {
         <button type="button" onClick={() => void saveIntervention()}>
           Enregistrer
         </button>
+      </section>
+
+      <section data-testid="professor-runs-reflections">
+        <h3>Réflexions du parcours sélectionné</h3>
+        <label>
+          Run id
+          <input
+            value={reflectionRunId}
+            onChange={(event) => setReflectionRunId(event.target.value)}
+            data-testid="professor-reflection-run-id"
+          />
+        </label>
+        <button
+          type="button"
+          onClick={() => {
+            void listRunReflectionsForProfessor(reflectionRunId)
+              .then((summary) => {
+                setReflectionSummary(summary);
+                setError(null);
+              })
+              .catch((err: Error) => setError(err.message));
+          }}
+        >
+          Charger les réflexions
+        </button>
+        {reflectionSummary ? (
+          <div data-testid="professor-reflection-summary">
+            <p>
+              Moyennes :{" "}
+              {reflectionSummary.averages
+                ? JSON.stringify(reflectionSummary.averages)
+                : "aucune donnée"}
+            </p>
+            {reflectionSummary.personaValidationContext ? (
+              <p role="note">Contexte de validation par persona — ne pas traiter comme avis humains réels.</p>
+            ) : null}
+            <pre>{JSON.stringify(reflectionSummary.reflections ?? [], null, 2)}</pre>
+          </div>
+        ) : (
+          <p>Aucune réflexion chargée.</p>
+        )}
       </section>
     </section>
   );

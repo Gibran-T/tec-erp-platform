@@ -34,6 +34,15 @@ export const PedagogicalRunStatusLabelFr: Record<PedagogicalRunStatus, string> =
   ARCHIVED: "Archivé",
 };
 
+export const AnalyticsModeSchema = z.enum([
+  "OFFICIAL_COHORT_RESULT",
+  "LEARNER_CURRENT_RUN",
+  "LEARNER_SELECTED_RUN",
+  "UNIQUE_STUDENT_LATEST",
+  "ALL_RUNS",
+]);
+export type AnalyticsMode = z.infer<typeof AnalyticsModeSchema>;
+
 export const PedagogicalCourseRunSchema = z.object({
   id: z.string().min(1),
   companyId: z.string().min(1),
@@ -53,6 +62,7 @@ export const PedagogicalCourseRunSchema = z.object({
   completedAt: z.string().datetime().nullable(),
   cancelledAt: z.string().datetime().nullable(),
   completionPercent: z.number().min(0).max(100),
+  reflectionsEnabled: z.boolean(),
   runTypeLabel: z.string().min(1),
   statusLabel: z.string().min(1),
   isWritable: z.boolean(),
@@ -71,6 +81,7 @@ export const CreatePedagogicalCourseRunRequestSchema = z.object({
   reason: z.string().min(1).max(500),
   plannedStartAt: z.string().datetime().optional(),
   runCode: z.string().min(1).max(120).optional(),
+  reflectionsEnabled: z.boolean().optional().default(false),
 });
 export type CreatePedagogicalCourseRunRequest = z.infer<
   typeof CreatePedagogicalCourseRunRequestSchema
@@ -110,22 +121,57 @@ export const CreateProfessorInterventionRequestSchema = z.object({
   learningHubCandidate: z.boolean().optional(),
 });
 
+const Likert1to5 = z.number().int().min(1).max(5);
+const OptionalLikert = z.number().int().min(1).max(5).nullable().optional();
+
 export const CreateStudentMissionReflectionRequestSchema = z.object({
   missionKey: z.string().min(1),
-  clarity: z.number().int().min(1).max(5),
-  confidence: z.number().int().min(1).max(5),
-  cognitiveLoad: z.number().int().min(1).max(5),
-  realism: z.number().int().min(1).max(5),
-  relevance: z.number().int().min(1).max(5),
-  navigationQuality: z.number().int().min(1).max(5),
-  feedbackQuality: z.number().int().min(1).max(5),
-  visualQuality: z.number().int().min(1).max(5),
-  aiUsefulness: z.number().int().min(1).max(5).nullable().optional(),
-  biUsefulness: z.number().int().min(1).max(5).nullable().optional(),
+  clarity: Likert1to5,
+  confidence: Likert1to5,
+  cognitiveLoad: Likert1to5,
+  realism: Likert1to5,
+  relevance: Likert1to5,
+  navigationQuality: Likert1to5,
+  feedbackQuality: Likert1to5,
+  visualQuality: Likert1to5,
+  aiUsefulness: OptionalLikert,
+  biUsefulness: OptionalLikert,
   externalExplanationRequired: z.boolean(),
   externalSlidesWouldHelp: z.boolean(),
   qualitativeNote: z.string().max(4000).nullable().optional(),
 });
+export type CreateStudentMissionReflectionRequest = z.infer<
+  typeof CreateStudentMissionReflectionRequestSchema
+>;
+
+export const UpdateStudentMissionReflectionRequestSchema =
+  CreateStudentMissionReflectionRequestSchema.omit({ missionKey: true });
+export type UpdateStudentMissionReflectionRequest = z.infer<
+  typeof UpdateStudentMissionReflectionRequestSchema
+>;
+
+export const StudentMissionReflectionSchema = z.object({
+  id: z.string().min(1),
+  runId: z.string().min(1),
+  missionKey: z.string().min(1),
+  employeeId: z.string().min(1),
+  clarity: Likert1to5,
+  confidence: Likert1to5,
+  cognitiveLoad: Likert1to5,
+  realism: Likert1to5,
+  relevance: Likert1to5,
+  navigationQuality: Likert1to5,
+  feedbackQuality: Likert1to5,
+  visualQuality: Likert1to5,
+  aiUsefulness: z.number().int().min(1).max(5).nullable(),
+  biUsefulness: z.number().int().min(1).max(5).nullable(),
+  externalExplanationRequired: z.boolean(),
+  externalSlidesWouldHelp: z.boolean(),
+  qualitativeNote: z.string().nullable(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type StudentMissionReflection = z.infer<typeof StudentMissionReflectionSchema>;
 
 export const PedagogicalRunComparisonSchema = z.object({
   left: PedagogicalCourseRunSchema,
@@ -137,12 +183,20 @@ export const PedagogicalRunComparisonSchema = z.object({
   averageScoreRight: z.number().nullable(),
   attemptCountLeft: z.number().int().nonnegative(),
   attemptCountRight: z.number().int().nonnegative(),
-  assessmentSummaryLeft: z.array(z.object({ code: z.string(), status: z.string(), scorePercent: z.number().nullable() })),
-  assessmentSummaryRight: z.array(z.object({ code: z.string(), status: z.string(), scorePercent: z.number().nullable() })),
+  assessmentSummaryLeft: z.array(
+    z.object({ code: z.string(), status: z.string(), scorePercent: z.number().nullable() }),
+  ),
+  assessmentSummaryRight: z.array(
+    z.object({ code: z.string(), status: z.string(), scorePercent: z.number().nullable() }),
+  ),
   capstoneStatusLeft: z.string().nullable(),
   capstoneStatusRight: z.string().nullable(),
-  certificateProvenanceLeft: z.array(z.object({ type: z.string(), status: z.string(), number: z.string() })),
-  certificateProvenanceRight: z.array(z.object({ type: z.string(), status: z.string(), number: z.string() })),
+  certificateProvenanceLeft: z.array(
+    z.object({ type: z.string(), status: z.string(), number: z.string() }),
+  ),
+  certificateProvenanceRight: z.array(
+    z.object({ type: z.string(), status: z.string(), number: z.string() }),
+  ),
   missionScoreDeltas: z.array(
     z.object({
       missionKey: z.string(),

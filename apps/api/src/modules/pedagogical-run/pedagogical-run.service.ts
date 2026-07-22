@@ -29,6 +29,7 @@ type PrismaRun = {
   completedAt: Date | null;
   cancelledAt: Date | null;
   completionPercent: number;
+  reflectionsEnabled: boolean;
 };
 
 const DEFAULT_COURSE_CODE = "TEC_ERP_V1";
@@ -67,6 +68,7 @@ function mapRun(run: PrismaRun): PedagogicalCourseRun {
     completedAt: run.completedAt?.toISOString() ?? null,
     cancelledAt: run.cancelledAt?.toISOString() ?? null,
     completionPercent: run.completionPercent,
+    reflectionsEnabled: run.reflectionsEnabled === true,
     runTypeLabel: PedagogicalRunTypeLabelFr[runType] ?? run.runType,
     statusLabel: PedagogicalRunStatusLabelFr[status] ?? run.status,
     isWritable: status === "ACTIVE",
@@ -214,6 +216,7 @@ export function createPedagogicalRunService() {
               sourceRunId: input.request.sourceRunId ?? null,
               createdById: input.actorId,
               completionPercent: 0,
+              reflectionsEnabled: input.request.reflectionsEnabled === true,
               metadataJson: {
                 reason: input.request.reason,
                 plannedStartAt: input.request.plannedStartAt ?? null,
@@ -523,31 +526,304 @@ export function createPedagogicalRunService() {
       return Result.ok(row);
     },
 
+    async upsertReflection(input: {
+      readonly actorId: string;
+      readonly actorRole: string;
+      readonly actorCompanyId: string;
+      readonly runId: string;
+      readonly missionKey: string;
+      readonly body: {
+        clarity: number;
+        confidence: number;
+        cognitiveLoad: number;
+        realism: number;
+        relevance: number;
+        navigationQuality: number;
+        feedbackQuality: number;
+        visualQuality: number;
+        aiUsefulness?: number | null;
+        biUsefulness?: number | null;
+        externalExplanationRequired: boolean;
+        externalSlidesWouldHelp: boolean;
+        qualitativeNote?: string | null;
+      };
+      readonly isUpdate: boolean;
+    }) {
+      const prisma = getPrismaClient();
+      const run = await prisma.pedagogicalCourseRun.findUnique({ where: { id: input.runId } });
+      if (!run || run.companyId !== input.actorCompanyId) {
+        return Result.fail(DomainError.notFound("Parcours introuvable."));
+      }
+      if (input.actorRole !== "JR_BUSINESS_ANALYST" && input.actorRole !== "STUDENT") {
+        // Students are JR_BUSINESS_ANALYST in this product; only the run owner may write.
+      }
+      if (run.employeeId !== input.actorId) {
+        return Result.fail(DomainError.forbidden("Vous ne pouvez reflechir que sur votre propre parcours."));
+      }
+      if (run.status !== "ACTIVE") {
+        return Result.fail(
+          DomainError.conflict("Les reflexions ne sont modifiables que sur un parcours ACTIVE."),
+        );
+      }
+      if (!run.reflectionsEnabled) {
+        return Result.fail(
+          DomainError.validation("Les reflexions ne sont pas activees pour ce parcours."),
+        );
+      }
+
+      const data = {
+        clarity: input.body.clarity,
+        confidence: input.body.confidence,
+        cognitiveLoad: input.body.cognitiveLoad,
+        realism: input.body.realism,
+        relevance: input.body.relevance,
+        navigationQuality: input.body.navigationQuality,
+        feedbackQuality: input.body.feedbackQuality,
+        visualQuality: input.body.visualQuality,
+        aiUsefulness: input.body.aiUsefulness ?? null,
+        biUsefulness: input.body.biUsefulness ?? null,
+        externalExplanationRequired: input.body.externalExplanationRequired,
+        externalSlidesWouldHelp: input.body.externalSlidesWouldHelp,
+        qualitativeNote: input.body.qualitativeNote ?? null,
+      };
+
+      if (input.isUpdate) {
+        const existing = await prisma.studentMissionReflection.findUnique({
+          where: {
+            runId_missionKey_employeeId: {
+              runId: run.id,
+              missionKey: input.missionKey,
+              employeeId: input.actorId,
+            },
+          },
+        });
+        if (!existing) {
+          return Result.fail(DomainError.notFound("Reflexion introuvable."));
+        }
+        const updated = await prisma.studentMissionReflection.update({
+          where: { id: existing.id },
+          data,
+        });
+        return Result.ok(mapReflection(updated));
+      }
+
+      try {
+        const created = await prisma.studentMissionReflection.create({
+          data: {
+            runId: run.id,
+            missionKey: input.missionKey,
+            employeeId: input.actorId,
+            ...data,
+          },
+        });
+        return Result.ok(mapReflection(created));
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "";
+        if (message.includes("Unique constraint") || message.includes("unique")) {
+          return Result.fail(
+            DomainError.conflict("Une reflexion existe deja pour cette mission. Utilisez la mise a jour."),
+          );
+        }
+        throw error;
+      }
+    },
+
+    async getReflection(input: {
+      readonly actorId: string;
+      readonly actorRole: string;
+      readonly actorCompanyId: string;
+      readonly runId: string;
+      readonly missionKey: string;
+    }) {
+      const access = await authorizeRunRead(input);
+      if (!access.ok) {
+        return access;
+      }
+      const prisma = getPrismaClient();
+      const row = await prisma.studentMissionReflection.findUnique({
+        where: {
+          runId_missionKey_employeeId: {
+            runId: input.runId,
+            missionKey: input.missionKey,
+            employeeId: access.value.employeeId,
+          },
+        },
+      });
+      if (!row) {
+        return Result.fail(DomainError.notFound("Reflexion introuvable."));
+      }
+      return Result.ok(mapReflection(row));
+    },
+
+    async listReflections(input: {
+      readonly actorId: string;
+      readonly actorRole: string;
+      readonly actorCompanyId: string;
+      readonly runId: string;
+    }) {
+      const access = await authorizeRunRead(input);
+      if (!access.ok) {
+        return access;
+      }
+      const prisma = getPrismaClient();
+      const rows = await prisma.studentMissionReflection.findMany({
+        where: { runId: input.runId },
+        orderBy: [{ missionKey: "asc" }],
+      });
+      const averages = averageReflectionScores(rows);
+      return Result.ok({
+        reflections: rows.map(mapReflection),
+        averages,
+        personaValidationContext: Boolean(
+          (access.value.metadataJson as { personaValidation?: boolean } | null)?.personaValidation,
+        ),
+      });
+    },
+
     async countDistinctStudentsForInstitutionalMetric(companyId: string): Promise<number> {
       const prisma = getPrismaClient();
-      // Default: one count per student using ACTIVE run if present else latest runSequence
       const runs = await prisma.pedagogicalCourseRun.findMany({
-        where: { companyId, status: { not: "CANCELLED" } },
-        select: { employeeId: true, status: true, runSequence: true },
+        where: { companyId },
+        select: {
+          id: true,
+          employeeId: true,
+          status: true,
+          runSequence: true,
+          runType: true,
+        },
       });
-      const chosen = new Map<string, { status: string; runSequence: number }>();
-      for (const run of runs) {
-        const prev = chosen.get(run.employeeId);
-        if (!prev) {
-          chosen.set(run.employeeId, run);
-          continue;
-        }
-        if (run.status === "ACTIVE") {
-          chosen.set(run.employeeId, run);
-          continue;
-        }
-        if (prev.status !== "ACTIVE" && run.runSequence > prev.runSequence) {
-          chosen.set(run.employeeId, run);
-        }
-      }
-      return chosen.size;
+      const { countUniqueStudentsFromRuns } = await import("../analytics/official-run-policy.js");
+      return countUniqueStudentsFromRuns(runs);
     },
   };
+}
+
+function mapReflection(row: {
+  id: string;
+  runId: string;
+  missionKey: string;
+  employeeId: string;
+  clarity: number;
+  confidence: number;
+  cognitiveLoad: number;
+  realism: number;
+  relevance: number;
+  navigationQuality: number;
+  feedbackQuality: number;
+  visualQuality: number;
+  aiUsefulness: number | null;
+  biUsefulness: number | null;
+  externalExplanationRequired: boolean;
+  externalSlidesWouldHelp: boolean;
+  qualitativeNote: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}) {
+  return {
+    id: row.id,
+    runId: row.runId,
+    missionKey: row.missionKey,
+    employeeId: row.employeeId,
+    clarity: row.clarity,
+    confidence: row.confidence,
+    cognitiveLoad: row.cognitiveLoad,
+    realism: row.realism,
+    relevance: row.relevance,
+    navigationQuality: row.navigationQuality,
+    feedbackQuality: row.feedbackQuality,
+    visualQuality: row.visualQuality,
+    aiUsefulness: row.aiUsefulness,
+    biUsefulness: row.biUsefulness,
+    externalExplanationRequired: row.externalExplanationRequired,
+    externalSlidesWouldHelp: row.externalSlidesWouldHelp,
+    qualitativeNote: row.qualitativeNote,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
+function averageReflectionScores(
+  rows: Array<{
+    clarity: number;
+    confidence: number;
+    cognitiveLoad: number;
+    realism: number;
+    relevance: number;
+    navigationQuality: number;
+    feedbackQuality: number;
+    visualQuality: number;
+  }>,
+): Record<string, number | null> {
+  if (rows.length === 0) {
+    return {
+      clarity: null,
+      confidence: null,
+      cognitiveLoad: null,
+      realism: null,
+      relevance: null,
+      navigationQuality: null,
+      feedbackQuality: null,
+      visualQuality: null,
+    };
+  }
+  const keys = [
+    "clarity",
+    "confidence",
+    "cognitiveLoad",
+    "realism",
+    "relevance",
+    "navigationQuality",
+    "feedbackQuality",
+    "visualQuality",
+  ] as const;
+  const out: Record<string, number | null> = {};
+  for (const key of keys) {
+    const sum = rows.reduce((acc, row) => acc + row[key], 0);
+    out[key] = Math.round((sum / rows.length) * 100) / 100;
+  }
+  return out;
+}
+
+async function authorizeRunRead(input: {
+  readonly actorId: string;
+  readonly actorRole: string;
+  readonly actorCompanyId: string;
+  readonly runId: string;
+}): Promise<
+  ResultType<{
+    employeeId: string;
+    metadataJson: unknown;
+  }>
+> {
+  const prisma = getPrismaClient();
+  const run = await prisma.pedagogicalCourseRun.findUnique({ where: { id: input.runId } });
+  if (!run || run.companyId !== input.actorCompanyId) {
+    return Result.fail(DomainError.notFound("Parcours introuvable."));
+  }
+  if (input.actorRole === "ADMIN") {
+    return Result.ok({ employeeId: run.employeeId, metadataJson: run.metadataJson });
+  }
+  if (run.employeeId === input.actorId) {
+    return Result.ok({ employeeId: run.employeeId, metadataJson: run.metadataJson });
+  }
+  if (input.actorRole === "PROFESSOR") {
+    const ok =
+      run.professorId === input.actorId ||
+      (run.cohortId
+        ? await prisma.cohortMembership.findFirst({
+            where: {
+              cohortId: run.cohortId,
+              employeeId: input.actorId,
+              roleInCohort: "professor",
+            },
+          })
+        : null);
+    if (!ok) {
+      return Result.fail(DomainError.forbidden("Lecture des reflexions non autorisee."));
+    }
+    return Result.ok({ employeeId: run.employeeId, metadataJson: run.metadataJson });
+  }
+  return Result.fail(DomainError.forbidden("Lecture des reflexions non autorisee."));
 }
 
 export type PedagogicalRunService = ReturnType<typeof createPedagogicalRunService>;

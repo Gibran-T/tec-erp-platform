@@ -35,23 +35,23 @@ model Company {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  employees            Employee[]
-  cohorts              Cohort[]
-  masterDataRecords    MasterDataRecord[]
-  businessDocuments    BusinessDocument[]
-  inventoryMovements   InventoryMovement[]
-  financialPostings    FinancialPosting[]
-  openItems            OpenItem[]
-  transactionEvents    TransactionEvent[]
-  auditEvents          AuditEvent[]
-  simulationSnapshots  SimulationSnapshot[]
-  configuration        CompanyConfiguration?
-  aiPolicy             AiPolicy?
-  kpiRecords           KpiRecord[]
-  aiInteractions       AiInteraction[]
+  employees              Employee[]
+  cohorts                Cohort[]
+  masterDataRecords      MasterDataRecord[]
+  businessDocuments      BusinessDocument[]
+  inventoryMovements     InventoryMovement[]
+  financialPostings      FinancialPosting[]
+  openItems              OpenItem[]
+  transactionEvents      TransactionEvent[]
+  auditEvents            AuditEvent[]
+  simulationSnapshots    SimulationSnapshot[]
+  configuration          CompanyConfiguration?
+  aiPolicy               AiPolicy?
+  kpiRecords             KpiRecord[]
+  aiInteractions         AiInteraction[]
   integrationConnections IntegrationConnection[]
-  featureFlags         FeatureFlag[]
-  pedagogicalCourseRuns PedagogicalCourseRun[]
+  featureFlags           FeatureFlag[]
+  pedagogicalCourseRuns  PedagogicalCourseRun[]
 
   @@map("company")
 }
@@ -73,34 +73,34 @@ model Employee {
 
   company Company @relation(fields: [companyId], references: [id])
 
-  messageStates EmployeeMessageState[]
-  taskStates    EmployeeTaskState[]
+  messageStates   EmployeeMessageState[]
+  taskStates      EmployeeTaskState[]
   missionAttempts EmployeeMissionAttempt[]
 
-  courseProgress       EmployeeCourseProgress[]
-  moduleProgress       EmployeeModuleProgress[]
-  v1MissionAttempts    MissionAttempt[]
-  unlockStates         UnlockState[]
-  cohortMemberships    CohortMembership[]
-  masterDataAudits     MasterDataAudit[]
-  approvalDecisions    ApprovalDecision[]
-  assessmentAttempts   AssessmentAttempt[]
-  certificates         Certificate[]
-  certificateAudits    CertificateAudit[]
-  auditEventsActed     AuditEvent[]              @relation("AuditActor")
-  aiInteractions       AiInteraction[]
-  capstoneSubmissions  CapstoneSubmission[]
-  missionDrafts        MissionDraft[]
-  missionVersions      MissionVersion[]          @relation("MissionVersionPublisher")
-  scenarioPublications ScenarioPublication[]
-  predictionRecords    PredictionRecord[]        @relation("PredictionStudent")
-  automationExecutions AutomationExecution[]
-  pedagogicalCourseRuns PedagogicalCourseRun[]   @relation("PedagogicalRunStudent")
-  pedagogicalRunsAsProfessor PedagogicalCourseRun[] @relation("PedagogicalRunProfessor")
-  pedagogicalRunsCreated PedagogicalCourseRun[]  @relation("PedagogicalRunCreator")
-  professorInterventions ProfessorIntervention[]
-  studentMissionReflections StudentMissionReflection[]
-  pedagogicalRunAudits PedagogicalCourseRunAudit[] @relation("PedagogicalRunAuditActor")
+  courseProgress             EmployeeCourseProgress[]
+  moduleProgress             EmployeeModuleProgress[]
+  v1MissionAttempts          MissionAttempt[]
+  unlockStates               UnlockState[]
+  cohortMemberships          CohortMembership[]
+  masterDataAudits           MasterDataAudit[]
+  approvalDecisions          ApprovalDecision[]
+  assessmentAttempts         AssessmentAttempt[]
+  certificates               Certificate[]
+  certificateAudits          CertificateAudit[]
+  auditEventsActed           AuditEvent[]                @relation("AuditActor")
+  aiInteractions             AiInteraction[]
+  capstoneSubmissions        CapstoneSubmission[]
+  missionDrafts              MissionDraft[]
+  missionVersions            MissionVersion[]            @relation("MissionVersionPublisher")
+  scenarioPublications       ScenarioPublication[]
+  predictionRecords          PredictionRecord[]          @relation("PredictionStudent")
+  automationExecutions       AutomationExecution[]
+  pedagogicalCourseRuns      PedagogicalCourseRun[]      @relation("PedagogicalRunStudent")
+  pedagogicalRunsAsProfessor PedagogicalCourseRun[]      @relation("PedagogicalRunProfessor")
+  pedagogicalRunsCreated     PedagogicalCourseRun[]      @relation("PedagogicalRunCreator")
+  professorInterventions     ProfessorIntervention[]
+  studentMissionReflections  StudentMissionReflection[]
+  pedagogicalRunAudits       PedagogicalCourseRunAudit[] @relation("PedagogicalRunAuditActor")
 
   @@index([companyId])
   @@map("employee")
@@ -108,12 +108,12 @@ model Employee {
 
 /// Per-employee read state for a static inbox message (content lives in code).
 model EmployeeMessageState {
-  id         String    @id @default(cuid())
+  id         String   @id @default(cuid())
   employeeId String
   messageKey String
   readAt     DateTime
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   employee Employee @relation(fields: [employeeId], references: [id])
 
@@ -173,8 +173,8 @@ model Course {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  modules  CourseModule[]
-  progress EmployeeCourseProgress[]
+  modules               CourseModule[]
+  progress              EmployeeCourseProgress[]
   pedagogicalCourseRuns PedagogicalCourseRun[]
 
   @@map("course")
@@ -205,28 +205,30 @@ model PedagogicalCourseRun {
   updatedAt          DateTime  @updatedAt
   createdById        String
   completionPercent  Float     @default(0)
+  /// When true, student may submit post-mission reflections for this run.
+  reflectionsEnabled Boolean   @default(false)
   metadataJson       Json      @default("{}")
 
-  company   Company  @relation(fields: [companyId], references: [id])
-  cohort    Cohort?  @relation(fields: [cohortId], references: [id])
-  employee  Employee @relation("PedagogicalRunStudent", fields: [employeeId], references: [id])
-  professor Employee? @relation("PedagogicalRunProfessor", fields: [professorId], references: [id])
-  course    Course   @relation(fields: [courseId], references: [id])
-  createdBy Employee @relation("PedagogicalRunCreator", fields: [createdById], references: [id])
-  sourceRun PedagogicalCourseRun?  @relation("PedagogicalRunLineage", fields: [sourceRunId], references: [id])
+  company     Company                @relation(fields: [companyId], references: [id])
+  cohort      Cohort?                @relation(fields: [cohortId], references: [id])
+  employee    Employee               @relation("PedagogicalRunStudent", fields: [employeeId], references: [id])
+  professor   Employee?              @relation("PedagogicalRunProfessor", fields: [professorId], references: [id])
+  course      Course                 @relation(fields: [courseId], references: [id])
+  createdBy   Employee               @relation("PedagogicalRunCreator", fields: [createdById], references: [id])
+  sourceRun   PedagogicalCourseRun?  @relation("PedagogicalRunLineage", fields: [sourceRunId], references: [id])
   derivedRuns PedagogicalCourseRun[] @relation("PedagogicalRunLineage")
 
-  courseProgress   EmployeeCourseProgress[]
-  moduleProgress   EmployeeModuleProgress[]
-  missionAttempts  MissionAttempt[]
-  unlockStates     UnlockState[]
-  assessmentAttempts AssessmentAttempt[]
+  courseProgress      EmployeeCourseProgress[]
+  moduleProgress      EmployeeModuleProgress[]
+  missionAttempts     MissionAttempt[]
+  unlockStates        UnlockState[]
+  assessmentAttempts  AssessmentAttempt[]
   capstoneSubmissions CapstoneSubmission[]
-  aiInteractions   AiInteraction[]
-  certificates     Certificate[]             @relation("CertificateSourceRun")
-  interventions    ProfessorIntervention[]
-  reflections      StudentMissionReflection[]
-  audits           PedagogicalCourseRunAudit[]
+  aiInteractions      AiInteraction[]
+  certificates        Certificate[]               @relation("CertificateSourceRun")
+  interventions       ProfessorIntervention[]
+  reflections         StudentMissionReflection[]
+  audits              PedagogicalCourseRunAudit[]
 
   @@unique([employeeId, courseId, runSequence])
   @@index([companyId])
@@ -236,15 +238,15 @@ model PedagogicalCourseRun {
 }
 
 model PedagogicalCourseRunAudit {
-  id        String   @id @default(cuid())
-  runId     String
-  actorId   String
-  action    String
-  fromStatus String?
-  toStatus   String?
-  reason    String?
-  payloadJson Json   @default("{}")
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  runId       String
+  actorId     String
+  action      String
+  fromStatus  String?
+  toStatus    String?
+  reason      String?
+  payloadJson Json     @default("{}")
+  createdAt   DateTime @default(now())
 
   run   PedagogicalCourseRun @relation(fields: [runId], references: [id])
   actor Employee             @relation("PedagogicalRunAuditActor", fields: [actorId], references: [id])
@@ -278,25 +280,25 @@ model ProfessorIntervention {
 }
 
 model StudentMissionReflection {
-  id                         String   @id @default(cuid())
-  runId                      String
-  missionKey                 String
-  employeeId                 String
-  clarity                    Int
-  confidence                 Int
-  cognitiveLoad              Int
-  realism                    Int
-  relevance                  Int
-  navigationQuality          Int
-  feedbackQuality            Int
-  visualQuality              Int
-  aiUsefulness               Int?
-  biUsefulness               Int?
-  externalExplanationRequired Boolean @default(false)
-  externalSlidesWouldHelp    Boolean  @default(false)
-  qualitativeNote            String?
-  createdAt                  DateTime @default(now())
-  updatedAt                  DateTime @updatedAt
+  id                          String   @id @default(cuid())
+  runId                       String
+  missionKey                  String
+  employeeId                  String
+  clarity                     Int
+  confidence                  Int
+  cognitiveLoad               Int
+  realism                     Int
+  relevance                   Int
+  navigationQuality           Int
+  feedbackQuality             Int
+  visualQuality               Int
+  aiUsefulness                Int?
+  biUsefulness                Int?
+  externalExplanationRequired Boolean  @default(false)
+  externalSlidesWouldHelp     Boolean  @default(false)
+  qualitativeNote             String?
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
 
   run      PedagogicalCourseRun @relation(fields: [runId], references: [id])
   employee Employee             @relation(fields: [employeeId], references: [id])
@@ -315,9 +317,9 @@ model CourseModule {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  course    Course                   @relation(fields: [courseId], references: [id])
-  missions  MissionDefinition[]
-  progress  EmployeeModuleProgress[]
+  course   Course                   @relation(fields: [courseId], references: [id])
+  missions MissionDefinition[]
+  progress EmployeeModuleProgress[]
 
   @@index([courseId])
   @@map("course_module")
@@ -338,7 +340,7 @@ model MissionDefinition {
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
-  module       CourseModule         @relation(fields: [moduleId], references: [id])
+  module       CourseModule        @relation(fields: [moduleId], references: [id])
   competencies MissionCompetency[]
   attempts     MissionAttempt[]
 
@@ -375,17 +377,17 @@ model MissionCompetency {
 }
 
 model EmployeeCourseProgress {
-  id                      String   @id @default(cuid())
-  employeeId              String
-  courseId                String
-  pedagogicalCourseRunId  String
-  percentComplete         Float    @default(0)
-  status                  String   @default("locked")
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  id                     String   @id @default(cuid())
+  employeeId             String
+  courseId               String
+  pedagogicalCourseRunId String
+  percentComplete        Float    @default(0)
+  status                 String   @default("locked")
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 
-  employee Employee             @relation(fields: [employeeId], references: [id])
-  course   Course               @relation(fields: [courseId], references: [id])
+  employee             Employee             @relation(fields: [employeeId], references: [id])
+  course               Course               @relation(fields: [courseId], references: [id])
   pedagogicalCourseRun PedagogicalCourseRun @relation(fields: [pedagogicalCourseRunId], references: [id])
 
   @@unique([employeeId, courseId, pedagogicalCourseRunId])
@@ -396,17 +398,17 @@ model EmployeeCourseProgress {
 }
 
 model EmployeeModuleProgress {
-  id                      String   @id @default(cuid())
-  employeeId              String
-  moduleId                String
-  pedagogicalCourseRunId  String
-  percentComplete         Float    @default(0)
-  status                  String   @default("locked")
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  id                     String   @id @default(cuid())
+  employeeId             String
+  moduleId               String
+  pedagogicalCourseRunId String
+  percentComplete        Float    @default(0)
+  status                 String   @default("locked")
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 
-  employee Employee     @relation(fields: [employeeId], references: [id])
-  module   CourseModule @relation(fields: [moduleId], references: [id])
+  employee             Employee             @relation(fields: [employeeId], references: [id])
+  module               CourseModule         @relation(fields: [moduleId], references: [id])
   pedagogicalCourseRun PedagogicalCourseRun @relation(fields: [pedagogicalCourseRunId], references: [id])
 
   @@unique([employeeId, moduleId, pedagogicalCourseRunId])
@@ -436,11 +438,11 @@ model MissionAttempt {
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
 
-  employee          Employee          @relation(fields: [employeeId], references: [id])
-  missionDefinition MissionDefinition @relation(fields: [missionDefinitionId], references: [id])
+  employee             Employee             @relation(fields: [employeeId], references: [id])
+  missionDefinition    MissionDefinition    @relation(fields: [missionDefinitionId], references: [id])
   pedagogicalCourseRun PedagogicalCourseRun @relation(fields: [pedagogicalCourseRunId], references: [id])
-  evidence          MissionEvidence[]
-  feedbackRecords   FeedbackRecord[]
+  evidence             MissionEvidence[]
+  feedbackRecords      FeedbackRecord[]
 
   @@unique([employeeId, missionDefinitionId, pedagogicalCourseRunId, attemptNumber])
   @@index([employeeId])
@@ -471,7 +473,7 @@ model UnlockState {
   unlockedAt             DateTime
   createdAt              DateTime @default(now())
 
-  employee Employee @relation(fields: [employeeId], references: [id])
+  employee             Employee             @relation(fields: [employeeId], references: [id])
   pedagogicalCourseRun PedagogicalCourseRun @relation(fields: [pedagogicalCourseRunId], references: [id])
 
   @@unique([employeeId, resourceType, resourceKey, pedagogicalCourseRunId])
@@ -502,9 +504,9 @@ model Cohort {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  company     Company            @relation(fields: [companyId], references: [id])
-  memberships CohortMembership[]
-  certificates Certificate[]
+  company               Company                @relation(fields: [companyId], references: [id])
+  memberships           CohortMembership[]
+  certificates          Certificate[]
   pedagogicalCourseRuns PedagogicalCourseRun[]
 
   @@index([companyId])
@@ -562,24 +564,24 @@ model MasterDataAudit {
 }
 
 model BusinessDocument {
-  id              String   @id @default(cuid())
-  companyId       String
-  employeeId      String?
-  documentType    String
-  documentNumber  String
-  status          String
-  payloadJson     Json
-  missionKey      String?
+  id               String   @id @default(cuid())
+  companyId        String
+  employeeId       String?
+  documentType     String
+  documentNumber   String
+  status           String
+  payloadJson      Json
+  missionKey       String?
   missionAttemptId String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  company    Company            @relation(fields: [companyId], references: [id])
-  lines      DocumentLine[]
-  approvals  ApprovalDecision[]
-  movements  InventoryMovement[]
-  postings   FinancialPosting[]
-  openItems  OpenItem[]
+  company   Company             @relation(fields: [companyId], references: [id])
+  lines     DocumentLine[]
+  approvals ApprovalDecision[]
+  movements InventoryMovement[]
+  postings  FinancialPosting[]
+  openItems OpenItem[]
 
   @@unique([companyId, documentType, documentNumber])
   @@index([companyId])
@@ -653,15 +655,15 @@ model FinancialPosting {
 }
 
 model OpenItem {
-  id          String   @id @default(cuid())
-  companyId   String
-  kind        String
-  documentId  String
-  amount      Float
-  openAmount  Float
-  status      String   @default("open")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  companyId  String
+  kind       String
+  documentId String
+  amount     Float
+  openAmount Float
+  status     String   @default("open")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   company  Company          @relation(fields: [companyId], references: [id])
   document BusinessDocument @relation(fields: [documentId], references: [id])
@@ -671,13 +673,13 @@ model OpenItem {
 }
 
 model TransactionEvent {
-  id         String   @id @default(cuid())
-  companyId  String
-  employeeId String?
-  eventType  String
+  id          String   @id @default(cuid())
+  companyId   String
+  employeeId  String?
+  eventType   String
   payloadJson Json
-  sequence   Int
-  createdAt  DateTime @default(now())
+  sequence    Int
+  createdAt   DateTime @default(now())
 
   company Company @relation(fields: [companyId], references: [id])
 
@@ -687,15 +689,15 @@ model TransactionEvent {
 }
 
 model AuditEvent {
-  id               String   @id @default(cuid())
-  companyId        String
-  actorEmployeeId  String
-  action           String
-  resourceType     String
-  resourceKey      String
-  reason           String?
-  payloadJson      Json?
-  createdAt        DateTime @default(now())
+  id              String   @id @default(cuid())
+  companyId       String
+  actorEmployeeId String
+  action          String
+  resourceType    String
+  resourceKey     String
+  reason          String?
+  payloadJson     Json?
+  createdAt       DateTime @default(now())
 
   company Company  @relation(fields: [companyId], references: [id])
   actor   Employee @relation("AuditActor", fields: [actorEmployeeId], references: [id])
@@ -766,8 +768,8 @@ model AssessmentAttempt {
   responsesJson          Json      @default("{}")
   feedbackJson           Json?
 
-  employee   Employee             @relation(fields: [employeeId], references: [id])
-  assessment AssessmentDefinition @relation(fields: [assessmentId], references: [id])
+  employee             Employee             @relation(fields: [employeeId], references: [id])
+  assessment           AssessmentDefinition @relation(fields: [assessmentId], references: [id])
   pedagogicalCourseRun PedagogicalCourseRun @relation(fields: [pedagogicalCourseRunId], references: [id])
 
   @@unique([employeeId, assessmentId, pedagogicalCourseRunId, attemptNumber])
@@ -791,11 +793,11 @@ model Certificate {
   revokedAt             DateTime?
   revokeReason          String?
 
-  employee  Employee              @relation(fields: [employeeId], references: [id])
-  cohort    Cohort?               @relation(fields: [cohortId], references: [id])
-  sourceRun PedagogicalCourseRun? @relation("CertificateSourceRun", fields: [sourceRunId], references: [id])
-  audits                CertificateAudit[]
-  verificationTokens    PublicVerificationToken[]
+  employee           Employee                  @relation(fields: [employeeId], references: [id])
+  cohort             Cohort?                   @relation(fields: [cohortId], references: [id])
+  sourceRun          PedagogicalCourseRun?     @relation("CertificateSourceRun", fields: [sourceRunId], references: [id])
+  audits             CertificateAudit[]
+  verificationTokens PublicVerificationToken[]
 
   @@index([employeeId])
   @@index([sourceRunId])
@@ -880,8 +882,8 @@ model AiInteraction {
   metadataJson           Json     @default("{}")
   createdAt              DateTime @default(now())
 
-  employee Employee @relation(fields: [employeeId], references: [id])
-  company  Company  @relation(fields: [companyId], references: [id])
+  employee             Employee              @relation(fields: [employeeId], references: [id])
+  company              Company               @relation(fields: [companyId], references: [id])
   pedagogicalCourseRun PedagogicalCourseRun? @relation(fields: [pedagogicalCourseRunId], references: [id])
 
   @@index([employeeId, createdAt])
@@ -922,9 +924,9 @@ model CapstoneSubmission {
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
 
-  employee Employee           @relation(fields: [employeeId], references: [id])
+  employee             Employee             @relation(fields: [employeeId], references: [id])
   pedagogicalCourseRun PedagogicalCourseRun @relation(fields: [pedagogicalCourseRunId], references: [id])
-  evidence CapstoneEvidence[]
+  evidence             CapstoneEvidence[]
 
   @@unique([employeeId, pedagogicalCourseRunId])
   @@index([pedagogicalCourseRunId])
@@ -1022,7 +1024,7 @@ model IntegrationRun {
   completedAt    DateTime?
 
   connection IntegrationConnection @relation(fields: [connectionId], references: [id])
-  events       IntegrationEvent[]
+  events     IntegrationEvent[]
 
   @@index([connectionId, startedAt])
   @@map("integration_run")
@@ -1100,12 +1102,12 @@ model FeatureFlag {
 }
 
 model CertificateAudit {
-  id               String   @id @default(cuid())
-  certificateId    String
-  actorEmployeeId  String
-  action           String
-  reason           String?
-  createdAt        DateTime @default(now())
+  id              String   @id @default(cuid())
+  certificateId   String
+  actorEmployeeId String
+  action          String
+  reason          String?
+  createdAt       DateTime @default(now())
 
   certificate Certificate @relation(fields: [certificateId], references: [id])
   actor       Employee    @relation(fields: [actorEmployeeId], references: [id])
