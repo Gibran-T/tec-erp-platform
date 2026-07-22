@@ -37,6 +37,7 @@ describe("gold eligibility gate", () => {
     const eligible = evaluateGoldEligibility({
       completedMissionKeys: v2Keys,
       goldAssessmentPassed: true,
+      hcmAssessmentPassed: true,
       capstoneSubmitted: true,
       capstoneProfessorApproved: true,
       professorApproveFlag: true,
@@ -44,9 +45,22 @@ describe("gold eligibility gate", () => {
     });
     expect(eligible.eligible).toBe(true);
 
+    const withoutHcm = evaluateGoldEligibility({
+      completedMissionKeys: v2Keys,
+      goldAssessmentPassed: true,
+      hcmAssessmentPassed: false,
+      capstoneSubmitted: true,
+      capstoneProfessorApproved: true,
+      professorApproveFlag: true,
+      curriculumVersion: "V2",
+    });
+    expect(withoutHcm.eligible).toBe(false);
+    expect(withoutHcm.reasons.some((reason) => reason.includes("HCM_M8"))).toBe(true);
+
     const withoutProfessorCapstone = evaluateGoldEligibility({
       completedMissionKeys: v2Keys,
       goldAssessmentPassed: true,
+      hcmAssessmentPassed: true,
       capstoneSubmitted: true,
       capstoneProfessorApproved: false,
       professorApproveFlag: true,
@@ -60,6 +74,7 @@ describe("gold eligibility gate", () => {
     const v1CompleteOnV2 = evaluateGoldEligibility({
       completedMissionKeys: new Set(listRegularMissionKeys("V1")),
       goldAssessmentPassed: true,
+      hcmAssessmentPassed: true,
       capstoneSubmitted: true,
       capstoneProfessorApproved: true,
       professorApproveFlag: true,
@@ -67,5 +82,28 @@ describe("gold eligibility gate", () => {
     });
     expect(v1CompleteOnV2.eligible).toBe(false);
     expect(v1CompleteOnV2.reasons.some((reason) => reason.startsWith("Missions"))).toBe(true);
+  });
+
+  it("HCM assessment alone never issues Gold and V1 ignores HCM requirement", () => {
+    const hcmOnly = evaluateGoldEligibility({
+      completedMissionKeys: new Set(),
+      goldAssessmentPassed: false,
+      hcmAssessmentPassed: true,
+      capstoneSubmitted: false,
+      capstoneProfessorApproved: false,
+      professorApproveFlag: false,
+      curriculumVersion: "V2",
+    });
+    expect(hcmOnly.eligible).toBe(false);
+
+    const v1WithoutHcmFlag = evaluateGoldEligibility({
+      completedMissionKeys: new Set(listRegularMissionKeys("V1")),
+      goldAssessmentPassed: true,
+      capstoneSubmitted: true,
+      capstoneProfessorApproved: true,
+      professorApproveFlag: true,
+      curriculumVersion: "V1",
+    });
+    expect(v1WithoutHcmFlag.eligible).toBe(true);
   });
 });

@@ -242,3 +242,28 @@ export async function runAdminAutomation(ruleKey: string) {
   });
   return parseJson<Record<string, unknown>>(response, "Impossible de lancer l'automatisation.");
 }
+
+export async function listAdminAssessments() {
+  const token = requireAccessToken();
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/admin/assessments`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return parseJson<{ assessments: Array<Record<string, unknown>> }>(
+    response,
+    "Impossible de charger les banques d'evaluation.",
+  );
+}
+
+export async function getAdminAssessmentBank(code: string, includeAnswerKey = false) {
+  const token = requireAccessToken();
+  const query = includeAnswerKey ? "?includeAnswerKey=true" : "";
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/admin/assessments/${code}${query}`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return parseJson<Record<string, unknown>>(
+    response,
+    "Impossible de charger la banque d'evaluation.",
+  );
+}

@@ -20,6 +20,8 @@ function hashToken(token: string): string {
 export interface GoldEligibilityInput {
   readonly completedMissionKeys: ReadonlySet<string>;
   readonly goldAssessmentPassed: boolean;
+  /** Required for V2 only — official HCM_M8 assessment. Ignored for V1. */
+  readonly hcmAssessmentPassed?: boolean;
   readonly capstoneSubmitted: boolean;
   readonly capstoneProfessorApproved: boolean;
   readonly professorApproveFlag: boolean;
@@ -38,6 +40,9 @@ export function evaluateGoldEligibility(input: GoldEligibilityInput): { eligible
   }
   if (!input.goldAssessmentPassed) {
     reasons.push("Évaluation GOLD_M7_M10 non réussie");
+  }
+  if (version === "V2" && input.hcmAssessmentPassed !== true) {
+    reasons.push("Évaluation HCM_M8 non réussie");
   }
   if (!input.capstoneSubmitted) {
     reasons.push("Dossier Capstone non soumis");
@@ -77,6 +82,15 @@ export function createCertificationService(client = getPrismaClient()) {
       },
     });
 
+    const hcmAttempt = await client.assessmentAttempt.findFirst({
+      where: {
+        employeeId: studentId,
+        assessment: { code: "HCM_M8" },
+        status: "passed",
+        ...runFilter,
+      },
+    });
+
     const capstone = run
       ? await client.capstoneSubmission.findUnique({
           where: {
@@ -88,13 +102,15 @@ export function createCertificationService(client = getPrismaClient()) {
         })
       : null;
 
+    const curriculumVersion = run?.curriculumVersion ?? DEFAULT_CURRICULUM_VERSION;
     return evaluateGoldEligibility({
       completedMissionKeys,
       goldAssessmentPassed: goldAttempt !== null,
+      hcmAssessmentPassed: hcmAttempt !== null,
       capstoneSubmitted: capstone?.status === "submitted" || capstone?.status === "approved",
       capstoneProfessorApproved: capstone?.professorApproved === true,
       professorApproveFlag,
-      curriculumVersion: run?.curriculumVersion ?? DEFAULT_CURRICULUM_VERSION,
+      curriculumVersion,
     });
   }
 
@@ -106,6 +122,7 @@ export function createCertificationService(client = getPrismaClient()) {
         studentReadyChecklist: {
           missionsComplete: !eligibility.reasons.some((reason) => reason.startsWith("Missions")),
           goldAssessmentPassed: !eligibility.reasons.some((reason) => reason.includes("GOLD_M7_M10")),
+          hcmAssessmentPassed: !eligibility.reasons.some((reason) => reason.includes("HCM_M8")),
           capstoneSubmitted: !eligibility.reasons.some((reason) => reason.includes("non soumis")),
           capstoneProfessorApproved: !eligibility.reasons.some((reason) =>
             reason.includes("Approbation professeur"),

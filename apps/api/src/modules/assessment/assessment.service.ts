@@ -4,6 +4,7 @@ import type {
   AssessmentDraftRequest,
   AssessmentQuestionView,
   AssessmentSubmitRequest,
+  AssessmentSubmitResult,
   AssessmentSummary,
   CertificateView,
 } from "@tec-platform/contracts";
@@ -15,6 +16,13 @@ import {
   getCurrentPedagogicalRun,
   requireCurrentPedagogicalRunId,
 } from "../pedagogical-run/run-context.js";
+import { buildHcmSubmitFeedback } from "./hcm/hcm-m8.feedback.js";
+import {
+  assessmentVisibleForCurriculum,
+  isHcmM8AssessmentCode,
+  lockReasonForAssessment,
+  modulesCompleteForAssessment,
+} from "./hcm/hcm-m8.policy.js";
 
 function shuffle<T>(items: readonly T[]): T[] {
   const copy = [...items];
@@ -178,58 +186,64 @@ export function createAssessmentService(client = getPrismaClient()) {
         missionAttempts.map((attempt) => attempt.missionDefinition.missionKey),
       );
 
-      return definitions.map((definition) => {
-        const relatedAttempts = attempts.filter((attempt) => attempt.assessmentId === definition.id);
-        const best = relatedAttempts.reduce<number | null>((acc, attempt) => {
-          if (attempt.scorePercent == null) {
-            return acc;
+      const curriculumVersion = getRunCurriculumVersion();
+      return definitions
+        .filter((definition) =>
+          assessmentVisibleForCurriculum(
+            definition.code,
+            definition.definitionJson,
+            curriculumVersion,
+          ),
+        )
+        .map((definition) => {
+          const relatedAttempts = attempts.filter((attempt) => attempt.assessmentId === definition.id);
+          const best = relatedAttempts.reduce<number | null>((acc, attempt) => {
+            if (attempt.scorePercent == null) {
+              return acc;
+            }
+            return acc == null ? attempt.scorePercent : Math.max(acc, attempt.scorePercent);
+          }, null);
+          const passed = best != null && best >= definition.passThresholdPercent;
+          const inProgress = relatedAttempts.some((attempt) => attempt.status === "in_progress");
+          const modulesComplete = modulesCompleteForAssessment({
+            assessmentCode: definition.code,
+            curriculumVersion,
+            completedMissionKeys: completedKeys,
+          });
+
+          let status: AssessmentSummary["status"] = "locked";
+          if (passed) {
+            status = "passed";
+          } else if (inProgress) {
+            status = "in_progress";
+          } else if (modulesComplete) {
+            status = "available";
+          } else if (relatedAttempts.some((attempt) => attempt.status === "failed")) {
+            status = "failed";
           }
-          return acc == null ? attempt.scorePercent : Math.max(acc, attempt.scorePercent);
-        }, null);
-        const passed = best != null && best >= definition.passThresholdPercent;
-        const inProgress = relatedAttempts.some((attempt) => attempt.status === "in_progress");
 
-        const curriculumVersion = getRunCurriculumVersion();
-        const requiredModules =
-          definition.code === "SILVER_M1_M2"
-            ? ["M1", "M2"]
-            : definition.code === "INTEGRATED_M3_M6"
-              ? ["M3", "M4", "M5", "M6"]
-              : definition.code === "GOLD_M7_M10"
-                ? ["M7", "M8", "M9", "M10"]
-                : [];
-        const modulesComplete =
-          requiredModules.length === 0
-            ? true
-            : requiredModules.every((moduleCode) =>
-                listMissionsForModuleInCurriculum(curriculumVersion, moduleCode).every((mission) =>
-                  completedKeys.has(mission.missionKey),
-                ),
-              );
-
-        let status: AssessmentSummary["status"] = "locked";
-        if (passed) {
-          status = "passed";
-        } else if (inProgress) {
-          status = "in_progress";
-        } else if (modulesComplete) {
-          status = "available";
-        } else if (relatedAttempts.some((attempt) => attempt.status === "failed")) {
-          status = "failed";
-        }
-
-        return {
-          code: definition.code,
-          title: definition.title,
-          moduleScope: definition.moduleScope,
-          passThresholdPercent: definition.passThresholdPercent,
-          maxAttempts: definition.maxAttempts,
-          timeLimitSeconds: definition.timeLimitSeconds,
-          status,
-          bestScorePercent: best,
-          attemptsUsed: relatedAttempts.length,
-        };
-      });
+          const definitionMeta = definition.definitionJson as { curriculumVersion?: "V1" | "V2" };
+          return {
+            code: definition.code,
+            title: definition.title,
+            moduleScope: definition.moduleScope,
+            passThresholdPercent: definition.passThresholdPercent,
+            maxAttempts: definition.maxAttempts,
+            timeLimitSeconds: definition.timeLimitSeconds,
+            status,
+            bestScorePercent: best,
+            attemptsUsed: relatedAttempts.length,
+            lockReason:
+              status === "locked"
+                ? lockReasonForAssessment({
+                    assessmentCode: definition.code,
+                    curriculumVersion,
+                    modulesComplete,
+                  })
+                : null,
+            curriculumVersion: definitionMeta.curriculumVersion ?? null,
+          };
+        });
     },
 
     async getActiveAttempt(
@@ -276,6 +290,19 @@ export function createAssessmentService(client = getPrismaClient()) {
         return Result.fail(DomainError.notFound("Evaluation introuvable."));
       }
 
+      const curriculumVersion = getRunCurriculumVersion();
+      if (
+        !assessmentVisibleForCurriculum(
+          definition.code,
+          definition.definitionJson,
+          curriculumVersion,
+        )
+      ) {
+        return Result.fail(
+          DomainError.forbidden("Cette evaluation HCM n'est disponible que pour le curriculum V2."),
+        );
+      }
+
       const pedagogicalCourseRunId = requireCurrentPedagogicalRunId();
       const existing = await client.assessmentAttempt.findFirst({
         where: {
@@ -293,6 +320,34 @@ export function createAssessmentService(client = getPrismaClient()) {
             toAttemptView(existing, assessmentCode, definition.timeLimitSeconds, state),
           );
         }
+      }
+
+      const missionAttempts = await client.missionAttempt.findMany({
+        where: {
+          employeeId,
+          status: "completed",
+          pedagogicalCourseRunId,
+        },
+        include: { missionDefinition: true },
+      });
+      const completedKeys = new Set(
+        missionAttempts.map((attempt) => attempt.missionDefinition.missionKey),
+      );
+      const modulesComplete = modulesCompleteForAssessment({
+        assessmentCode: definition.code,
+        curriculumVersion,
+        completedMissionKeys: completedKeys,
+      });
+      if (!modulesComplete) {
+        return Result.fail(
+          DomainError.conflict(
+            lockReasonForAssessment({
+              assessmentCode: definition.code,
+              curriculumVersion,
+              modulesComplete: false,
+            }) ?? "Evaluation verrouillee.",
+          ),
+        );
       }
 
       const used = await client.assessmentAttempt.count({
@@ -402,7 +457,7 @@ export function createAssessmentService(client = getPrismaClient()) {
       employeeId: string,
       assessmentCode: string,
       body: AssessmentSubmitRequest,
-    ): Promise<ResultType<{ scorePercent: number; passed: boolean; feedback: string }>> {
+    ): Promise<ResultType<AssessmentSubmitResult>> {
       if (!body.confirmFinalSubmission) {
         return Result.fail(DomainError.validation("Confirmation de soumission finale requise."));
       }
@@ -447,9 +502,16 @@ export function createAssessmentService(client = getPrismaClient()) {
       );
       const scorePercent = scored.scorePercent;
       const passed = scorePercent >= definition.passThresholdPercent;
-      const feedback = passed
+
+      let feedback = passed
         ? "Evaluation reussie."
         : "Seuil non atteint. Vous pouvez retenter si des tentatives restent.";
+      let feedbackDetails: AssessmentSubmitResult["feedbackDetails"];
+      if (isHcmM8AssessmentCode(assessmentCode)) {
+        const hcmFeedback = buildHcmSubmitFeedback(body.responses, scorePercent, passed);
+        feedback = hcmFeedback.feedback;
+        feedbackDetails = hcmFeedback.details;
+      }
 
       await client.assessmentAttempt.update({
         where: { id: attempt.id },
@@ -464,10 +526,45 @@ export function createAssessmentService(client = getPrismaClient()) {
             ),
             submitted: body.responses,
           }),
-          feedbackJson: { feedback },
+          feedbackJson: toInputJson({ feedback, feedbackDetails: feedbackDetails ?? null }),
         },
       });
-      return Result.ok({ scorePercent, passed, feedback });
+      return Result.ok({ scorePercent, passed, feedback, feedbackDetails });
+    },
+
+    async getHcmAnalyticsForEmployee(employeeId: string, pedagogicalCourseRunId: string) {
+      const definition = await client.assessmentDefinition.findUnique({
+        where: { code: "HCM_M8" },
+        include: { questions: { orderBy: { sequence: "asc" } } },
+      });
+      if (!definition) {
+        return null;
+      }
+      const attempts = await client.assessmentAttempt.findMany({
+        where: { employeeId, assessmentId: definition.id, pedagogicalCourseRunId },
+        orderBy: { attemptNumber: "asc" },
+      });
+      const best = attempts.reduce<number | null>((acc, attempt) => {
+        if (attempt.scorePercent == null) {
+          return acc;
+        }
+        return acc == null ? attempt.scorePercent : Math.max(acc, attempt.scorePercent);
+      }, null);
+      return {
+        code: definition.code,
+        title: definition.title,
+        attempts: attempts.map((attempt) => ({
+          attemptNumber: attempt.attemptNumber,
+          status: attempt.status,
+          scorePercent: attempt.scorePercent,
+          startedAt: attempt.startedAt.toISOString(),
+          submittedAt: attempt.submittedAt?.toISOString() ?? null,
+          feedbackJson: attempt.feedbackJson,
+        })),
+        bestScorePercent: best,
+        passed: best != null && best >= definition.passThresholdPercent,
+        questionCount: definition.questions.length,
+      };
     },
 
     async issueSilverIfEligible(

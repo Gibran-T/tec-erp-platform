@@ -10,8 +10,36 @@ export const AssessmentSummarySchema = z.object({
   status: z.enum(["locked", "available", "in_progress", "passed", "failed"]),
   bestScorePercent: z.number().min(0).max(100).nullable(),
   attemptsUsed: z.number().int().nonnegative(),
+  /** French learner-facing reason when status is locked; null otherwise. */
+  lockReason: z.string().nullable().optional(),
+  /** Curriculum scope for version-gated assessments (e.g. HCM_M8 = V2). */
+  curriculumVersion: z.enum(["V1", "V2"]).nullable().optional(),
 });
 export type AssessmentSummary = z.infer<typeof AssessmentSummarySchema>;
+
+export const AssessmentSubmitResultSchema = z.object({
+  scorePercent: z.number().min(0).max(100),
+  passed: z.boolean(),
+  feedback: z.string().min(1),
+  feedbackDetails: z
+    .object({
+      strengths: z.array(z.string()),
+      revisionAreas: z.array(z.string()),
+      missionBreakdown: z.array(
+        z.object({
+          mission: z.string(),
+          earned: z.number(),
+          max: z.number(),
+          percent: z.number(),
+        }),
+      ),
+      quantitativeNotes: z.array(z.string()),
+      privacyGovernanceReminder: z.string().optional(),
+      humanAccountabilityReminder: z.string().optional(),
+    })
+    .optional(),
+});
+export type AssessmentSubmitResult = z.infer<typeof AssessmentSubmitResultSchema>;
 
 export const AssessmentOptionSchema = z.object({
   key: z.string().min(1),

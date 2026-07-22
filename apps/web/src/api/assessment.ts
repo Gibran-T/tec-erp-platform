@@ -1,4 +1,9 @@
-import type { AssessmentAttemptView, AssessmentSummary, CertificateView } from "@tec-platform/contracts";
+import type {
+  AssessmentAttemptView,
+  AssessmentSubmitResult,
+  AssessmentSummary,
+  CertificateView,
+} from "@tec-platform/contracts";
 
 import { loadStoredTokens } from "./auth.js";
 import { getApiBaseUrl } from "./health.js";
@@ -81,10 +86,7 @@ export async function submitAssessment(
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
     body: JSON.stringify({ responses, confirmFinalSubmission: true }),
   });
-  return parseJson<{ scorePercent: number; passed: boolean; feedback: string }>(
-    response,
-    "Impossible de soumettre l'evaluation.",
-  );
+  return parseJson<AssessmentSubmitResult>(response, "Impossible de soumettre l'evaluation.");
 }
 
 export async function issueSilver() {

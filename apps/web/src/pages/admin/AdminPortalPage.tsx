@@ -9,6 +9,8 @@ import {
   listAdminCohorts,
   listAdminCompanies,
   listAdminEmployees,
+  getAdminAssessmentBank,
+  listAdminAssessments,
   listAdminFeatureFlags,
   listAdminScenarioDrafts,
   publishAdminScenarioDraft,
@@ -26,6 +28,7 @@ type AdminTab =
   | "cohorts"
   | "employees"
   | "runs"
+  | "assessments"
   | "ai"
   | "flags"
   | "scenarios"
@@ -41,6 +44,8 @@ export function AdminPortalPage(): ReactElement {
   const [aiEnabled, setAiEnabled] = useState(true);
   const [flags, setFlags] = useState<Array<Record<string, unknown>>>([]);
   const [drafts, setDrafts] = useState<Array<Record<string, unknown>>>([]);
+  const [assessments, setAssessments] = useState<Array<Record<string, unknown>>>([]);
+  const [assessmentDetail, setAssessmentDetail] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
 
@@ -55,21 +60,30 @@ export function AdminPortalPage(): ReactElement {
   const [enrollForm, setEnrollForm] = useState({ cohortId: "", employeeId: "" });
 
   async function refresh(): Promise<void> {
-    const [companyResponse, cohortResponse, employeeResponse, configResponse, flagResponse, draftResponse] =
-      await Promise.all([
-        listAdminCompanies(),
-        listAdminCohorts(),
-        listAdminEmployees(),
-        getAdminConfiguration(),
-        listAdminFeatureFlags(),
-        listAdminScenarioDrafts(),
-      ]);
+    const [
+      companyResponse,
+      cohortResponse,
+      employeeResponse,
+      configResponse,
+      flagResponse,
+      draftResponse,
+      assessmentResponse,
+    ] = await Promise.all([
+      listAdminCompanies(),
+      listAdminCohorts(),
+      listAdminEmployees(),
+      getAdminConfiguration(),
+      listAdminFeatureFlags(),
+      listAdminScenarioDrafts(),
+      listAdminAssessments(),
+    ]);
     setCompanies(companyResponse.companies);
     setCohorts(cohortResponse.cohorts);
     setEmployees(employeeResponse.employees);
     setAiEnabled(configResponse.aiEnabled);
     setFlags(flagResponse.flags);
     setDrafts(draftResponse.drafts);
+    setAssessments(assessmentResponse.assessments);
   }
 
   useEffect(() => {
@@ -224,6 +238,7 @@ export function AdminPortalPage(): ReactElement {
             ["cohorts", "Cohortes"],
             ["employees", "Employés / professeurs"],
             ["runs", "Parcours pédagogiques"],
+            ["assessments", "Évaluations"],
             ["ai", "Coach IA"],
             ["flags", "Indicateurs"],
             ["scenarios", "Scénarios"],
@@ -257,6 +272,54 @@ export function AdminPortalPage(): ReactElement {
       ) : null}
 
       {tab === "runs" ? <PedagogicalRunsAdminPanel /> : null}
+
+      {tab === "assessments" ? (
+        <section data-testid="admin-assessments">
+          <h2>Banques d&apos;évaluation</h2>
+          <ul>
+            {assessments.map((assessment) => (
+              <li key={String(assessment.code)}>
+                <strong>{String(assessment.code)}</strong> — {String(assessment.title)} (
+                {String(assessment.questionCount)} questions, curriculum{" "}
+                {String(assessment.curriculumVersion ?? "n/a")})
+                <button
+                  type="button"
+                  data-testid={`admin-assessment-preview-${String(assessment.code)}`}
+                  onClick={() => {
+                    void getAdminAssessmentBank(String(assessment.code), true)
+                      .then((detail) => {
+                        setAssessmentDetail(detail);
+                        setStatus(`Banque ${String(assessment.code)} chargée (clé admin).`);
+                      })
+                      .catch((err: Error) => setError(err.message));
+                  }}
+                >
+                  Prévisualiser / clé
+                </button>
+              </li>
+            ))}
+          </ul>
+          {assessmentDetail ? (
+            <pre data-testid="admin-assessment-detail">
+              {JSON.stringify(
+                {
+                  code: assessmentDetail.code,
+                  title: assessmentDetail.title,
+                  questionCount: Array.isArray(assessmentDetail.questions)
+                    ? assessmentDetail.questions.length
+                    : 0,
+                  companyAttemptCount: assessmentDetail.companyAttemptCount,
+                  sampleQuestion: Array.isArray(assessmentDetail.questions)
+                    ? assessmentDetail.questions[0]
+                    : null,
+                },
+                null,
+                2,
+              )}
+            </pre>
+          ) : null}
+        </section>
+      ) : null}
 
       {tab === "employees" ? (
         <section data-testid="admin-employees">
