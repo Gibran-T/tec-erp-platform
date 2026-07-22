@@ -9,7 +9,7 @@ export const M3_M01 = {
   "title": "Identifier un besoin d'achat",
   "preview": "Transformez un besoin operationnel en demande d'achat controlee.",
   "briefing": "Bonjour,\n\nDenise signale un besoin de pieces HVAC apres tension de stock. Identifiez le besoin, le demandeur et le fournisseur eligible ThermoControl.\n\nJulie Chen\nApprovisionnements — NordHabitat",
-  "unlockExplanation": "Completez le Module 2 pour debloquer Procure-to-Pay.",
+  "unlockExplanation": "Complétez le Module 2 pour débloquer Procure-to-Pay.",
   "sequence": 1,
   "estimatedMinutes": 30,
   "difficulty": "intro",
@@ -93,7 +93,7 @@ export const M3_M01 = {
         },
         {
           "key": "validate-md",
-          "label": "Valider les donnees maitre"
+          "label": "Valider les données maitre"
         },
         {
           "key": "create-pr",
@@ -117,7 +117,7 @@ export const M3_M01 = {
     {
       "id": "qty",
       "type": "NUMERIC_INPUT",
-      "prompt": "Quantite minimale a demander si stock critique (unites) ?",
+      "prompt": "Quantite minimale a demander si stock critique (unités) ?",
       "scoring": {
         "maxPoints": 10,
         "numericTarget": 40,

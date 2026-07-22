@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
+import { EmployeeRoleSchema } from "@tec-platform/contracts";
 import { DomainError, Result } from "@tec-platform/core";
 
 import { getAuthenticatedEmployee } from "../../middleware/require-employee.js";
@@ -12,6 +13,27 @@ const CompanySchema = z.object({
 
 const EnrollSchema = z.object({
   cohortId: z.string().min(1),
+  employeeId: z.string().min(1),
+});
+
+const CreateEmployeeSchema = z.object({
+  employeeNumber: z.string().min(1),
+  email: z.string().email(),
+  displayName: z.string().min(1),
+  role: EmployeeRoleSchema,
+  password: z.string().min(8),
+});
+
+const PatchRoleSchema = z.object({
+  role: EmployeeRoleSchema,
+});
+
+const CreateCohortSchema = z.object({
+  code: z.string().min(2),
+  name: z.string().min(2),
+});
+
+const ProfessorAssignSchema = z.object({
   employeeId: z.string().min(1),
 });
 
@@ -60,6 +82,23 @@ export function createAdminRouter(service: AdminService): Router {
     }
   });
 
+  router.post("/cohorts", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      const parsed = CreateCohortSchema.safeParse(req.body);
+      if (!parsed.success) {
+        throw DomainError.validation("Cohorte invalide.");
+      }
+      const result = await service.createCohort(employee.id, parsed.data);
+      if (Result.isFail(result)) {
+        throw result.error;
+      }
+      res.status(201).json({ cohort: result.value });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   router.post("/cohorts/enroll", async (req, res, next) => {
     try {
       const employee = getAuthenticatedEmployee(req);
@@ -76,6 +115,95 @@ export function createAdminRouter(service: AdminService): Router {
         throw result.error;
       }
       res.status(200).json(result.value);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post("/cohorts/:cohortId/assign-professor", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      const parsed = ProfessorAssignSchema.safeParse(req.body);
+      if (!parsed.success) {
+        throw DomainError.validation("Affectation professeur invalide.");
+      }
+      const result = await service.assignProfessor(
+        employee.id,
+        req.params.cohortId ?? "",
+        parsed.data.employeeId,
+      );
+      if (Result.isFail(result)) {
+        throw result.error;
+      }
+      res.status(200).json(result.value);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post("/cohorts/:cohortId/remove-professor", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      const parsed = ProfessorAssignSchema.safeParse(req.body);
+      if (!parsed.success) {
+        throw DomainError.validation("Retrait professeur invalide.");
+      }
+      const result = await service.removeProfessor(
+        employee.id,
+        req.params.cohortId ?? "",
+        parsed.data.employeeId,
+      );
+      if (Result.isFail(result)) {
+        throw result.error;
+      }
+      res.status(200).json(result.value);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get("/employees", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      res.status(200).json({ employees: await service.listCompanyEmployees(employee.id) });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post("/employees", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      const parsed = CreateEmployeeSchema.safeParse(req.body);
+      if (!parsed.success) {
+        throw DomainError.validation("Création d'employé invalide.");
+      }
+      const result = await service.createEmployee(employee.id, parsed.data);
+      if (Result.isFail(result)) {
+        throw result.error;
+      }
+      res.status(201).json({ employee: result.value });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.patch("/employees/:employeeId/role", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      const parsed = PatchRoleSchema.safeParse(req.body);
+      if (!parsed.success) {
+        throw DomainError.validation("Rôle invalide.");
+      }
+      const result = await service.updateEmployeeRole(
+        employee.id,
+        req.params.employeeId ?? "",
+        parsed.data.role,
+      );
+      if (Result.isFail(result)) {
+        throw result.error;
+      }
+      res.status(200).json({ employee: result.value });
     } catch (error) {
       next(error);
     }

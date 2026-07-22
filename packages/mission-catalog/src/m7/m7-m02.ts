@@ -9,7 +9,7 @@ export const M7_M02 = {
   "title": "Coordonner l'escalade",
   "preview": "Escaladez CAS-7701 vers qualite et logistique sans perdre la trace client.",
   "briefing": "Bonjour,\n\nCAS-7701 est qualifie P1 : deux unites bruyantes, impact salle pediatrique. Qualite suspecte un lot ThermoControl; logistique doit confirmer le stock de remplacement a DC-TRT.\n\nVotre role : coordonner l'escalade multi-departements sans que le Dr Meunier recoive trois versions differentes. Chaque action doit etre tracee dans le CRM avec proprietaire et echeance.\n\nPatrick veut une reponse unifiee avant 16 h. Moi je veux une chaine d'escalade propre.\n\nSophie Lambert\nService client — NordHabitat",
-  "unlockExplanation": "Completez d'abord « Ouvrir le dossier client » (CAS-7701 qualifie).",
+  "unlockExplanation": "Complétez d'abord « Ouvrir le dossier client » (CAS-7701 qualifie).",
   "sequence": 2,
   "estimatedMinutes": 40,
   "difficulty": "intermediate",
@@ -33,7 +33,7 @@ export const M7_M02 = {
     {
       "key": "ctx-replacement-stock",
       "title": "Stock remplacement DC-TRT",
-      "body": "SKU-HVAC-4421 : 6 unites libres apres allocation Sacre-Coeur; transfert express possible depuis DC-MTL (52 unites) si validation qualite sous 4 h.",
+      "body": "SKU-HVAC-4421 : 6 unités libres apres allocation Sacre-Coeur; transfert express possible depuis DC-MTL (52 unités) si validation qualite sous 4 h.",
       "required": true
     }
   ],

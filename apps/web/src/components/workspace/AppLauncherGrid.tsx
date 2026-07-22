@@ -1,10 +1,12 @@
 import type { ReactNode } from "react";
 
+import { useAuth } from "../../auth/AuthContext.js";
 import { getLauncherApps } from "../../workspace/appRegistry.js";
 import { AppTile } from "./AppTile.js";
 
 export function AppLauncherGrid(): ReactNode {
-  const apps = getLauncherApps().filter((app) => app.id !== "accueil");
+  const { employee } = useAuth();
+  const apps = getLauncherApps(employee?.role).filter((app) => app.id !== "accueil");
 
   return (
     <section className="workspace-app-launcher" data-testid="workspace-app-launcher">

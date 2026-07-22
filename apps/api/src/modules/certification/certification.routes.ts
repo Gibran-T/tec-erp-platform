@@ -28,6 +28,15 @@ export function createCertificationMeRouter(service: CertificationService): Rout
     }
   });
 
+  router.get("/gold-eligibility", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      res.status(200).json(await service.getGoldEligibility(employee.id));
+    } catch (error) {
+      next(error);
+    }
+  });
+
   return router;
 }
 

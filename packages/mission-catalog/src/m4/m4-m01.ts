@@ -9,7 +9,7 @@ export const M4_M01 = {
   "title": "Saisir la commande institutionnelle",
   "preview": "Creez la commande Sacre-Coeur pour l'aile pediatrique avec controle credit et ATP.",
   "briefing": "Bonjour,\n\nL'Hopital du Sacre-Coeur confirme la commande pour l'aile pediatrique : 40 unites de SKU-HVAC-4421, livraison jeudi. Patrick insiste sur la priorite; le Dr. Meunier attend une date ferme.\n\nAvant de promettre quoi que ce soit, verifiez le credit client et la disponibilite (ATP). Rappel : la reception partielle ThermoControl (36/40) a deja tendu le stock.\n\nNe promettez pas une date que nous ne pouvons tenir. Documentez tout conflit honnetement.\n\nElodie Moreau\nVentes institutionnelles — NordHabitat",
-  "unlockExplanation": "Completez d'abord le Module 3 (reception partielle PO-88421) pour debloquer Order-to-Cash.",
+  "unlockExplanation": "Complétez d'abord le Module 3 (reception partielle PO-88421) pour débloquer Order-to-Cash.",
   "sequence": 1,
   "estimatedMinutes": 35,
   "difficulty": "intermediate",
@@ -32,7 +32,7 @@ export const M4_M01 = {
     {
       "key": "ctx-atp",
       "title": "Disponibilite ATP DC-TRT",
-      "body": "SKU-HVAC-4421 : stock libre DC-TRT = 28 unites; DC-MTL = 52 unites; allocation hospitaliere en attente. Delai appro fournisseur : 14 jours.",
+      "body": "SKU-HVAC-4421 : stock libre DC-TRT = 28 unités; DC-MTL = 52 unités; allocation hospitaliere en attente. Delai appro fournisseur : 14 jours.",
       "required": true
     }
   ],
@@ -133,7 +133,7 @@ export const M4_M01 = {
     {
       "id": "atp-gap",
       "type": "NUMERIC_INPUT",
-      "prompt": "Combien d'unites manquent a DC-TRT pour couvrir la commande de 40 unites (stock libre = 28) ?",
+      "prompt": "Combien d'unités manquent a DC-TRT pour couvrir la commande de 40 unités (stock libre = 28) ?",
       "scoring": {
         "maxPoints": 10,
         "numericTarget": 12,
@@ -143,7 +143,7 @@ export const M4_M01 = {
     {
       "id": "honest-conflict",
       "type": "DIAGNOSIS_RECOMMENDATION",
-      "prompt": "L'ATP montre 28 unites disponibles pour 40 demandees. Que recommandez-vous a Elodie : fausse promesse ou conflit documente ? Justifiez.",
+      "prompt": "L'ATP montre 28 unités disponibles pour 40 demandees. Que recommandez-vous a Elodie : fausse promesse ou conflit documente ? Justifiez.",
       "scoring": {
         "maxPoints": 15,
         "requiredConcepts": [

@@ -108,18 +108,8 @@ export function createCourseService(dependencies: CourseServiceDependencies): Co
         });
       }
 
-      // Surface Module 2 readiness without content: locked until institutional open.
-      const m2Ready = await dependencies.unlockStates.isUnlocked(employeeId, "module_ready", "M2");
-      if (m2Ready) {
-        modules.push({
-          moduleCode: "M2",
-          title: "Module 2 — Processus d’affaires (à venir)",
-          sequence: 2,
-          status: "locked" as const,
-          percentComplete: 0,
-          missions: [],
-        });
-      }
+      // Z1-002: modules come solely from mission-catalog (exactly one entry per moduleCode).
+      // Do not append Wave-1 placeholder Module 2 — it duplicated M2 for completed students.
 
       const overallPercent =
         modules.length === 0

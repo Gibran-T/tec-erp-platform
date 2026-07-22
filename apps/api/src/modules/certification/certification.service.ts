@@ -26,19 +26,19 @@ export function evaluateGoldEligibility(input: GoldEligibilityInput): { eligible
   const requiredMissions = listAllMissions().map((mission) => mission.missionKey);
   const missing = requiredMissions.filter((key) => !input.completedMissionKeys.has(key));
   if (missing.length > 0) {
-    reasons.push(`Missions incompletes: ${missing.length}`);
+    reasons.push(`Missions incomplètes: ${missing.length}`);
   }
   if (!input.goldAssessmentPassed) {
-    reasons.push("Evaluation GOLD_M7_M10 non reussie");
+    reasons.push("Évaluation GOLD_M7_M10 non réussie");
   }
   if (!input.capstoneSubmitted) {
-    reasons.push("Dossier capstone non soumis");
+    reasons.push("Dossier Capstone non soumis");
   }
   if (!input.capstoneProfessorApproved) {
-    reasons.push("Approbation professeur capstone manquante");
+    reasons.push("Approbation professeur Capstone manquante");
   }
   if (!input.professorApproveFlag) {
-    reasons.push("Validation professeur Gold requise");
+    reasons.push("Validation professeur Or requise");
   }
   return { eligible: reasons.length === 0, reasons };
 }
@@ -71,6 +71,29 @@ export function createCertificationService(client = getPrismaClient()) {
   }
 
   return {
+    async getGoldEligibility(employeeId: string) {
+      const eligibility = await loadEligibility(employeeId, false);
+      return {
+        eligibleForProfessorIssue: false,
+        studentReadyChecklist: {
+          missionsComplete: !eligibility.reasons.some((reason) => reason.startsWith("Missions")),
+          goldAssessmentPassed: !eligibility.reasons.some((reason) => reason.includes("GOLD_M7_M10")),
+          capstoneSubmitted: !eligibility.reasons.some((reason) => reason.includes("non soumis")),
+          capstoneProfessorApproved: !eligibility.reasons.some((reason) =>
+            reason.includes("Approbation professeur"),
+          ),
+        },
+        reasons: eligibility.reasons.filter(
+          (reason) => !reason.includes("Validation professeur Or"),
+        ),
+        nextStepHint: eligibility.reasons.some((reason) => reason.includes("Approbation professeur"))
+          ? "Votre dossier Capstone est en attente de revue professeur. Le certificat Or n'est émis qu'après approbation et validation professeur."
+          : eligibility.reasons.some((reason) => reason.includes("non soumis"))
+            ? "Soumettez votre dossier Capstone lorsque les 30 missions et l'évaluation Or sont réussies."
+            : "Lorsque le Capstone est approuvé, votre professeur peut émettre le certificat Or.",
+      };
+    },
+
     async listMyCertificates(employeeId: string): Promise<CertificateView[]> {
       const rows = await client.certificate.findMany({
         where: { employeeId },

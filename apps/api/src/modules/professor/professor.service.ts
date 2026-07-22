@@ -1,12 +1,31 @@
 import { DomainError, Result, type ResultType } from "@tec-platform/core";
 import type { ProfessorOverrideRequest } from "@tec-platform/contracts";
 import { getPrismaClient, type Prisma } from "@tec-platform/database-erp";
-import { listAllMissions } from "@tec-platform/mission-catalog";
+import { listAllMissions, listModules } from "@tec-platform/mission-catalog";
 
 import { createAssessmentService } from "../assessment/assessment.service.js";
 
 function toInputJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
+}
+
+/** Z1-009: always project M1–M10 in catalog order (empty rows = locked). */
+function normalizeModuleProgress(
+  progress: ReadonlyArray<{
+    readonly moduleCode: string;
+    readonly status: string;
+    readonly percentComplete: number;
+  }>,
+): Array<{ moduleCode: string; status: string; percentComplete: number }> {
+  const byCode = new Map(progress.map((item) => [item.moduleCode, item]));
+  return listModules().map((moduleEntry) => {
+    const stored = byCode.get(moduleEntry.moduleCode);
+    return {
+      moduleCode: moduleEntry.moduleCode,
+      status: stored?.status ?? "locked",
+      percentComplete: stored?.percentComplete ?? 0,
+    };
+  });
 }
 
 export function createProfessorService(client = getPrismaClient()) {
@@ -80,18 +99,36 @@ export function createProfessorService(client = getPrismaClient()) {
             silverStatus = "eligible";
           }
         }
+        const capstone = await client.capstoneSubmission.findUnique({
+          where: { employeeId: student.employeeId },
+        });
+        let capstoneStatus: "none" | "draft" | "submitted" | "approved" | "needs_revision" = "none";
+        if (capstone) {
+          if (capstone.professorApproved) {
+            capstoneStatus = "approved";
+          } else if (capstone.reviewStatus === "needs_revision") {
+            capstoneStatus = "needs_revision";
+          } else if (capstone.status === "submitted") {
+            capstoneStatus = "submitted";
+          } else {
+            capstoneStatus = "draft";
+          }
+        }
         result.push({
           employeeId: student.employeeId,
           employeeNumber: student.employee.employeeNumber,
           displayName: student.employee.displayName,
           email: student.employee.email,
           completedMissions,
-          moduleProgress: progress.map((item) => ({
-            moduleCode: item.module.moduleCode,
-            status: item.status,
-            percentComplete: item.percentComplete,
-          })),
+          moduleProgress: normalizeModuleProgress(
+            progress.map((item) => ({
+              moduleCode: item.module.moduleCode,
+              status: item.status,
+              percentComplete: item.percentComplete,
+            })),
+          ),
           silverStatus,
+          capstoneStatus,
         });
       }
       return result;
@@ -244,11 +281,34 @@ export function createProfessorService(client = getPrismaClient()) {
 
     async exportCsv(professorId: string): Promise<string> {
       const students = await this.listStudents(professorId);
-      const header = "employeeNumber,displayName,email,completedMissions,silverStatus";
-      const rows = students.map(
-        (student) =>
-          `${student.employeeNumber},${student.displayName},${student.email},${student.completedMissions},${student.silverStatus}`,
-      );
+      const moduleCodes = listModules().map((moduleEntry) => moduleEntry.moduleCode);
+      const header = [
+        "employeeNumber",
+        "displayName",
+        "email",
+        "completedMissions",
+        "silverStatus",
+        "capstoneStatus",
+        ...moduleCodes.map((code) => `${code}_percent`),
+        ...moduleCodes.map((code) => `${code}_status`),
+      ].join(",");
+      const rows = students.map((student) => {
+        const byCode = new Map(
+          student.moduleProgress.map((item) => [item.moduleCode, item] as const),
+        );
+        const percents = moduleCodes.map((code) => String(byCode.get(code)?.percentComplete ?? 0));
+        const statuses = moduleCodes.map((code) => byCode.get(code)?.status ?? "locked");
+        return [
+          student.employeeNumber,
+          student.displayName,
+          student.email,
+          String(student.completedMissions),
+          student.silverStatus,
+          student.capstoneStatus,
+          ...percents,
+          ...statuses,
+        ].join(",");
+      });
       return [header, ...rows].join("\n");
     },
 
@@ -280,6 +340,9 @@ export function createProfessorService(client = getPrismaClient()) {
         orderBy: { issuedAt: "desc" },
         include: { audits: { include: { actor: true }, orderBy: { createdAt: "desc" } } },
       });
+      const capstone = await client.capstoneSubmission.findUnique({
+        where: { employeeId: studentId },
+      });
       const pendingReviews = missionAttempts.filter(
         (attempt) => attempt.status === "needs_review",
       );
@@ -301,11 +364,21 @@ export function createProfessorService(client = getPrismaClient()) {
         employeeNumber: employee.employeeNumber,
         displayName: employee.displayName,
         email: employee.email,
-        moduleProgress: moduleProgress.map((item) => ({
-          moduleCode: item.module.moduleCode,
-          status: item.status,
-          percentComplete: item.percentComplete,
-        })),
+        moduleProgress: normalizeModuleProgress(
+          moduleProgress.map((item) => ({
+            moduleCode: item.module.moduleCode,
+            status: item.status,
+            percentComplete: item.percentComplete,
+          })),
+        ),
+        capstone: capstone
+          ? {
+              status: capstone.status,
+              reviewStatus: capstone.reviewStatus,
+              professorApproved: capstone.professorApproved,
+              submittedAt: capstone.submittedAt?.toISOString() ?? null,
+            }
+          : null,
         missions: missionAttempts.map((attempt) => ({
           missionKey: attempt.missionDefinition.missionKey,
           missionCode: attempt.missionDefinition.missionCode,

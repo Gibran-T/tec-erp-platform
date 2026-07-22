@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { AppRoutes } from "../App.js";
 import { AuthProvider } from "../auth/AuthContext.js";
 import { saveStoredTokens } from "../api/auth.js";
-import { WORKSPACE_APPS } from "../workspace/appRegistry.js";
+import { getLauncherApps, getSidebarApps } from "../workspace/appRegistry.js";
 
 function buildTestTokens() {
   return {
@@ -220,11 +220,14 @@ describe("navigation and placeholders", () => {
       expect(screen.getByTestId("workspace-app-launcher")).toBeInTheDocument();
     });
 
-    for (const app of WORKSPACE_APPS) {
+    const visibleApps = getSidebarApps("JR_BUSINESS_ANALYST");
+    for (const app of visibleApps) {
       expect(screen.getByTestId(`workspace-sidebar-link-${app.id}`)).toHaveTextContent(app.label);
     }
+    expect(screen.queryByTestId("workspace-sidebar-link-administration")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("workspace-sidebar-link-portail-professeur")).not.toBeInTheDocument();
 
-    const launcherApps = WORKSPACE_APPS.filter((app) => app.id !== "accueil");
+    const launcherApps = getLauncherApps("JR_BUSINESS_ANALYST").filter((app) => app.id !== "accueil");
     for (const app of launcherApps) {
       expect(screen.getByTestId(`workspace-app-tile-${app.id}`)).toBeInTheDocument();
     }

@@ -44,6 +44,30 @@ export interface PublicCertificateVerification {
   readonly message?: string;
 }
 
+export async function getGoldEligibility() {
+  const token = requireAccessToken();
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/me/certificates/gold-eligibility`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return parseJson<GoldEligibilityView>(
+    response,
+    "Impossible de charger l'éligibilité Or.",
+  );
+}
+
+export interface GoldEligibilityView {
+  readonly eligibleForProfessorIssue: boolean;
+  readonly studentReadyChecklist: {
+    readonly missionsComplete: boolean;
+    readonly goldAssessmentPassed: boolean;
+    readonly capstoneSubmitted: boolean;
+    readonly capstoneProfessorApproved: boolean;
+  };
+  readonly reasons: readonly string[];
+  readonly nextStepHint: string;
+}
+
 export async function listMyCertificates() {
   const token = requireAccessToken();
   const response = await safeFetch(`${getApiBaseUrl()}/api/v1/me/certificates`, {

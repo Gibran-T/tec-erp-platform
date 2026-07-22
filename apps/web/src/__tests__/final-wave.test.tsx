@@ -25,7 +25,7 @@ describe("Final Wave workspace pages", () => {
     );
 
     expect(screen.getByTestId("admin-forbidden")).toHaveTextContent(
-      "Acces reserve aux comptes administrateur.",
+      "Accès réservé aux comptes administrateur.",
     );
   });
 
@@ -37,7 +37,7 @@ describe("Final Wave workspace pages", () => {
     );
 
     expect(screen.getByTestId("ai-coach-disclaimer")).toHaveTextContent(
-      "Assistance pedagogique IA",
+      "Assistance pédagogique IA",
     );
     expect(screen.getByTestId("ai-coach-disclaimer")).toHaveTextContent(
       "ne modifie jamais vos scores",

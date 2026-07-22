@@ -9,7 +9,7 @@ export const M8_M01 = {
   "title": "Matrice d'approbation sous pression",
   "preview": "Traitez une demande d'achat de 32 000 CAD sous pression sans contourner la gouvernance.",
   "briefing": "Bonjour,\n\nUn remplacement d'urgence pour CAS-7701 necessite une commande fournisseur de 32 000 CAD (256 unites de rechange preventif lot LT-8842). Patrick insiste pour liberer avant 17 h; Marc rappelle que la limite VP est 25 000 CAD.\n\nVotre role : appliquer la matrice d'approbation sans raccourci, documenter la justification metier et obtenir le bon niveau d'autorisation. Aucune PO ne sort sans trace audit.\n\nLa pression n'annule pas la gouvernance.\n\nIsabelle Roy\nGouvernance — NordHabitat",
-  "unlockExplanation": "Completez d'abord le Module 7 (cloture CAS-7701) pour debloquer la gouvernance.",
+  "unlockExplanation": "Complétez d'abord le Module 7 (cloture CAS-7701) pour débloquer la gouvernance.",
   "sequence": 1,
   "estimatedMinutes": 40,
   "difficulty": "intermediate",
@@ -26,7 +26,7 @@ export const M8_M01 = {
     {
       "key": "ctx-urgent-po",
       "title": "Demande PO-URG-9033",
-      "body": "256 unites SKU-HVAC-4421 a 125 CAD = 32 000 CAD; fournisseur ThermoControl; justification : remplacement preventif lot LT-8842; delai Patrick : 17 h.",
+      "body": "256 unités SKU-HVAC-4421 a 125 CAD = 32 000 CAD; fournisseur ThermoControl; justification : remplacement preventif lot LT-8842; delai Patrick : 17 h.",
       "required": true
     },
     {

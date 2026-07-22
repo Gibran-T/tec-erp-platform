@@ -1,4 +1,5 @@
-import { DomainError, Result, type ResultType } from "@tec-platform/core";
+import { DomainError, Password, Result, type ResultType } from "@tec-platform/core";
+import type { EmployeeRole } from "@tec-platform/contracts";
 import { getPrismaClient } from "@tec-platform/database-erp";
 
 export function createAdminService(client = getPrismaClient()) {
@@ -17,6 +18,14 @@ export function createAdminService(client = getPrismaClient()) {
         reason,
       },
     });
+  }
+
+  async function requireActor(actorId: string) {
+    const actor = await client.employee.findUnique({ where: { id: actorId } });
+    if (!actor) {
+      throw DomainError.notFound("Administrateur introuvable.");
+    }
+    return actor;
   }
 
   return {
@@ -47,7 +56,13 @@ export function createAdminService(client = getPrismaClient()) {
       const cohorts = await client.cohort.findMany({
         where: companyId ? { companyId } : undefined,
         orderBy: { name: "asc" },
-        include: { _count: { select: { memberships: true } } },
+        include: {
+          _count: { select: { memberships: true } },
+          memberships: {
+            where: { roleInCohort: "professor" },
+            include: { employee: true },
+          },
+        },
       });
       return cohorts.map((cohort) => ({
         id: cohort.id,
@@ -55,7 +70,169 @@ export function createAdminService(client = getPrismaClient()) {
         name: cohort.name,
         companyId: cohort.companyId,
         memberCount: cohort._count.memberships,
+        professors: cohort.memberships.map((membership) => ({
+          id: membership.employee.id,
+          employeeNumber: membership.employee.employeeNumber,
+          displayName: membership.employee.displayName,
+          email: membership.employee.email,
+        })),
       }));
+    },
+
+    async listCompanyEmployees(actorId: string) {
+      const actor = await requireActor(actorId);
+      const employees = await client.employee.findMany({
+        where: { companyId: actor.companyId },
+        orderBy: { displayName: "asc" },
+      });
+      return employees.map((employee) => ({
+        id: employee.id,
+        employeeNumber: employee.employeeNumber,
+        email: employee.email,
+        displayName: employee.displayName,
+        role: employee.role,
+      }));
+    },
+
+    async createEmployee(
+      actorId: string,
+      input: {
+        employeeNumber: string;
+        email: string;
+        displayName: string;
+        role: EmployeeRole;
+        password: string;
+      },
+    ): Promise<
+      ResultType<{
+        id: string;
+        employeeNumber: string;
+        email: string;
+        displayName: string;
+        role: EmployeeRole;
+        companyId: string;
+      }>
+    > {
+      const actor = await requireActor(actorId);
+      try {
+        const created = await client.employee.create({
+          data: {
+            employeeNumber: input.employeeNumber.trim(),
+            email: input.email.trim().toLowerCase(),
+            displayName: input.displayName.trim(),
+            role: input.role,
+            passwordHash: Password.hash(input.password),
+            companyId: actor.companyId,
+          },
+        });
+        await audit(actorId, "admin.employee.create", created.id, input.role);
+        return Result.ok({
+          id: created.id,
+          employeeNumber: created.employeeNumber,
+          email: created.email,
+          displayName: created.displayName,
+          role: created.role,
+          companyId: created.companyId,
+        });
+      } catch {
+        return Result.fail(
+          DomainError.conflict("Impossible de créer l'employé — numéro ou courriel déjà utilisé."),
+        );
+      }
+    },
+
+    async updateEmployeeRole(
+      actorId: string,
+      employeeId: string,
+      role: EmployeeRole,
+    ): Promise<ResultType<{ id: string; role: EmployeeRole }>> {
+      const actor = await requireActor(actorId);
+      const employee = await client.employee.findUnique({ where: { id: employeeId } });
+      if (!employee || employee.companyId !== actor.companyId) {
+        return Result.fail(DomainError.notFound("Employé introuvable dans votre entreprise."));
+      }
+      const updated = await client.employee.update({
+        where: { id: employeeId },
+        data: { role },
+      });
+      await audit(actorId, "admin.employee.role_change", employeeId, role);
+      return Result.ok({ id: updated.id, role: updated.role });
+    },
+
+    async createCohort(
+      actorId: string,
+      input: { code: string; name: string },
+    ): Promise<ResultType<{ id: string; code: string; name: string; companyId: string }>> {
+      const actor = await requireActor(actorId);
+      try {
+        const created = await client.cohort.create({
+          data: {
+            code: input.code.trim(),
+            name: input.name.trim(),
+            companyId: actor.companyId,
+          },
+        });
+        await audit(actorId, "admin.cohort.create", created.id);
+        return Result.ok({
+          id: created.id,
+          code: created.code,
+          name: created.name,
+          companyId: created.companyId,
+        });
+      } catch {
+        return Result.fail(DomainError.conflict("Code de cohorte déjà utilisé."));
+      }
+    },
+
+    async assignProfessor(
+      actorId: string,
+      cohortId: string,
+      employeeId: string,
+    ): Promise<ResultType<{ ok: true }>> {
+      const actor = await requireActor(actorId);
+      const cohort = await client.cohort.findUnique({ where: { id: cohortId } });
+      const employee = await client.employee.findUnique({ where: { id: employeeId } });
+      if (!cohort || !employee) {
+        return Result.fail(DomainError.notFound("Cohorte ou employé introuvable."));
+      }
+      if (cohort.companyId !== actor.companyId || employee.companyId !== actor.companyId) {
+        return Result.fail(DomainError.forbidden("Affectation limitée à votre entreprise."));
+      }
+      if (employee.role !== "PROFESSOR") {
+        return Result.fail(
+          DomainError.validation("L'employé doit avoir le rôle PROFESSEUR avant l'affectation."),
+        );
+      }
+      await client.cohortMembership.upsert({
+        where: { cohortId_employeeId: { cohortId, employeeId } },
+        create: { cohortId, employeeId, roleInCohort: "professor" },
+        update: { roleInCohort: "professor" },
+      });
+      await audit(actorId, "admin.cohort.assign_professor", `${cohortId}:${employeeId}`);
+      return Result.ok({ ok: true });
+    },
+
+    async removeProfessor(
+      actorId: string,
+      cohortId: string,
+      employeeId: string,
+    ): Promise<ResultType<{ ok: true }>> {
+      const actor = await requireActor(actorId);
+      const cohort = await client.cohort.findUnique({ where: { id: cohortId } });
+      if (!cohort || cohort.companyId !== actor.companyId) {
+        return Result.fail(DomainError.notFound("Cohorte introuvable."));
+      }
+      const membership = await client.cohortMembership.findUnique({
+        where: { cohortId_employeeId: { cohortId, employeeId } },
+      });
+      if (!membership || membership.roleInCohort !== "professor") {
+        return Result.fail(DomainError.notFound("Affectation professeur introuvable."));
+      }
+      await client.cohortMembership.delete({
+        where: { cohortId_employeeId: { cohortId, employeeId } },
+      });
+      await audit(actorId, "admin.cohort.remove_professor", `${cohortId}:${employeeId}`);
+      return Result.ok({ ok: true });
     },
 
     async enrollStudent(
@@ -66,10 +243,12 @@ export function createAdminService(client = getPrismaClient()) {
       const cohort = await client.cohort.findUnique({ where: { id: cohortId } });
       const employee = await client.employee.findUnique({ where: { id: employeeId } });
       if (!cohort || !employee) {
-        return Result.fail(DomainError.notFound("Cohorte ou employe introuvable."));
+        return Result.fail(DomainError.notFound("Cohorte ou employé introuvable."));
       }
       if (cohort.companyId !== employee.companyId) {
-        return Result.fail(DomainError.conflict("Employe et cohorte doivent appartenir a la meme entreprise."));
+        return Result.fail(
+          DomainError.conflict("Employé et cohorte doivent appartenir à la même entreprise."),
+        );
       }
       await client.cohortMembership.upsert({
         where: { cohortId_employeeId: { cohortId, employeeId } },

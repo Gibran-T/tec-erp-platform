@@ -33,14 +33,17 @@ export interface AiCoachAskResponse {
   readonly createdAt: string;
 }
 
-export async function askAiCoach(question: string) {
+export async function askAiCoach(
+  question: string,
+  context: { moduleCode?: string; missionKey?: string; department?: string } = {},
+) {
   const token = requireAccessToken();
   const response = await safeFetch(`${getApiBaseUrl()}/api/v1/me/ai-coach/ask`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ question }),
+    body: JSON.stringify({ question, ...context }),
   });
-  return parseJson<AiCoachAskResponse>(response, "Impossible d'obtenir une reponse du coach IA.");
+  return parseJson<AiCoachAskResponse>(response, "Impossible d'obtenir une réponse du coach IA.");
 }
 
 export async function listProfessorAiInteractions() {

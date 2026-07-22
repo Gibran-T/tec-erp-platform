@@ -7,6 +7,9 @@ import type { AiCoachService } from "./ai-coach.service.js";
 
 const AskSchema = z.object({
   question: z.string().min(1),
+  moduleCode: z.string().min(1).max(10).optional(),
+  missionKey: z.string().min(1).max(32).optional(),
+  department: z.string().min(1).max(80).optional(),
 });
 
 export function createAiCoachMeRouter(service: AiCoachService): Router {
@@ -19,7 +22,11 @@ export function createAiCoachMeRouter(service: AiCoachService): Router {
       if (!parsed.success) {
         throw DomainError.validation("Question invalide.");
       }
-      const result = await service.ask(employee.id, parsed.data.question);
+      const result = await service.ask(employee.id, parsed.data.question, {
+        moduleCode: parsed.data.moduleCode,
+        missionKey: parsed.data.missionKey,
+        department: parsed.data.department,
+      });
       if (Result.isFail(result)) {
         throw result.error;
       }

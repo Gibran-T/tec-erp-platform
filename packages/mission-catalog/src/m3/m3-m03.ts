@@ -6,10 +6,10 @@ export const M3_M03 = {
   "missionKey": "m3-m03-receptionner-analyser-fournisseur",
   "missionCode": "M3-M03",
   "moduleCode": "M3",
-  "title": "Receptionner et analyser l'impact fournisseur",
+  "title": "Réceptionner et analyser l'impact fournisseur",
   "preview": "Enregistrez la reception, mettez a jour le stock et evaluez OTIF.",
   "briefing": "Bonjour,\n\nThermoControl livre 36 unites sur 40. Receptionnez, analysez l'ecart et preparez l'impact stock/fournisseur.\n\nDenise Roy\nSupply Chain — NordHabitat",
-  "unlockExplanation": "Completez d'abord la commande d'achat.",
+  "unlockExplanation": "Complétez d'abord la commande d'achat.",
   "sequence": 3,
   "estimatedMinutes": 35,
   "difficulty": "intermediate",
@@ -21,7 +21,7 @@ export const M3_M03 = {
     {
       "key": "ctx-gr",
       "title": "Bon de livraison",
-      "body": "PO 40; livre 36; ecart 4; stock DC-MTL doit augmenter de 36.",
+      "body": "PO 40; livre 36; écart 4; stock DC-MTL doit augmenter de 36.",
       "required": true
     }
   ],
@@ -29,7 +29,7 @@ export const M3_M03 = {
     {
       "id": "gr-qty",
       "type": "NUMERIC_INPUT",
-      "prompt": "Quantite a receptionner (unites) ?",
+      "prompt": "Quantite a receptionner (unités) ?",
       "scoring": {
         "maxPoints": 15,
         "numericTarget": 36,

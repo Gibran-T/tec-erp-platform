@@ -9,7 +9,7 @@ export const M10_M01 = {
   "title": "Diapositive conseil et synthese executive",
   "preview": "Preparez la diapositive conseil pour le DG : synthese M1-M9 en une page.",
   "briefing": "Bonjour,\n\nLe DG Equinoxe veut une diapositive conseil — une seule page — avant le defi final. Pas de detail operationnel : vision, risques, opportunites, recommandation.\n\nVous avez parcouru PO-88421, Sacre-Coeur, CAS-7701, gouvernance, KPI et IA. Condensez en message executive que Marc, Patrick et le DG comprennent en 60 secondes.\n\nLa synthese distingue les leaders des executants.\n\nDirecteur General\nEquinoxe — NordHabitat",
-  "unlockExplanation": "Completez d'abord le Module 9 (frontieres IA validees) pour debloquer le Capstone.",
+  "unlockExplanation": "Complétez d'abord le Module 9 (frontières IA validees) pour débloquer le Capstone.",
   "sequence": 1,
   "estimatedMinutes": 45,
   "difficulty": "advanced",
@@ -20,7 +20,7 @@ export const M10_M01 = {
     {
       "key": "ctx-executive-brief",
       "title": "Cadrage diapositive conseil",
-      "body": "Format : Situation → Risques → Opportunites → Recommandation. Max 5 bullet points. Audience : DG, Marc, Patrick. Duree presentation : 3 min.",
+      "body": "Format : Situation → Risques → Opportunités → Recommandation. Max 5 bullet points. Audience : DG, Marc, Patrick. Duree presentation : 3 min.",
       "required": true
     },
     {
@@ -44,7 +44,7 @@ export const M10_M01 = {
       "options": [
         {
           "key": "sora",
-          "label": "Situation → Risques → Opportunites → Recommandation"
+          "label": "Situation → Risques → Opportunités → Recommandation"
         },
         {
           "key": "detail",
@@ -77,7 +77,7 @@ export const M10_M01 = {
         },
         {
           "key": "opportunities",
-          "label": "Opportunites (NPS, tracabilite, gouvernance)"
+          "label": "Opportunités (NPS, tracabilite, gouvernance)"
         },
         {
           "key": "recommendation",
@@ -110,7 +110,7 @@ export const M10_M01 = {
         },
         {
           "key": "prioritize",
-          "label": "Prioriser risques et opportunites"
+          "label": "Prioriser risques et opportunités"
         },
         {
           "key": "recommend",

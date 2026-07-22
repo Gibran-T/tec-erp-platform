@@ -9,7 +9,7 @@ export const M10_M03 = {
   "title": "Presentation Capstone et certification Or",
   "preview": "Presentez votre parcours Equinoxe et recevez la certification Or NordHabitat.",
   "briefing": "Bonjour,\n\nVous avez survecu au defi final. Derniere etape : presenter votre parcours Capstone devant le jury Equinoxe — DG, Marc, Isabelle, Nadia.\n\nRacontez votre transformation M1-M10 : ce que vous avez appris, les decisions dont vous etes fier, les erreurs corrigees, votre vision professionnelle. Puis recevez la certification Or si le jury valide.\n\nC'est la cloture de votre parcours analyste ERP NordHabitat.\n\nDirecteur General\nEquinoxe — NordHabitat",
-  "unlockExplanation": "Completez d'abord « Defi final Equinoxe (crise integree) » (defi reussi).",
+  "unlockExplanation": "Complétez d'abord « Defi final Equinoxe (crise integree) » (defi reussi).",
   "sequence": 3,
   "estimatedMinutes": 50,
   "difficulty": "expert",

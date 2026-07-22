@@ -7,9 +7,9 @@ export const M7_M01 = {
   "missionCode": "M7-M01",
   "moduleCode": "M7",
   "title": "Ouvrir le dossier client",
-  "preview": "Qualifiez la reclamation garantie du Dr Meunier sur les unites HVAC Sacre-Coeur.",
+  "preview": "Qualifiez la reclamation garantie du Dr Meunier sur les unités HVAC Sacre-Coeur.",
   "briefing": "Bonjour,\n\nLe Dr Meunier signale deux unites SKU-HVAC-4421 defectueuses sur la commande Sacre-Coeur (SO-12047). Il exige un remplacement sous 48 h et menace de suspendre les futurs achats.\n\nAvant toute promesse, ouvrez un dossier CRM structure : identifiez le client, la garantie, la preuve de livraison et le niveau de severite. Patrick insiste pour calmer la situation; moi je veux un dossier propre et tracable.\n\nNe promettez rien sans verifier la couverture garantie et l'historique service.\n\nSophie Lambert\nService client — NordHabitat",
-  "unlockExplanation": "Completez d'abord le Module 6 (narration finance M3-M6) pour debloquer le CRM post-vente.",
+  "unlockExplanation": "Complétez d'abord le Module 6 (narration finance M3-M6) pour débloquer le CRM post-vente.",
   "sequence": 1,
   "estimatedMinutes": 35,
   "difficulty": "intermediate",
@@ -20,7 +20,7 @@ export const M7_M01 = {
     {
       "key": "ctx-case-intake",
       "title": "Signalement Dr Meunier — CAS-7701",
-      "body": "Client Sacre-Coeur; contact Dr Meunier; 2 unites SKU-HVAC-4421 bruit anormal apres 72 h; livraison SO-12047 du 12 juin; demande remplacement express.",
+      "body": "Client Sacre-Coeur; contact Dr Meunier; 2 unités SKU-HVAC-4421 bruit anormal apres 72 h; livraison SO-12047 du 12 juin; demande remplacement express.",
       "required": true
     },
     {
@@ -32,7 +32,7 @@ export const M7_M01 = {
     {
       "key": "ctx-delivery-proof",
       "title": "Preuve livraison et GR",
-      "body": "Bon de livraison BL-8847 confirme 40 unites recues; GR partiel ThermoControl non applicable ici; photos Dr Meunier jointes; numero de serie SN-4421-A17 et SN-4421-B03.",
+      "body": "Bon de livraison BL-8847 confirme 40 unités recues; GR partiel ThermoControl non applicable ici; photos Dr Meunier jointes; numero de serie SN-4421-A17 et SN-4421-B03.",
       "required": true
     }
   ],
@@ -77,7 +77,7 @@ export const M7_M01 = {
         },
         {
           "key": "serial",
-          "label": "Numeros de serie des unites concernees"
+          "label": "Numeros de serie des unités concernees"
         },
         {
           "key": "severity",
@@ -134,7 +134,7 @@ export const M7_M01 = {
     {
       "id": "units-affected",
       "type": "NUMERIC_INPUT",
-      "prompt": "Combien d'unites defectueuses le Dr Meunier signale-t-il sur SO-12047 ?",
+      "prompt": "Combien d'unités defectueuses le Dr Meunier signale-t-il sur SO-12047 ?",
       "scoring": {
         "maxPoints": 10,
         "numericTarget": 2,
@@ -144,7 +144,7 @@ export const M7_M01 = {
     {
       "id": "warranty-stance",
       "type": "DIAGNOSIS_RECOMMENDATION",
-      "prompt": "La garantie couvre les unites mais le delai express depend de la severite P1. Que recommandez-vous a Sophie : promesse immediate ou qualification documentee ? Justifiez.",
+      "prompt": "La garantie couvre les unités mais le delai express depend de la severite P1. Que recommandez-vous a Sophie : promesse immediate ou qualification documentee ? Justifiez.",
       "scoring": {
         "maxPoints": 15,
         "requiredConcepts": [

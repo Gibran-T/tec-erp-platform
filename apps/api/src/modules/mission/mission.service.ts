@@ -473,7 +473,17 @@ export function createMissionService(dependencies: MissionServiceDependencies): 
           scorePercent: score.scorePercent,
           earnedPoints: score.earnedPoints,
           maxPoints: score.maxPoints,
-          feedbackJson: { feedback: score.feedback },
+          feedbackJson: {
+            feedback: score.feedback,
+            gapExplanation: score.gapExplanation,
+            retryGuidance: score.retryGuidance,
+            criteria: score.interactionResults.map((item) => ({
+              interactionId: item.interactionId,
+              earnedPoints: item.earnedPoints,
+              maxPoints: item.maxPoints,
+              feedback: item.feedback ?? "",
+            })),
+          },
         });
       } else {
         // In-memory / test path: store generic payload fields into legacy complete shape.
@@ -516,6 +526,14 @@ export function createMissionService(dependencies: MissionServiceDependencies): 
           maxPoints: score.maxPoints,
           passed: score.passed,
           feedback: score.feedback,
+          criteria: score.interactionResults.map((item) => ({
+            interactionId: item.interactionId,
+            earnedPoints: item.earnedPoints,
+            maxPoints: item.maxPoints,
+            feedback: item.feedback ?? "",
+          })),
+          gapExplanation: score.gapExplanation,
+          retryGuidance: score.retryGuidance,
         },
       });
     },

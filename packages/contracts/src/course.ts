@@ -67,11 +67,22 @@ export const GenericMissionSubmitRequestSchema = z.object({
 });
 export type GenericMissionSubmitRequest = z.infer<typeof GenericMissionSubmitRequestSchema>;
 
+export const MissionScoreCriterionSchema = z.object({
+  interactionId: z.string().min(1),
+  earnedPoints: z.number(),
+  maxPoints: z.number(),
+  feedback: z.string(),
+});
+export type MissionScoreCriterion = z.infer<typeof MissionScoreCriterionSchema>;
+
 export const MissionScoreSummarySchema = z.object({
   scorePercent: z.number().min(0).max(100),
   earnedPoints: z.number(),
   maxPoints: z.number(),
   passed: z.boolean(),
   feedback: z.string().min(1),
+  criteria: z.array(MissionScoreCriterionSchema).optional(),
+  gapExplanation: z.string().optional(),
+  retryGuidance: z.string().optional(),
 });
 export type MissionScoreSummary = z.infer<typeof MissionScoreSummarySchema>;

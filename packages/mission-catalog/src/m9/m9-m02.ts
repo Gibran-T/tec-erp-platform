@@ -9,7 +9,7 @@ export const M9_M02 = {
   "title": "Tableau de bord du comite de direction",
   "preview": "Construisez le tableau de bord Equinoxe pour le comite avec les KPI definis.",
   "briefing": "Bonjour,\n\nLes KPI sont definis — maintenant il faut un tableau de bord que Marc, Patrick et Sophie comprennent en 30 secondes. Pas de graphiques decoratifs : chaque tuile doit declencher une question metier.\n\nStructurez le dashboard par domaine (CRM, P2P, O2C, GOV) avec signaux vert/jaune/rouge. Le comite se reunit jeudi; votre dashboard doit raconter l'histoire NordHabitat M1-M8.\n\nLa clarte vaut mieux que la complexite.\n\nNadia Fontaine\nBusiness Intelligence — NordHabitat",
-  "unlockExplanation": "Completez d'abord « Atelier de definition des KPI » (cinq KPI valides).",
+  "unlockExplanation": "Complétez d'abord « Atelier de définition des KPI » (cinq KPI valides).",
   "sequence": 2,
   "estimatedMinutes": 45,
   "difficulty": "advanced",
@@ -74,7 +74,7 @@ export const M9_M02 = {
         },
         {
           "key": "p2p-zone",
-          "label": "Zone P2P : ecart reliquat PO-88421"
+          "label": "Zone P2P : écart reliquat PO-88421"
         },
         {
           "key": "o2c-zone",
