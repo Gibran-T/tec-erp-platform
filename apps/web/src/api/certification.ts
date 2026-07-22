@@ -61,6 +61,7 @@ export interface GoldEligibilityView {
   readonly studentReadyChecklist: {
     readonly missionsComplete: boolean;
     readonly goldAssessmentPassed: boolean;
+    readonly hcmAssessmentPassed?: boolean;
     readonly capstoneSubmitted: boolean;
     readonly capstoneProfessorApproved: boolean;
   };

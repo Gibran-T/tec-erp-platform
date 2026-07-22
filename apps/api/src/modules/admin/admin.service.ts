@@ -335,6 +335,100 @@ export function createAdminService(client = getPrismaClient()) {
       };
     },
 
+    async listAssessmentBanks(actorId: string) {
+      const actor = await client.employee.findUnique({ where: { id: actorId } });
+      if (!actor || actor.role !== "ADMIN") {
+        throw DomainError.forbidden("Acces administrateur requis.");
+      }
+      const definitions = await client.assessmentDefinition.findMany({
+        orderBy: { code: "asc" },
+        include: { _count: { select: { questions: true, attempts: true } } },
+      });
+      return definitions.map((definition) => {
+        const meta = definition.definitionJson as {
+          curriculumVersion?: string;
+          kind?: string;
+          modules?: string[];
+        };
+        return {
+          code: definition.code,
+          title: definition.title,
+          moduleScope: definition.moduleScope,
+          passThresholdPercent: definition.passThresholdPercent,
+          maxAttempts: definition.maxAttempts,
+          timeLimitSeconds: definition.timeLimitSeconds,
+          curriculumVersion: meta.curriculumVersion ?? null,
+          kind: meta.kind ?? null,
+          modules: meta.modules ?? [],
+          questionCount: definition._count.questions,
+          attemptCount: definition._count.attempts,
+          releaseStatus: "seeded",
+        };
+      });
+    },
+
+    async getAssessmentBank(actorId: string, code: string, options?: { includeAnswerKey?: boolean }) {
+      const actor = await client.employee.findUnique({ where: { id: actorId } });
+      if (!actor || actor.role !== "ADMIN") {
+        throw DomainError.forbidden("Acces administrateur requis.");
+      }
+      const definition = await client.assessmentDefinition.findUnique({
+        where: { code },
+        include: { questions: { orderBy: { sequence: "asc" } } },
+      });
+      if (!definition) {
+        throw DomainError.notFound("Banque d'evaluation introuvable.");
+      }
+      const includeAnswerKey = options?.includeAnswerKey === true;
+      const companyAttemptCount = await client.assessmentAttempt.count({
+        where: {
+          assessmentId: definition.id,
+          employee: { companyId: actor.companyId },
+        },
+      });
+      return {
+        code: definition.code,
+        title: definition.title,
+        moduleScope: definition.moduleScope,
+        passThresholdPercent: definition.passThresholdPercent,
+        maxAttempts: definition.maxAttempts,
+        timeLimitSeconds: definition.timeLimitSeconds,
+        definitionJson: definition.definitionJson,
+        companyAttemptCount,
+        questions: definition.questions.map((question) => {
+          const scoring = question.scoringJson as {
+            maxPoints?: number;
+            correctKeys?: string[];
+            mission?: string;
+            competency?: string;
+            questionKind?: string;
+            difficulty?: string;
+            tags?: string[];
+            explanation?: string;
+          };
+          return {
+            questionKey: question.questionKey,
+            sequence: question.sequence,
+            type: question.type,
+            prompt: question.prompt,
+            options: question.optionsJson,
+            maxPoints: scoring.maxPoints ?? null,
+            mission: scoring.mission ?? null,
+            competency: scoring.competency ?? null,
+            questionKind: scoring.questionKind ?? null,
+            difficulty: scoring.difficulty ?? null,
+            tags: scoring.tags ?? [],
+            ...(includeAnswerKey
+              ? {
+                  correctKeys: scoring.correctKeys ?? [],
+                  explanation: scoring.explanation ?? null,
+                }
+              : {}),
+          };
+        }),
+      };
+    },
+
     async exportCsv(actorId: string) {
       const actor = await client.employee.findUnique({ where: { id: actorId } });
       if (!actor) {

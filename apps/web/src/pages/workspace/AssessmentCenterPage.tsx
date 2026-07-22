@@ -33,6 +33,12 @@ export function AssessmentCenterPage(): ReactElement {
     scorePercent: number;
     passed: boolean;
     feedback: string;
+    feedbackDetails?: {
+      strengths: string[];
+      revisionAreas: string[];
+      missionBreakdown: Array<{ mission: string; earned: number; max: number; percent: number }>;
+      quantitativeNotes: string[];
+    };
   } | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -166,7 +172,10 @@ export function AssessmentCenterPage(): ReactElement {
   return (
     <main className="workspace-page" data-testid="assessment-center-page">
       <h1>Centre d&apos;evaluation</h1>
-      <p>Evaluations Silver (M1–M2) et integree (M3–M6). Le serveur corrige les reponses.</p>
+      <p>
+        Evaluations Silver, integree, HCM (V2/M8) et Gold. Le serveur corrige les reponses; la cle
+        n&apos;est jamais exposee avant soumission.
+      </p>
       {error ? (
         <p role="alert" data-testid="assessment-error">
           {error}
@@ -183,11 +192,14 @@ export function AssessmentCenterPage(): ReactElement {
         <>
           <ul data-testid="assessment-list">
             {assessments.map((assessment) => (
-              <li key={assessment.code}>
+              <li key={assessment.code} data-testid={`assessment-row-${assessment.code}`}>
                 <strong>{assessment.title}</strong> — {assessment.status}
                 {assessment.bestScorePercent != null
                   ? ` (meilleur: ${assessment.bestScorePercent}%)`
                   : ""}
+                {assessment.status === "locked" && assessment.lockReason ? (
+                  <p data-testid={`assessment-lock-reason-${assessment.code}`}>{assessment.lockReason}</p>
+                ) : null}
                 {assessment.status === "available" ||
                 assessment.status === "failed" ||
                 assessment.status === "in_progress" ? (

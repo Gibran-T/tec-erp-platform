@@ -289,6 +289,99 @@ export function createAnalyticsService(client = getPrismaClient()) {
 
     getProfessorHeatmap,
     getProfessorCompetencies,
+
+    async getHcmAssessmentAnalytics(
+      professorId: string,
+      options?: { readonly analyticsMode?: string; readonly selectedRunId?: string },
+    ) {
+      const professor = await client.employee.findUnique({ where: { id: professorId } });
+      if (!professor || professor.role !== "PROFESSOR") {
+        return Result.fail(DomainError.forbidden("Acces professeur requis."));
+      }
+
+      const { parseAnalyticsMode, resolveRunIdsForAnalytics } = await import(
+        "./official-run-policy.js"
+      );
+      const { aggregateHcmAssessmentAnalytics } = await import(
+        "../assessment/hcm/hcm-m8.analytics.js"
+      );
+      const mode = parseAnalyticsMode(options?.analyticsMode);
+
+      const memberships = await client.cohortMembership.findMany({
+        where: { employeeId: professorId, roleInCohort: "professor" },
+        select: { cohortId: true },
+      });
+      const cohortIds = memberships.map((item) => item.cohortId);
+      if (cohortIds.length === 0) {
+        return Result.ok({
+          mode,
+          analytics: aggregateHcmAssessmentAnalytics([]),
+        });
+      }
+
+      const students = await client.cohortMembership.findMany({
+        where: { cohortId: { in: cohortIds }, roleInCohort: "student" },
+        include: { employee: true },
+      });
+      const uniqueStudents = new Map<string, (typeof students)[number]>();
+      for (const membership of students) {
+        if (
+          membership.employee.companyId === professor.companyId &&
+          !uniqueStudents.has(membership.employeeId)
+        ) {
+          uniqueStudents.set(membership.employeeId, membership);
+        }
+      }
+
+      const officialAttempts = [];
+      for (const membership of uniqueStudents.values()) {
+        const runFilter = await resolveRunIdsForAnalytics({
+          employeeId: membership.employeeId,
+          mode,
+          selectedRunId: options?.selectedRunId,
+        });
+        if (runFilter === "ALL" || runFilter.length === 0) {
+          // Official cohort metrics use one run; ALL_RUNS still picks best per learner via first run id set.
+          if (runFilter !== "ALL") {
+            continue;
+          }
+        }
+        const runIds = runFilter === "ALL" ? undefined : runFilter;
+        const attempt = await client.assessmentAttempt.findFirst({
+          where: {
+            employeeId: membership.employeeId,
+            assessment: { code: "HCM_M8" },
+            status: { in: ["passed", "failed"] },
+            ...(runIds ? { pedagogicalCourseRunId: { in: runIds } } : {}),
+          },
+          orderBy: [{ scorePercent: "desc" }, { attemptNumber: "desc" }],
+        });
+        if (!attempt || attempt.scorePercent == null) {
+          continue;
+        }
+        const responsesJson = attempt.responsesJson as {
+          submitted?: Array<{ questionKey: string; value: string | string[] }>;
+        };
+        const run = await client.pedagogicalCourseRun.findUnique({
+          where: { id: attempt.pedagogicalCourseRunId },
+          select: { curriculumVersion: true },
+        });
+        officialAttempts.push({
+          employeeId: membership.employeeId,
+          pedagogicalCourseRunId: attempt.pedagogicalCourseRunId,
+          curriculumVersion: (run?.curriculumVersion === "V2" ? "V2" : "V1") as "V1" | "V2",
+          attemptNumber: attempt.attemptNumber,
+          status: attempt.status,
+          scorePercent: attempt.scorePercent,
+          responses: responsesJson.submitted ?? [],
+        });
+      }
+
+      return Result.ok({
+        mode,
+        analytics: aggregateHcmAssessmentAnalytics(officialAttempts),
+      });
+    },
   };
 }
 

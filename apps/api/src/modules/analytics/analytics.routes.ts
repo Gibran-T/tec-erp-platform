@@ -84,5 +84,21 @@ export function createAnalyticsProfessorRouter(service: AnalyticsService): Route
     }
   });
 
+  router.get("/analytics/hcm-assessment", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      const result = await service.getHcmAssessmentAnalytics(employee.id, {
+        analyticsMode: typeof req.query.analyticsMode === "string" ? req.query.analyticsMode : undefined,
+        selectedRunId: typeof req.query.selectedRunId === "string" ? req.query.selectedRunId : undefined,
+      });
+      if (Result.isFail(result)) {
+        throw result.error;
+      }
+      res.status(200).json(result.value);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   return router;
 }

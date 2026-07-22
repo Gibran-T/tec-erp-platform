@@ -458,13 +458,37 @@ export function createProfessorService(client = getPrismaClient()) {
           attemptNumber: attempt.attemptNumber,
           needsReview: attempt.status === "needs_review",
         })),
-        assessments: assessmentAttempts.map((attempt) => ({
-          code: attempt.assessment.code,
-          title: attempt.assessment.title,
-          status: attempt.status,
-          scorePercent: attempt.scorePercent,
-          attemptNumber: attempt.attemptNumber,
-        })),
+        assessments: assessmentAttempts.map((attempt) => {
+          const feedback = attempt.feedbackJson as {
+            feedbackDetails?: {
+              missionBreakdown?: Array<{
+                mission: string;
+                earned: number;
+                max: number;
+                percent: number;
+              }>;
+              revisionAreas?: string[];
+              strengths?: string[];
+            };
+          } | null;
+          return {
+            code: attempt.assessment.code,
+            title: attempt.assessment.title,
+            status: attempt.status,
+            scorePercent: attempt.scorePercent,
+            attemptNumber: attempt.attemptNumber,
+            startedAt: attempt.startedAt.toISOString(),
+            submittedAt: attempt.submittedAt?.toISOString() ?? null,
+            pedagogicalCourseRunId: attempt.pedagogicalCourseRunId,
+            curriculumVersion: attempt.assessment.definitionJson
+              ? ((attempt.assessment.definitionJson as { curriculumVersion?: string })
+                  .curriculumVersion ?? null)
+              : null,
+            missionBreakdown: feedback?.feedbackDetails?.missionBreakdown ?? null,
+            strengths: feedback?.feedbackDetails?.strengths ?? null,
+            revisionAreas: feedback?.feedbackDetails?.revisionAreas ?? null,
+          };
+        }),
         pendingManualReviews: pendingReviews
           .filter((attempt) => attempt.status === "needs_review")
           .map((attempt) => ({

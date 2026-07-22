@@ -114,6 +114,12 @@ export function CertificatesPage(): ReactElement {
               Évaluation Or :{" "}
               {eligibility.studentReadyChecklist.goldAssessmentPassed ? "réussie" : "à réussir"}
             </li>
+            {eligibility.studentReadyChecklist.hcmAssessmentPassed !== undefined ? (
+              <li data-testid="gold-hcm-checklist">
+                Évaluation HCM (V2) :{" "}
+                {eligibility.studentReadyChecklist.hcmAssessmentPassed ? "réussie" : "à réussir"}
+              </li>
+            ) : null}
             <li>
               Capstone soumis :{" "}
               {eligibility.studentReadyChecklist.capstoneSubmitted ? "oui" : "non"}

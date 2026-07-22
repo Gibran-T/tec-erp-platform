@@ -270,6 +270,28 @@ export function createAdminRouter(service: AdminService): Router {
     }
   });
 
+  router.get("/assessments", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      res.status(200).json({ assessments: await service.listAssessmentBanks(employee.id) });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get("/assessments/:code", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      const includeAnswerKey =
+        req.query.includeAnswerKey === "1" || req.query.includeAnswerKey === "true";
+      res.status(200).json(
+        await service.getAssessmentBank(employee.id, req.params.code ?? "", { includeAnswerKey }),
+      );
+    } catch (error) {
+      next(error);
+    }
+  });
+
   router.get("/export.csv", async (req, res, next) => {
     try {
       const employee = getAuthenticatedEmployee(req);
