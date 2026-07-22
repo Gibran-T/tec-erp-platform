@@ -1,0 +1,597 @@
+{
+  "generatedAt": "2026-07-22T14:23:02.175Z",
+  "results": [
+    {
+      "event": "course_snapshot_start",
+      "percent": 3.33
+    },
+    {
+      "missionKey": "m1-m01-decouvrir-entreprise",
+      "mode": "already_completed",
+      "score": 100
+    },
+    {
+      "missionKey": "m1-m02-connecter-departements",
+      "event": "deliberate_incorrect",
+      "clientError": "Complétez toutes les questions avant de soumettre.",
+      "at": "2026-07-22T14:21:06.648Z"
+    },
+    {
+      "missionKey": "m1-m02-connecter-departements",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nConnecter les départements\nDisponible\nObjectif\n\nReliez les flux d’information entre départements pour expliquer comment un écart local devient un risque d’entreprise.\n\nBriefing de Claire Fontaine\nBonjour,\n\nVotre découverte initiale est notée. Nous devons maintenant connecter les départements.\n\nUn écart d’inventaire n’est jamais isolé : il traverse l’entrepôt, les TI, les opérations, les ventes et la finance. Votre mission est de reconstruire la chaîne de dépen",
+      "startedAt": "2026-07-22T14:21:01.143Z",
+      "completedAt": "2026-07-22T14:21:07.169Z"
+    },
+    {
+      "missionKey": "m1-m03-diagnostiquer-preparation",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nDiagnostiquer la préparation\nDisponible\nObjectif\n\nÉvaluez si NordHabitat est prête à traiter la fragmentation d’information avant d’ouvrir le Module 2.\n\nBriefing de Claire Fontaine\nBonjour,\n\nDernière mission du Module 1. À partir de vos observations, diagnostiquez la préparation organisationnelle de NordHabitat.\n\nNous ne cherchons pas un correctif transactionnel. Nous voulons savoir si les rôles, les données et les processus sont suffisamment alignés pour qu’u",
+      "startedAt": "2026-07-22T14:21:07.296Z",
+      "completedAt": "2026-07-22T14:21:11.172Z"
+    },
+    {
+      "missionKey": "m2-m01-structurer-organisation",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nStructurer l'organisation\nDisponible\nObjectif\n\nDefinissez les unites organisationnelles, usines et centres de couts avant toute transaction.\n\nBriefing de Claire Fontaine\nBonjour,\n\nLe Module 1 est complete. Avant toute transaction, NordHabitat doit structurer son organisation ERP.\n\nCartographiez sieges, DC-MTL, DC-TRT et centres de couts.\n\nClaire Fontaine\nGestionnaire — NordHabitat\nDémarrer la mission\nQuelles unites doivent etre creees avant les transactions ?\n",
+      "startedAt": "2026-07-22T14:21:11.296Z",
+      "completedAt": "2026-07-22T14:21:14.845Z"
+    },
+    {
+      "missionKey": "m2-m02-creer-donnees-reference",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nCreer les donnees de reference essentielles\nDisponible\nObjectif\n\nCreez clients, fournisseurs, articles et unites de mesure coherents.\n\nBriefing de Claire Fontaine\nBonjour,\n\nLa structure est en place. Creez les enregistrements maitre : client Sacre-Coeur, fournisseur ThermoControl, article SKU-HVAC-4421 et UoM EA.\n\nClaire Fontaine\nDémarrer la mission\nQuels champs sont obligatoires pour un fournisseur actif ?\nStatut\nConditions de paiement\nCoordonnees bancaires\nS",
+      "startedAt": "2026-07-22T14:21:15.005Z",
+      "completedAt": "2026-07-22T14:21:18.701Z"
+    },
+    {
+      "missionKey": "m2-m03-corriger-qualite-donnees",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nCorriger les problemes de qualite des donnees\nDisponible\nObjectif\n\nDetectez doublons, champs manquants et enregistrements bloques.\n\nBriefing de Claire Fontaine\nBonjour,\n\nLe rapport qualite signale des doublons fournisseurs et un client inactif encore utilise. Corrigez sans casser l'integrite referentielle.\n\nClaire Fontaine\nDémarrer la mission\nQuels defauts bloquent les transactions ?\nDoublon fournisseur\nPartenaire bloque\nUoM manquante\nLogo manquant\nAction corr",
+      "startedAt": "2026-07-22T14:21:18.829Z",
+      "completedAt": "2026-07-22T14:21:22.501Z"
+    },
+    {
+      "missionKey": "m3-m01-identifier-besoin-achat",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nIdentifier un besoin d'achat\nDisponible\nObjectif\n\nTransformez un besoin operationnel en demande d'achat controlee.\n\nBriefing de Claire Fontaine\nBonjour,\n\nDenise signale un besoin de pieces HVAC apres tension de stock. Identifiez le besoin, le demandeur et le fournisseur eligible ThermoControl.\n\nJulie Chen\nApprovisionnements — NordHabitat\nDémarrer la mission\nQui porte le besoin d'achat initial ?\nOperations / entrepot\nMarketing\nRH\nQuels controles avant creation ",
+      "startedAt": "2026-07-22T14:21:22.640Z",
+      "completedAt": "2026-07-22T14:21:26.325Z"
+    },
+    {
+      "missionKey": "m3-m02-creer-traiter-commande-achat",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nCreer et traiter une commande d'achat\nDisponible\nObjectif\n\nCreez PO-88421 avec approbation, prix et tolerances.\n\nBriefing de Claire Fontaine\nBonjour,\n\nConvertissez la demande en commande d'achat PO-88421 vers ThermoControl. Respectez limites d'approbation et segregation des taches.\n\nJulie Chen\nDémarrer la mission\nQue faire si le fournisseur est bloque ?\nBloquer la PO\nForcer la creation\nEnvoyer un email seulement\nElements requis pour une PO valide ?\nPrix cohere",
+      "startedAt": "2026-07-22T14:21:26.450Z",
+      "completedAt": "2026-07-22T14:21:30.018Z"
+    },
+    {
+      "missionKey": "m3-m03-receptionner-analyser-fournisseur",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nReceptionner et analyser l'impact fournisseur\nDisponible\nObjectif\n\nEnregistrez la reception, mettez a jour le stock et evaluez OTIF.\n\nBriefing de Claire Fontaine\nBonjour,\n\nThermoControl livre 36 unites sur 40. Receptionnez, analysez l'ecart et preparez l'impact stock/fournisseur.\n\nDenise Roy\nSupply Chain — NordHabitat\nDémarrer la mission\nQuantite a receptionner (unites) ?\nValeur numérique\nConsequences d'une reception partielle correcte ?\nStock augmente de 36\nR",
+      "startedAt": "2026-07-22T14:21:30.144Z",
+      "completedAt": "2026-07-22T14:21:33.944Z"
+    },
+    {
+      "missionKey": "m4-m01-saisir-commande-institutionnelle",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 85,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nSaisir la commande institutionnelle\nDisponible\nObjectif\n\nCreez la commande Sacre-Coeur pour l'aile pediatrique avec controle credit et ATP.\n\nBriefing de Claire Fontaine\nBonjour,\n\nL'Hopital du Sacre-Coeur confirme la commande pour l'aile pediatrique : 40 unites de SKU-HVAC-4421, livraison jeudi. Patrick insiste sur la priorite; le Dr. Meunier attend une date ferme.\n\nAvant de promettre quoi que ce soit, verifiez le credit client et la disponibilite (ATP). Rappel",
+      "startedAt": "2026-07-22T14:21:34.068Z",
+      "completedAt": "2026-07-22T14:21:37.621Z"
+    },
+    {
+      "missionKey": "m4-m02-allocation-inter-entrepots",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nAllouer entre entrepots (DC)\nDisponible\nObjectif\n\nOrganisez le transfert d'urgence DC-MTL vers DC-TRT pour l'aile pediatrique.\n\nBriefing de Claire Fontaine\nBonjour,\n\nElodie vient de confirmer : tu es le owner jusqu'a nouvel ordre pour Sacre-Coeur. Il manque 12 unites a DC-TRT.\n\nDenise propose un transfert d'urgence depuis DC-MTL. Tom peut preparer l'expedition demain matin, mais Marc veut une estimation de fret avant approbation.\n\nPatrick compte sur nous pour ",
+      "startedAt": "2026-07-22T14:21:37.747Z",
+      "completedAt": "2026-07-22T14:21:41.695Z"
+    },
+    {
+      "missionKey": "m4-m03-confirmer-livraison-cloture",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nConfirmer la livraison et cloturer\nDisponible\nObjectif\n\nConfirmez la sortie de marchandises, declenchez la facturation et cloturez le dossier Sacre-Coeur.\n\nBriefing de Claire Fontaine\nBonjour,\n\nBonne nouvelle : les 40 unites sont livrees a l'aile pediatrique. Le Dr. Meunier a confirme la reception. Patrick envoie un message de remerciement.\n\nIl reste a poster la sortie de marchandises (GI), declencher la facturation client et mettre a jour le dossier AR. Marc ",
+      "startedAt": "2026-07-22T14:21:41.825Z",
+      "completedAt": "2026-07-22T14:21:45.537Z"
+    },
+    {
+      "missionKey": "m5-m01-analyser-stock-reappro",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nAnalyser les stocks et le signal de reapprovisionnement\nDisponible\nObjectif\n\nInterpretez le stockout DC-TRT sur SKU-HVAC-4421 et proposez un signal de reappro.\n\nBriefing de Claire Fontaine\nBonjour,\n\nCanicule en Ontario : la demande HVAC explose. Tom signale un stockout imminents a DC-TRT sur SKU-HVAC-4421. DC-MTL a encore du stock, mais les couvertures divergent fortement.\n\nKarim te challenge sur le MAPE de la prevision. Denise veut une proposition de reapprov",
+      "startedAt": "2026-07-22T14:21:45.673Z",
+      "completedAt": "2026-07-22T14:21:49.330Z"
+    },
+    {
+      "missionKey": "m5-m02-decision-transfert-inter-dc",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 85,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nDecider un transfert inter-DC\nDisponible\nObjectif\n\nApprouvez un transfert MTL-TRT pour equilibrer les stocks avec impact fret documente.\n\nBriefing de Claire Fontaine\nBonjour,\n\nTon analyse confirme le desequilibre : DC-MTL a 47 jours de couverture, DC-TRT est en rupture. Avant de commander 40 unites a ThermoControl (14 jours de delai), nous devons servir les clients cette semaine.\n\nTom propose un transfert de 20 unites MTL vers TRT. Marc veut connaitre l'impact",
+      "startedAt": "2026-07-22T14:21:49.457Z",
+      "completedAt": "2026-07-22T14:21:52.999Z"
+    },
+    {
+      "missionKey": "m5-m03-presentation-sop",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nPresenter la recommandation S&OP\nDisponible\nObjectif\n\nDefendez la recommandation de reapprovisionnement devant Finance, Ventes et Supply Chain.\n\nBriefing de Claire Fontaine\nBonjour,\n\nC'est le S&OP mensuel. Tu presentes la recommandation complete : analyse stockout DC-TRT, transfert STO-4512 et commande de reappro 40 unites ThermoControl.\n\nMarc va challenger le cout cumule du fret (680 + 850 CAD des missions precedentes). Patrick veut garantir le service client",
+      "startedAt": "2026-07-22T14:21:53.134Z",
+      "completedAt": "2026-07-22T14:21:56.872Z"
+    },
+    {
+      "missionKey": "m6-m01-reception-facture",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nReceptionner la facture fournisseur\nDisponible\nObjectif\n\nSaisissez la facture ThermoControl pour PO-88421 et preparez le rapprochement trois voies.\n\nBriefing de Claire Fontaine\nBonjour,\n\nThermoControl a envoye sa facture INV-TC-88421 pour la livraison partielle liee a PO-88421. Julie a deja valide la reception de 36 unites sur 40 commandees.\n\nAvant de poster quoi que ce soit, saisis la facture et lance l'apercu de rapprochement (match preview). Je bloque tout ",
+      "startedAt": "2026-07-22T14:21:56.993Z",
+      "completedAt": "2026-07-22T14:22:00.538Z"
+    },
+    {
+      "missionKey": "m6-m02-exception-rapprochement-trois-voies",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 85,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nTraiter l'exception de rapprochement trois voies\nDisponible\nObjectif\n\nResolvez l'ecart PO (40) / GR (36) / facture (36) avant de debloquer le paiement.\n\nBriefing de Claire Fontaine\nBonjour,\n\nL'exception est confirmee : PO-88421 commandait 40 unites, GR-88421 n'en a recu que 36, et la facture ThermoControl couvre 36 unites. Le paiement est bloque.\n\nJulie connait l'historique : ThermoControl a livre partiellement en mai. Renee veut une explication claire avant q",
+      "startedAt": "2026-07-22T14:22:00.695Z",
+      "completedAt": "2026-07-22T14:22:04.420Z"
+    },
+    {
+      "missionKey": "m6-m03-expliquer-ecart-finance",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nExpliquer l'ecart a la finance\nDisponible\nObjectif\n\nExpliquez a Marc l'impact tresorerie et marge de la chaine M3-M6 complete.\n\nBriefing de Claire Fontaine\nBonjour,\n\nAvant le comite de pilotage, j'ai besoin d'une narration finance claire sur toute la chaine : PO-88421 (40 vs 36), frets d'urgence Sacre-Coeur et STO-4512, marge Order-to-Cash.\n\nEn trois lignes maximum : trace l'ecart, quantifie l'impact cash et marge, et explique pourquoi nous avons accepte ces d",
+      "startedAt": "2026-07-22T14:22:04.578Z",
+      "completedAt": "2026-07-22T14:22:08.218Z"
+    },
+    {
+      "missionKey": "m7-m01-ouvrir-dossier-client",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 85,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nOuvrir le dossier client\nDisponible\nObjectif\n\nQualifiez la reclamation garantie du Dr Meunier sur les unites HVAC Sacre-Coeur.\n\nBriefing de Claire Fontaine\nBonjour,\n\nLe Dr Meunier signale deux unites SKU-HVAC-4421 defectueuses sur la commande Sacre-Coeur (SO-12047). Il exige un remplacement sous 48 h et menace de suspendre les futurs achats.\n\nAvant toute promesse, ouvrez un dossier CRM structure : identifiez le client, la garantie, la preuve de livraison et le",
+      "startedAt": "2026-07-22T14:22:08.343Z",
+      "completedAt": "2026-07-22T14:22:11.991Z"
+    },
+    {
+      "missionKey": "m7-m02-coordonner-escalade",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nCoordonner l'escalade\nDisponible\nObjectif\n\nEscaladez CAS-7701 vers qualite et logistique sans perdre la trace client.\n\nBriefing de Claire Fontaine\nBonjour,\n\nCAS-7701 est qualifie P1 : deux unites bruyantes, impact salle pediatrique. Qualite suspecte un lot ThermoControl; logistique doit confirmer le stock de remplacement a DC-TRT.\n\nVotre role : coordonner l'escalade multi-departements sans que le Dr Meunier recoive trois versions differentes. Chaque action doi",
+      "startedAt": "2026-07-22T14:22:12.154Z",
+      "completedAt": "2026-07-22T14:22:15.625Z"
+    },
+    {
+      "missionKey": "m7-m03-cloturer-cas-nps",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 85,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nCloturer le cas et recuperer le NPS\nDisponible\nObjectif\n\nCloturez CAS-7701, documentez la resolution et collectez le NPS institutionnel.\n\nBriefing de Claire Fontaine\nBonjour,\n\nLes deux unites de remplacement sont installees; le Dr Meunier confirme le bon fonctionnement. Il est time de cloturer CAS-7701 proprement et de recuperer son NPS — c'est notre indicateur cle pour les comptes institutionnels.\n\nDocumentez cause racine, actions correctives et delai reel. N",
+      "startedAt": "2026-07-22T14:22:15.747Z",
+      "completedAt": "2026-07-22T14:22:19.508Z"
+    },
+    {
+      "missionKey": "m8-m01-matrice-approbation-pression",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 85,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nMatrice d'approbation sous pression\nDisponible\nObjectif\n\nTraitez une demande d'achat de 32 000 CAD sous pression sans contourner la gouvernance.\n\nBriefing de Claire Fontaine\nBonjour,\n\nUn remplacement d'urgence pour CAS-7701 necessite une commande fournisseur de 32 000 CAD (256 unites de rechange preventif lot LT-8842). Patrick insiste pour liberer avant 17 h; Marc rappelle que la limite VP est 25 000 CAD.\n\nVotre role : appliquer la matrice d'approbation sans r",
+      "startedAt": "2026-07-22T14:22:19.672Z",
+      "completedAt": "2026-07-22T14:22:23.232Z"
+    },
+    {
+      "missionKey": "m8-m02-revue-acces-sod",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nRevue d'acces et segregation des taches\nDisponible\nObjectif\n\nIdentifiez les conflits SoD sur les acces achats et finance apres PO-URG-9033.\n\nBriefing de Claire Fontaine\nBonjour,\n\nL'audit interne demande une revue d'acces trimestrielle. PO-URG-9033 a revele que Julie peut creer ET approuver des PO jusqu'a 15 000 CAD — conflit SoD potentiel avec Marc sur le rapprochement.\n\nVotre role : cartographier les roles ERP, identifier les conflits segregation des taches e",
+      "startedAt": "2026-07-22T14:22:23.355Z",
+      "completedAt": "2026-07-22T14:22:26.951Z"
+    },
+    {
+      "missionKey": "m8-m03-autoevaluation-probation",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 85,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nAutoevaluation de probation\nDisponible\nObjectif\n\nCompletez votre autoevaluation de fin de probation avec preuves M1-M8.\n\nBriefing de Claire Fontaine\nBonjour,\n\nVotre periode de probation Equinoxe se termine. Avant la certification Or, vous devez soumettre une autoevaluation honnete : competences acquises, ecarts identifies, preuves des missions M1-M8.\n\nJe ne cherche pas la perfection — je cherche la reflexion. Documentez ce que vous maitrisez, ce qui reste frag",
+      "startedAt": "2026-07-22T14:22:27.071Z",
+      "completedAt": "2026-07-22T14:22:30.631Z"
+    },
+    {
+      "missionKey": "m9-m01-atelier-definition-kpi",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nAtelier de definition des KPI\nDisponible\nObjectif\n\nDefinissez les KPI directeurs pour le comite Equinoxe a partir des donnees M1-M8.\n\nBriefing de Claire Fontaine\nBonjour,\n\nLe comite de direction Equinoxe veut un tableau de bord fiable — pas 40 indicateurs, mais les KPI qui comptent vraiment. NPS institutionnel, delai P1 CRM, ecart P2P, marge O2C : tout est la, mais rien n'est formalise.\n\nVotre role : animer l'atelier de definition KPI. Chaque indicateur doit a",
+      "startedAt": "2026-07-22T14:22:30.789Z",
+      "completedAt": "2026-07-22T14:22:34.437Z"
+    },
+    {
+      "missionKey": "m9-m02-tableau-bord-comite",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 85,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nTableau de bord du comite de direction\nDisponible\nObjectif\n\nConstruisez le tableau de bord Equinoxe pour le comite avec les KPI definis.\n\nBriefing de Claire Fontaine\nBonjour,\n\nLes KPI sont definis — maintenant il faut un tableau de bord que Marc, Patrick et Sophie comprennent en 30 secondes. Pas de graphiques decoratifs : chaque tuile doit declencher une question metier.\n\nStructurez le dashboard par domaine (CRM, P2P, O2C, GOV) avec signaux vert/jaune/rouge. L",
+      "startedAt": "2026-07-22T14:22:34.558Z",
+      "completedAt": "2026-07-22T14:22:38.133Z"
+    },
+    {
+      "missionKey": "m9-m03-analyse-concurrentielle-ia",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nAnalyse concurrentielle et frontieres IA\nDisponible\nObjectif\n\nEvaluez la concurrence HVAC institutionnelle et definissez les frontieres IA pour Equinoxe.\n\nBriefing de Claire Fontaine\nBonjour,\n\nThermoRival propose des delais 30 % plus courts sur le segment institutionnel. Notre Coach IA peut aider les etudiants — mais pas decider a leur place.\n\nVotre role : analyser le positionnement concurrentiel et definir les frontieres ethiques de l'IA dans Equinoxe. Ou l'I",
+      "startedAt": "2026-07-22T14:22:38.294Z",
+      "completedAt": "2026-07-22T14:22:42.050Z"
+    },
+    {
+      "missionKey": "m10-m01-diapositive-conseil",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 85,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nDiapositive conseil et synthese executive\nDisponible\nObjectif\n\nPreparez la diapositive conseil pour le DG : synthese M1-M9 en une page.\n\nBriefing de Claire Fontaine\nBonjour,\n\nLe DG Equinoxe veut une diapositive conseil — une seule page — avant le defi final. Pas de detail operationnel : vision, risques, opportunites, recommandation.\n\nVous avez parcouru PO-88421, Sacre-Coeur, CAS-7701, gouvernance, KPI et IA. Condensez en message executive que Marc, Patrick et ",
+      "startedAt": "2026-07-22T14:22:42.209Z",
+      "completedAt": "2026-07-22T14:22:45.704Z"
+    },
+    {
+      "missionKey": "m10-m02-defi-final-equinoxe",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 85,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nDefi final Equinoxe (crise integree)\nDisponible\nObjectif\n\nGerez la crise integree : lot LT-8842, ThermoRival et pression DG simultanees.\n\nBriefing de Claire Fontaine\nBonjour,\n\nC'est le defi final. En une matinee, tout converge : nouveau signalement lot LT-8842 (5 unites), ThermoRival courtise Sacre-Coeur, Patrick demande PO d'urgence sans comite, Sophie a trois cas P1 ouverts.\n\nVous devez prioriser, coordonner et decider — sans contourner gouvernance, sans per",
+      "startedAt": "2026-07-22T14:22:45.825Z",
+      "completedAt": "2026-07-22T14:22:49.450Z"
+    },
+    {
+      "missionKey": "m10-m03-presentation-capstone-or",
+      "mode": "ui_observe_api_submit_ordering",
+      "startStatus": 200,
+      "submitStatus": 200,
+      "score": 100,
+      "visibleTextPreview": "Centre de mission\nRetour à la liste\nPresentation Capstone et certification Or\nDisponible\nObjectif\n\nPresentez votre parcours Equinoxe et recevez la certification Or NordHabitat.\n\nBriefing de Claire Fontaine\nBonjour,\n\nVous avez survecu au defi final. Derniere etape : presenter votre parcours Capstone devant le jury Equinoxe — DG, Marc, Isabelle, Nadia.\n\nRacontez votre transformation M1-M10 : ce que vous avez appris, les decisions dont vous etes fier, les erreurs corrigees, votre vision professionn",
+      "startedAt": "2026-07-22T14:22:49.605Z",
+      "completedAt": "2026-07-22T14:22:53.176Z"
+    },
+    {
+      "event": "assessments_list",
+      "status": 200,
+      "bodyPreview": "{\"assessments\":[{\"code\":\"GOLD_M7_M10\",\"title\":\"Evaluation Gold — Modules 7 a 10\",\"moduleScope\":\"M7-M10\",\"passThresholdPercent\":70,\"maxAttempts\":2,\"timeLimitSeconds\":3600,\"status\":\"available\",\"bestScorePercent\":null,\"attemptsUsed\":0},{\"code\":\"INTEGRATED_M3_M6\",\"title\":\"Evaluation integree — Modules 3 a 6\",\"moduleScope\":\"M3-M6\",\"passThresholdPercent\":70,\"maxAttempts\":2,\"timeLimitSeconds\":3600,\"status\":\"available\",\"bestScorePercent\":null,\"attemptsUsed\":0},{\"code\":\"SILVER_M1_M2\",\"title\":\"Evaluation Silver — Modules 1 et 2\",\"moduleScope\":\"M1-M2\",\"passThresholdPercent\":70,\"maxAttempts\":2,\"timeLimitSeconds\":2700,\"status\":\"available\",\"bestScorePercent\":null,\"attemptsUsed\":0}]}"
+    },
+    {
+      "event": "evaluations_ui",
+      "textPreview": ""
+    },
+    {
+      "event": "silver_submit",
+      "key": "SILVER_M1_M2",
+      "status": 200,
+      "body": {
+        "scorePercent": 100,
+        "passed": true,
+        "feedback": "Evaluation reussie."
+      },
+      "answersUsed": [
+        "silver-q1",
+        "silver-q2",
+        "silver-q3",
+        "silver-q4"
+      ]
+    },
+    {
+      "event": "capstone_ui",
+      "textPreview": ""
+    },
+    {
+      "event": "capstone_submit",
+      "status": 404,
+      "body": {
+        "error": {
+          "code": "NOT_FOUND",
+          "message": "Route not found: POST /api/v1/me/capstone",
+          "requestId": "dad97794-1cb5-412d-90a2-d0023d2e5636"
+        }
+      }
+    },
+    {
+      "event": "gold_submit",
+      "key": "GOLD_M7_M10",
+      "status": 200,
+      "body": {
+        "scorePercent": 100,
+        "passed": true,
+        "feedback": "Evaluation reussie."
+      },
+      "answersUsed": [
+        "gold-q1",
+        "gold-q2",
+        "gold-q3",
+        "gold-q4"
+      ]
+    },
+    {
+      "event": "ai_coach_ui",
+      "textPreview": ""
+    },
+    {
+      "event": "ai_coach_ask",
+      "status": 200,
+      "answerPreview": "{\"answer\":\"Je peux vous guider avec des questions reflexives sur le processus metier, sans modifier vos scores ni reveler les reponses attendues.\",\"disclaimer\":\"Le coach IA est un assistant pedagogique. Il ne remplace pas votre jugement professionnel ni les consignes du professeur.\",\"interactionId\":\"cmrw69n9h0091s701fs2nfmg2\",\"createdAt\":\"2026-07-22T14:22:58.566Z\"}"
+    },
+    {
+      "event": "bi_ui",
+      "textPreview": ""
+    },
+    {
+      "event": "certificates_ui",
+      "textPreview": ""
+    },
+    {
+      "event": "certificates_api",
+      "status": 200,
+      "body": {
+        "certificates": []
+      }
+    },
+    {
+      "event": "course_snapshot_end",
+      "percent": 100,
+      "modules": [
+        {
+          "code": "M1",
+          "status": "completed",
+          "percent": 100,
+          "missions": [
+            {
+              "code": "M1-M01",
+              "status": "completed"
+            },
+            {
+              "code": "M1-M02",
+              "status": "completed"
+            },
+            {
+              "code": "M1-M03",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "code": "M2",
+          "status": "completed",
+          "percent": 100,
+          "missions": [
+            {
+              "code": "M2-M01",
+              "status": "completed"
+            },
+            {
+              "code": "M2-M02",
+              "status": "completed"
+            },
+            {
+              "code": "M2-M03",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "code": "M3",
+          "status": "completed",
+          "percent": 100,
+          "missions": [
+            {
+              "code": "M3-M01",
+              "status": "completed"
+            },
+            {
+              "code": "M3-M02",
+              "status": "completed"
+            },
+            {
+              "code": "M3-M03",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "code": "M4",
+          "status": "completed",
+          "percent": 100,
+          "missions": [
+            {
+              "code": "M4-M01",
+              "status": "completed"
+            },
+            {
+              "code": "M4-M02",
+              "status": "completed"
+            },
+            {
+              "code": "M4-M03",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "code": "M5",
+          "status": "completed",
+          "percent": 100,
+          "missions": [
+            {
+              "code": "M5-M01",
+              "status": "completed"
+            },
+            {
+              "code": "M5-M02",
+              "status": "completed"
+            },
+            {
+              "code": "M5-M03",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "code": "M6",
+          "status": "completed",
+          "percent": 100,
+          "missions": [
+            {
+              "code": "M6-M01",
+              "status": "completed"
+            },
+            {
+              "code": "M6-M02",
+              "status": "completed"
+            },
+            {
+              "code": "M6-M03",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "code": "M7",
+          "status": "completed",
+          "percent": 100,
+          "missions": [
+            {
+              "code": "M7-M01",
+              "status": "completed"
+            },
+            {
+              "code": "M7-M02",
+              "status": "completed"
+            },
+            {
+              "code": "M7-M03",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "code": "M8",
+          "status": "completed",
+          "percent": 100,
+          "missions": [
+            {
+              "code": "M8-M01",
+              "status": "completed"
+            },
+            {
+              "code": "M8-M02",
+              "status": "completed"
+            },
+            {
+              "code": "M8-M03",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "code": "M9",
+          "status": "completed",
+          "percent": 100,
+          "missions": [
+            {
+              "code": "M9-M01",
+              "status": "completed"
+            },
+            {
+              "code": "M9-M02",
+              "status": "completed"
+            },
+            {
+              "code": "M9-M03",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "code": "M10",
+          "status": "completed",
+          "percent": 100,
+          "missions": [
+            {
+              "code": "M10-M01",
+              "status": "completed"
+            },
+            {
+              "code": "M10-M02",
+              "status": "completed"
+            },
+            {
+              "code": "M10-M03",
+              "status": "completed"
+            }
+          ]
+        },
+        {
+          "code": "M2",
+          "status": "locked",
+          "percent": 0,
+          "missions": []
+        }
+      ]
+    },
+    {
+      "event": "security",
+      "adminStatus": 403,
+      "professorStatus": 403
+    }
+  ]
+}
