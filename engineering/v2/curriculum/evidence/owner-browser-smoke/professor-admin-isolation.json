@@ -1,0 +1,41 @@
+{
+  "professorA": {
+    "studentsStatus": 200,
+    "students": [
+      {
+        "employeeNumber": "__QA_V2_OWNER_SMOKE_STU_V1",
+        "displayName": "__QA_V2_OWNER_SMOKE_ Student V1",
+        "curriculumVersion": "V1"
+      },
+      {
+        "employeeNumber": "__QA_V2_OWNER_SMOKE_STU_V2",
+        "displayName": "__QA_V2_OWNER_SMOKE_ Student V2",
+        "curriculumVersion": "V2"
+      }
+    ],
+    "runs": [
+      {
+        "runCode": "__QA_V2_OWNER_SMOKE_RUN_STU_V2_1",
+        "curriculumVersion": "V2",
+        "curriculumVersionLabel": "Curriculum V2 (M1–M10, HCM, Capstone séparé)",
+        "completionPercent": 73.33
+      },
+      {
+        "runCode": "__QA_V2_OWNER_SMOKE_RUN_STU_V1_1",
+        "curriculumVersion": "V1",
+        "curriculumVersionLabel": "Curriculum V1 (historique)",
+        "completionPercent": 100
+      }
+    ]
+  },
+  "professorB": {
+    "students": {
+      "students": []
+    },
+    "runs": []
+  },
+  "adminUnique": {
+    "mode": "OFFICIAL_COHORT_RESULT",
+    "studentCount": 2
+  }
+}

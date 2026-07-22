@@ -1,0 +1,181 @@
+{
+  "curriculumVersion": "V2",
+  "curriculumVersionLabel": "Curriculum V2 (M1–M10, HCM, Capstone séparé)",
+  "percentComplete": 73.33,
+  "moduleCount": 10,
+  "modules": [
+    {
+      "code": "M1",
+      "title": "Module 1 — Entreprise intégrée et processus",
+      "percent": 100,
+      "missionCount": 3,
+      "missionCodes": [
+        "M1-M01",
+        "M1-M02",
+        "M1-M03"
+      ],
+      "missionKeys": [
+        "m1-m01-decouvrir-entreprise",
+        "m1-m02-connecter-departements",
+        "m1-m03-diagnostiquer-preparation"
+      ]
+    },
+    {
+      "code": "M2",
+      "title": "Module 2 — Structure organisationnelle et données de base",
+      "percent": 100,
+      "missionCount": 3,
+      "missionCodes": [
+        "M2-M01",
+        "M2-M02",
+        "M2-M03"
+      ],
+      "missionKeys": [
+        "m2-m01-structurer-organisation",
+        "m2-m02-creer-donnees-reference",
+        "m2-m03-corriger-qualite-donnees"
+      ]
+    },
+    {
+      "code": "M3",
+      "title": "Module 3 — Approvisionnement et Procure-to-Pay",
+      "percent": 100,
+      "missionCount": 3,
+      "missionCodes": [
+        "M3-M01",
+        "M3-M02",
+        "M3-M03"
+      ],
+      "missionKeys": [
+        "m3-m01-identifier-besoin-achat",
+        "m3-m02-creer-traiter-commande-achat",
+        "m3-m03-receptionner-analyser-fournisseur"
+      ]
+    },
+    {
+      "code": "M4",
+      "title": "Module 4 — Ventes et Order-to-Cash",
+      "percent": 100,
+      "missionCount": 3,
+      "missionCodes": [
+        "M4-M01",
+        "M4-M02",
+        "M4-M03"
+      ],
+      "missionKeys": [
+        "m4-m01-saisir-commande-institutionnelle",
+        "m4-m02-allocation-inter-entrepots",
+        "m4-m03-confirmer-livraison-cloture"
+      ]
+    },
+    {
+      "code": "M5",
+      "title": "Module 5 — Stocks, réapprovisionnement et S&OP",
+      "percent": 100,
+      "missionCount": 3,
+      "missionCodes": [
+        "M5-M01",
+        "M5-M02",
+        "M5-M03"
+      ],
+      "missionKeys": [
+        "m5-m01-analyser-stock-reappro",
+        "m5-m02-decision-transfert-inter-dc",
+        "m5-m03-presentation-sop"
+      ]
+    },
+    {
+      "code": "M6",
+      "title": "Module 6 — Finance et contrôle",
+      "percent": 100,
+      "missionCount": 3,
+      "missionCodes": [
+        "M6-M01",
+        "M6-M02",
+        "M6-M03"
+      ],
+      "missionKeys": [
+        "m6-m01-reception-facture",
+        "m6-m02-exception-rapprochement-trois-voies",
+        "m6-m03-expliquer-ecart-finance"
+      ]
+    },
+    {
+      "code": "M7",
+      "title": "Module 7 — CRM et service client",
+      "percent": 100,
+      "missionCount": 3,
+      "missionCodes": [
+        "M7-M01",
+        "M7-M02",
+        "M7-M03"
+      ],
+      "missionKeys": [
+        "m7-m01-ouvrir-dossier-client",
+        "m7-m02-coordonner-escalade",
+        "m7-m03-cloturer-cas-nps"
+      ]
+    },
+    {
+      "code": "M8",
+      "title": "Module 8 — Ressources humaines et HCM",
+      "percent": 33.33,
+      "missionCount": 3,
+      "missionCodes": [
+        "M8-M01",
+        "M8-M02",
+        "M8-M03"
+      ],
+      "missionKeys": [
+        "m8-m01-integrer-nouvel-employe",
+        "m8-m02-gerer-temps-absences",
+        "m8-m03-evaluer-competences-evolution"
+      ]
+    },
+    {
+      "code": "M9",
+      "title": "Module 9 — Gouvernance, accès et conformité",
+      "percent": 0,
+      "missionCount": 3,
+      "missionCodes": [
+        "M9-M01",
+        "M9-M02",
+        "M9-M03"
+      ],
+      "missionKeys": [
+        "m8-m01-matrice-approbation-pression",
+        "m8-m02-revue-acces-sod",
+        "m8-m03-autoevaluation-probation"
+      ]
+    },
+    {
+      "code": "M10",
+      "title": "Module 10 — BI, KPI, IA et conseil",
+      "percent": 0,
+      "missionCount": 3,
+      "missionCodes": [
+        "M10-M01",
+        "M10-M02",
+        "M10-M03"
+      ],
+      "missionKeys": [
+        "m9-m01-atelier-definition-kpi",
+        "m9-m02-tableau-bord-comite",
+        "m9-m03-analyse-concurrentielle-ia"
+      ]
+    }
+  ],
+  "capstone": {
+    "lifecycleStatus": "LOCKED",
+    "status": "draft",
+    "stages": [
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S6",
+      "S7"
+    ]
+  }
+}
