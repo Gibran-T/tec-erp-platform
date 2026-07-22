@@ -43,6 +43,9 @@ export function PedagogicalRunBanner(): ReactElement | null {
   }
 
   const selected = runs.find((run) => run.id === selectedRunId) ?? runs[0];
+  const isHistorical =
+    Boolean(selected?.isHistorical) || selected?.status === "COMPLETED" || selected?.isWritable === false;
+  const isCurrent = Boolean(selected?.isWritable) || selected?.status === "ACTIVE";
 
   return (
     <section className="pedagogical-run-banner" data-testid="pedagogical-run-banner" aria-label="Parcours pédagogique">
@@ -52,9 +55,18 @@ export function PedagogicalRunBanner(): ReactElement | null {
           {" "}
           · {String(selected?.statusLabel ?? selected?.status ?? "")} ·{" "}
           {String(selected?.runTypeLabel ?? selected?.runType ?? "")}
+          {selected?.curriculumVersionLabel || selected?.curriculumVersion
+            ? ` · ${String(selected.curriculumVersionLabel ?? selected.curriculumVersion)}`
+            : ""}
         </span>
         {typeof selected?.completionPercent === "number" ? (
           <span> · {selected.completionPercent} %</span>
+        ) : null}
+        {isHistorical ? (
+          <span data-testid="pedagogical-run-historical-badge"> · Historique (lecture seule)</span>
+        ) : null}
+        {isCurrent ? (
+          <span data-testid="pedagogical-run-current-badge"> · Parcours courant</span>
         ) : null}
       </div>
       <label>
