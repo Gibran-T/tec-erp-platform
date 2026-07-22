@@ -28,8 +28,10 @@
 | Interventions | no | yes (run company + assignment checks) | via professor role if applicable |
 | Unique-student metric | no | no | yes |
 | Write learning data | yes only on **own ACTIVE** run | n/a | n/a |
+| Write reflection | yes only on **own ACTIVE** run with `reflectionsEnabled` | no | no |
+| Read reflection | own only | assigned professor / cohort professor | yes (company) |
 
-Professor assigning `professorId` ≠ self → `403`. Non-cohort professor (non-admin) → `403`.
+Professor assigning `professorId` ≠ self → `403`. Non-cohort professor (non-admin) → `403`. Unrelated professor/student reading another learner’s reflection → `403`. Cross-company → `404`/`403`.
 
 ---
 
@@ -50,11 +52,13 @@ Prevents horizontal access to another student’s run via `runId` / `X-Tec-Run-I
 | Control | Implementation |
 |---------|----------------|
 | ACTIVE-only writes | `requireWritableRun` / `WRITE_STATUSES` |
+| Reflection enablement | Typed `reflectionsEnabled` (default false); historical Run 1 stays false |
+| Reflection ACTIVE gate | `upsertReflection` rejects non-ACTIVE |
 | One ACTIVE per employee+course | Partial unique index + start/resume conflict |
 | Context mandatory for repositories | `requireCurrentPedagogicalRunId()` throws if ALS missing |
 | Complete gate | 30 completed missions on that run before `complete` |
 
-Historical / paused runs are read-only for mutations.
+Historical / paused / cancelled / archived runs are read-only for mutations (including reflections).
 
 ---
 

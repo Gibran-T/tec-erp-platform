@@ -30,13 +30,24 @@ Business before software: a run is a **pedagogical attempt**, not a technical se
 | `status` | `PLANNED` \| `ACTIVE` \| `PAUSED` \| `COMPLETED` \| `CANCELLED` \| `ARCHIVED` |
 | `sourceRunId` | Optional lineage to a prior run |
 | `completionPercent` | Snapshot progress for list/banner |
-| `metadataJson` | Extensible (e.g. `legacyBackfill`, create `reason`) |
+| `reflectionsEnabled` | Typed boolean (default `false`) — enables post-mission reflections for this run only |
+| `metadataJson` | Extensible (e.g. `legacyBackfill`, create `reason`, `personaValidation`) |
 
 Supporting entities:
 
 - `PedagogicalCourseRunAudit` — lifecycle / create / backfill audit
 - `ProfessorIntervention` — professor support logged against a run
-- `StudentMissionReflection` — per-mission learner reflection scoped to a run
+- `StudentMissionReflection` — per-mission learner reflection scoped to a run (`@@unique([runId, missionKey, employeeId])`)
+
+### Student reflection workflow
+
+- Create / read / list / update reflections are **run-scoped**
+- Writes only when run is `ACTIVE` **and** `reflectionsEnabled === true`
+- Historical / completed / archived / cancelled runs reject writes
+- Run 1 backfill keeps `reflectionsEnabled = false`; Run 2 begins with zero reflections (no copy from source)
+- All reflection rows belong to `pedagogicalCourseRunId` via `runId`
+- Student UI: compact post-mission form when enabled; never blocks mission completion unless separately configured
+- Professor / Admin: averages, mission-level rows, qualitative notes, persona-validation indicator when metadata says so — no fabricated analytics when empty
 
 ---
 

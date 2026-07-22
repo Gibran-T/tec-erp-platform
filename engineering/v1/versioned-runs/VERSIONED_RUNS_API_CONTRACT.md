@@ -37,6 +37,7 @@
   runCode, runSequence, runType, runLabel, language, status, sourceRunId,
   startedAt, pausedAt, completedAt, cancelledAt, // ISO datetime | null
   completionPercent,
+  reflectionsEnabled, // boolean — typed run configuration
   runTypeLabel, statusLabel, // FR presentation
   isWritable,   // status === ACTIVE
   isHistorical  // COMPLETED | ARCHIVED | CANCELLED
@@ -52,6 +53,10 @@
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `/pedagogical-course-runs` | List runs for authenticated employee |
+| `GET` | `/pedagogical-course-runs/:runId/reflections` | List own reflections for run |
+| `GET` | `/pedagogical-course-runs/:runId/reflections/:missionKey` | Get reflection by mission |
+| `POST` | `/pedagogical-course-runs/:runId/reflections` | Create reflection (ACTIVE + `reflectionsEnabled`) |
+| `PATCH` | `/pedagogical-course-runs/:runId/reflections/:missionKey` | Update reflection (same gates) |
 
 ### Professor (`/api/v1/professor`)
 
@@ -62,6 +67,7 @@
 | `POST` | `/pedagogical-course-runs/:runId/transition` | Lifecycle transition |
 | `GET` | `/pedagogical-course-runs/compare?leftRunId&rightRunId` | Same-student comparison |
 | `POST` | `/pedagogical-course-runs/:runId/interventions` | Log professor intervention |
+| `GET` | `/pedagogical-course-runs/:runId/reflections` | List reflections + averages (assigned professor) |
 
 ### Admin (`/api/v1/admin`)
 
@@ -71,7 +77,8 @@
 | `POST` | `/pedagogical-course-runs` | Create run |
 | `POST` | `/pedagogical-course-runs/:runId/transition` | Lifecycle transition |
 | `GET` | `/pedagogical-course-runs/compare?leftRunId&rightRunId` | Comparison |
-| `GET` | `/pedagogical-course-runs/metrics/unique-students` | Institutional unique-student count |
+| `GET` | `/pedagogical-course-runs/metrics/unique-students` | Institutional unique-student count (`OFFICIAL_COHORT_RESULT`) |
+| `GET` | `/pedagogical-course-runs/:runId/reflections` | Read-only reflection inspection |
 
 ---
 
@@ -89,8 +96,22 @@
 | `sourceRunId` | optional | Same student |
 | `plannedStartAt` | optional | ISO datetime → metadata |
 | `runCode` | optional | Else `{cohort\|company}-{employeeNumber}-RUN{n}` |
+| `reflectionsEnabled` | optional | default `false`; typed boolean (no opaque JSON) |
 
 Response: `201` + run. Conflict on duplicate `runCode`.
+
+---
+
+## 4b. Student reflection body
+
+Likert fields (required unless noted), integers **1–5** only:
+
+`clarity`, `confidence`, `cognitiveLoad`, `realism`, `relevance`, `navigationQuality`, `feedbackQuality`, `visualQuality`,  
+`aiUsefulness` (nullable), `biUsefulness` (nullable),  
+`externalExplanationRequired`, `externalSlidesWouldHelp`,  
+`qualitativeNote` (nullable)
+
+Create includes `missionKey`. Update omits `missionKey`. One reflection per `(runId, missionKey, employeeId)`.
 
 ---
 
@@ -126,7 +147,7 @@ Placeholder nulls (not yet computed): `professorInterventionRate`, `confidenceGa
 ## 8. Unique-student metric response
 
 ```json
-{ "mode": "unique-student-latest-or-active", "studentCount": <number> }
+{ "mode": "OFFICIAL_COHORT_RESULT", "studentCount": <number> }
 ```
 
-See analytics policy for mode definitions beyond this endpoint.
+See `VERSIONED_RUNS_ANALYTICS_POLICY.md` for precedence and exploratory modes.

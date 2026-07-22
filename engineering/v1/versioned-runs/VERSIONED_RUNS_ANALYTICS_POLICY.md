@@ -1,66 +1,79 @@
 # TEC.ERP — Versioned Pedagogical Runs · Analytics Policy
 
 **Baseline `main`:** `e8761d8` · Product SHA: `2378b2b`  
-**Implemented institutional endpoint:** `GET /api/v1/admin/pedagogical-course-runs/metrics/unique-students`
+**Implementation:** `apps/api/src/modules/analytics/official-run-policy.ts`  
+**Default institutional mode:** `OFFICIAL_COHORT_RESULT`
 
 ---
 
 ## 1. Principle
 
-Multiple pedagogical runs must **not** inflate headcount or “completion” denominators by default. Institutional reporting counts **unique students**, then optionally drills into run-scoped evidence.
+Multiple pedagogical runs must **not** inflate headcount, completion denominators, averages, or rankings by default. Institutional reporting counts **each learner once** via a deterministic official-run selection, then optionally drills into exploratory run-scoped evidence.
 
 ---
 
-## 2. Aggregation modes
+## 2. Aggregation modes (`AnalyticsMode`)
 
 | Mode | Intent | Count / scope rule |
 |------|--------|--------------------|
-| **unique-student** (default institutional) | Headcount without double count | One slot per `employeeId`; prefer `ACTIVE`, else highest `runSequence` among non-`CANCELLED` |
-| **unique-student-latest** | Same as default when no ACTIVE | Highest `runSequence` per student (exclude `CANCELLED`) |
-| **learner-current-run** | Operational learner view | Metrics for the resolved ACTIVE (or writable) run only |
-| **learner-selected-run** | Historical review | Metrics for explicit `runId` / banner selection (`X-Tec-Run-Id`) |
-| **all-runs** | Research / remediation analysis | Sum or list across all runs; **never** use as institutional headcount |
-| **official-cohort** | Cohort governance | Restrict to students with cohort membership; still apply unique-student inside the cohort |
+| **OFFICIAL_COHORT_RESULT** (default) | Institutional dashboards | One official run per learner; exclude `DEMONSTRATION` + `CANCELLED` |
+| **LEARNER_CURRENT_RUN** | Operational learner view | Resolved ACTIVE / writable run only |
+| **LEARNER_SELECTED_RUN** | Historical / banner selection | Explicit `runId` / `X-Tec-Run-Id` |
+| **UNIQUE_STUDENT_LATEST** | Latest eligible sequence | Highest `runSequence` among eligible runs |
+| **ALL_RUNS** | Exploratory / research | List or aggregate across runs; **never** use as institutional headcount |
 
-Default for admin metric API today: `unique-student-latest-or-active` (ACTIVE wins, else latest sequence).
-
----
-
-## 3. Implemented algorithm
-
-`PedagogicalRunService.countDistinctStudentsForInstitutionalMetric(companyId)`:
-
-1. Load company runs with `status ≠ CANCELLED`  
-2. For each `employeeId`, keep ACTIVE if present; else keep max `runSequence`  
-3. Return `chosen.size`
-
-Unit test (service test file) asserts two students with one holding two runs → count `2`.
+Professor exploratory endpoints may request `ALL_RUNS` or selected-run mode via query params. Product UIs that lack a selector keep `OFFICIAL_COHORT_RESULT`.
 
 ---
 
-## 4. UI / product mapping
+## 3. Official result precedence
+
+No separate “official” boolean flag is required. Deterministic precedence on eligible runs (`runType ≠ DEMONSTRATION`, `status ≠ CANCELLED`):
+
+1. Latest `COMPLETED` or `ARCHIVED` by `runSequence` (desc)
+2. `ACTIVE` eligible run
+3. Latest `PAUSED`
+4. Latest `PLANNED`
+5. Legacy `runSequence = 1` when still present among remaining eligible
+
+`sourceRunId` lineage does **not** create duplicate headcount rows.
+
+---
+
+## 4. Wired surfaces
 
 | Surface | Mode |
 |---------|------|
-| Student workspace progress / mission center | `learner-current-run` (writes) or `learner-selected-run` (reads with selection) |
-| Pedagogical run banner selector | Selection feed for `learner-selected-run` |
-| Admin unique-students metric | `unique-student` default |
-| Run compare | Pairwise `all-runs` evidence for one student — not a headcount |
-| Professor cohort dashboards (existing heatmap/competencies) | Prefer unique-student / official-cohort; run-scoped drill-down is follow-on |
+| Admin `GET .../metrics/unique-students` | `OFFICIAL_COHORT_RESULT` |
+| Professor heatmap / competencies | Default official; optional exploratory modes |
+| Professor student list | Deduped; progress scoped to official run |
+| Student workspace / mission center | Learner current / selected run |
+| Run compare | Pairwise evidence — not a headcount |
 
 ---
 
-## 5. Forbidden practices
+## 5. Required invariants (tested)
 
-- Summing `COMPLETED` runs across sequences to report “students completed”  
-- Counting cancelled runs in institutional headcount  
-- Treating AI interaction volume as a unique-student proxy  
-- Hardcoding James into analytics filters — use cohort + employee identity relationally
+- 1 student + Run 1 + Run 2 ⇒ enrolled count `1`
+- Averages not double-weighted across runs in official mode
+- Rankings / heatmap rows: one row per student in official mode
+- Demonstration and cancelled runs excluded from official metrics
+- Selected-run / all-runs exploratory modes work without mutating official default
+- Company and cohort isolation preserved
 
 ---
 
-## 6. Future work (not blocking foundation)
+## 6. Forbidden practices
 
-- Explicit `mode` query param on analytics routers  
-- Wire professor heatmap to official-cohort + unique-student  
-- Intervention rate / confidence gain fields already reserved as `null` on compare payload
+- Summing completed runs across sequences to report “students completed”
+- Counting cancelled or demonstration runs in institutional headcount
+- Silently replacing official cohort results with the newest ACTIVE run when a completed official run exists
+- Treating AI interaction volume as a unique-student proxy
+- Hardcoding James into analytics filters
+
+---
+
+## 7. Deferred (P2)
+
+- Broader public mode selector on every analytics surface
+- Intervention rate / confidence gain fields reserved as `null` on compare payload

@@ -26,9 +26,10 @@ If any hard gate fails → **STOP**. Do not migrate. Do not deploy.
 - [ ] Owner approval recorded (name, UTC timestamp, artifact SHA)  
 - [ ] Backup completed and restore smoke noted  
 - [ ] Target deploy SHA identified (foundation merge commit — not assumed)  
-- [ ] Diff reviewed: migration `20260724120000_v1_pedagogical_course_runs` only expected schema change  
-- [ ] Staging or disposable migrate PASS (optional but strongly recommended)  
+- [ ] Diff reviewed: migrations `20260724120000_v1_pedagogical_course_runs` **and** `20260724131000_v1_run_reflections_enabled`  
+- [ ] Staging or disposable migrate PASS (empty + populated validated in PR evidence)  
 - [ ] Confirm no production script will `POST` a James Run 2  
+- [ ] Confirm James integrity hash still `83dea106…571da4` (or owner-accepted delta) before migrate  
 - [ ] On-call available for rollback window  
 
 ---
