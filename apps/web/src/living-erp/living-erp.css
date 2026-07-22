@@ -1,0 +1,371 @@
+:root,
+[data-theme="light"] {
+  --living-canvas: #eef6fb;
+  --living-surface: rgba(255, 255, 255, 0.92);
+  --living-surface-solid: #ffffff;
+  --living-border: #d7e6f2;
+  --living-text: #1d2d3e;
+  --living-muted: #5b6b7c;
+  --living-pale-blue: #d9ecf8;
+  --living-strong-blue: #0a6ed1;
+  --living-green: #107e3e;
+  --living-amber: #c97800;
+  --living-red: #bb0000;
+  --living-purple: #6b4fa0;
+  --living-gold: #b58900;
+  --living-gray: #6a6d70;
+  --living-flow: rgba(10, 110, 209, 0.18);
+  --living-focus: #0854a0;
+  --living-shadow: 0 1px 2px rgba(29, 45, 62, 0.06);
+}
+
+[data-theme="dark"] {
+  --living-canvas: #0f1a24;
+  --living-surface: rgba(24, 36, 48, 0.94);
+  --living-surface-solid: #182430;
+  --living-border: #2c3e50;
+  --living-text: #e8eef4;
+  --living-muted: #9aa8b5;
+  --living-pale-blue: #1a3348;
+  --living-strong-blue: #4da3ff;
+  --living-green: #3bb273;
+  --living-amber: #e0a106;
+  --living-red: #ff6b6b;
+  --living-purple: #b39ddb;
+  --living-gold: #f0c14b;
+  --living-gray: #8a939c;
+  --living-flow: rgba(77, 163, 255, 0.22);
+  --living-focus: #8ec5ff;
+  --living-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, var(--living-pale-blue), transparent 42%),
+    linear-gradient(180deg, var(--living-canvas), var(--living-canvas));
+  color: var(--living-text);
+}
+
+.tec-app-shell {
+  background: transparent;
+}
+
+.tec-app-shell__top-nav,
+.tec-app-shell__sidebar,
+.tec-app-shell__right-panel {
+  background: var(--living-surface);
+  border-color: var(--living-border);
+  color: var(--living-text);
+}
+
+.tec-app-shell__main {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent 120px),
+    var(--living-canvas);
+}
+
+.tec-app-shell--context-collapsed .tec-app-shell__body {
+  grid-template-columns: 240px minmax(0, 1fr);
+}
+
+.tec-app-shell--context-collapsed .tec-app-shell__right-panel {
+  display: none;
+}
+
+.tec-app-shell--nav-collapsed .tec-app-shell__body {
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+}
+
+.tec-app-shell--nav-collapsed.tec-app-shell--context-collapsed .tec-app-shell__body {
+  grid-template-columns: 72px minmax(0, 1fr);
+}
+
+.living-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--living-border);
+  background: var(--living-surface-solid);
+  color: var(--living-text);
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  padding: 0.2rem 0.65rem;
+}
+
+.living-status-chip__icon {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--living-gray);
+}
+
+.living-status-chip--pale .living-status-chip__icon { background: var(--living-strong-blue); opacity: 0.55; }
+.living-status-chip--strong .living-status-chip__icon { background: var(--living-strong-blue); }
+.living-status-chip--green .living-status-chip__icon { background: var(--living-green); }
+.living-status-chip--amber .living-status-chip__icon { background: var(--living-amber); }
+.living-status-chip--red .living-status-chip__icon { background: var(--living-red); }
+.living-status-chip--purple .living-status-chip__icon { background: var(--living-purple); }
+.living-status-chip--gold .living-status-chip__icon { background: var(--living-gold); }
+.living-status-chip--gray .living-status-chip__icon { background: var(--living-gray); }
+
+.living-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--living-border);
+  border-radius: 0.4rem;
+  padding: 0.15rem 0.5rem;
+  background: var(--living-surface-solid);
+  font-size: 0.75rem;
+  color: var(--living-muted);
+}
+
+.living-badge--historical {
+  color: var(--living-gray);
+}
+
+.living-badge--active {
+  border-color: var(--living-strong-blue);
+  color: var(--living-strong-blue);
+}
+
+.living-progress {
+  width: 100%;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--living-pale-blue);
+  overflow: hidden;
+}
+
+.living-progress__bar {
+  height: 100%;
+  background: var(--living-strong-blue);
+  transition: width 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .living-progress__bar {
+    transition: none;
+  }
+}
+
+.living-empty,
+.living-error,
+.living-skeleton {
+  border: 1px dashed var(--living-border);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--living-surface);
+}
+
+.living-skeleton {
+  min-height: 4rem;
+  background: linear-gradient(
+    90deg,
+    var(--living-pale-blue),
+    var(--living-surface-solid),
+    var(--living-pale-blue)
+  );
+  background-size: 200% 100%;
+  animation: living-shimmer 1.4s linear infinite;
+}
+
+@keyframes living-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .living-skeleton {
+    animation: none;
+  }
+}
+
+.living-kpi-card,
+.living-module-card,
+.living-mission-card,
+.living-home-section {
+  border: 1px solid var(--living-border);
+  border-radius: 0.85rem;
+  background: var(--living-surface);
+  box-shadow: var(--living-shadow);
+  padding: 1rem 1.15rem;
+}
+
+.living-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.living-flow__node {
+  border: 1px solid var(--living-border);
+  border-radius: 0.65rem;
+  padding: 0.55rem 0.75rem;
+  background: var(--living-surface-solid);
+}
+
+.living-flow__arrow {
+  color: var(--living-strong-blue);
+  opacity: 0.7;
+}
+
+.living-bottom-nav {
+  display: none;
+}
+
+.living-capstone__stepper {
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.living-capstone__stage-code {
+  display: inline-flex;
+  min-width: 2rem;
+  font-weight: 700;
+  color: var(--living-strong-blue);
+}
+
+.living-capstone__stage--current {
+  border-left: 3px solid var(--living-strong-blue);
+  padding-left: 0.5rem;
+  background: var(--living-pale-blue);
+}
+
+.living-shell-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.living-shell-controls select,
+.living-shell-controls button {
+  border: 1px solid var(--living-border);
+  background: var(--living-surface-solid);
+  color: var(--living-text);
+  border-radius: 0.4rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.workspace-sidebar__section-title {
+  margin: 1rem 0 0.35rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--living-muted);
+}
+
+.professor-cc {
+  display: grid;
+  gap: 1rem;
+}
+
+.professor-cc__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.professor-cc__nav button {
+  border: 1px solid var(--living-border);
+  background: var(--living-surface-solid);
+  color: var(--living-text);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+}
+
+.professor-cc__nav button[aria-current="page"] {
+  background: var(--living-strong-blue);
+  border-color: var(--living-strong-blue);
+  color: #fff;
+}
+
+.professor-presentation {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: var(--living-canvas);
+  color: var(--living-text);
+  padding: 2rem;
+  overflow: auto;
+}
+
+.professor-presentation__content {
+  max-width: 72rem;
+  margin: 0 auto;
+  font-size: 1.25rem;
+}
+
+@media (max-width: 1024px) {
+  .tec-app-shell__body {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+
+  .tec-app-shell__right-panel {
+    position: fixed;
+    top: 3.5rem;
+    right: 0;
+    bottom: 0;
+    width: min(20rem, 92vw);
+    z-index: 40;
+    box-shadow: var(--living-shadow);
+  }
+
+  .tec-app-shell--context-collapsed .tec-app-shell__right-panel {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .tec-app-shell__body {
+    grid-template-columns: 1fr;
+  }
+
+  .tec-app-shell__sidebar {
+    display: none;
+  }
+
+  .living-bottom-nav {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.25rem;
+    position: sticky;
+    bottom: 0;
+    z-index: 30;
+    background: var(--living-surface-solid);
+    border-top: 1px solid var(--living-border);
+    padding: 0.4rem;
+  }
+
+  .living-bottom-nav a {
+    text-align: center;
+    text-decoration: none;
+    color: var(--living-text);
+    font-size: 0.7rem;
+    padding: 0.35rem 0.15rem;
+  }
+
+  .tec-app-shell__main {
+    padding: 1rem;
+    padding-bottom: 4.5rem;
+  }
+
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--living-focus);
+  outline-offset: 2px;
+}

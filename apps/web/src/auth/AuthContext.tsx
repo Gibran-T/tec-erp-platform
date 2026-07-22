@@ -21,7 +21,7 @@ export interface AuthContextValue {
   logout(): Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+export const AuthContext = createContext<AuthContextValue | null>(null);
 
 export interface AuthProviderProps {
   readonly children: ReactNode;

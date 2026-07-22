@@ -4,12 +4,15 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext.js";
 import { ProtectedRoute } from "./auth/ProtectedRoute.js";
 import { ErrorBoundary } from "./components/ErrorBoundary.js";
+import { LocaleProvider } from "./i18n/LocaleProvider.js";
 import { WorkspaceLayout } from "./layouts/WorkspaceLayout.js";
 import { LoginPage } from "./pages/LoginPage.js";
 import { NotFoundPage } from "./pages/NotFoundPage.js";
 import { CertificateVerifyPage } from "./pages/public/CertificateVerifyPage.js";
+import { LearnerHomePage } from "./pages/workspace/LearnerHomePage.js";
+import { ModuleHubPage } from "./pages/workspace/modules/ModuleHubPage.js";
 import { WorkspaceAppPage } from "./pages/workspace/WorkspaceAppPage.js";
-import { WorkspaceHomePage } from "./pages/workspace/WorkspaceHomePage.js";
+import { ThemeProvider } from "./theme/ThemeProvider.js";
 
 export function AppRoutes(): ReactNode {
   return (
@@ -19,7 +22,8 @@ export function AppRoutes(): ReactNode {
       <Route element={<ProtectedRoute />}>
         <Route element={<WorkspaceLayout />}>
           <Route index element={<Navigate to="/workspace" replace />} />
-          <Route path="workspace" element={<WorkspaceHomePage />} />
+          <Route path="workspace" element={<LearnerHomePage />} />
+          <Route path="workspace/modules/:moduleCode" element={<ModuleHubPage />} />
           <Route path="workspace/apps/:appId" element={<WorkspaceAppPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
@@ -31,11 +35,15 @@ export function AppRoutes(): ReactNode {
 export function App(): ReactNode {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <LocaleProvider>
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </LocaleProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

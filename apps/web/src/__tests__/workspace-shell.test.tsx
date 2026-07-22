@@ -103,6 +103,89 @@ function renderWorkspace(
           } as Response;
         }
 
+        if (url.endsWith("/api/v1/me/course") && method === "GET") {
+          return {
+            ok: true,
+            json: async () => ({
+              courseCode: "TEC_ERP_V1",
+              title: "TEC.ERP",
+              version: "1.0.0",
+              curriculumVersion: "V1",
+              curriculumVersionLabel: "Curriculum V1",
+              status: "available",
+              percentComplete: 0,
+              modules: [
+                {
+                  moduleCode: "M1",
+                  title: "Bloc 1 — Découverte organisationnelle",
+                  sequence: 1,
+                  status: "available",
+                  percentComplete: 0,
+                  competencySummary: "Comprendre l'entreprise intégrée",
+                  missions: [
+                    {
+                      missionKey: "m1-m01-decouvrir-entreprise",
+                      missionCode: "M1-M01",
+                      title: "Découvrir l’entreprise",
+                      sequence: 1,
+                      status: "available",
+                      unlockExplanation: null,
+                    },
+                  ],
+                },
+              ],
+            }),
+          } as Response;
+        }
+
+        if (url.includes("/api/v1/me/pedagogical-course-runs") && method === "GET") {
+          return {
+            ok: true,
+            json: async () => [
+              {
+                id: "run_active",
+                runCode: "RUN-1",
+                runLabel: "Parcours actif",
+                status: "ACTIVE",
+                statusLabel: "Actif",
+                runTypeLabel: "Autonome",
+                completionPercent: 10,
+                isHistorical: false,
+                isWritable: true,
+                curriculumVersion: "V1",
+                curriculumVersionLabel: "Curriculum V1",
+              },
+            ],
+          } as Response;
+        }
+
+        if (url.includes("/api/v1/me/capstone/submission") && method === "GET") {
+          return {
+            ok: true,
+            json: async () => ({
+              id: "cap_1",
+              status: "draft",
+              diagnose: "",
+              prioritize: "",
+              execute: "",
+              analyze: "",
+              recommend: "",
+              executiveSummary: null,
+              submittedAt: null,
+              reviewStatus: null,
+              lifecycleStatus: "LOCKED",
+              lifecycleStatusLabel: "Verrouillé",
+            }),
+          } as Response;
+        }
+
+        if (url.includes("/api/v1/me/analytics/exceptions") && method === "GET") {
+          return {
+            ok: true,
+            json: async () => ({ exceptions: [] }),
+          } as Response;
+        }
+
         throw new Error(`Unexpected request in workspace-shell test: ${method} ${url}`);
       }),
     );
