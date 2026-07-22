@@ -20,6 +20,9 @@
     },
     "erp-web#typecheck": {
       "dependsOn": ["@tec-platform/ui#build", "@tec-platform/contracts#build"]
+    },
+    "@tec-platform/database-erp#typecheck": {
+      "dependsOn": ["@tec-platform/database-erp#build"]
     }
   }
 }
