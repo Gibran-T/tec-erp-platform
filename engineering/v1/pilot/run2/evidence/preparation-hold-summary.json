@@ -1,0 +1,16 @@
+{
+  "probe": "production-identity",
+  "capturedAt": "2026-07-22T17:18:04.150Z",
+  "thiagoMatches": 0,
+  "professorAccounts": 0,
+  "cohortTECERP_PILOT_001_professors": 0,
+  "qaResidueZero": true,
+  "jamesLogin": "OK",
+  "run1IntegrityHash": "83dea106c47c80ace90ff50656986e13cf2d36b70fcc4185578a10c163571da4",
+  "versionedRunSupported": false,
+  "executionBlocked": true,
+  "blockers": [
+    "VERSIONED_PEDAGOGICAL_RUN_SUPPORT_REQUIRED",
+    "LEGITIMATE_THIAGO_PROFESSOR_IDENTITY_REQUIRED"
+  ]
+}
