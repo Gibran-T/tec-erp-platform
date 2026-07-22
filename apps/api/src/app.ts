@@ -34,7 +34,10 @@ import { createOrganizationMeRouter } from "./modules/organization/organization.
 import { createOrganizationService } from "./modules/organization/organization.service.js";
 import { createAssessmentMeRouter } from "./modules/assessment/assessment.routes.js";
 import { createAssessmentService } from "./modules/assessment/assessment.service.js";
-import { createAnalyticsMeRouter } from "./modules/analytics/analytics.routes.js";
+import {
+  createAnalyticsMeRouter,
+  createAnalyticsProfessorRouter,
+} from "./modules/analytics/analytics.routes.js";
 import { createAnalyticsService } from "./modules/analytics/analytics.service.js";
 import { createAiCoachMeRouter, createAiCoachProfessorRouter } from "./modules/ai-coach/ai-coach.routes.js";
 import { createAiCoachService } from "./modules/ai-coach/ai-coach.service.js";
@@ -189,6 +192,12 @@ export function createApp(
     requireEmployee,
     requireProfessor,
     createProfessorRouter(professorService),
+  );
+  app.use(
+    "/api/v1/professor",
+    requireEmployee,
+    requireProfessor,
+    createAnalyticsProfessorRouter(analyticsService),
   );
   app.use(
     "/api/v1/professor",

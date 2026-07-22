@@ -48,3 +48,35 @@ export function createAnalyticsMeRouter(service: AnalyticsService): Router {
 
   return router;
 }
+
+export function createAnalyticsProfessorRouter(service: AnalyticsService): Router {
+  const router = Router();
+
+  router.get("/analytics/heatmap", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      const result = await service.getProfessorHeatmap(employee.id);
+      if (Result.isFail(result)) {
+        throw result.error;
+      }
+      res.status(200).json(result.value);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get("/analytics/competencies", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      const result = await service.getProfessorCompetencies(employee.id);
+      if (Result.isFail(result)) {
+        throw result.error;
+      }
+      res.status(200).json(result.value);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  return router;
+}
