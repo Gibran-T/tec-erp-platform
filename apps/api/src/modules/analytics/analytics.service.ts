@@ -135,12 +135,6 @@ export function createAnalyticsService(client = getPrismaClient()) {
           ? [...new Set(attempts.map((attempt) => attempt.missionDefinition.missionKey))]
           : attempts.map((attempt) => attempt.missionDefinition.missionKey);
 
-      const moduleCounts: Record<string, number> = {};
-      for (const key of completedKeys) {
-        const moduleCode = key.split("-")[0]?.toUpperCase() ?? "M?";
-        moduleCounts[moduleCode] = (moduleCounts[moduleCode] ?? 0) + 1;
-      }
-
       const studentRuns = await client.pedagogicalCourseRun.findMany({
         where: { employeeId: membership.employeeId },
         select: {
@@ -150,9 +144,22 @@ export function createAnalyticsService(client = getPrismaClient()) {
           runType: true,
           status: true,
           runCode: true,
+          curriculumVersion: true,
         },
       });
       const official = pickOfficialRun(studentRuns);
+      const { moduleCodeForMissionInCurriculum, parseCurriculumVersion } = await import(
+        "@tec-platform/mission-catalog"
+      );
+      const curriculumVersion = parseCurriculumVersion(official?.curriculumVersion);
+
+      const moduleCounts: Record<string, number> = {};
+      for (const key of completedKeys) {
+        const moduleCode =
+          moduleCodeForMissionInCurriculum(curriculumVersion, key) ??
+          (/^m(\d+)/i.exec(key)?.[0]?.toUpperCase() ?? "M?");
+        moduleCounts[moduleCode] = (moduleCounts[moduleCode] ?? 0) + 1;
+      }
 
       rows.push({
         studentId: membership.employee.id,
@@ -160,14 +167,20 @@ export function createAnalyticsService(client = getPrismaClient()) {
         displayName: membership.employee.displayName,
         completedMissions: completedKeys.length,
         moduleCounts,
+        curriculumVersion,
         officialRunCode: official?.runCode ?? null,
         runCount: studentRuns.filter(isEligibleForOfficial).length,
+        note:
+          curriculumVersion === "V1"
+            ? "Curriculum V1 historique — ne pas comparer module-à-module avec V2 (HCM)."
+            : "Curriculum V2 — M8 HCM, M9 Gouvernance, M10 BI/IA; Capstone séparé.",
       });
     }
 
     return Result.ok({
       mode,
       enrolledStudentCount: rows.length,
+      curriculumVersionsPresent: [...new Set(rows.map((row) => row.curriculumVersion))],
       rows,
     });
   }

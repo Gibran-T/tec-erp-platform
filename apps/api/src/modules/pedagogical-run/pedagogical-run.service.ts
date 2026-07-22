@@ -1,5 +1,6 @@
 ﻿import { DomainError, Result, type ResultType } from "@tec-platform/core";
 import {
+  CurriculumVersionLabelFr,
   PedagogicalRunStatusLabelFr,
   PedagogicalRunTypeLabelFr,
   type CreatePedagogicalCourseRunRequest,
@@ -9,6 +10,10 @@ import {
   type TransitionPedagogicalCourseRunRequest,
 } from "@tec-platform/contracts";
 import { getPrismaClient } from "@tec-platform/database-erp";
+import {
+  CURRENT_CURRICULUM_VERSION,
+  parseCurriculumVersion,
+} from "@tec-platform/mission-catalog";
 
 type PrismaRun = {
   id: string;
@@ -30,6 +35,7 @@ type PrismaRun = {
   cancelledAt: Date | null;
   completionPercent: number;
   reflectionsEnabled: boolean;
+  curriculumVersion?: string | null;
 };
 
 const DEFAULT_COURSE_CODE = "TEC_ERP_V1";
@@ -49,6 +55,7 @@ const TRANSITIONS: Record<string, PedagogicalRunStatus> = {
 function mapRun(run: PrismaRun): PedagogicalCourseRun {
   const status = run.status as PedagogicalRunStatus;
   const runType = run.runType as keyof typeof PedagogicalRunTypeLabelFr;
+  const curriculumVersion = parseCurriculumVersion(run.curriculumVersion);
   return {
     id: run.id,
     companyId: run.companyId,
@@ -69,6 +76,8 @@ function mapRun(run: PrismaRun): PedagogicalCourseRun {
     cancelledAt: run.cancelledAt?.toISOString() ?? null,
     completionPercent: run.completionPercent,
     reflectionsEnabled: run.reflectionsEnabled === true,
+    curriculumVersion,
+    curriculumVersionLabel: CurriculumVersionLabelFr[curriculumVersion],
     runTypeLabel: PedagogicalRunTypeLabelFr[runType] ?? run.runType,
     statusLabel: PedagogicalRunStatusLabelFr[status] ?? run.status,
     isWritable: status === "ACTIVE",
@@ -217,6 +226,7 @@ export function createPedagogicalRunService() {
               createdById: input.actorId,
               completionPercent: 0,
               reflectionsEnabled: input.request.reflectionsEnabled === true,
+              curriculumVersion: CURRENT_CURRICULUM_VERSION,
               metadataJson: {
                 reason: input.request.reason,
                 plannedStartAt: input.request.plannedStartAt ?? null,

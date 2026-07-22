@@ -3,7 +3,11 @@ import { createHash, randomBytes } from "node:crypto";
 import { DomainError, Result, type ResultType } from "@tec-platform/core";
 import type { CertificateView } from "@tec-platform/contracts";
 import { getPrismaClient, type Prisma } from "@tec-platform/database-erp";
-import { listAllMissions } from "@tec-platform/mission-catalog";
+import {
+  DEFAULT_CURRICULUM_VERSION,
+  listRegularMissionsForCurriculum,
+  type CurriculumVersion,
+} from "@tec-platform/mission-catalog";
 
 function toInputJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
@@ -19,11 +23,15 @@ export interface GoldEligibilityInput {
   readonly capstoneSubmitted: boolean;
   readonly capstoneProfessorApproved: boolean;
   readonly professorApproveFlag: boolean;
+  readonly curriculumVersion?: CurriculumVersion;
 }
 
 export function evaluateGoldEligibility(input: GoldEligibilityInput): { eligible: boolean; reasons: string[] } {
   const reasons: string[] = [];
-  const requiredMissions = listAllMissions().map((mission) => mission.missionKey);
+  const version = input.curriculumVersion ?? DEFAULT_CURRICULUM_VERSION;
+  const requiredMissions = listRegularMissionsForCurriculum(version).map(
+    (mission) => mission.missionKey,
+  );
   const missing = requiredMissions.filter((key) => !input.completedMissionKeys.has(key));
   if (missing.length > 0) {
     reasons.push(`Missions incomplètes: ${missing.length}`);
@@ -86,6 +94,7 @@ export function createCertificationService(client = getPrismaClient()) {
       capstoneSubmitted: capstone?.status === "submitted" || capstone?.status === "approved",
       capstoneProfessorApproved: capstone?.professorApproved === true,
       professorApproveFlag,
+      curriculumVersion: run?.curriculumVersion ?? DEFAULT_CURRICULUM_VERSION,
     });
   }
 

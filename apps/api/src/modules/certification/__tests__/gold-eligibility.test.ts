@@ -1,41 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { listRegularMissionKeys } from "@tec-platform/mission-catalog";
 
 import { evaluateGoldEligibility } from "../certification.service.js";
 
 describe("gold eligibility gate", () => {
-  it("requires all missions, gold assessment, capstone approval and professor flag", () => {
-    const allKeys = new Set([
-      "m1-m01-decouvrir-entreprise",
-      "m1-m02-connecter-departements",
-      "m1-m03-diagnostiquer-preparation",
-      "m2-m01-structurer-organisation",
-      "m2-m02-creer-donnees-reference",
-      "m2-m03-corriger-qualite-donnees",
-      "m3-m01-identifier-besoin-achat",
-      "m3-m02-creer-traiter-commande-achat",
-      "m3-m03-receptionner-analyser-fournisseur",
-      "m4-m01-saisir-commande-institutionnelle",
-      "m4-m02-allocation-inter-entrepots",
-      "m4-m03-confirmer-livraison-cloture",
-      "m5-m01-analyser-stock-reappro",
-      "m5-m02-decision-transfert-inter-dc",
-      "m5-m03-presentation-sop",
-      "m6-m01-reception-facture",
-      "m6-m02-exception-rapprochement-trois-voies",
-      "m6-m03-expliquer-ecart-finance",
-      "m7-m01-ouvrir-dossier-client",
-      "m7-m02-coordonner-escalade",
-      "m7-m03-cloturer-cas-nps",
-      "m8-m01-matrice-approbation-pression",
-      "m8-m02-revue-acces-sod",
-      "m8-m03-autoevaluation-probation",
-      "m9-m01-atelier-definition-kpi",
-      "m9-m02-tableau-bord-comite",
-      "m9-m03-analyse-concurrentielle-ia",
-      "m10-m01-diapositive-conseil",
-      "m10-m02-defi-final-equinoxe",
-      "m10-m03-presentation-capstone-or",
-    ]);
+  it("V1 requires historical 30 including m10 Capstone-module missions plus Capstone approval", () => {
+    const allKeys = new Set(listRegularMissionKeys("V1"));
 
     const eligible = evaluateGoldEligibility({
       completedMissionKeys: allKeys,
@@ -43,6 +13,7 @@ describe("gold eligibility gate", () => {
       capstoneSubmitted: true,
       capstoneProfessorApproved: true,
       professorApproveFlag: true,
+      curriculumVersion: "V1",
     });
     expect(eligible.eligible).toBe(true);
 
@@ -52,8 +23,49 @@ describe("gold eligibility gate", () => {
       capstoneSubmitted: true,
       capstoneProfessorApproved: true,
       professorApproveFlag: true,
+      curriculumVersion: "V1",
     });
     expect(blocked.eligible).toBe(false);
     expect(blocked.reasons.some((reason) => reason.includes("GOLD_M7_M10"))).toBe(true);
+  });
+
+  it("V2 requires HCM missions and rejects Capstone-as-mission-30 keys as regular progress", () => {
+    const v2Keys = new Set(listRegularMissionKeys("V2"));
+    expect(v2Keys.has("m8-m01-integrer-nouvel-employe")).toBe(true);
+    expect(v2Keys.has("m10-m03-presentation-capstone-or")).toBe(false);
+
+    const eligible = evaluateGoldEligibility({
+      completedMissionKeys: v2Keys,
+      goldAssessmentPassed: true,
+      capstoneSubmitted: true,
+      capstoneProfessorApproved: true,
+      professorApproveFlag: true,
+      curriculumVersion: "V2",
+    });
+    expect(eligible.eligible).toBe(true);
+
+    const withoutProfessorCapstone = evaluateGoldEligibility({
+      completedMissionKeys: v2Keys,
+      goldAssessmentPassed: true,
+      capstoneSubmitted: true,
+      capstoneProfessorApproved: false,
+      professorApproveFlag: true,
+      curriculumVersion: "V2",
+    });
+    expect(withoutProfessorCapstone.eligible).toBe(false);
+    expect(
+      withoutProfessorCapstone.reasons.some((reason) => reason.includes("Approbation professeur")),
+    ).toBe(true);
+
+    const v1CompleteOnV2 = evaluateGoldEligibility({
+      completedMissionKeys: new Set(listRegularMissionKeys("V1")),
+      goldAssessmentPassed: true,
+      capstoneSubmitted: true,
+      capstoneProfessorApproved: true,
+      professorApproveFlag: true,
+      curriculumVersion: "V2",
+    });
+    expect(v1CompleteOnV2.eligible).toBe(false);
+    expect(v1CompleteOnV2.reasons.some((reason) => reason.startsWith("Missions"))).toBe(true);
   });
 });

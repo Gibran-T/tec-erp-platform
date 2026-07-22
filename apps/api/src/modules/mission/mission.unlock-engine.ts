@@ -1,5 +1,10 @@
-import { listMissionsForModule, listModules } from "@tec-platform/mission-catalog";
+import {
+  listMissionsForModuleInCurriculum,
+  listModulesForCurriculum,
+  type CurriculumVersion,
+} from "@tec-platform/mission-catalog";
 
+import { getRunCurriculumVersion } from "../pedagogical-run/curriculum-context.js";
 import { moduleCodeForMission, nextUnlockKeyAfterMission } from "./mission.migration-mapper.js";
 import type {
   CourseProgressRepository,
@@ -7,8 +12,8 @@ import type {
   UnlockStateRepository,
 } from "./mission.types.js";
 
-function nextModuleCode(moduleCode: string): string | null {
-  const modules = listModules()
+function nextModuleCode(moduleCode: string, version: CurriculumVersion): string | null {
+  const modules = listModulesForCurriculum(version)
     .slice()
     .sort((left, right) => left.sequence - right.sequence);
   const index = modules.findIndex((module) => module.moduleCode === moduleCode);
@@ -25,14 +30,16 @@ export async function applyMissionCompletionUnlocks(input: {
   readonly unlockStates: UnlockStateRepository;
   readonly courseProgress: CourseProgressRepository;
   readonly attemptRepository: MissionAttemptRepository;
+  readonly curriculumVersion?: CurriculumVersion;
 }): Promise<void> {
-  const nextKey = nextUnlockKeyAfterMission(input.missionKey);
+  const version = input.curriculumVersion ?? getRunCurriculumVersion();
+  const nextKey = nextUnlockKeyAfterMission(input.missionKey, version);
   if (nextKey) {
     await input.unlockStates.unlock(input.employeeId, "mission", nextKey, input.completedAt);
   }
 
-  const moduleCode = moduleCodeForMission(input.missionKey) ?? "M1";
-  const moduleMissions = listMissionsForModule(moduleCode);
+  const moduleCode = moduleCodeForMission(input.missionKey, version) ?? "M1";
+  const moduleMissions = listMissionsForModuleInCurriculum(version, moduleCode);
   const attempts = input.attemptRepository.listAttemptsForEmployee
     ? await input.attemptRepository.listAttemptsForEmployee(input.employeeId)
     : [];
@@ -64,11 +71,11 @@ export async function applyMissionCompletionUnlocks(input: {
     status: moduleStatus,
   });
 
-  const allModules = listModules();
+  const allModules = listModulesForCurriculum(version);
   let courseCompletedMissions = 0;
   let courseTotalMissions = 0;
   for (const module of allModules) {
-    const missions = listMissionsForModule(module.moduleCode);
+    const missions = listMissionsForModuleInCurriculum(version, module.moduleCode);
     courseTotalMissions += missions.length;
     courseCompletedMissions += missions.filter((mission) =>
       completedKeys.has(mission.missionKey),
@@ -87,7 +94,7 @@ export async function applyMissionCompletionUnlocks(input: {
   });
 
   if (moduleStatus === "completed") {
-    const following = nextModuleCode(moduleCode);
+    const following = nextModuleCode(moduleCode, version);
     if (following) {
       await input.unlockStates.unlock(input.employeeId, "module", following, input.completedAt);
       await input.unlockStates.unlock(

@@ -14,8 +14,13 @@ import {
   GenericMissionSubmitRequestSchema,
   MissionSubmitRequestSchema,
 } from "@tec-platform/contracts";
-import { getMissionByKey, listAllMissions } from "@tec-platform/mission-catalog";
+import {
+  getMissionByKey,
+  getMissionForCurriculum,
+  listRegularMissionsForCurriculum,
+} from "@tec-platform/mission-catalog";
 
+import { getRunCurriculumVersion } from "../pedagogical-run/curriculum-context.js";
 import {
   ENTERPRISE_DISCOVERY_MISSION_KEY,
   getMissionCatalogEntry,
@@ -116,10 +121,10 @@ async function isMissionUnlocked(
   }
 
   // Derive unlock from previous mission completion when unlock_state is absent.
-  const previousKey = listAllMissions()
-    .filter((mission) => mission.moduleCode === "M1")
-    .sort((left, right) => left.sequence - right.sequence)
-    .find((mission) => nextUnlockKeyAfterMission(mission.missionKey) === missionKey)?.missionKey;
+  const version = getRunCurriculumVersion();
+  const previousKey = listRegularMissionsForCurriculum(version)
+    .find((mission) => nextUnlockKeyAfterMission(mission.missionKey, version) === missionKey)
+    ?.missionKey;
 
   if (!previousKey) {
     return false;
@@ -318,8 +323,9 @@ export function createMissionService(dependencies: MissionServiceDependencies): 
   return {
     async listMissions(employeeId) {
       const missions = [];
+      const version = getRunCurriculumVersion();
 
-      for (const catalog of listAllMissions()) {
+      for (const catalog of listRegularMissionsForCurriculum(version)) {
         const missionKey = catalog.missionKey as MissionKey;
         const { status } = await resolveDerivedStatus(dependencies, employeeId, missionKey);
 
@@ -340,7 +346,18 @@ export function createMissionService(dependencies: MissionServiceDependencies): 
         return Result.fail(DomainError.notFound("Mission introuvable."));
       }
 
-      const catalog = getMissionCatalogEntry(missionKey);
+      const version = getRunCurriculumVersion();
+      const placed = getMissionForCurriculum(version, missionKey);
+      const catalog = placed
+        ? {
+            missionKey: placed.missionKey as MissionKey,
+            title: placed.title,
+            preview: placed.preview,
+            briefing: placed.briefing,
+            unlockExplanation: placed.unlockExplanation,
+            competencyCodes: placed.competencyCodes,
+          }
+        : getMissionCatalogEntry(missionKey);
       if (!catalog) {
         return Result.fail(DomainError.notFound("Mission introuvable."));
       }

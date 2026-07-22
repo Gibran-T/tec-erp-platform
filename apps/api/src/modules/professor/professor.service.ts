@@ -1,7 +1,13 @@
 import { DomainError, Result, type ResultType } from "@tec-platform/core";
 import type { ProfessorOverrideRequest } from "@tec-platform/contracts";
 import { getPrismaClient, type Prisma } from "@tec-platform/database-erp";
-import { listAllMissions, listModules } from "@tec-platform/mission-catalog";
+import {
+  DEFAULT_CURRICULUM_VERSION,
+  isKnownCatalogMissionKey,
+  listModulesForCurriculum,
+  parseCurriculumVersion,
+  type CurriculumVersion,
+} from "@tec-platform/mission-catalog";
 
 import { createAssessmentService } from "../assessment/assessment.service.js";
 
@@ -9,21 +15,30 @@ function toInputJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 }
 
-/** Z1-009: always project M1–M10 in catalog order (empty rows = locked). */
+/** Z1-009: always project M1–M10 for the student's curriculum version (empty = locked). */
 function normalizeModuleProgress(
   progress: ReadonlyArray<{
     readonly moduleCode: string;
     readonly status: string;
     readonly percentComplete: number;
   }>,
-): Array<{ moduleCode: string; status: string; percentComplete: number }> {
+  curriculumVersion: CurriculumVersion = DEFAULT_CURRICULUM_VERSION,
+): Array<{
+  moduleCode: string;
+  moduleTitle: string;
+  status: string;
+  percentComplete: number;
+  curriculumVersion: CurriculumVersion;
+}> {
   const byCode = new Map(progress.map((item) => [item.moduleCode, item]));
-  return listModules().map((moduleEntry) => {
+  return listModulesForCurriculum(curriculumVersion).map((moduleEntry) => {
     const stored = byCode.get(moduleEntry.moduleCode);
     return {
       moduleCode: moduleEntry.moduleCode,
+      moduleTitle: moduleEntry.title,
       status: stored?.status ?? "locked",
       percentComplete: stored?.percentComplete ?? 0,
+      curriculumVersion,
     };
   });
 }
@@ -85,6 +100,10 @@ export function createProfessorService(client = getPrismaClient()) {
       const result = [];
       for (const student of uniqueByEmployee.values()) {
         const officialRunId = await resolveOfficialRunIdForEmployee(student.employeeId);
+        const officialRun = officialRunId
+          ? await client.pedagogicalCourseRun.findUnique({ where: { id: officialRunId } })
+          : null;
+        const curriculumVersion = parseCurriculumVersion(officialRun?.curriculumVersion);
         const progress = await client.employeeModuleProgress.findMany({
           where: {
             employeeId: student.employeeId,
@@ -140,12 +159,14 @@ export function createProfessorService(client = getPrismaClient()) {
           displayName: student.employee.displayName,
           email: student.employee.email,
           completedMissions,
+          curriculumVersion,
           moduleProgress: normalizeModuleProgress(
             progress.map((item) => ({
               moduleCode: item.module.moduleCode,
               status: item.status,
               percentComplete: item.percentComplete,
             })),
+            curriculumVersion,
           ),
           silverStatus,
           capstoneStatus,
@@ -170,8 +191,7 @@ export function createProfessorService(client = getPrismaClient()) {
       }
 
       if (body.action === "release_mission" && body.missionKey) {
-        const known = listAllMissions().some((mission) => mission.missionKey === body.missionKey);
-        if (!known) {
+        if (!isKnownCatalogMissionKey(body.missionKey)) {
           return Result.fail(DomainError.notFound("Mission inconnue."));
         }
         const activeRun = await client.pedagogicalCourseRun.findFirst({
@@ -319,7 +339,9 @@ export function createProfessorService(client = getPrismaClient()) {
 
     async exportCsv(professorId: string): Promise<string> {
       const students = await this.listStudents(professorId);
-      const moduleCodes = listModules().map((moduleEntry) => moduleEntry.moduleCode);
+      const moduleCodes = listModulesForCurriculum(DEFAULT_CURRICULUM_VERSION).map(
+        (moduleEntry) => moduleEntry.moduleCode,
+      );
       const header = [
         "employeeNumber",
         "displayName",
@@ -409,6 +431,14 @@ export function createProfessorService(client = getPrismaClient()) {
             status: item.status,
             percentComplete: item.percentComplete,
           })),
+          parseCurriculumVersion(
+            (
+              await client.pedagogicalCourseRun.findFirst({
+                where: { employeeId: studentId, status: { in: ["ACTIVE", "COMPLETED"] } },
+                orderBy: [{ status: "asc" }, { runSequence: "desc" }],
+              })
+            )?.curriculumVersion,
+          ),
         ),
         capstone: capstone
           ? {
@@ -416,6 +446,7 @@ export function createProfessorService(client = getPrismaClient()) {
               reviewStatus: capstone.reviewStatus,
               professorApproved: capstone.professorApproved,
               submittedAt: capstone.submittedAt?.toISOString() ?? null,
+              lifecycleStatus: capstone.lifecycleStatus,
             }
           : null,
         missions: missionAttempts.map((attempt) => ({

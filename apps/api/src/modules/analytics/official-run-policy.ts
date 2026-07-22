@@ -26,6 +26,7 @@ export type RunCandidate = {
   runType: string;
   status: string;
   runCode?: string;
+  curriculumVersion?: string | null;
 };
 
 export function isEligibleForOfficial(run: Pick<RunCandidate, "runType" | "status">): boolean {

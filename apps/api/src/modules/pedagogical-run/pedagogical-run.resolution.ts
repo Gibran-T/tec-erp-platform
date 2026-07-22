@@ -1,6 +1,12 @@
 import { DomainError } from "@tec-platform/core";
 import type { PedagogicalRunStatus } from "@tec-platform/contracts";
 import { getPrismaClient } from "@tec-platform/database-erp";
+import {
+  CURRENT_CURRICULUM_VERSION,
+  DEFAULT_CURRICULUM_VERSION,
+  parseCurriculumVersion,
+  type CurriculumVersion,
+} from "@tec-platform/mission-catalog";
 
 const WRITE_STATUSES: ReadonlySet<PedagogicalRunStatus> = new Set(["ACTIVE"]);
 const HISTORICAL_STATUSES: ReadonlySet<PedagogicalRunStatus> = new Set([
@@ -17,6 +23,7 @@ export interface ResolvedPedagogicalRun {
   readonly status: PedagogicalRunStatus;
   readonly runCode: string;
   readonly runSequence: number;
+  readonly curriculumVersion: CurriculumVersion;
   readonly isWritable: boolean;
   readonly isHistorical: boolean;
 }
@@ -27,6 +34,7 @@ function isDatabaseConfigured(): boolean {
 
 function syntheticWritableRun(employeeId: string): ResolvedPedagogicalRun {
   // In-memory unit stacks (CI quality job without DATABASE_URL): synthetic ACTIVE context.
+  // Defaults to V1 so existing unit fixtures that assert the historical catalog remain stable.
   return {
     id: `pcr_synth_${employeeId}`,
     employeeId,
@@ -35,6 +43,7 @@ function syntheticWritableRun(employeeId: string): ResolvedPedagogicalRun {
     status: "ACTIVE",
     runCode: `SYNTH-${employeeId.slice(0, 16)}`,
     runSequence: 1,
+    curriculumVersion: DEFAULT_CURRICULUM_VERSION,
     isWritable: true,
     isHistorical: false,
   };
@@ -169,6 +178,7 @@ async function tryBootstrapActiveRun(employeeId: string): Promise<ResolvedPedago
         createdById: employee.id,
         completionPercent: 0,
         reflectionsEnabled: false,
+        curriculumVersion: CURRENT_CURRICULUM_VERSION,
         metadataJson: { bootstrap: true },
       },
     });
@@ -187,6 +197,7 @@ function toResolved(
     status: string;
     runCode: string;
     runSequence: number;
+    curriculumVersion?: string | null;
   },
   forWrite: boolean,
 ): ResolvedPedagogicalRun {
@@ -206,6 +217,7 @@ function toResolved(
     status,
     runCode: run.runCode,
     runSequence: run.runSequence,
+    curriculumVersion: parseCurriculumVersion(run.curriculumVersion),
     isWritable,
     isHistorical,
   };

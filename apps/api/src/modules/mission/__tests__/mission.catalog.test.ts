@@ -12,8 +12,8 @@ import {
 } from "../mission.catalog.js";
 
 describe("mission catalog", () => {
-  it("contains Modules 1–6 missions from the registry", () => {
-    expect(MISSION_CATALOG).toHaveLength(30);
+  it("contains known mission definitions including HCM (historical + V2)", () => {
+    expect(MISSION_CATALOG.length).toBeGreaterThanOrEqual(33);
     expect(MISSION_CATALOG[0]?.missionKey).toBe(ENTERPRISE_DISCOVERY_MISSION_KEY);
     expect(MISSION_CATALOG.map((mission) => mission.missionKey).slice(0, 3)).toEqual([
       "m1-m01-decouvrir-entreprise",

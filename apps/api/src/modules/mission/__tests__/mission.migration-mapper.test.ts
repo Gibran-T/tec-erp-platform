@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   M1_M01_MISSION_KEY,
   mapLegacyAttemptToV1,
+  moduleCodeForMission,
   nextUnlockKeyAfterMission,
 } from "../mission.migration-mapper.js";
 
@@ -81,5 +82,13 @@ describe("mission migration mapper", () => {
       "m7-m01-ouvrir-dossier-client",
     );
     expect(nextUnlockKeyAfterMission("m10-m03-presentation-capstone-or")).toBeNull();
+    expect(nextUnlockKeyAfterMission("m7-m03-cloturer-cas-nps", "V2")).toBe(
+      "m8-m01-integrer-nouvel-employe",
+    );
+  });
+
+  it("maps m10-* keys to M10 (not M1)", () => {
+    expect(moduleCodeForMission("m10-m01-diapositive-conseil", "V1")).toBe("M10");
+    expect(moduleCodeForMission("m8-m01-matrice-approbation-pression", "V2")).toBe("M9");
   });
 });
