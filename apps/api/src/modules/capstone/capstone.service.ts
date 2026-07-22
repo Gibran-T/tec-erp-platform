@@ -1,10 +1,21 @@
 import { DomainError, Result, type ResultType } from "@tec-platform/core";
 import { getPrismaClient, type Prisma } from "@tec-platform/database-erp";
+import {
+  DEFAULT_CURRICULUM_VERSION,
+  parseCurriculumVersion,
+} from "@tec-platform/mission-catalog";
 
 import {
   getCurrentPedagogicalRun,
   requireCurrentPedagogicalRunId,
 } from "../pedagogical-run/run-context.js";
+import {
+  areRegularMissionsComplete,
+  CAPSTONE_LIFECYCLE_LABEL_FR,
+  CAPSTONE_STAGES_V2,
+  computeCapstoneLifecycle,
+  type CapstoneLifecycleStatus,
+} from "./capstone.lifecycle.js";
 
 function toInputJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
@@ -19,18 +30,24 @@ export interface CapstoneSubmitInput {
   readonly executiveSummary: string;
 }
 
-function mapSubmission(row: {
-  id: string;
-  status: string;
-  diagnose: string | null;
-  prioritize: string | null;
-  execute: string | null;
-  analyze: string | null;
-  recommend: string | null;
-  executiveSummary: string | null;
-  submittedAt: Date | null;
-  reviewStatus: string | null;
-}) {
+function mapSubmission(
+  row: {
+    id: string;
+    status: string;
+    diagnose: string | null;
+    prioritize: string | null;
+    execute: string | null;
+    analyze: string | null;
+    recommend: string | null;
+    executiveSummary: string | null;
+    submittedAt: Date | null;
+    reviewStatus: string | null;
+    professorApproved?: boolean;
+    lifecycleStatus?: string | null;
+    currentStage?: string | null;
+  },
+  lifecycleStatus: CapstoneLifecycleStatus,
+) {
   return {
     id: row.id,
     status: row.status,
@@ -42,7 +59,48 @@ function mapSubmission(row: {
     executiveSummary: row.executiveSummary,
     submittedAt: row.submittedAt?.toISOString() ?? null,
     reviewStatus: row.reviewStatus,
+    lifecycleStatus,
+    lifecycleStatusLabel: CAPSTONE_LIFECYCLE_LABEL_FR[lifecycleStatus],
+    currentStage: row.currentStage ?? (lifecycleStatus === "LOCKED" ? null : "S1"),
+    stages: [...CAPSTONE_STAGES_V2],
+    separateFromRegularMissions: true as const,
   };
+}
+
+async function loadCompletedMissionKeys(
+  client: ReturnType<typeof getPrismaClient>,
+  employeeId: string,
+  pedagogicalCourseRunId: string,
+): Promise<Set<string>> {
+  const attempts = await client.missionAttempt.findMany({
+    where: {
+      employeeId,
+      pedagogicalCourseRunId,
+      status: "completed",
+    },
+    include: { missionDefinition: true },
+  });
+  return new Set(attempts.map((attempt) => attempt.missionDefinition.missionKey));
+}
+
+function emptySubmission(lifecycleStatus: CapstoneLifecycleStatus) {
+  return mapSubmission(
+    {
+      id: "",
+      status: "draft",
+      diagnose: null,
+      prioritize: null,
+      execute: null,
+      analyze: null,
+      recommend: null,
+      executiveSummary: null,
+      submittedAt: null,
+      reviewStatus: null,
+      professorApproved: false,
+      currentStage: null,
+    },
+    lifecycleStatus,
+  );
 }
 
 export function createCapstoneService(client = getPrismaClient()) {
@@ -50,19 +108,16 @@ export function createCapstoneService(client = getPrismaClient()) {
     async getSubmission(employeeId: string) {
       const run = getCurrentPedagogicalRun();
       if (!run) {
-        return {
-          id: "",
-          status: "draft",
-          diagnose: "",
-          prioritize: "",
-          execute: "",
-          analyze: "",
-          recommend: "",
-          executiveSummary: null,
-          submittedAt: null,
-          reviewStatus: null,
-        };
+        return emptySubmission("LOCKED");
       }
+      const curriculumVersion = parseCurriculumVersion(
+        run.curriculumVersion,
+        DEFAULT_CURRICULUM_VERSION,
+      );
+      const completed = await loadCompletedMissionKeys(client, employeeId, run.id);
+      const regularComplete = areRegularMissionsComplete(curriculumVersion, completed);
+      const runEligible = run.status === "ACTIVE" || run.status === "COMPLETED";
+
       const row = await client.capstoneSubmission.findUnique({
         where: {
           employeeId_pedagogicalCourseRunId: {
@@ -72,20 +127,26 @@ export function createCapstoneService(client = getPrismaClient()) {
         },
       });
       if (!row) {
-        return {
-          id: "",
-          status: "draft",
-          diagnose: "",
-          prioritize: "",
-          execute: "",
-          analyze: "",
-          recommend: "",
-          executiveSummary: null,
-          submittedAt: null,
-          reviewStatus: null,
-        };
+        return emptySubmission(
+          computeCapstoneLifecycle({
+            regularMissionsComplete: regularComplete,
+            runEligible,
+            status: null,
+            reviewStatus: null,
+            professorApproved: false,
+            hasDraftContent: false,
+          }),
+        );
       }
-      return mapSubmission(row);
+      const lifecycleStatus = computeCapstoneLifecycle({
+        regularMissionsComplete: regularComplete,
+        runEligible,
+        status: row.status,
+        reviewStatus: row.reviewStatus,
+        professorApproved: row.professorApproved,
+        hasDraftContent: Boolean(row.diagnose || row.executiveSummary),
+      });
+      return mapSubmission(row, lifecycleStatus);
     },
 
     async submit(
@@ -93,6 +154,20 @@ export function createCapstoneService(client = getPrismaClient()) {
       input: CapstoneSubmitInput,
     ): Promise<ResultType<ReturnType<typeof mapSubmission>>> {
       const pedagogicalCourseRunId = requireCurrentPedagogicalRunId();
+      const run = getCurrentPedagogicalRun();
+      const curriculumVersion = parseCurriculumVersion(
+        run?.curriculumVersion,
+        DEFAULT_CURRICULUM_VERSION,
+      );
+      const completed = await loadCompletedMissionKeys(client, employeeId, pedagogicalCourseRunId);
+      if (!areRegularMissionsComplete(curriculumVersion, completed)) {
+        return Result.fail(
+          DomainError.validation(
+            "Le Capstone reste verrouillé tant que les 30 missions régulières du curriculum actif ne sont pas terminées.",
+          ),
+        );
+      }
+
       const fields = [
         input.diagnose,
         input.prioritize,
@@ -103,7 +178,9 @@ export function createCapstoneService(client = getPrismaClient()) {
       ];
       if (fields.some((value) => value.trim().length < 20)) {
         return Result.fail(
-          DomainError.validation("Chaque section du dossier capstone doit contenir au moins 20 caracteres."),
+          DomainError.validation(
+            "Chaque section du dossier capstone doit contenir au moins 20 caracteres.",
+          ),
         );
       }
 
@@ -119,6 +196,8 @@ export function createCapstoneService(client = getPrismaClient()) {
           employeeId,
           pedagogicalCourseRunId,
           status: "submitted",
+          lifecycleStatus: "UNDER_REVIEW",
+          currentStage: "S6",
           diagnose: input.diagnose.trim(),
           prioritize: input.prioritize.trim(),
           execute: input.execute.trim(),
@@ -127,9 +206,12 @@ export function createCapstoneService(client = getPrismaClient()) {
           executiveSummary: input.executiveSummary.trim(),
           submittedAt: now,
           reviewStatus: "pending",
+          professorApproved: false,
         },
         update: {
           status: "submitted",
+          lifecycleStatus: "UNDER_REVIEW",
+          currentStage: "S6",
           diagnose: input.diagnose.trim(),
           prioritize: input.prioritize.trim(),
           execute: input.execute.trim(),
@@ -138,6 +220,7 @@ export function createCapstoneService(client = getPrismaClient()) {
           executiveSummary: input.executiveSummary.trim(),
           submittedAt: now,
           reviewStatus: "pending",
+          professorApproved: false,
         },
       });
 
@@ -149,7 +232,7 @@ export function createCapstoneService(client = getPrismaClient()) {
         },
       });
 
-      return Result.ok(mapSubmission(row));
+      return Result.ok(mapSubmission(row, "UNDER_REVIEW"));
     },
 
     async listForProfessor(professorId: string) {
@@ -162,15 +245,30 @@ export function createCapstoneService(client = getPrismaClient()) {
           status: "submitted",
           employee: { companyId: professor.companyId, role: "JR_BUSINESS_ANALYST" },
         },
-        include: { employee: true },
+        include: {
+          employee: true,
+          pedagogicalCourseRun: true,
+        },
         orderBy: { submittedAt: "desc" },
       });
-      return rows.map((row) => ({
-        ...mapSubmission(row),
-        employeeId: row.employeeId,
-        studentName: row.employee.displayName,
-        professorApproved: row.professorApproved,
-      }));
+      return rows.map((row) => {
+        const lifecycleStatus = computeCapstoneLifecycle({
+          regularMissionsComplete: true,
+          runEligible: true,
+          status: row.status,
+          reviewStatus: row.reviewStatus,
+          professorApproved: row.professorApproved,
+          hasDraftContent: true,
+        });
+        return {
+          ...mapSubmission(row, lifecycleStatus),
+          employeeId: row.employeeId,
+          studentName: row.employee.displayName,
+          professorApproved: row.professorApproved,
+          curriculumVersion: parseCurriculumVersion(row.pedagogicalCourseRun.curriculumVersion),
+          runCode: row.pedagogicalCourseRun.runCode,
+        };
+      });
     },
 
     async review(
@@ -199,6 +297,8 @@ export function createCapstoneService(client = getPrismaClient()) {
           reviewStatus: approved ? "approved" : "needs_revision",
           professorApproved: approved,
           professorNotes: notes ?? null,
+          lifecycleStatus: approved ? "APPROVED" : "REVISION_REQUESTED",
+          currentStage: approved ? "S7" : "S7",
         },
       });
       await client.auditEvent.create({

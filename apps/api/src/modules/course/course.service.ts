@@ -6,8 +6,13 @@ import type {
   MissionStatus,
   ProgressStatus,
 } from "@tec-platform/contracts";
-import { listMissionsForModule, listModules } from "@tec-platform/mission-catalog";
+import {
+  listMissionsForModuleInCurriculum,
+  listModulesForCurriculum,
+} from "@tec-platform/mission-catalog";
+import { CurriculumVersionLabelFr } from "@tec-platform/contracts";
 
+import { getRunCurriculumVersion } from "../pedagogical-run/curriculum-context.js";
 import { createMissionService, type MissionServiceDependencies } from "../mission/mission.service.js";
 import type {
   CourseProgressRepository,
@@ -57,6 +62,7 @@ export function createCourseService(dependencies: CourseServiceDependencies): Co
 
   return {
     async getCourseOverview(employeeId) {
+      const curriculumVersion = getRunCurriculumVersion();
       const listed = await missionService.listMissions(employeeId);
       const byKey = new Map(listed.missions.map((mission) => [mission.missionKey, mission]));
       const storedCourse = await dependencies.courseProgress.getCourseProgress(
@@ -66,8 +72,11 @@ export function createCourseService(dependencies: CourseServiceDependencies): Co
 
       const modules = [];
 
-      for (const moduleEntry of listModules()) {
-        const missions = listMissionsForModule(moduleEntry.moduleCode).map((definition) => {
+      for (const moduleEntry of listModulesForCurriculum(curriculumVersion)) {
+        const missions = listMissionsForModuleInCurriculum(
+          curriculumVersion,
+          moduleEntry.moduleCode,
+        ).map((definition) => {
           const summary = byKey.get(definition.missionKey as MissionKey);
           const status: MissionStatus = summary?.status ?? "locked";
           return {
@@ -104,6 +113,8 @@ export function createCourseService(dependencies: CourseServiceDependencies): Co
           sequence: moduleEntry.sequence,
           status: toProgressStatus(storedModule?.status, status),
           percentComplete: storedModule?.percentComplete ?? percentComplete,
+          competencySummary: moduleEntry.competencySummary,
+          processTags: moduleEntry.processTags,
           missions,
         });
       }
@@ -123,6 +134,8 @@ export function createCourseService(dependencies: CourseServiceDependencies): Co
         courseCode: COURSE_CODE,
         title: COURSE_TITLE,
         version: COURSE_VERSION,
+        curriculumVersion,
+        curriculumVersionLabel: CurriculumVersionLabelFr[curriculumVersion],
         status: toProgressStatus(storedCourse?.status, overallPercent > 0 ? "in_progress" : "available"),
         percentComplete: storedCourse?.percentComplete ?? overallPercent,
         modules,

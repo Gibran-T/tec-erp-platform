@@ -105,10 +105,13 @@ describe("professor analytics service", () => {
           displayName: "Etudiant A",
           completedMissions: 3,
           moduleCounts: { M1: 1, M2: 2 },
+          curriculumVersion: "V1",
           officialRunCode: "A-RUN1",
           runCount: 2,
+          note: "Curriculum V1 historique — ne pas comparer module-à-module avec V2 (HCM).",
         },
       ]);
+      expect(result.value.curriculumVersionsPresent).toEqual(["V1"]);
     }
   });
 

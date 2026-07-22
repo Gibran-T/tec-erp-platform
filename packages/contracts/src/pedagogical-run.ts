@@ -63,12 +63,20 @@ export const PedagogicalCourseRunSchema = z.object({
   cancelledAt: z.string().datetime().nullable(),
   completionPercent: z.number().min(0).max(100),
   reflectionsEnabled: z.boolean(),
+  /** V1 historical catalog vs V2 M1–M10+HCM with separate Capstone. */
+  curriculumVersion: z.enum(["V1", "V2"]),
+  curriculumVersionLabel: z.string().min(1),
   runTypeLabel: z.string().min(1),
   statusLabel: z.string().min(1),
   isWritable: z.boolean(),
   isHistorical: z.boolean(),
 });
 export type PedagogicalCourseRun = z.infer<typeof PedagogicalCourseRunSchema>;
+
+export const CurriculumVersionLabelFr: Record<"V1" | "V2", string> = {
+  V1: "Curriculum V1 (historique)",
+  V2: "Curriculum V2 (M1–M10, HCM, Capstone séparé)",
+};
 
 export const CreatePedagogicalCourseRunRequestSchema = z.object({
   employeeId: z.string().min(1),

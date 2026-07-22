@@ -207,6 +207,9 @@ model PedagogicalCourseRun {
   completionPercent  Float     @default(0)
   /// When true, student may submit post-mission reflections for this run.
   reflectionsEnabled Boolean   @default(false)
+  /// V1 = historical 30-mission catalog (M8 Governance, M10 Capstone module).
+  /// V2 = M1–M10 with HCM + Governance + BI; Capstone is a separate domain.
+  curriculumVersion  String    @default("V1")
   metadataJson       Json      @default("{}")
 
   company     Company                @relation(fields: [companyId], references: [id])
@@ -909,8 +912,13 @@ model CapstoneSubmission {
   id                     String    @id @default(cuid())
   employeeId             String
   pedagogicalCourseRunId String
+  /// Historical link for V1; V2 Capstone is domain-level (not one of the 30 regular missions).
   missionKey             String    @default("m10-m03-presentation-capstone-or")
   status                 String    @default("draft")
+  /// LOCKED | AVAILABLE | IN_PROGRESS | SUBMITTED | UNDER_REVIEW | REVISION_REQUESTED | APPROVED | REJECTED
+  lifecycleStatus        String?
+  /// Stage 1–7 of the Equinoxe integrator project (V2 structured Capstone).
+  currentStage           String?
   diagnose               String?
   prioritize             String?
   execute                String?

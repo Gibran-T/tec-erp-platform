@@ -8,8 +8,9 @@ import type {
   CertificateView,
 } from "@tec-platform/contracts";
 import { getPrismaClient, type Prisma } from "@tec-platform/database-erp";
-import { listMissionsForModule } from "@tec-platform/mission-catalog";
+import { listMissionsForModuleInCurriculum } from "@tec-platform/mission-catalog";
 
+import { getRunCurriculumVersion } from "../pedagogical-run/curriculum-context.js";
 import {
   getCurrentPedagogicalRun,
   requireCurrentPedagogicalRunId,
@@ -188,15 +189,23 @@ export function createAssessmentService(client = getPrismaClient()) {
         const passed = best != null && best >= definition.passThresholdPercent;
         const inProgress = relatedAttempts.some((attempt) => attempt.status === "in_progress");
 
+        const curriculumVersion = getRunCurriculumVersion();
         const requiredModules =
           definition.code === "SILVER_M1_M2"
             ? ["M1", "M2"]
             : definition.code === "INTEGRATED_M3_M6"
               ? ["M3", "M4", "M5", "M6"]
-              : [];
-        const modulesComplete = requiredModules.every((moduleCode) =>
-          listMissionsForModule(moduleCode).every((mission) => completedKeys.has(mission.missionKey)),
-        );
+              : definition.code === "GOLD_M7_M10"
+                ? ["M7", "M8", "M9", "M10"]
+                : [];
+        const modulesComplete =
+          requiredModules.length === 0
+            ? true
+            : requiredModules.every((moduleCode) =>
+                listMissionsForModuleInCurriculum(curriculumVersion, moduleCode).every((mission) =>
+                  completedKeys.has(mission.missionKey),
+                ),
+              );
 
         let status: AssessmentSummary["status"] = "locked";
         if (passed) {
@@ -473,8 +482,9 @@ export function createAssessmentService(client = getPrismaClient()) {
         );
       }
 
-      const m1 = listMissionsForModule("M1");
-      const m2 = listMissionsForModule("M2");
+      const curriculumVersion = getRunCurriculumVersion();
+      const m1 = listMissionsForModuleInCurriculum(curriculumVersion, "M1");
+      const m2 = listMissionsForModuleInCurriculum(curriculumVersion, "M2");
       const completed = await client.missionAttempt.findMany({
         where: { employeeId, status: "completed" },
         include: { missionDefinition: true },

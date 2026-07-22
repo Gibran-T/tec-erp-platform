@@ -38,17 +38,23 @@ export function refusesAnswerKeyRequest(question: string): boolean {
 }
 
 const MODULE_CONTEXT: Record<string, string> = {
-  M1: "Fondations ERP — cartographie processus, rôles et données de référence.",
-  M2: "Données maîtres — articles, partenaires, cohérence des unités et coûts.",
-  M3: "Procure-to-Pay — besoin, commande, réception, facture fournisseur.",
-  M4: "Order-to-Cash — commande client, livraison, facturation, encaissement.",
-  M5: "Supply Chain — stocks, transferts, risques de rupture.",
-  M6: "Finance — factures, écarts, trésorerie et contrôles.",
-  M7: "CRM — parcours client, opportunités et preuves transactionnelles.",
-  M8: "Gouvernance — accès, séparation des tâches, contrôles internes.",
-  M9: "BI & indicateurs — définition KPI, lignée de données, frontières analytiques.",
-  M10: "Capstone / intégration — diagnostic transversal et recommandation exécutive.",
+  M1: "Entreprise intégrée et processus — cartographie ERP, rôles et dépendances.",
+  M2: "Structure organisationnelle et données de base — master data et qualité.",
+  M3: "Approvisionnement / Procure-to-Pay — besoin, commande, réception, impact fournisseur.",
+  M4: "Ventes / Order-to-Cash — commande, allocation, livraison, clôture.",
+  M5: "Stocks, réapprovisionnement et S&OP — capacité et planification.",
+  M6: "Finance et contrôle — factures, rapprochement trois voies, explication d'écart.",
+  M7: "CRM et service client — dossier, escalade, récupération de satisfaction.",
+  M8: "Ressources humaines / HCM — intégration, temps/absences, compétences (décision humaine).",
+  M9: "Gouvernance, accès et conformité — approbations, SoD, responsabilité professionnelle.",
+  M10: "BI, KPI, IA et conseil — définition d'indicateurs, interprétation, limites de l'IA.",
 };
+
+const HCM_SAFEGUARD =
+  "Garde-fou HCM : ne jamais inférer de traits sensibles, ne pas prendre de décision d'emploi finale, exiger des preuves, préserver la vie privée et rappeler la responsabilité humaine.";
+
+const M10_AI_SAFEGUARD =
+  "Garde-fou M10 : expliquer les KPI (formule, source, variance), distinguer anomalie et causalité, rappeler hallucination/biais/explicabilité et human-in-the-loop. L'IA n'est pas autoritative.";
 
 function detectCategory(normalized: string): string {
   if (/flux|document|commande|facture|livraison|r[eé]ception/.test(normalized)) {
@@ -143,7 +149,15 @@ export function buildDeterministicAiCoachAnswer(
         : "Je peux vous guider avec des questions réflexives sur le processus métier, sans modifier vos scores ni révéler les réponses attendues.";
   }
 
-  return [prefix, body].filter(Boolean).join(" ").trim();
+  const safeguards: string[] = [];
+  if (moduleCode === "M8" || /hcm|rh|employ[eé]|absence|comp[eé]tence/.test(normalized)) {
+    safeguards.push(HCM_SAFEGUARD);
+  }
+  if (moduleCode === "M10" || /kpi|bi\b|hallucin|biais|copilote|ia\b/.test(normalized)) {
+    safeguards.push(M10_AI_SAFEGUARD);
+  }
+
+  return [prefix, body, ...safeguards].filter(Boolean).join(" ").trim();
 }
 
 export function isRateLimited(recentCount: number): boolean {

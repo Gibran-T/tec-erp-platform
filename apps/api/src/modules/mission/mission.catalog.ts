@@ -1,6 +1,7 @@
 import {
   getMissionByKey,
-  listAllMissions,
+  isKnownCatalogMissionKey,
+  listAllKnownMissionDefinitions,
   type MissionDefinitionDocument,
 } from "@tec-platform/mission-catalog";
 import type { MissionKey } from "@tec-platform/contracts";
@@ -65,7 +66,9 @@ function toCatalogEntry(doc: MissionDefinitionDocument): MissionCatalogEntry {
   };
 }
 
-export const MISSION_CATALOG: readonly MissionCatalogEntry[] = listAllMissions().map(toCatalogEntry);
+/** All known definitions (V1 + HCM). Placement overlays are applied at list/detail time. */
+export const MISSION_CATALOG: readonly MissionCatalogEntry[] =
+  listAllKnownMissionDefinitions().map(toCatalogEntry);
 
 const m01 = getMissionByKey(ENTERPRISE_DISCOVERY_MISSION_KEY);
 
@@ -124,7 +127,7 @@ export function getMissionCatalogEntry(missionKey: string): MissionCatalogEntry 
 }
 
 export function isKnownMissionKey(missionKey: string): missionKey is MissionKey {
-  return MISSION_CATALOG.some((mission) => mission.missionKey === missionKey);
+  return isKnownCatalogMissionKey(missionKey);
 }
 
 export function isAllowedDepartmentProblemPair(

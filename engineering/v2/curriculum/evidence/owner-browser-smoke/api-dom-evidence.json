@@ -1,0 +1,518 @@
+{
+  "capturedAt": "2026-07-22T21:54:39.132Z",
+  "api": "http://127.0.0.1:3000",
+  "web": "http://localhost:5173",
+  "checks": [
+    {
+      "section": "local_api_health",
+      "ok": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "section": "local_web_health",
+      "ok": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "section": "v1_missions_30_30",
+      "ok": true,
+      "detail": {
+        "count": 30,
+        "completed": 30,
+        "keys": [
+          "m1-m01-decouvrir-entreprise",
+          "m1-m02-connecter-departements",
+          "m1-m03-diagnostiquer-preparation",
+          "m2-m01-structurer-organisation",
+          "m2-m02-creer-donnees-reference",
+          "m2-m03-corriger-qualite-donnees",
+          "m3-m01-identifier-besoin-achat",
+          "m3-m02-creer-traiter-commande-achat",
+          "m3-m03-receptionner-analyser-fournisseur",
+          "m4-m01-saisir-commande-institutionnelle",
+          "m4-m02-allocation-inter-entrepots",
+          "m4-m03-confirmer-livraison-cloture",
+          "m5-m01-analyser-stock-reappro",
+          "m5-m02-decision-transfert-inter-dc",
+          "m5-m03-presentation-sop",
+          "m6-m01-reception-facture",
+          "m6-m02-exception-rapprochement-trois-voies",
+          "m6-m03-expliquer-ecart-finance",
+          "m7-m01-ouvrir-dossier-client",
+          "m7-m02-coordonner-escalade",
+          "m7-m03-cloturer-cas-nps",
+          "m8-m01-matrice-approbation-pression",
+          "m8-m02-revue-acces-sod",
+          "m8-m03-autoevaluation-probation",
+          "m9-m01-atelier-definition-kpi",
+          "m9-m02-tableau-bord-comite",
+          "m9-m03-analyse-concurrentielle-ia",
+          "m10-m01-diapositive-conseil",
+          "m10-m02-defi-final-equinoxe",
+          "m10-m03-presentation-capstone-or"
+        ],
+        "hasHcm": false,
+        "hasV1GovM8": true,
+        "hasV1CapstoneModule": true,
+        "titlesSample": [
+          "Découvrir l’entreprise",
+          "Connecter les départements",
+          "Diagnostiquer la préparation"
+        ]
+      }
+    },
+    {
+      "section": "v1_no_hcm_completion",
+      "ok": true,
+      "detail": {
+        "hasHcmKeyListed": false
+      }
+    },
+    {
+      "section": "v1_has_historical_gov_m8",
+      "ok": true,
+      "detail": {
+        "key": "m8-m01-matrice-approbation-pression"
+      }
+    },
+    {
+      "section": "v1_has_m10_module_missions",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "section": "v1_curriculum_modules_endpoint",
+      "ok": true,
+      "detail": {
+        "status": 404,
+        "bodyKeys": [
+          "error"
+        ]
+      }
+    },
+    {
+      "section": "v1_curriculum_version",
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "section": "v1_capstone_resolvable",
+      "ok": true,
+      "detail": {
+        "status": 200,
+        "lifecycle": "UNDER_REVIEW",
+        "reviewStatus": "pending"
+      }
+    },
+    {
+      "section": "v1_certificates_endpoint",
+      "ok": true,
+      "detail": {
+        "status": 200,
+        "count": 0
+      }
+    },
+    {
+      "section": "v1_mission_open_m8-m01-matrice-approbation-pression",
+      "ok": true,
+      "detail": {
+        "status": 200,
+        "title": "Matrice d'approbation sous pression",
+        "statusMission": "completed"
+      }
+    },
+    {
+      "section": "v1_mission_open_m9-m01-atelier-definition-kpi",
+      "ok": true,
+      "detail": {
+        "status": 200,
+        "title": "Atelier de définition des KPI",
+        "statusMission": "completed"
+      }
+    },
+    {
+      "section": "v1_mission_open_m10-m01-diapositive-conseil",
+      "ok": true,
+      "detail": {
+        "status": 200,
+        "title": "Diapositive conseil et synthese executive",
+        "statusMission": "completed"
+      }
+    },
+    {
+      "section": "v2_curriculum_version",
+      "ok": false,
+      "detail": {}
+    },
+    {
+      "section": "v2_missions_exactly_30",
+      "ok": true,
+      "detail": {
+        "count": 30,
+        "completed": 0,
+        "keys": [
+          "m1-m01-decouvrir-entreprise",
+          "m1-m02-connecter-departements",
+          "m1-m03-diagnostiquer-preparation",
+          "m2-m01-structurer-organisation",
+          "m2-m02-creer-donnees-reference",
+          "m2-m03-corriger-qualite-donnees",
+          "m3-m01-identifier-besoin-achat",
+          "m3-m02-creer-traiter-commande-achat",
+          "m3-m03-receptionner-analyser-fournisseur",
+          "m4-m01-saisir-commande-institutionnelle",
+          "m4-m02-allocation-inter-entrepots",
+          "m4-m03-confirmer-livraison-cloture",
+          "m5-m01-analyser-stock-reappro",
+          "m5-m02-decision-transfert-inter-dc",
+          "m5-m03-presentation-sop",
+          "m6-m01-reception-facture",
+          "m6-m02-exception-rapprochement-trois-voies",
+          "m6-m03-expliquer-ecart-finance",
+          "m7-m01-ouvrir-dossier-client",
+          "m7-m02-coordonner-escalade",
+          "m7-m03-cloturer-cas-nps",
+          "m8-m01-integrer-nouvel-employe",
+          "m8-m02-gerer-temps-absences",
+          "m8-m03-evaluer-competences-evolution",
+          "m8-m01-matrice-approbation-pression",
+          "m8-m02-revue-acces-sod",
+          "m8-m03-autoevaluation-probation",
+          "m9-m01-atelier-definition-kpi",
+          "m9-m02-tableau-bord-comite",
+          "m9-m03-analyse-concurrentielle-ia"
+        ],
+        "hasHcm": true,
+        "hasV1GovM8": true,
+        "hasV1CapstoneModule": false,
+        "titlesSample": [
+          "Découvrir l’entreprise",
+          "Connecter les départements",
+          "Diagnostiquer la préparation organisationnelle"
+        ]
+      }
+    },
+    {
+      "section": "v2_progress_0_30_initial_or_post",
+      "ok": true,
+      "detail": {
+        "completed": 0
+      }
+    },
+    {
+      "section": "v2_has_hcm",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "section": "v2_no_m10_regular_capstone_keys",
+      "ok": true,
+      "detail": {
+        "m10Keys": []
+      }
+    },
+    {
+      "section": "v2_includes_governance_keys_in_m9_slot",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "section": "v2_capstone_locked",
+      "ok": true,
+      "detail": {
+        "status": 200,
+        "lifecycleStatus": "LOCKED",
+        "statusField": "draft",
+        "stages": [
+          {
+            "code": "S1",
+            "title": "Prise en charge du mandat"
+          },
+          {
+            "code": "S2",
+            "title": "Diagnostic transversal"
+          },
+          {
+            "code": "S3",
+            "title": "Analyse des données et des processus"
+          },
+          {
+            "code": "S4",
+            "title": "Gestion de la crise intégrée"
+          },
+          {
+            "code": "S5",
+            "title": "Recommandation exécutive"
+          },
+          {
+            "code": "S6",
+            "title": "Présentation au professeur"
+          },
+          {
+            "code": "S7",
+            "title": "Révision et décision finale"
+          }
+        ]
+      }
+    },
+    {
+      "section": "v2_first_mission_complete",
+      "ok": true,
+      "detail": {
+        "status": 200,
+        "attempt": {
+          "status": "completed",
+          "startedAt": "2026-07-22T21:54:39.876Z",
+          "completedAt": "2026-07-22T21:54:39.928Z",
+          "acknowledgedInputKeys": [
+            "ctx-nordhabitat-overview",
+            "ctx-tom-40-36"
+          ],
+          "departmentProblemMappings": [
+            {
+              "departmentKey": "dept-entrepot",
+              "problemKey": "prob-inventaire-divergent"
+            },
+            {
+              "departmentKey": "dept-ti",
+              "problemKey": "prob-coherence-donnees"
+            }
+          ],
+          "justification": "La fragmentation de l inventaire entre departements montre un ecart entre systeme et terrain.",
+          "feedbackKey": "fb-discovery-complete",
+          "feedbackBody": "Merci. Votre observation est enregistrée. L’écart 40 versus 36 illustre bien une fragmentation d’information entre départements — sans exiger un ajustement de stock de votre part. Nous pourrons plus tard approfondir le contexte organisationnel. Continuer à observer avec rigueur.\n\nClaire Fontaine",
+          "scorePercent": 100,
+          "attemptNumber": 1
+        }
+      }
+    },
+    {
+      "section": "v2_progress_1_30",
+      "ok": true,
+      "detail": {
+        "completed": 1
+      }
+    },
+    {
+      "section": "v2_hcm_mission_resolvable",
+      "ok": true,
+      "detail": {
+        "status": 200,
+        "title": "Intégrer un nouvel employé",
+        "missionStatus": "locked"
+      }
+    },
+    {
+      "section": "hcm_wrong_action_rejected_or_failed",
+      "ok": true,
+      "detail": {
+        "status": 200,
+        "score": {
+          "scorePercent": 30,
+          "earnedPoints": 30,
+          "maxPoints": 100,
+          "passed": false,
+          "feedback": "Score insuffisant. Relisez le briefing et retentez la mission.",
+          "criteria": [
+            {
+              "interactionId": "identity-boundary",
+              "earnedPoints": 0,
+              "maxPoints": 15,
+              "feedback": "Réponse incorrecte."
+            },
+            {
+              "interactionId": "cost-center",
+              "earnedPoints": 0,
+              "maxPoints": 20,
+              "feedback": "Réponse incorrecte."
+            },
+            {
+              "interactionId": "manager-assignment",
+              "earnedPoints": 0,
+              "maxPoints": 20,
+              "feedback": "Réponse incorrecte."
+            },
+            {
+              "interactionId": "access-timing",
+              "earnedPoints": 20,
+              "maxPoints": 20,
+              "feedback": ""
+            },
+            {
+              "interactionId": "mandatory-assignments",
+              "earnedPoints": 0,
+              "maxPoints": 15,
+              "feedback": "Sélectionnez au moins 3 options."
+            },
+            {
+              "interactionId": "access-scope",
+              "earnedPoints": 10,
+              "maxPoints": 10,
+              "feedback": ""
+            }
+          ],
+          "gapExplanation": "Score insuffisant (30 % / seuil 70 %). 70 point(s) manquants sur 100.",
+          "retryGuidance": "Relisez le briefing, vérifiez vos mappings et justifications, puis retentez la mission. Les erreurs de validation (champs incomplets) ne sont pas des déductions pédagogiques."
+        }
+      }
+    },
+    {
+      "section": "hcm_recovery_success",
+      "ok": true,
+      "detail": {
+        "status": 200,
+        "score": {
+          "scorePercent": 100,
+          "earnedPoints": 100,
+          "maxPoints": 100,
+          "passed": true,
+          "feedback": "Intégration conforme : identité protégée, affectations valides, accès déclenché après validation et limité au besoin opérationnel. La paie reste hors de votre périmètre d'accès.",
+          "criteria": [
+            {
+              "interactionId": "identity-boundary",
+              "earnedPoints": 15,
+              "maxPoints": 15,
+              "feedback": ""
+            },
+            {
+              "interactionId": "cost-center",
+              "earnedPoints": 20,
+              "maxPoints": 20,
+              "feedback": ""
+            },
+            {
+              "interactionId": "manager-assignment",
+              "earnedPoints": 20,
+              "maxPoints": 20,
+              "feedback": ""
+            },
+            {
+              "interactionId": "access-timing",
+              "earnedPoints": 20,
+              "maxPoints": 20,
+              "feedback": ""
+            },
+            {
+              "interactionId": "mandatory-assignments",
+              "earnedPoints": 15,
+              "maxPoints": 15,
+              "feedback": ""
+            },
+            {
+              "interactionId": "access-scope",
+              "earnedPoints": 10,
+              "maxPoints": 10,
+              "feedback": ""
+            }
+          ],
+          "gapExplanation": "Mission validée avec le score maximal.",
+          "retryGuidance": "Poursuivez vers la mission suivante ou le module suivant."
+        },
+        "attemptNumber": 1
+      }
+    },
+    {
+      "section": "v2_capstone_still_locked_before_30",
+      "ok": true,
+      "detail": {
+        "lifecycleStatus": "LOCKED",
+        "status": "draft"
+      }
+    },
+    {
+      "section": "professor_a_sees_learners",
+      "ok": true,
+      "detail": {
+        "studentsStatus": 200,
+        "runsStatus": 200,
+        "uniqueStatus": 404,
+        "uniqueBody": {
+          "error": {
+            "code": "NOT_FOUND",
+            "message": "Route not found: GET /api/v1/professor/pedagogical-course-runs/metrics/unique-students",
+            "requestId": "9827e6bd-0935-4903-9ae8-774037bb0471"
+          }
+        }
+      }
+    },
+    {
+      "section": "professor_b_isolation",
+      "ok": true,
+      "detail": {
+        "studentsStatus": 200,
+        "runsStatus": 200,
+        "hasLeak": false
+      }
+    },
+    {
+      "section": "admin_inspection",
+      "ok": true,
+      "detail": {
+        "runsStatus": 200,
+        "unique": {
+          "mode": "OFFICIAL_COHORT_RESULT",
+          "studentCount": 2
+        }
+      }
+    },
+    {
+      "section": "v1_unchanged_after_v2_progress",
+      "ok": true,
+      "detail": {
+        "count": 30,
+        "completed": 30,
+        "keys": [
+          "m1-m01-decouvrir-entreprise",
+          "m1-m02-connecter-departements",
+          "m1-m03-diagnostiquer-preparation",
+          "m2-m01-structurer-organisation",
+          "m2-m02-creer-donnees-reference",
+          "m2-m03-corriger-qualite-donnees",
+          "m3-m01-identifier-besoin-achat",
+          "m3-m02-creer-traiter-commande-achat",
+          "m3-m03-receptionner-analyser-fournisseur",
+          "m4-m01-saisir-commande-institutionnelle",
+          "m4-m02-allocation-inter-entrepots",
+          "m4-m03-confirmer-livraison-cloture",
+          "m5-m01-analyser-stock-reappro",
+          "m5-m02-decision-transfert-inter-dc",
+          "m5-m03-presentation-sop",
+          "m6-m01-reception-facture",
+          "m6-m02-exception-rapprochement-trois-voies",
+          "m6-m03-expliquer-ecart-finance",
+          "m7-m01-ouvrir-dossier-client",
+          "m7-m02-coordonner-escalade",
+          "m7-m03-cloturer-cas-nps",
+          "m8-m01-matrice-approbation-pression",
+          "m8-m02-revue-acces-sod",
+          "m8-m03-autoevaluation-probation",
+          "m9-m01-atelier-definition-kpi",
+          "m9-m02-tableau-bord-comite",
+          "m9-m03-analyse-concurrentielle-ia",
+          "m10-m01-diapositive-conseil",
+          "m10-m02-defi-final-equinoxe",
+          "m10-m03-presentation-capstone-or"
+        ],
+        "hasHcm": false,
+        "hasV1GovM8": true,
+        "hasV1CapstoneModule": true,
+        "titlesSample": [
+          "Découvrir l’entreprise",
+          "Connecter les départements",
+          "Diagnostiquer la préparation"
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "total": 30,
+    "passed": 28,
+    "failed": 2,
+    "verdict": "API_SMOKE_PARTIAL"
+  }
+}

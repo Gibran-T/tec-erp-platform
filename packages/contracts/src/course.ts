@@ -26,6 +26,8 @@ export const CourseModuleSummarySchema = z.object({
   sequence: z.number().int().positive(),
   status: ProgressStatusSchema,
   percentComplete: z.number().min(0).max(100),
+  competencySummary: z.string().optional(),
+  processTags: z.array(z.string()).optional(),
   missions: z.array(CourseMissionSummarySchema),
 });
 export type CourseModuleSummary = z.infer<typeof CourseModuleSummarySchema>;
@@ -34,6 +36,8 @@ export const CourseOverviewResponseSchema = z.object({
   courseCode: z.string().min(1),
   title: z.string().min(1),
   version: z.string().min(1),
+  curriculumVersion: z.enum(["V1", "V2"]).optional(),
+  curriculumVersionLabel: z.string().optional(),
   status: ProgressStatusSchema,
   percentComplete: z.number().min(0).max(100),
   modules: z.array(CourseModuleSummarySchema),

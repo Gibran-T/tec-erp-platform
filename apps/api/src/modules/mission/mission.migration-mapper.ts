@@ -1,7 +1,15 @@
 /**
  * Maps RC01 employee_mission_attempt rows into V1 mission_attempt payloads.
- * Also owns the canonical sequential unlock chain for M1–M6.
+ * Owns versioned sequential unlock chains for curriculum V1 / V2.
  */
+
+import {
+  DEFAULT_CURRICULUM_VERSION,
+  listRegularMissionKeys,
+  moduleCodeForMissionInCurriculum,
+  nextUnlockKeyAfterMissionInCurriculum,
+  type CurriculumVersion,
+} from "@tec-platform/mission-catalog";
 
 export interface LegacyEmployeeMissionAttemptRow {
   readonly id: string;
@@ -38,49 +46,24 @@ export const M1_M01_DEFINITION_ID = "md_m1_m01";
 export const M1_M01_MISSION_KEY = "m1-m01-decouvrir-entreprise";
 export const M1_M02_MISSION_KEY = "m1-m02-connecter-departements";
 
-/** Canonical mission sequence across Modules 1–6 (Wave 2). */
-export const COURSE_MISSION_SEQUENCE: readonly string[] = [
-  "m1-m01-decouvrir-entreprise",
-  "m1-m02-connecter-departements",
-  "m1-m03-diagnostiquer-preparation",
-  "m2-m01-structurer-organisation",
-  "m2-m02-creer-donnees-reference",
-  "m2-m03-corriger-qualite-donnees",
-  "m3-m01-identifier-besoin-achat",
-  "m3-m02-creer-traiter-commande-achat",
-  "m3-m03-receptionner-analyser-fournisseur",
-  "m4-m01-saisir-commande-institutionnelle",
-  "m4-m02-allocation-inter-entrepots",
-  "m4-m03-confirmer-livraison-cloture",
-  "m5-m01-analyser-stock-reappro",
-  "m5-m02-decision-transfert-inter-dc",
-  "m5-m03-presentation-sop",
-  "m6-m01-reception-facture",
-  "m6-m02-exception-rapprochement-trois-voies",
-  "m6-m03-expliquer-ecart-finance",
-  "m7-m01-ouvrir-dossier-client",
-  "m7-m02-coordonner-escalade",
-  "m7-m03-cloturer-cas-nps",
-  "m8-m01-matrice-approbation-pression",
-  "m8-m02-revue-acces-sod",
-  "m8-m03-autoevaluation-probation",
-  "m9-m01-atelier-definition-kpi",
-  "m9-m02-tableau-bord-comite",
-  "m9-m03-analyse-concurrentielle-ia",
-  "m10-m01-diapositive-conseil",
-  "m10-m02-defi-final-equinoxe",
-  "m10-m03-presentation-capstone-or",
-];
+/** @deprecated Prefer listRegularMissionKeys(version). Kept as V1 alias. */
+export const COURSE_MISSION_SEQUENCE: readonly string[] = listRegularMissionKeys("V1");
 
-const MODULE_BY_MISSION: Readonly<Record<string, string>> = Object.fromEntries(
-  COURSE_MISSION_SEQUENCE.map((key) => {
-    const moduleCode = key.slice(0, 2).toUpperCase();
-    return [key, moduleCode];
-  }),
-);
+function fallbackModuleCodeFromKey(missionKey: string): string | undefined {
+  const match = /^m(\d+)/i.exec(missionKey);
+  if (!match?.[1]) {
+    return undefined;
+  }
+  return `M${match[1]}`;
+}
 
-export function moduleCodeForMission(missionKey: string): string | undefined {
-  return MODULE_BY_MISSION[missionKey];
+export function moduleCodeForMission(
+  missionKey: string,
+  version: CurriculumVersion = DEFAULT_CURRICULUM_VERSION,
+): string | undefined {
+  return (
+    moduleCodeForMissionInCurriculum(version, missionKey) ?? fallbackModuleCodeFromKey(missionKey)
+  );
 }
 
 export function mapLegacyAttemptToV1(
@@ -112,10 +95,9 @@ export function mapLegacyAttemptToV1(
   };
 }
 
-export function nextUnlockKeyAfterMission(missionKey: string): string | null {
-  const index = COURSE_MISSION_SEQUENCE.indexOf(missionKey);
-  if (index < 0 || index >= COURSE_MISSION_SEQUENCE.length - 1) {
-    return null;
-  }
-  return COURSE_MISSION_SEQUENCE[index + 1] ?? null;
+export function nextUnlockKeyAfterMission(
+  missionKey: string,
+  version: CurriculumVersion = DEFAULT_CURRICULUM_VERSION,
+): string | null {
+  return nextUnlockKeyAfterMissionInCurriculum(version, missionKey) ?? null;
 }

@@ -79,5 +79,7 @@ export const ModuleCatalogEntrySchema = z.object({
   title: z.string().min(1),
   sequence: z.number().int().positive(),
   missionKeys: z.array(z.string().min(1)).min(1),
+  competencySummary: z.string().min(1).optional(),
+  processTags: z.array(z.string().min(1)).optional(),
 });
 export type ModuleCatalogEntry = z.infer<typeof ModuleCatalogEntrySchema>;
