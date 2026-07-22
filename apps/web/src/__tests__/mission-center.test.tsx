@@ -359,6 +359,11 @@ function mockMissionWorkspace(options: MissionMockOptions = {}): ReturnType<type
       });
     }
 
+    // Final Wave shell/pages may probe additional /me endpoints; keep the mock resilient.
+    if (url.includes("/api/v1/me/") && method === "GET") {
+      return jsonResponse({});
+    }
+
     throw new Error(`Unexpected request: ${method} ${url}`);
   });
 
@@ -781,13 +786,22 @@ describe("mission center experience", () => {
   });
 
   it("shows backend validation errors on submit", async () => {
-    mockMissionWorkspace({ unlocked: true, status: "available", submitStatus: 400 });
+    const fetchMock = mockMissionWorkspace({
+      unlocked: true,
+      status: "available",
+      submitStatus: 400,
+    });
     renderWorkspace("/workspace/apps/centre-mission");
 
     await waitFor(() => {
+      expect(screen.getByTestId("mission-center-page")).toBeInTheDocument();
       expect(screen.getAllByTestId("mission-open-button").length).toBeGreaterThan(0);
     });
-    fireEvent.click(screen.getAllByTestId("mission-open-button")[0]!);
+    fireEvent.click(
+      within(screen.getByTestId(`mission-summary-${missionKey}`)).getByTestId(
+        "mission-open-button",
+      ),
+    );
     await waitFor(() => expect(screen.getByTestId("mission-start-button")).toBeInTheDocument());
     fireEvent.click(screen.getByTestId("mission-start-button"));
     await waitFor(() => expect(screen.getByTestId("mission-submit-button")).toBeInTheDocument());
@@ -814,7 +828,21 @@ describe("mission center experience", () => {
           "L’écart 40 versus 36 montre une fragmentation entre l’entrepôt et les systèmes TI.",
       },
     });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("mission-submit-button")).not.toBeDisabled();
+    });
     fireEvent.click(screen.getByTestId("mission-submit-button"));
+
+    await waitFor(() => {
+      expect(
+        fetchMock.mock.calls.some(([input, init]) => {
+          const url = String(input);
+          const method = String((init as RequestInit | undefined)?.method ?? "GET").toUpperCase();
+          return url.includes(`/api/v1/me/missions/${missionKey}/submit`) && method === "POST";
+        }),
+      ).toBe(true);
+    });
 
     const submitError = await screen.findByTestId(
       "mission-submit-error",
@@ -822,6 +850,7 @@ describe("mission center experience", () => {
       { timeout: 10_000 },
     );
     expect(submitError).toHaveTextContent("Soumission invalide.");
+    expect(screen.queryByTestId("mission-client-error")).not.toBeInTheDocument();
   }, 20_000);
 
   it("renders M02 generic interaction types", async () => {
