@@ -7,17 +7,23 @@ describe("professor analytics service", () => {
   const employeeFindUnique = vi.fn();
   const cohortMembershipFindMany = vi.fn();
   const courseModuleFindMany = vi.fn();
+  const missionAttemptFindMany = vi.fn();
+  const pedagogicalCourseRunFindMany = vi.fn();
 
   const client = {
     employee: { findUnique: employeeFindUnique },
     cohortMembership: { findMany: cohortMembershipFindMany },
     courseModule: { findMany: courseModuleFindMany },
+    missionAttempt: { findMany: missionAttemptFindMany },
+    pedagogicalCourseRun: { findMany: pedagogicalCourseRunFindMany },
   };
 
   beforeEach(() => {
     employeeFindUnique.mockReset();
     cohortMembershipFindMany.mockReset();
     courseModuleFindMany.mockReset();
+    missionAttemptFindMany.mockReset();
+    pedagogicalCourseRunFindMany.mockReset();
   });
 
   it("returns empty heatmap rows when the professor has no assigned cohorts", async () => {
@@ -33,10 +39,12 @@ describe("professor analytics service", () => {
     expect(Result.isOk(result)).toBe(true);
     if (Result.isOk(result)) {
       expect(result.value.rows).toEqual([]);
+      expect(result.value.enrolledStudentCount).toBe(0);
+      expect(result.value.mode).toBe("OFFICIAL_COHORT_RESULT");
     }
   });
 
-  it("aggregates completed missions by module code for assigned cohort students", async () => {
+  it("aggregates completed missions by module for one official run per student", async () => {
     employeeFindUnique.mockResolvedValue({
       id: "emp_prof",
       companyId: "co_nord",
@@ -45,24 +53,51 @@ describe("professor analytics service", () => {
       .mockResolvedValueOnce([{ cohortId: "cohort_1" }])
       .mockResolvedValueOnce([
         {
+          employeeId: "emp_stu",
           employee: {
             id: "emp_stu",
             employeeNumber: "#QA-STU-A",
             displayName: "Etudiant A",
-            v1MissionAttempts: [
-              { missionDefinition: { missionKey: "m1-m01-decouvrir-entreprise" } },
-              { missionDefinition: { missionKey: "m2-m01-structurer-organisation" } },
-              { missionDefinition: { missionKey: "m2-m02-creer-donnees-reference" } },
-            ],
           },
         },
       ]);
+    pedagogicalCourseRunFindMany.mockResolvedValue([
+      {
+        id: "run1",
+        employeeId: "emp_stu",
+        runSequence: 1,
+        runType: "AUTONOMOUS",
+        status: "COMPLETED",
+        runCode: "A-RUN1",
+      },
+      {
+        id: "run2",
+        employeeId: "emp_stu",
+        runSequence: 2,
+        runType: "INSTRUCTOR_LED",
+        status: "ACTIVE",
+        runCode: "A-RUN2",
+      },
+    ]);
+    // resolveOfficialRunIdForEmployee uses getPrismaClient internally — heatmap uses
+    // resolveRunIdsForAnalytics which also uses getPrismaClient. For unit test we mock
+    // missionAttempt after official resolution; when DB client is the mock passed in,
+    // resolveRunIdsForAnalytics still uses real getPrismaClient. To keep this unit test
+    // hermetic, ALL_RUNS mode avoids official resolver DB dependency.
+    missionAttemptFindMany.mockResolvedValue([
+      { missionDefinition: { missionKey: "m1-m01-decouvrir-entreprise" } },
+      { missionDefinition: { missionKey: "m2-m01-structurer-organisation" } },
+      { missionDefinition: { missionKey: "m2-m02-creer-donnees-reference" } },
+    ]);
 
     const service = createAnalyticsService(client as never);
-    const result = await service.getProfessorHeatmap("emp_prof");
+    const result = await service.getProfessorHeatmap("emp_prof", {
+      analyticsMode: "ALL_RUNS",
+    });
 
     expect(Result.isOk(result)).toBe(true);
     if (Result.isOk(result)) {
+      expect(result.value.enrolledStudentCount).toBe(1);
       expect(result.value.rows).toEqual([
         {
           studentId: "emp_stu",
@@ -70,6 +105,8 @@ describe("professor analytics service", () => {
           displayName: "Etudiant A",
           completedMissions: 3,
           moduleCounts: { M1: 1, M2: 2 },
+          officialRunCode: "A-RUN1",
+          runCount: 2,
         },
       ]);
     }
@@ -84,16 +121,27 @@ describe("professor analytics service", () => {
       .mockResolvedValueOnce([{ cohortId: "cohort_1" }])
       .mockResolvedValueOnce([
         {
+          employeeId: "emp_stu",
           employee: {
             id: "emp_stu",
             employeeNumber: "#QA-STU-A",
             displayName: "Etudiant A",
-            v1MissionAttempts: [
-              { missionDefinition: { missionKey: "m1-m01-decouvrir-entreprise" } },
-            ],
           },
         },
       ]);
+    pedagogicalCourseRunFindMany.mockResolvedValue([
+      {
+        id: "run1",
+        employeeId: "emp_stu",
+        runSequence: 1,
+        runType: "AUTONOMOUS",
+        status: "COMPLETED",
+        runCode: "A-RUN1",
+      },
+    ]);
+    missionAttemptFindMany.mockResolvedValue([
+      { missionDefinition: { missionKey: "m1-m01-decouvrir-entreprise" } },
+    ]);
     courseModuleFindMany.mockResolvedValue([
       {
         moduleCode: "M1",
@@ -108,10 +156,13 @@ describe("professor analytics service", () => {
     ]);
 
     const service = createAnalyticsService(client as never);
-    const result = await service.getProfessorCompetencies("emp_prof");
+    const result = await service.getProfessorCompetencies("emp_prof", {
+      analyticsMode: "ALL_RUNS",
+    });
 
     expect(Result.isOk(result)).toBe(true);
     if (Result.isOk(result)) {
+      expect(result.value.enrolledStudentCount).toBe(1);
       expect(result.value.competencies.map((item) => item.moduleCode)).toEqual(["M1", "M2"]);
       expect(result.value.competencies[0]).toMatchObject({
         moduleCode: "M1",
