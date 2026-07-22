@@ -196,8 +196,33 @@ export function TransactionWorkspacePage(): ReactElement {
 
   return (
     <main className="workspace-page" data-testid="transaction-workspace-page">
-      <h1>Espace documents et transactions</h1>
-      <p>Consultation et actions P2P, O2C, inventaire et finance — donnees serveur autoritatives.</p>
+      <h1>Flux documentaire et transactions</h1>
+      <p>
+        Vue métier du flux ERP — les identifiants techniques restent disponibles en détail, mais ne
+        sont pas le point d’entrée.
+      </p>
+
+      <section className="living-home-section" data-testid="document-flow-view" aria-label="Vue flux">
+        <h2>Vue flux</h2>
+        <div className="living-flow">
+          {[
+            "Demande d’achat",
+            "Commande d’achat",
+            "Réception",
+            "Facture",
+            "Paiement",
+          ].map((node, index, arr) => (
+            <div key={node} style={{ display: "contents" }}>
+              <span className="living-flow__node">{node}</span>
+              {index < arr.length - 1 ? <span className="living-flow__arrow">→</span> : null}
+            </div>
+          ))}
+        </div>
+        <p>
+          Relations amont/aval, exceptions et rapprochement sont visibles dans la fiche document et
+          l’onglet finance.
+        </p>
+      </section>
 
       <div role="tablist" aria-label="Sections transactionnelles" data-testid="transaction-tabs">
         {TABS.map((tab) => (

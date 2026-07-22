@@ -13,6 +13,23 @@ async function authHeaders(): Promise<HeadersInit> {
   };
 }
 
+function asRunArray(body: unknown): Array<Record<string, unknown>> {
+  if (Array.isArray(body)) {
+    return body as Array<Record<string, unknown>>;
+  }
+  if (body && typeof body === "object") {
+    const record = body as Record<string, unknown>;
+    if (Array.isArray(record.runs)) {
+      return record.runs as Array<Record<string, unknown>>;
+    }
+    // Production/me may return the selected/current run object directly.
+    if ("id" in record || "runCode" in record || "runSequence" in record) {
+      return [record];
+    }
+  }
+  return [];
+}
+
 export async function listMyPedagogicalRuns(): Promise<Array<Record<string, unknown>>> {
   const response = await safeFetch(`${getApiBaseUrl()}/api/v1/me/pedagogical-course-runs`, {
     headers: await authHeaders(),
@@ -21,7 +38,7 @@ export async function listMyPedagogicalRuns(): Promise<Array<Record<string, unkn
     throw new Error("Impossible de charger les parcours.");
   }
   const body = (await response.json()) as unknown;
-  return Array.isArray(body) ? (body as Array<Record<string, unknown>>) : [];
+  return asRunArray(body);
 }
 
 export async function listAdminPedagogicalRuns(): Promise<Array<Record<string, unknown>>> {
@@ -88,7 +105,21 @@ export async function listProfessorPedagogicalRuns(
     throw new Error("Impossible de charger les parcours professeur.");
   }
   const body = (await response.json()) as unknown;
-  return Array.isArray(body) ? (body as Array<Record<string, unknown>>) : [];
+  return asRunArray(body);
+}
+
+export async function getProfessorUniqueStudentMetric(): Promise<{
+  mode: string;
+  studentCount: number;
+}> {
+  const response = await safeFetch(
+    `${getApiBaseUrl()}/api/v1/professor/pedagogical-course-runs/metrics/unique-students`,
+    { headers: await authHeaders() },
+  );
+  if (!response.ok) {
+    throw new Error("Impossible de charger le compteur d'apprenants uniques.");
+  }
+  return (await response.json()) as { mode: string; studentCount: number };
 }
 
 export async function createProfessorPedagogicalRun(input: {
