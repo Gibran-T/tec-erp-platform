@@ -3,6 +3,10 @@ import { z } from "zod";
 import { DomainError, Result } from "@tec-platform/core";
 
 import { getAuthenticatedEmployee } from "../../middleware/require-employee.js";
+import {
+  extractRunId,
+  withEmployeeRunContext,
+} from "../pedagogical-run/with-employee-run.js";
 import type { CapstoneService } from "./capstone.service.js";
 
 const SubmitSchema = z.object({
@@ -25,7 +29,13 @@ export function createCapstoneMeRouter(service: CapstoneService): Router {
   router.get("/submission", async (req, res, next) => {
     try {
       const employee = getAuthenticatedEmployee(req);
-      res.status(200).json(await service.getSubmission(employee.id));
+      const payload = await withEmployeeRunContext({
+        employeeId: employee.id,
+        explicitRunId: extractRunId(req),
+        forWrite: false,
+        fn: () => service.getSubmission(employee.id),
+      });
+      res.status(200).json(payload);
     } catch (error) {
       next(error);
     }
@@ -38,7 +48,12 @@ export function createCapstoneMeRouter(service: CapstoneService): Router {
       if (!parsed.success) {
         throw DomainError.validation("Dossier capstone invalide.");
       }
-      const result = await service.submit(employee.id, parsed.data);
+      const result = await withEmployeeRunContext({
+        employeeId: employee.id,
+        explicitRunId: extractRunId(req),
+        forWrite: true,
+        fn: () => service.submit(employee.id, parsed.data),
+      });
       if (Result.isFail(result)) {
         throw result.error;
       }

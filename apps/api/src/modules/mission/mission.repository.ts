@@ -1,6 +1,10 @@
 import { getPrismaClient, type Prisma } from "@tec-platform/database-erp";
 
 import {
+  getCurrentPedagogicalRun,
+  requireCurrentPedagogicalRunId,
+} from "../pedagogical-run/run-context.js";
+import {
   ENTERPRISE_DISCOVERY_MISSION_KEY,
   MISSION_FEEDBACK_COMPLETE_KEY,
 } from "./mission.catalog.js";
@@ -124,10 +128,15 @@ export function createPrismaMissionAttemptRepository(): MissionAttemptRepository
   return {
     async findAttempt(employeeId, missionKey) {
       const prisma = getPrismaClient();
+      const run = getCurrentPedagogicalRun();
+      if (!run) {
+        return null;
+      }
 
       const row = await prisma.missionAttempt.findFirst({
         where: {
           employeeId,
+          pedagogicalCourseRunId: run.id,
           missionDefinition: { missionKey },
         },
         orderBy: { attemptNumber: "desc" },
@@ -136,35 +145,17 @@ export function createPrismaMissionAttemptRepository(): MissionAttemptRepository
       if (row) {
         return mapV1RowToLegacy(row);
       }
-
-      // Fallback for environments where V1 migration has not yet run for this row.
-      const legacy = await prisma.employeeMissionAttempt.findUnique({
-        where: { employeeId_missionKey: { employeeId, missionKey } },
-      });
-      if (!legacy) {
-        return null;
-      }
-
-      return {
-        id: legacy.id,
-        employeeId: legacy.employeeId,
-        missionKey: legacy.missionKey,
-        status: legacy.status as PersistedMissionStatus,
-        startedAt: legacy.startedAt,
-        completedAt: legacy.completedAt,
-        acknowledgedInputKeys: parseStringArray(legacy.acknowledgedInputKeys),
-        departmentProblemMappings: parseMappings(legacy.departmentProblemMappings),
-        justification: legacy.justification,
-        feedbackKey: legacy.feedbackKey,
-        scorePercent: legacy.status === "completed" ? 100 : null,
-        attemptNumber: 1,
-      };
+      return null;
     },
 
     async listAttemptsForEmployee(employeeId) {
       const prisma = getPrismaClient();
+      const run = getCurrentPedagogicalRun();
+      if (!run) {
+        return [];
+      }
       const rows = await prisma.missionAttempt.findMany({
-        where: { employeeId },
+        where: { employeeId, pedagogicalCourseRunId: run.id },
         include: { missionDefinition: true },
         orderBy: [{ missionDefinitionId: "asc" }, { attemptNumber: "desc" }],
       });
@@ -173,15 +164,21 @@ export function createPrismaMissionAttemptRepository(): MissionAttemptRepository
 
     async createAttempt(input) {
       const prisma = getPrismaClient();
+      const pedagogicalCourseRunId = requireCurrentPedagogicalRunId();
       const definitionId = await resolveDefinitionId(input.missionKey);
       const existingCount = await prisma.missionAttempt.count({
-        where: { employeeId: input.employeeId, missionDefinitionId: definitionId },
+        where: {
+          employeeId: input.employeeId,
+          missionDefinitionId: definitionId,
+          pedagogicalCourseRunId,
+        },
       });
 
       const row = await prisma.missionAttempt.create({
         data: {
           employeeId: input.employeeId,
           missionDefinitionId: definitionId,
+          pedagogicalCourseRunId,
           attemptNumber: existingCount + 1,
           status: "in_progress" satisfies PersistedV1AttemptStatus,
           startedAt: input.startedAt,
@@ -215,11 +212,13 @@ export function createPrismaMissionAttemptRepository(): MissionAttemptRepository
 
     async completeAttempt(input) {
       const prisma = getPrismaClient();
+      const pedagogicalCourseRunId = requireCurrentPedagogicalRunId();
       const definitionId = await resolveDefinitionId(input.missionKey);
       const current = await prisma.missionAttempt.findFirst({
         where: {
           employeeId: input.employeeId,
           missionDefinitionId: definitionId,
+          pedagogicalCourseRunId,
           status: "in_progress",
         },
         orderBy: { attemptNumber: "desc" },

@@ -10,6 +10,10 @@ import {
 import type { NextFunction, Request, Response } from "express";
 
 import { getAuthenticatedEmployee } from "../../middleware/require-employee.js";
+import {
+  extractRunId,
+  withEmployeeRunContext,
+} from "../pedagogical-run/with-employee-run.js";
 import type { MissionService } from "./mission.service.js";
 
 export interface MissionHandlers {
@@ -24,7 +28,12 @@ export function createMissionHandlers(service: MissionService): MissionHandlers 
     async listMissions(req, res, next) {
       try {
         const employee = getAuthenticatedEmployee(req);
-        const missions = await service.listMissions(employee.id);
+        const missions = await withEmployeeRunContext({
+          employeeId: employee.id,
+          explicitRunId: extractRunId(req),
+          forWrite: false,
+          fn: () => service.listMissions(employee.id),
+        });
         res.status(200).json(MissionsResponseSchema.parse(missions));
       } catch (error) {
         next(error);
@@ -34,7 +43,12 @@ export function createMissionHandlers(service: MissionService): MissionHandlers 
     async getMission(req, res, next) {
       try {
         const employee = getAuthenticatedEmployee(req);
-        const outcome = await service.getMission(employee.id, req.params.missionKey ?? "");
+        const outcome = await withEmployeeRunContext({
+          employeeId: employee.id,
+          explicitRunId: extractRunId(req),
+          forWrite: false,
+          fn: () => service.getMission(employee.id, req.params.missionKey ?? ""),
+        });
 
         if (Result.isFail(outcome)) {
           next(outcome.error);
@@ -50,7 +64,12 @@ export function createMissionHandlers(service: MissionService): MissionHandlers 
     async startMission(req, res, next) {
       try {
         const employee = getAuthenticatedEmployee(req);
-        const outcome = await service.startMission(employee.id, req.params.missionKey ?? "");
+        const outcome = await withEmployeeRunContext({
+          employeeId: employee.id,
+          explicitRunId: extractRunId(req),
+          forWrite: true,
+          fn: () => service.startMission(employee.id, req.params.missionKey ?? ""),
+        });
 
         if (Result.isFail(outcome)) {
           next(outcome.error);
@@ -75,11 +94,13 @@ export function createMissionHandlers(service: MissionService): MissionHandlers 
           throw DomainError.validation("La soumission de mission est invalide.");
         }
 
-        const outcome = await service.submitMission(
-          employee.id,
-          req.params.missionKey ?? "",
-          req.body,
-        );
+        const outcome = await withEmployeeRunContext({
+          employeeId: employee.id,
+          explicitRunId: extractRunId(req),
+          forWrite: true,
+          fn: () =>
+            service.submitMission(employee.id, req.params.missionKey ?? "", req.body),
+        });
 
         if (Result.isFail(outcome)) {
           next(outcome.error);

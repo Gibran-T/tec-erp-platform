@@ -10,6 +10,11 @@ import type {
 import { getPrismaClient, type Prisma } from "@tec-platform/database-erp";
 import { listMissionsForModule } from "@tec-platform/mission-catalog";
 
+import {
+  getCurrentPedagogicalRun,
+  requireCurrentPedagogicalRunId,
+} from "../pedagogical-run/run-context.js";
+
 function shuffle<T>(items: readonly T[]): T[] {
   const copy = [...items];
   for (let index = copy.length - 1; index > 0; index -= 1) {
@@ -154,10 +159,18 @@ function toAttemptView(
 export function createAssessmentService(client = getPrismaClient()) {
   return {
     async listForEmployee(employeeId: string): Promise<AssessmentSummary[]> {
+      const run = getCurrentPedagogicalRun();
+      const runId = run?.id;
       const definitions = await client.assessmentDefinition.findMany({ orderBy: { code: "asc" } });
-      const attempts = await client.assessmentAttempt.findMany({ where: { employeeId } });
+      const attempts = await client.assessmentAttempt.findMany({
+        where: { employeeId, ...(runId ? { pedagogicalCourseRunId: runId } : { pedagogicalCourseRunId: "__none__" }) },
+      });
       const missionAttempts = await client.missionAttempt.findMany({
-        where: { employeeId, status: "completed" },
+        where: {
+          employeeId,
+          status: "completed",
+          ...(runId ? { pedagogicalCourseRunId: runId } : { pedagogicalCourseRunId: "__none__" }),
+        },
         include: { missionDefinition: true },
       });
       const completedKeys = new Set(
@@ -220,8 +233,14 @@ export function createAssessmentService(client = getPrismaClient()) {
       if (!definition) {
         return Result.fail(DomainError.notFound("Evaluation introuvable."));
       }
+      const pedagogicalCourseRunId = requireCurrentPedagogicalRunId();
       const attempt = await client.assessmentAttempt.findFirst({
-        where: { employeeId, assessmentId: definition.id, status: "in_progress" },
+        where: {
+          employeeId,
+          assessmentId: definition.id,
+          pedagogicalCourseRunId,
+          status: "in_progress",
+        },
         orderBy: { attemptNumber: "desc" },
       });
       if (!attempt) {
@@ -248,8 +267,14 @@ export function createAssessmentService(client = getPrismaClient()) {
         return Result.fail(DomainError.notFound("Evaluation introuvable."));
       }
 
+      const pedagogicalCourseRunId = requireCurrentPedagogicalRunId();
       const existing = await client.assessmentAttempt.findFirst({
-        where: { employeeId, assessmentId: definition.id, status: "in_progress" },
+        where: {
+          employeeId,
+          assessmentId: definition.id,
+          pedagogicalCourseRunId,
+          status: "in_progress",
+        },
         orderBy: { attemptNumber: "desc" },
       });
       if (existing) {
@@ -262,7 +287,7 @@ export function createAssessmentService(client = getPrismaClient()) {
       }
 
       const used = await client.assessmentAttempt.count({
-        where: { employeeId, assessmentId: definition.id },
+        where: { employeeId, assessmentId: definition.id, pedagogicalCourseRunId },
       });
       if (used >= definition.maxAttempts) {
         return Result.fail(DomainError.conflict("Nombre maximal de tentatives atteint."));
@@ -290,6 +315,7 @@ export function createAssessmentService(client = getPrismaClient()) {
         data: {
           employeeId,
           assessmentId: definition.id,
+          pedagogicalCourseRunId,
           attemptNumber: used + 1,
           status: "in_progress",
           startedAt: new Date(),
@@ -314,7 +340,12 @@ export function createAssessmentService(client = getPrismaClient()) {
         return Result.fail(DomainError.notFound("Evaluation introuvable."));
       }
       const attempt = await client.assessmentAttempt.findFirst({
-        where: { employeeId, assessmentId: definition.id, status: "in_progress" },
+        where: {
+          employeeId,
+          assessmentId: definition.id,
+          pedagogicalCourseRunId: requireCurrentPedagogicalRunId(),
+          status: "in_progress",
+        },
         orderBy: { attemptNumber: "desc" },
       });
       if (!attempt) {
@@ -374,7 +405,12 @@ export function createAssessmentService(client = getPrismaClient()) {
         return Result.fail(DomainError.notFound("Evaluation introuvable."));
       }
       const attempt = await client.assessmentAttempt.findFirst({
-        where: { employeeId, assessmentId: definition.id, status: "in_progress" },
+        where: {
+          employeeId,
+          assessmentId: definition.id,
+          pedagogicalCourseRunId: requireCurrentPedagogicalRunId(),
+          status: "in_progress",
+        },
         orderBy: { attemptNumber: "desc" },
       });
       if (!attempt) {
@@ -465,10 +501,13 @@ export function createAssessmentService(client = getPrismaClient()) {
         include: { cohort: true },
       });
       const certificateNumber = `SILVER-${employee.employeeNumber.replace("#", "")}-${Date.now()}`;
+      const sourceRun = getCurrentPedagogicalRun();
       const issued = await client.certificate.create({
         data: {
           employeeId,
           cohortId: membership?.cohortId,
+          sourceRunId: sourceRun?.id ?? null,
+          achievementType: "silver",
           certificateType: "silver",
           certificateNumber,
           issuedAt: new Date(),
@@ -478,6 +517,7 @@ export function createAssessmentService(client = getPrismaClient()) {
             modules: ["M1", "M2"],
             assessment: "SILVER_M1_M2",
             scorePercent: silver.bestScorePercent,
+            sourceRunId: sourceRun?.id ?? null,
           },
         },
       });

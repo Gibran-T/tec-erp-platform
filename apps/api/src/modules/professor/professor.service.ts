@@ -99,8 +99,9 @@ export function createProfessorService(client = getPrismaClient()) {
             silverStatus = "eligible";
           }
         }
-        const capstone = await client.capstoneSubmission.findUnique({
+        const capstone = await client.capstoneSubmission.findFirst({
           where: { employeeId: student.employeeId },
+          orderBy: { updatedAt: "desc" },
         });
         let capstoneStatus: "none" | "draft" | "submitted" | "approved" | "needs_revision" = "none";
         if (capstone) {
@@ -154,12 +155,24 @@ export function createProfessorService(client = getPrismaClient()) {
         if (!known) {
           return Result.fail(DomainError.notFound("Mission inconnue."));
         }
+        const activeRun = await client.pedagogicalCourseRun.findFirst({
+          where: { employeeId: studentId, status: "ACTIVE" },
+          orderBy: { updatedAt: "desc" },
+        });
+        if (!activeRun) {
+          return Result.fail(
+            DomainError.conflict(
+              "Aucun parcours ACTIVE. Impossible de liberer une mission hors parcours actif.",
+            ),
+          );
+        }
         await client.unlockState.upsert({
           where: {
-            employeeId_resourceType_resourceKey: {
+            employeeId_resourceType_resourceKey_pedagogicalCourseRunId: {
               employeeId: studentId,
               resourceType: "mission",
               resourceKey: body.missionKey,
+              pedagogicalCourseRunId: activeRun.id,
             },
           },
           update: { unlockedAt: new Date() },
@@ -167,6 +180,7 @@ export function createProfessorService(client = getPrismaClient()) {
             employeeId: studentId,
             resourceType: "mission",
             resourceKey: body.missionKey,
+            pedagogicalCourseRunId: activeRun.id,
             unlockedAt: new Date(),
           },
         });
@@ -176,11 +190,16 @@ export function createProfessorService(client = getPrismaClient()) {
         const definition = await client.missionDefinition.findUnique({
           where: { missionKey: body.missionKey },
         });
-        if (definition) {
+        const activeRun = await client.pedagogicalCourseRun.findFirst({
+          where: { employeeId: studentId, status: "ACTIVE" },
+          orderBy: { updatedAt: "desc" },
+        });
+        if (definition && activeRun) {
           await client.missionAttempt.deleteMany({
             where: {
               employeeId: studentId,
               missionDefinitionId: definition.id,
+              pedagogicalCourseRunId: activeRun.id,
               status: { in: ["in_progress", "failed"] },
             },
           });
@@ -340,8 +359,9 @@ export function createProfessorService(client = getPrismaClient()) {
         orderBy: { issuedAt: "desc" },
         include: { audits: { include: { actor: true }, orderBy: { createdAt: "desc" } } },
       });
-      const capstone = await client.capstoneSubmission.findUnique({
+      const capstone = await client.capstoneSubmission.findFirst({
         where: { employeeId: studentId },
+        orderBy: { updatedAt: "desc" },
       });
       const pendingReviews = missionAttempts.filter(
         (attempt) => attempt.status === "needs_review",

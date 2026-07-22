@@ -45,8 +45,17 @@ export function evaluateGoldEligibility(input: GoldEligibilityInput): { eligible
 
 export function createCertificationService(client = getPrismaClient()) {
   async function loadEligibility(studentId: string, professorApproveFlag: boolean) {
+    const { resolvePedagogicalRunForEmployee } = await import(
+      "../pedagogical-run/pedagogical-run.resolution.js"
+    );
+    const run = await resolvePedagogicalRunForEmployee({
+      employeeId: studentId,
+      forWrite: false,
+    });
+    const runFilter = run ? { pedagogicalCourseRunId: run.id } : { pedagogicalCourseRunId: "__none__" };
+
     const attempts = await client.missionAttempt.findMany({
-      where: { employeeId: studentId, status: "completed" },
+      where: { employeeId: studentId, status: "completed", ...runFilter },
       include: { missionDefinition: true },
     });
     const completedMissionKeys = new Set(attempts.map((row) => row.missionDefinition.missionKey));
@@ -56,10 +65,20 @@ export function createCertificationService(client = getPrismaClient()) {
         employeeId: studentId,
         assessment: { code: "GOLD_M7_M10" },
         status: "passed",
+        ...runFilter,
       },
     });
 
-    const capstone = await client.capstoneSubmission.findUnique({ where: { employeeId: studentId } });
+    const capstone = run
+      ? await client.capstoneSubmission.findUnique({
+          where: {
+            employeeId_pedagogicalCourseRunId: {
+              employeeId: studentId,
+              pedagogicalCourseRunId: run.id,
+            },
+          },
+        })
+      : null;
 
     return evaluateGoldEligibility({
       completedMissionKeys,
@@ -148,10 +167,19 @@ export function createCertificationService(client = getPrismaClient()) {
       });
 
       const certificateNumber = `GOLD-${student.employeeNumber.replace("#", "")}-${Date.now()}`;
+      const { resolvePedagogicalRunForEmployee } = await import(
+        "../pedagogical-run/pedagogical-run.resolution.js"
+      );
+      const sourceRun = await resolvePedagogicalRunForEmployee({
+        employeeId: studentId,
+        forWrite: false,
+      });
       const issued = await client.certificate.create({
         data: {
           employeeId: studentId,
           cohortId: membership?.cohortId,
+          sourceRunId: sourceRun?.id ?? null,
+          achievementType: "gold",
           certificateType: "gold",
           certificateNumber,
           issuedAt: new Date(),
@@ -161,6 +189,7 @@ export function createCertificationService(client = getPrismaClient()) {
             modules: ["M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9", "M10"],
             assessment: "GOLD_M7_M10",
             capstone: true,
+            sourceRunId: sourceRun?.id ?? null,
           },
         },
       });
