@@ -27,4 +27,13 @@
 
 ## Local UI smoke
 - Structural coverage via Mission Center + Capstone UI tests
-- Full browser smoke with disposable V1/V2 learners: deferred (P1)
+- Owner browser smoke (2026-07-22): **COMPLETE** — see `TEC_ERP_V2_OWNER_BROWSER_SMOKE.md`
+  - Isolated DB `tec_erp_v2_owner_smoke` @ `:5435`
+  - Disposable V1 30/30 + V2 greenfield/HCM wrong-action/recovery
+  - Professor A visibility + Professor B isolation; Admin unique count = 2
+  - Screenshots under `evidence/owner-browser-smoke/`
+  - Local QA residue 0; production unchanged (James hash match)
+
+## Regression gates (owner smoke re-run)
+- mission-catalog 8/8 · API 181/181 · Web 83/83
+- typecheck/lint/build API+Web · env:check · git diff --check · secret scan

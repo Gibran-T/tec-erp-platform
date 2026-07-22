@@ -17,3 +17,9 @@
 - No James Run 2 / Thiago professor
 - No full Living ERP visual redesign
 - PR #26 untouched
+
+## Owner browser smoke (final gate)
+- Completed on isolated local DB with disposable `__QA_V2_OWNER_SMOKE_` fixtures
+- Evidence: `TEC_ERP_V2_OWNER_BROWSER_SMOKE.md` + `evidence/owner-browser-smoke/`
+- No P0/P1 product defects; deferred P2 UX/i18n/professor metrics alias only
+- Production James integrity hash unchanged; V2 migration not applied to production
