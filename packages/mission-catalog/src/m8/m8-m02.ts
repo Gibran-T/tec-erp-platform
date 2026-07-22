@@ -6,10 +6,10 @@ export const M8_M02 = {
   "missionKey": "m8-m02-revue-acces-sod",
   "missionCode": "M8-M02",
   "moduleCode": "M8",
-  "title": "Revue d'acces et segregation des taches",
-  "preview": "Identifiez les conflits SoD sur les acces achats et finance apres PO-URG-9033.",
+  "title": "Revue d'accès et ségrégation des tâches",
+  "preview": "Identifiez les conflits SoD sur les accès achats et finance apres PO-URG-9033.",
   "briefing": "Bonjour,\n\nL'audit interne demande une revue d'acces trimestrielle. PO-URG-9033 a revele que Julie peut creer ET approuver des PO jusqu'a 15 000 CAD — conflit SoD potentiel avec Marc sur le rapprochement.\n\nVotre role : cartographier les roles ERP, identifier les conflits segregation des taches et proposer des remediations tracees. Aucune suppression d'acces sans validation metier.\n\nLa securite des processus commence par des acces propres.\n\nIsabelle Roy\nGouvernance — NordHabitat",
-  "unlockExplanation": "Completez d'abord « Matrice d'approbation sous pression » (PO-URG-9033 tracee).",
+  "unlockExplanation": "Complétez d'abord « Matrice d'approbation sous pression » (PO-URG-9033 tracee).",
   "sequence": 2,
   "estimatedMinutes": 45,
   "difficulty": "advanced",
@@ -86,7 +86,7 @@ export const M8_M02 = {
         },
         {
           "key": "remove-all",
-          "label": "Supprimer tous les acces sans analyse"
+          "label": "Supprimer tous les accès sans analyse"
         }
       ],
       "scoring": {
@@ -102,11 +102,11 @@ export const M8_M02 = {
     {
       "id": "sod-flow",
       "type": "ORDERING",
-      "prompt": "Ordonnez la revue d'acces et remediation SoD.",
+      "prompt": "Ordonnez la revue d'accès et remediation SoD.",
       "options": [
         {
           "key": "inventory",
-          "label": "Inventorier les roles et acces actifs"
+          "label": "Inventorier les roles et accès actifs"
         },
         {
           "key": "detect",
@@ -144,7 +144,7 @@ export const M8_M02 = {
     {
       "id": "sod-explanation",
       "type": "TEXT_ANALYSIS",
-      "prompt": "Expliquez pourquoi la segregation des taches entre creation PO et approbation PO protege NordHabitat contre la fraude.",
+      "prompt": "Expliquez pourquoi la ségrégation des tâches entre creation PO et approbation PO protege NordHabitat contre la fraude.",
       "scoring": {
         "maxPoints": 15,
         "requiredConcepts": [

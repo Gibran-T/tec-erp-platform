@@ -575,8 +575,34 @@ function MissionDetailView({
       {lastScore ? (
         <article className="workspace-mission__feedback" data-testid="mission-result">
           <h3>{lastScore.passed ? RESULT_PASSED_LABEL : RESULT_RETRY_LABEL}</h3>
-          <p data-testid="mission-result-percent">{lastScore.scorePercent} %</p>
+          <p data-testid="mission-result-percent">
+            {lastScore.scorePercent} % — {lastScore.earnedPoints} / {lastScore.maxPoints} points
+          </p>
           <pre className="workspace-mission__briefing-body">{lastScore.feedback}</pre>
+          {lastScore.gapExplanation ? (
+            <p data-testid="mission-result-gap">{lastScore.gapExplanation}</p>
+          ) : null}
+          {lastScore.retryGuidance ? (
+            <p data-testid="mission-result-retry">{lastScore.retryGuidance}</p>
+          ) : null}
+          {lastScore.criteria && lastScore.criteria.length > 0 ? (
+            <ul data-testid="mission-result-criteria">
+              {lastScore.criteria.map((criterion) => (
+                <li key={criterion.interactionId}>
+                  Critère {criterion.interactionId} : {criterion.earnedPoints}/
+                  {criterion.maxPoints}
+                  {criterion.feedback ? ` — ${criterion.feedback}` : ""}
+                  {criterion.earnedPoints < criterion.maxPoints
+                    ? " (déduction pédagogique)"
+                    : ""}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <p data-testid="mission-result-validation-note">
+            Les erreurs de validation (champs incomplets / format invalide) bloquent la soumission
+            et ne sont pas des déductions de score.
+          </p>
         </article>
       ) : null}
 

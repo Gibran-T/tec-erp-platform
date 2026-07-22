@@ -50,6 +50,105 @@ export async function listAdminCohorts() {
   );
 }
 
+export async function listAdminEmployees() {
+  const token = requireAccessToken();
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/admin/employees`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return parseJson<{ employees: Array<Record<string, unknown>> }>(
+    response,
+    "Impossible de charger les employés.",
+  );
+}
+
+export async function createAdminEmployee(input: {
+  employeeNumber: string;
+  email: string;
+  displayName: string;
+  role: "JR_BUSINESS_ANALYST" | "PROFESSOR" | "ADMIN";
+  password: string;
+}) {
+  const token = requireAccessToken();
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/admin/employees`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseJson<{ employee: Record<string, unknown> }>(
+    response,
+    "Impossible de créer l'employé.",
+  );
+}
+
+export async function updateAdminEmployeeRole(
+  employeeId: string,
+  role: "JR_BUSINESS_ANALYST" | "PROFESSOR" | "ADMIN",
+) {
+  const token = requireAccessToken();
+  const response = await safeFetch(
+    `${getApiBaseUrl()}/api/v1/admin/employees/${encodeURIComponent(employeeId)}/role`,
+    {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ role }),
+    },
+  );
+  return parseJson<{ employee: Record<string, unknown> }>(
+    response,
+    "Impossible de mettre à jour le rôle.",
+  );
+}
+
+export async function createAdminCohort(input: { code: string; name: string }) {
+  const token = requireAccessToken();
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/admin/cohorts`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  return parseJson<{ cohort: Record<string, unknown> }>(
+    response,
+    "Impossible de créer la cohorte.",
+  );
+}
+
+export async function assignAdminProfessor(cohortId: string, employeeId: string) {
+  const token = requireAccessToken();
+  const response = await safeFetch(
+    `${getApiBaseUrl()}/api/v1/admin/cohorts/${encodeURIComponent(cohortId)}/assign-professor`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ employeeId }),
+    },
+  );
+  return parseJson<{ ok: true }>(response, "Impossible d'affecter le professeur.");
+}
+
+export async function removeAdminProfessor(cohortId: string, employeeId: string) {
+  const token = requireAccessToken();
+  const response = await safeFetch(
+    `${getApiBaseUrl()}/api/v1/admin/cohorts/${encodeURIComponent(cohortId)}/remove-professor`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ employeeId }),
+    },
+  );
+  return parseJson<{ ok: true }>(response, "Impossible de retirer le professeur.");
+}
+
+export async function enrollAdminStudent(cohortId: string, employeeId: string) {
+  const token = requireAccessToken();
+  const response = await safeFetch(`${getApiBaseUrl()}/api/v1/admin/cohorts/enroll`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ cohortId, employeeId }),
+  });
+  return parseJson<{ ok: true }>(response, "Impossible d'inscrire l'étudiant.");
+}
+
 export async function getAdminConfiguration() {
   const token = requireAccessToken();
   const response = await safeFetch(`${getApiBaseUrl()}/api/v1/admin/configuration`, {

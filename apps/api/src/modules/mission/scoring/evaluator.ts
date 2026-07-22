@@ -18,6 +18,8 @@ export interface MissionScoreResult {
   readonly passed: boolean;
   readonly interactionResults: readonly ScoreInteractionResult[];
   readonly feedback: string;
+  readonly gapExplanation: string;
+  readonly retryGuidance: string;
 }
 
 export type ResponseValue =
@@ -295,6 +297,17 @@ export function evaluateMissionResponses(
   const maxPoints = interactionResults.reduce((sum, item) => sum + item.maxPoints, 0);
   const scorePercent = maxPoints === 0 ? 0 : Math.round((earnedPoints / maxPoints) * 10000) / 100;
   const passed = scorePercent >= definition.passThresholdPercent;
+  const lostPoints = Math.max(0, Math.round((maxPoints - earnedPoints) * 100) / 100);
+  const gapExplanation = passed
+    ? lostPoints > 0
+      ? `Mission validée. ${lostPoints} point(s) non obtenus sur ${maxPoints} — révisez les critères partiels ci-dessous pour consolider votre maîtrise.`
+      : "Mission validée avec le score maximal."
+    : `Score insuffisant (${scorePercent} % / seuil ${definition.passThresholdPercent} %). ${lostPoints} point(s) manquants sur ${maxPoints}.`;
+  const retryGuidance = passed
+    ? lostPoints > 0
+      ? "Vous pouvez poursuivre. Pour progresser, relisez le briefing et les critères où des points ont été perdus — sans chercher une clé de réponse."
+      : "Poursuivez vers la mission suivante ou le module suivant."
+    : "Relisez le briefing, vérifiez vos mappings et justifications, puis retentez la mission. Les erreurs de validation (champs incomplets) ne sont pas des déductions pédagogiques.";
 
   return {
     earnedPoints,
@@ -305,6 +318,8 @@ export function evaluateMissionResponses(
     feedback: passed
       ? definition.completionFeedback
       : "Score insuffisant. Relisez le briefing et retentez la mission.",
+    gapExplanation,
+    retryGuidance,
   };
 }
 

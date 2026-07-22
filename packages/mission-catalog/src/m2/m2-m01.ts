@@ -7,9 +7,9 @@ export const M2_M01 = {
   "missionCode": "M2-M01",
   "moduleCode": "M2",
   "title": "Structurer l'organisation",
-  "preview": "Definissez les unites organisationnelles, usines et centres de couts avant toute transaction.",
+  "preview": "Définissez les unités organisationnelles, usines et centres de coûts avant toute transaction.",
   "briefing": "Bonjour,\n\nLe Module 1 est complete. Avant toute transaction, NordHabitat doit structurer son organisation ERP.\n\nCartographiez sieges, DC-MTL, DC-TRT et centres de couts.\n\nClaire Fontaine\nGestionnaire — NordHabitat",
-  "unlockExplanation": "Completez le Module 1 pour debloquer la structuration organisationnelle.",
+  "unlockExplanation": "Complétez le Module 1 pour débloquer la structuration organisationnelle.",
   "sequence": 1,
   "estimatedMinutes": 30,
   "difficulty": "intro",
@@ -21,7 +21,7 @@ export const M2_M01 = {
     {
       "key": "ctx-org-map",
       "title": "Carte organisationnelle provisoire",
-      "body": "NordHabitat dispose d'un siege, de DC-MTL et DC-TRT, et de centres de couts encore mal relies.",
+      "body": "NordHabitat dispose d'un siege, de DC-MTL et DC-TRT, et de centres de coûts encore mal relies.",
       "required": true
     }
   ],
@@ -29,7 +29,7 @@ export const M2_M01 = {
     {
       "id": "org-units",
       "type": "MULTI_CHOICE",
-      "prompt": "Quelles unites doivent etre creees avant les transactions ?",
+      "prompt": "Quelles unités doivent etre creees avant les transactions ?",
       "options": [
         {
           "key": "hq",
@@ -61,7 +61,7 @@ export const M2_M01 = {
     {
       "id": "cost-center-owner",
       "type": "SINGLE_CHOICE",
-      "prompt": "Qui valide la creation des centres de couts ?",
+      "prompt": "Qui valide la creation des centres de coûts ?",
       "options": [
         {
           "key": "finance",
@@ -98,7 +98,7 @@ export const M2_M01 = {
         },
         {
           "key": "cc",
-          "label": "Creer les centres de couts"
+          "label": "Creer les centres de coûts"
         },
         {
           "key": "assign",
@@ -118,7 +118,7 @@ export const M2_M01 = {
     {
       "id": "governance-note",
       "type": "TEXT_ANALYSIS",
-      "prompt": "Expliquez pourquoi la structure organisationnelle doit preceder les donnees de reference.",
+      "prompt": "Expliquez pourquoi la structure organisationnelle doit preceder les données de reference.",
       "scoring": {
         "maxPoints": 25,
         "requiredConcepts": [
@@ -129,5 +129,5 @@ export const M2_M01 = {
       }
     }
   ],
-  "completionFeedback": "Structure validee. Vous pouvez maintenant creer les donnees de reference essentielles.\n\nClaire Fontaine"
+  "completionFeedback": "Structure validee. Vous pouvez maintenant creer les données de reference essentielles.\n\nClaire Fontaine"
 } as const satisfies MissionDefinitionDocument;

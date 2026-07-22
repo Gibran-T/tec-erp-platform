@@ -156,6 +156,18 @@ export const MissionSubmitResponseSchema = z.object({
       maxPoints: z.number(),
       passed: z.boolean(),
       feedback: z.string().min(1),
+      criteria: z
+        .array(
+          z.object({
+            interactionId: z.string().min(1),
+            earnedPoints: z.number(),
+            maxPoints: z.number(),
+            feedback: z.string(),
+          }),
+        )
+        .optional(),
+      gapExplanation: z.string().optional(),
+      retryGuidance: z.string().optional(),
     })
     .optional(),
 });

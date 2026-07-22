@@ -79,6 +79,22 @@ export async function listProfessorCapstoneQueue() {
   );
 }
 
+export async function reviewProfessorCapstoneSubmission(
+  submissionId: string,
+  payload: { approved: boolean; notes?: string },
+) {
+  const token = requireAccessToken();
+  const response = await safeFetch(
+    `${getApiBaseUrl()}/api/v1/professor/capstone/submissions/${encodeURIComponent(submissionId)}/review`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    },
+  );
+  return parseJson<{ ok: true }>(response, "Impossible d'enregistrer la revue capstone.");
+}
+
 export async function getProfessorPredictions(studentId: string) {
   const token = requireAccessToken();
   const response = await safeFetch(

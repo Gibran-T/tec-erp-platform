@@ -1,10 +1,12 @@
 import { useEffect, useState, type ReactElement } from "react";
+import { Link } from "react-router-dom";
 
 import {
   getCapstoneSubmission,
   submitCapstoneExecutiveSummary,
   type CapstoneSubmissionView,
 } from "../../api/capstone.js";
+import { getGoldEligibility, type GoldEligibilityView } from "../../api/certification.js";
 
 const EMPTY_SECTIONS = {
   diagnose: "",
@@ -18,14 +20,16 @@ const EMPTY_SECTIONS = {
 export function CapstonePage(): ReactElement {
   const [sections, setSections] = useState(EMPTY_SECTIONS);
   const [submission, setSubmission] = useState<CapstoneSubmissionView | null>(null);
+  const [eligibility, setEligibility] = useState<GoldEligibilityView | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    void getCapstoneSubmission()
-      .then((loaded) => {
+    void Promise.all([getCapstoneSubmission(), getGoldEligibility()])
+      .then(([loaded, gold]) => {
         setSubmission(loaded);
+        setEligibility(gold);
         setSections({
           diagnose: loaded.diagnose,
           prioritize: loaded.prioritize,
@@ -44,7 +48,7 @@ export function CapstonePage(): ReactElement {
 
   async function submit(): Promise<void> {
     if (sections.executiveSummary.trim().length < 40) {
-      setError("Le resume executif doit contenir au moins 40 caracteres.");
+      setError("Le résumé exécutif doit contenir au moins 40 caractères.");
       return;
     }
     setSubmitting(true);
@@ -52,7 +56,9 @@ export function CapstonePage(): ReactElement {
     try {
       const saved = await submitCapstoneExecutiveSummary(sections);
       setSubmission(saved);
-      setStatus("Dossier capstone soumis pour revue professeur.");
+      setStatus("Dossier Capstone soumis pour revue professeur.");
+      const gold = await getGoldEligibility();
+      setEligibility(gold);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Soumission impossible.");
     } finally {
@@ -60,18 +66,46 @@ export function CapstonePage(): ReactElement {
     }
   }
 
+  const missionsReady = eligibility?.studentReadyChecklist.missionsComplete ?? false;
+  const lockedHint = !missionsReady
+    ? "État verrouillé / prérequis : complétez les 30 missions (M1–M10) avant de considérer le Capstone comme éligible au certificat Or. Vous pouvez néanmoins préparer votre dossier."
+    : null;
+
   return (
     <main className="workspace-page" data-testid="capstone-page">
-      <h1>Capstone Equinoxe</h1>
+      <h1>Capstone Équinoxe</h1>
       <p>
-        Diagnostiquez, priorisez, executez, analysez et recommandez — puis soumettez votre resume
-        executif.
+        Diagnostiquez, priorisez, exécutez, analysez et recommandez — puis soumettez votre résumé
+        exécutif.{" "}
+        <Link to="/workspace/apps/certificats">Voir les certificats</Link>
       </p>
+      {lockedHint ? (
+        <p role="status" data-testid="capstone-locked-hint">
+          {lockedHint}
+        </p>
+      ) : null}
       {submission ? (
-        <p role="status">
+        <p role="status" data-testid="capstone-submission-status">
           Statut dossier : {submission.status}
           {submission.reviewStatus ? ` — revue ${submission.reviewStatus}` : ""}
         </p>
+      ) : (
+        <p role="status">Aucun dossier soumis pour le moment.</p>
+      )}
+      {eligibility ? (
+        <section data-testid="capstone-gold-status">
+          <h2>Statut certificat Or</h2>
+          <p>{eligibility.nextStepHint}</p>
+          {eligibility.reasons.length > 0 ? (
+            <ul>
+              {eligibility.reasons.map((reason) => (
+                <li key={reason}>{reason}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>Prérequis étudiants satisfaits — émission Or par le professeur uniquement.</p>
+          )}
+        </section>
       ) : null}
       {error ? (
         <p role="alert" data-testid="capstone-error">
@@ -88,7 +122,7 @@ export function CapstonePage(): ReactElement {
         [
           ["diagnose", "Diagnostiquer"],
           ["prioritize", "Prioriser"],
-          ["execute", "Executer"],
+          ["execute", "Exécuter"],
           ["analyze", "Analyser"],
           ["recommend", "Recommander"],
         ] as const
@@ -104,14 +138,14 @@ export function CapstonePage(): ReactElement {
       ))}
 
       <section data-testid="capstone-executive-summary">
-        <h2>Resume executif</h2>
+        <h2>Résumé exécutif</h2>
         <textarea
           value={sections.executiveSummary}
           onChange={(event) => updateField("executiveSummary", event.target.value)}
           rows={6}
         />
         <button type="button" disabled={submitting} onClick={() => void submit()} data-testid="capstone-submit">
-          {submitting ? "Soumission…" : "Soumettre le dossier capstone"}
+          {submitting ? "Soumission…" : "Soumettre le dossier Capstone"}
         </button>
       </section>
     </main>

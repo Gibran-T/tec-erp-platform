@@ -3,7 +3,7 @@ import { useState, type ReactElement } from "react";
 import { askAiCoach, type AiCoachAskResponse } from "../../api/aiCoach.js";
 
 const AI_DISCLAIMER =
-  "Assistance pedagogique IA — cette reponse ne modifie jamais vos scores, debloque aucune mission et ne remplace pas votre jugement professionnel.";
+  "Assistance pédagogique IA — cette réponse ne modifie jamais vos scores, ne débloque aucune mission et ne remplace pas votre jugement professionnel.";
 
 interface ChatEntry {
   readonly id: string;
@@ -13,6 +13,7 @@ interface ChatEntry {
 
 export function AiCoachPage(): ReactElement {
   const [question, setQuestion] = useState("");
+  const [moduleCode, setModuleCode] = useState("");
   const [entries, setEntries] = useState<ChatEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +22,7 @@ export function AiCoachPage(): ReactElement {
     event.preventDefault();
     const trimmed = question.trim();
     if (trimmed.length < 4) {
-      setError("Posez une question d'au moins 4 caracteres.");
+      setError("Posez une question d'au moins 4 caractères.");
       return;
     }
     setError(null);
@@ -34,7 +35,9 @@ export function AiCoachPage(): ReactElement {
     setEntries((current) => [...current, studentEntry]);
     setQuestion("");
     try {
-      const response: AiCoachAskResponse = await askAiCoach(trimmed);
+      const response: AiCoachAskResponse = await askAiCoach(trimmed, {
+        moduleCode: moduleCode.trim() || undefined,
+      });
       setEntries((current) => [
         ...current,
         {
@@ -63,7 +66,9 @@ export function AiCoachPage(): ReactElement {
       ) : null}
 
       <section aria-label="Conversation" data-testid="ai-coach-conversation">
-        {entries.length === 0 ? <p>Posez une question liee a votre mission en cours.</p> : null}
+        {entries.length === 0 ? (
+          <p>Posez une question liée à votre mission en cours (flux documentaire, risque, KPI…).</p>
+        ) : null}
         <ul>
           {entries.map((entry) => (
             <li key={entry.id} data-testid={`ai-coach-entry-${entry.role}`}>
@@ -74,6 +79,21 @@ export function AiCoachPage(): ReactElement {
       </section>
 
       <form onSubmit={(event) => void submitQuestion(event)} data-testid="ai-coach-form">
+        <label>
+          Module (optionnel)
+          <select
+            value={moduleCode}
+            onChange={(event) => setModuleCode(event.target.value)}
+            data-testid="ai-coach-module"
+          >
+            <option value="">—</option>
+            {["M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9", "M10"].map((code) => (
+              <option key={code} value={code}>
+                {code}
+              </option>
+            ))}
+          </select>
+        </label>
         <label>
           Votre question
           <textarea

@@ -6,10 +6,10 @@ export const M6_M01 = {
   "missionKey": "m6-m01-reception-facture",
   "missionCode": "M6-M01",
   "moduleCode": "M6",
-  "title": "Receptionner la facture fournisseur",
+  "title": "Réceptionner la facture fournisseur",
   "preview": "Saisissez la facture ThermoControl pour PO-88421 et preparez le rapprochement trois voies.",
   "briefing": "Bonjour,\n\nThermoControl a envoye sa facture INV-TC-88421 pour la livraison partielle liee a PO-88421. Julie a deja valide la reception de 36 unites sur 40 commandees.\n\nAvant de poster quoi que ce soit, saisis la facture et lance l'apercu de rapprochement (match preview). Je bloque tout paiement sans controle.\n\nIdentifie le statut de match avant la prochaine etape.\n\nMarc Tremblay\nFinance — NordHabitat",
-  "unlockExplanation": "Completez d'abord le Module 5 (decision S&OP) pour debloquer Finance.",
+  "unlockExplanation": "Complétez d'abord le Module 5 (decision S&OP) pour débloquer Finance.",
   "sequence": 1,
   "estimatedMinutes": 30,
   "difficulty": "intermediate",
@@ -20,13 +20,13 @@ export const M6_M01 = {
     {
       "key": "ctx-invoice",
       "title": "Facture INV-TC-88421",
-      "body": "Fournisseur ThermoControl; reference PO-88421; 36 unites SKU-HVAC-4421 a 125 CAD; montant 4 500 CAD; date facture 5 septembre.",
+      "body": "Fournisseur ThermoControl; reference PO-88421; 36 unités SKU-HVAC-4421 a 125 CAD; montant 4 500 CAD; date facture 5 septembre.",
       "required": true
     },
     {
       "key": "ctx-po-gr",
       "title": "PO et reception GR-88421",
-      "body": "PO-88421 : 40 unites commandees a 125 CAD (5 000 CAD). GR-88421 : 36 unites recues le 15 mai. 4 unites en attente fournisseur.",
+      "body": "PO-88421 : 40 unités commandees a 125 CAD (5 000 CAD). GR-88421 : 36 unités recues le 15 mai. 4 unités en attente fournisseur.",
       "required": true
     },
     {
@@ -44,7 +44,7 @@ export const M6_M01 = {
       "options": [
         {
           "key": "receive",
-          "label": "Receptionner et enregistrer la facture"
+          "label": "Réceptionner et enregistrer la facture"
         },
         {
           "key": "pay",
@@ -77,11 +77,11 @@ export const M6_M01 = {
         },
         {
           "key": "flag-exception",
-          "label": "Signaler exception si ecart detecte"
+          "label": "Signaler exception si écart detecte"
         },
         {
           "key": "verify-gr",
-          "label": "Verifier GR-88421 (36 unites)"
+          "label": "Verifier GR-88421 (36 unités)"
         },
         {
           "key": "blind-post",
@@ -106,7 +106,7 @@ export const M6_M01 = {
       "options": [
         {
           "key": "receive",
-          "label": "Receptionner la facture INV-TC-88421"
+          "label": "Réceptionner la facture INV-TC-88421"
         },
         {
           "key": "enter",
@@ -134,7 +134,7 @@ export const M6_M01 = {
     {
       "id": "invoice-qty",
       "type": "NUMERIC_INPUT",
-      "prompt": "Combien d'unites figurent sur la facture INV-TC-88421 ?",
+      "prompt": "Combien d'unités figurent sur la facture INV-TC-88421 ?",
       "scoring": {
         "maxPoints": 10,
         "numericTarget": 36,
@@ -156,5 +156,5 @@ export const M6_M01 = {
       }
     }
   ],
-  "completionFeedback": "Facture INV-TC-88421 saisie. Exception quantite signalee : facture 36 unites alignee sur GR, PO reste a 40. Pret pour resolution.\n\nMarc Tremblay"
+  "completionFeedback": "Facture INV-TC-88421 saisie. Exception quantite signalee : facture 36 unités alignee sur GR, PO reste a 40. Pret pour resolution.\n\nMarc Tremblay"
 } as const satisfies MissionDefinitionDocument;

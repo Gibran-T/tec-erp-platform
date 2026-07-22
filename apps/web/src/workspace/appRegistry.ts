@@ -1,3 +1,5 @@
+import type { EmployeeRole } from "@tec-platform/contracts";
+
 export type WorkspaceAppAccess = "day1" | "preparing";
 
 export interface WorkspaceAppDefinition {
@@ -6,6 +8,11 @@ export interface WorkspaceAppDefinition {
   readonly access: WorkspaceAppAccess;
   readonly sidebarOrder: number;
   readonly launcherOrder: number;
+  /**
+   * When set, the app is shown only to employees whose role is listed.
+   * When omitted, any authenticated employee may see the app (subject to `access`).
+   */
+  readonly roles?: readonly EmployeeRole[];
 }
 
 export const WORKSPACE_APPS: readonly WorkspaceAppDefinition[] = [
@@ -40,6 +47,7 @@ export const WORKSPACE_APPS: readonly WorkspaceAppDefinition[] = [
     access: "day1",
     sidebarOrder: 8,
     launcherOrder: 8,
+    roles: ["PROFESSOR", "ADMIN"],
   },
   {
     id: "tableaux-bord",
@@ -75,6 +83,7 @@ export const WORKSPACE_APPS: readonly WorkspaceAppDefinition[] = [
     access: "day1",
     sidebarOrder: 13,
     launcherOrder: 13,
+    roles: ["ADMIN"],
   },
   { id: "calendrier", label: "Calendrier", access: "preparing", sidebarOrder: 14, launcherOrder: 14 },
   {
@@ -87,16 +96,30 @@ export const WORKSPACE_APPS: readonly WorkspaceAppDefinition[] = [
   { id: "profil", label: "Mon profil", access: "day1", sidebarOrder: 16, launcherOrder: 16 },
 ];
 
+export function isWorkspaceAppVisibleToRole(
+  app: WorkspaceAppDefinition,
+  role: EmployeeRole,
+): boolean {
+  if (!app.roles || app.roles.length === 0) {
+    return true;
+  }
+  return app.roles.includes(role);
+}
+
 export function getWorkspaceApp(appId: string): WorkspaceAppDefinition | undefined {
   return WORKSPACE_APPS.find((app) => app.id === appId);
 }
 
-export function getSidebarApps(): WorkspaceAppDefinition[] {
-  return [...WORKSPACE_APPS].sort((left, right) => left.sidebarOrder - right.sidebarOrder);
+export function getSidebarApps(role?: EmployeeRole): WorkspaceAppDefinition[] {
+  return [...WORKSPACE_APPS]
+    .filter((app) => (role ? isWorkspaceAppVisibleToRole(app, role) : true))
+    .sort((left, right) => left.sidebarOrder - right.sidebarOrder);
 }
 
-export function getLauncherApps(): WorkspaceAppDefinition[] {
-  return [...WORKSPACE_APPS].sort((left, right) => left.launcherOrder - right.launcherOrder);
+export function getLauncherApps(role?: EmployeeRole): WorkspaceAppDefinition[] {
+  return [...WORKSPACE_APPS]
+    .filter((app) => (role ? isWorkspaceAppVisibleToRole(app, role) : true))
+    .sort((left, right) => left.launcherOrder - right.launcherOrder);
 }
 
 export function getAppPath(appId: string): string {

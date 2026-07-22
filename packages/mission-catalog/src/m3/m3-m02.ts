@@ -9,7 +9,7 @@ export const M3_M02 = {
   "title": "Creer et traiter une commande d'achat",
   "preview": "Creez PO-88421 avec approbation, prix et tolerances.",
   "briefing": "Bonjour,\n\nConvertissez la demande en commande d'achat PO-88421 vers ThermoControl. Respectez limites d'approbation et segregation des taches.\n\nJulie Chen",
-  "unlockExplanation": "Completez d'abord l'identification du besoin d'achat.",
+  "unlockExplanation": "Complétez d'abord l'identification du besoin d'achat.",
   "sequence": 2,
   "estimatedMinutes": 35,
   "difficulty": "intermediate",
@@ -117,7 +117,7 @@ export const M3_M02 = {
     {
       "id": "po-amount",
       "type": "NUMERIC_INPUT",
-      "prompt": "Montant PO (CAD) pour 40 unites a 125 CAD ?",
+      "prompt": "Montant PO (CAD) pour 40 unités a 125 CAD ?",
       "scoring": {
         "maxPoints": 10,
         "numericTarget": 5000,
@@ -127,7 +127,7 @@ export const M3_M02 = {
     {
       "id": "sod",
       "type": "TEXT_ANALYSIS",
-      "prompt": "Expliquez la segregation des taches entre demandeur et approbateur.",
+      "prompt": "Expliquez la ségrégation des tâches entre demandeur et approbateur.",
       "scoring": {
         "maxPoints": 10,
         "requiredConcepts": [

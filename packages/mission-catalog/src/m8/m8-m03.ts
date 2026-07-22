@@ -6,10 +6,10 @@ export const M8_M03 = {
   "missionKey": "m8-m03-autoevaluation-probation",
   "missionCode": "M8-M03",
   "moduleCode": "M8",
-  "title": "Autoevaluation de probation",
-  "preview": "Completez votre autoevaluation de fin de probation avec preuves M1-M8.",
+  "title": "Autoévaluation de probation",
+  "preview": "Complétez votre autoevaluation de fin de probation avec preuves M1-M8.",
   "briefing": "Bonjour,\n\nVotre periode de probation Equinoxe se termine. Avant la certification Or, vous devez soumettre une autoevaluation honnete : competences acquises, ecarts identifies, preuves des missions M1-M8.\n\nJe ne cherche pas la perfection — je cherche la reflexion. Documentez ce que vous maitrisez, ce qui reste fragile et comment vous comptez progresser en M9-M10.\n\nC'est votre dossier de credibilite professionnelle.\n\nIsabelle Roy\nGouvernance — NordHabitat",
-  "unlockExplanation": "Completez d'abord « Revue d'acces et segregation des taches » (revue Q3 archivee).",
+  "unlockExplanation": "Complétez d'abord « Revue d'accès et ségrégation des tâches » (revue Q3 archivee).",
   "sequence": 3,
   "estimatedMinutes": 45,
   "difficulty": "advanced",
@@ -115,7 +115,7 @@ export const M8_M03 = {
         },
         {
           "key": "gaps",
-          "label": "Documenter ecarts et causes"
+          "label": "Documenter écarts et causes"
         },
         {
           "key": "commit",
@@ -157,5 +157,5 @@ export const M8_M03 = {
       }
     }
   ],
-  "completionFeedback": "Autoevaluation de probation soumise. Portfolio M1-M8 documente; plan M9-M10 valide par Isabelle. Probation levee conditionnellement.\n\nIsabelle Roy"
+  "completionFeedback": "Autoévaluation de probation soumise. Portfolio M1-M8 documente; plan M9-M10 valide par Isabelle. Probation levee conditionnellement.\n\nIsabelle Roy"
 } as const satisfies MissionDefinitionDocument;

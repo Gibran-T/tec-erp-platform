@@ -6,10 +6,10 @@ export const M9_M01 = {
   "missionKey": "m9-m01-atelier-definition-kpi",
   "missionCode": "M9-M01",
   "moduleCode": "M9",
-  "title": "Atelier de definition des KPI",
-  "preview": "Definissez les KPI directeurs pour le comite Equinoxe a partir des donnees M1-M8.",
+  "title": "Atelier de définition des KPI",
+  "preview": "Définissez les KPI directeurs pour le comite Equinoxe a partir des données M1-M8.",
   "briefing": "Bonjour,\n\nLe comite de direction Equinoxe veut un tableau de bord fiable — pas 40 indicateurs, mais les KPI qui comptent vraiment. NPS institutionnel, delai P1 CRM, ecart P2P, marge O2C : tout est la, mais rien n'est formalise.\n\nVotre role : animer l'atelier de definition KPI. Chaque indicateur doit avoir une definition, une source de donnees, un seuil et un proprietaire.\n\nUn KPI sans proprietaire est un numero mort.\n\nNadia Fontaine\nBusiness Intelligence — NordHabitat",
-  "unlockExplanation": "Completez d'abord le Module 8 (autoevaluation probation) pour debloquer BI.",
+  "unlockExplanation": "Complétez d'abord le Module 8 (autoevaluation probation) pour débloquer BI.",
   "sequence": 1,
   "estimatedMinutes": 40,
   "difficulty": "intermediate",
@@ -20,18 +20,18 @@ export const M9_M01 = {
     {
       "key": "ctx-kpi-candidates",
       "title": "Candidats KPI Equinoxe",
-      "body": "NPS institutionnel (CAS-7701 : 9); delai resolution P1 CRM (22 h vs 24 h SLA); ecart P2P PO-88421 (500 CAD reliquat); marge O2C Sacre-Coeur (-3,1 % frets); taux SoD remedie (3/3).",
+      "body": "NPS institutionnel (CAS-7701 : 9); delai resolution P1 CRM (22 h vs 24 h SLA); écart P2P PO-88421 (500 CAD reliquat); marge O2C Sacre-Coeur (-3,1 % frets); taux SoD remedie (3/3).",
       "required": true
     },
     {
       "key": "ctx-kpi-framework",
-      "title": "Cadre definition KPI",
-      "body": "Chaque KPI : nom, definition, formule, source ERP, frequence, seuil vert/jaune/rouge, proprietaire metier, audience comite.",
+      "title": "Cadre définition KPI",
+      "body": "Chaque KPI : nom, définition, formule, source ERP, frequence, seuil vert/jaune/rouge, proprietaire metier, audience comite.",
       "required": true
     },
     {
       "key": "ctx-data-sources",
-      "title": "Sources de donnees ERP",
+      "title": "Sources de données ERP",
       "body": "CRM : CAS-7701, NPS; P2P : PO-88421, GR; O2C : SO-12047, frets; GOV : revue SoD Q3; Finance : rapprochement Marc.",
       "required": true
     }
@@ -73,7 +73,7 @@ export const M9_M01 = {
         },
         {
           "key": "source",
-          "label": "Source de donnees ERP identifiee"
+          "label": "Source de données ERP identifiee"
         },
         {
           "key": "threshold",
@@ -85,7 +85,7 @@ export const M9_M01 = {
         },
         {
           "key": "vague-name",
-          "label": "Nom seul sans definition"
+          "label": "Nom seul sans définition"
         }
       ],
       "scoring": {
@@ -102,7 +102,7 @@ export const M9_M01 = {
     {
       "id": "kpi-workshop-flow",
       "type": "ORDERING",
-      "prompt": "Ordonnez l'atelier de definition des KPI.",
+      "prompt": "Ordonnez l'atelier de définition des KPI.",
       "options": [
         {
           "key": "identify",

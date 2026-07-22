@@ -24,7 +24,11 @@ export function createAiCoachService(client = getPrismaClient()) {
   }
 
   return {
-    async ask(employeeId: string, rawQuestion: string): Promise<
+    async ask(
+      employeeId: string,
+      rawQuestion: string,
+      context: { moduleCode?: string; missionKey?: string; department?: string } = {},
+    ): Promise<
       ResultType<{
         answer: string;
         disclaimer: string;
@@ -34,12 +38,12 @@ export function createAiCoachService(client = getPrismaClient()) {
     > {
       const employee = await client.employee.findUnique({ where: { id: employeeId } });
       if (!employee) {
-        return Result.fail(DomainError.notFound("Employe introuvable."));
+        return Result.fail(DomainError.notFound("Employé introuvable."));
       }
 
       const enabled = await isAiEnabled(employee.companyId);
       if (!enabled) {
-        return Result.fail(DomainError.forbidden("Le coach IA est desactive pour votre entreprise."));
+        return Result.fail(DomainError.forbidden("Le coach IA est désactivé pour votre entreprise."));
       }
 
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
@@ -48,7 +52,7 @@ export function createAiCoachService(client = getPrismaClient()) {
       });
       if (isRateLimited(recentCount)) {
         return Result.fail(
-          DomainError.conflict("Limite horaire atteinte (30 questions). Reessayez plus tard."),
+          DomainError.conflict("Limite horaire atteinte (30 questions). Réessayez plus tard."),
         );
       }
 
@@ -59,8 +63,8 @@ export function createAiCoachService(client = getPrismaClient()) {
 
       const refused = refusesAnswerKeyRequest(question);
       const answer = refused
-        ? "Je ne peux pas reveler les cles de reponse ou les solutions attendues. Reformulez votre question en termes de demarche ou de concepts."
-        : buildDeterministicAiCoachAnswer(question);
+        ? "Je ne peux pas révéler les clés de réponse ou les solutions attendues. Reformulez votre question en termes de démarche ou de concepts."
+        : buildDeterministicAiCoachAnswer(question, context);
 
       const interaction = await client.aiInteraction.create({
         data: {
@@ -69,7 +73,12 @@ export function createAiCoachService(client = getPrismaClient()) {
           question,
           answer,
           refused,
-          metadataJson: toInputJson({ source: "deterministic-fallback-v1" }),
+          metadataJson: toInputJson({
+            source: "deterministic-fallback-v2",
+            moduleCode: context.moduleCode ?? null,
+            missionKey: context.missionKey ?? null,
+            department: context.department ?? null,
+          }),
         },
       });
 
@@ -84,7 +93,7 @@ export function createAiCoachService(client = getPrismaClient()) {
     async listForProfessor(professorId: string) {
       const professor = await client.employee.findUnique({ where: { id: professorId } });
       if (!professor || professor.role !== "PROFESSOR") {
-        throw DomainError.forbidden("Acces reserve aux professeurs.");
+        throw DomainError.forbidden("Accès réservé aux professeurs.");
       }
       const rows = await client.aiInteraction.findMany({
         where: { companyId: professor.companyId },

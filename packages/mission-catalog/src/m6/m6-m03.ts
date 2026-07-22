@@ -7,9 +7,9 @@ export const M6_M03 = {
   "missionCode": "M6-M03",
   "moduleCode": "M6",
   "title": "Expliquer l'ecart a la finance",
-  "preview": "Expliquez a Marc l'impact tresorerie et marge de la chaine M3-M6 complete.",
+  "preview": "Expliquez a Marc l'impact trésorerie et marge de la chaine M3-M6 complete.",
   "briefing": "Bonjour,\n\nAvant le comite de pilotage, j'ai besoin d'une narration finance claire sur toute la chaine : PO-88421 (40 vs 36), frets d'urgence Sacre-Coeur et STO-4512, marge Order-to-Cash.\n\nEn trois lignes maximum : trace l'ecart, quantifie l'impact cash et marge, et explique pourquoi nous avons accepte ces decisions.\n\nC'est ta credibilite en jeu pour le steering de septembre.\n\nMarc Tremblay\nFinance — NordHabitat",
-  "unlockExplanation": "Completez d'abord « Traiter l'exception de rapprochement trois voies » (paiement 4 500 CAD debloque).",
+  "unlockExplanation": "Complétez d'abord « Traiter l'exception de rapprochement trois voies » (paiement 4 500 CAD debloque).",
   "sequence": 3,
   "estimatedMinutes": 40,
   "difficulty": "advanced",
@@ -20,7 +20,7 @@ export const M6_M03 = {
     {
       "key": "ctx-p2p-chain",
       "title": "Chaine P2P PO-88421",
-      "body": "PO 5 000 CAD (40 x 125) → GR 36 unites → paiement 4 500 CAD. Reliquat 4 unites (500 CAD) en attente ThermoControl. Reception partielle mai.",
+      "body": "PO 5 000 CAD (40 x 125) → GR 36 unités → paiement 4 500 CAD. Reliquat 4 unités (500 CAD) en attente ThermoControl. Reception partielle mai.",
       "required": true
     },
     {
@@ -31,7 +31,7 @@ export const M6_M03 = {
     },
     {
       "key": "ctx-cash-flow",
-      "title": "Impact tresorerie septembre",
+      "title": "Impact trésorerie septembre",
       "body": "Decaissement ThermoControl : 4 500 CAD (Net-30). Encaissement Sacre-Coeur : 50 000 CAD (Net-30). Ecart cash net positif mais retarde par delais paiement.",
       "required": true
     }
@@ -69,7 +69,7 @@ export const M6_M03 = {
       "options": [
         {
           "key": "p2p-variance",
-          "label": "Ecart P2P : 4 unites / 500 CAD en reliquat"
+          "label": "Ecart P2P : 4 unités / 500 CAD en reliquat"
         },
         {
           "key": "freight-cost",
@@ -81,7 +81,7 @@ export const M6_M03 = {
         },
         {
           "key": "cash-timing",
-          "label": "Timing tresorerie Net-30 entrees/sorties"
+          "label": "Timing trésorerie Net-30 entrees/sorties"
         },
         {
           "key": "vague",
@@ -110,7 +110,7 @@ export const M6_M03 = {
         },
         {
           "key": "quantify",
-          "label": "Quantifier ecarts (500 CAD reliquat, 1 530 CAD fret)"
+          "label": "Quantifier écarts (500 CAD reliquat, 1 530 CAD fret)"
         },
         {
           "key": "narrate",
@@ -134,7 +134,7 @@ export const M6_M03 = {
     {
       "id": "reliquat-value",
       "type": "NUMERIC_INPUT",
-      "prompt": "Quelle est la valeur (CAD) du reliquat 4 unites a 125 CAD sur PO-88421 ?",
+      "prompt": "Quelle est la valeur (CAD) du reliquat 4 unités a 125 CAD sur PO-88421 ?",
       "scoring": {
         "maxPoints": 10,
         "numericTarget": 500,

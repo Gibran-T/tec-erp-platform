@@ -6,10 +6,10 @@ export const M5_M03 = {
   "missionKey": "m5-m03-presentation-sop",
   "missionCode": "M5-M03",
   "moduleCode": "M5",
-  "title": "Presenter la recommandation S&OP",
+  "title": "Présenter la recommandation S&OP",
   "preview": "Defendez la recommandation de reapprovisionnement devant Finance, Ventes et Supply Chain.",
   "briefing": "Bonjour,\n\nC'est le S&OP mensuel. Tu presentes la recommandation complete : analyse stockout DC-TRT, transfert STO-4512 et commande de reappro 40 unites ThermoControl.\n\nMarc va challenger le cout cumule du fret (680 + 850 CAD des missions precedentes). Patrick veut garantir le service client. Karim attend des chiffres MAPE solides.\n\nClaire observe en silence — c'est ton moment de montrer que tu maitrises les chiffres.\n\nDenise Roy\nSupply Chain — NordHabitat",
-  "unlockExplanation": "Completez d'abord « Decider un transfert inter-DC » (STO-4512 execute).",
+  "unlockExplanation": "Complétez d'abord « Décider un transfert inter-DC » (STO-4512 execute).",
   "sequence": 3,
   "estimatedMinutes": 45,
   "difficulty": "advanced",
@@ -20,7 +20,7 @@ export const M5_M03 = {
     {
       "key": "ctx-sop-pack",
       "title": "Pack S&OP aout",
-      "body": "Recommandation : reappro 40 unites ThermoControl + transfert STO-4512 (20 unites). KPI cibles : fill rate 95 %, MAPE < 15 %, couverture TRT 14 jours.",
+      "body": "Recommandation : reappro 40 unités ThermoControl + transfert STO-4512 (20 unités). KPI cibles : fill rate 95 %, MAPE < 15 %, couverture TRT 14 jours.",
       "required": true
     },
     {
@@ -48,7 +48,7 @@ export const M5_M03 = {
         },
         {
           "key": "wing-it",
-          "label": "Improviser sans pack de donnees"
+          "label": "Improviser sans pack de données"
         },
         {
           "key": "skip-marc",
@@ -73,7 +73,7 @@ export const M5_M03 = {
         },
         {
           "key": "recommendation",
-          "label": "Recommandation reappro 40 unites + transfert"
+          "label": "Recommandation reappro 40 unités + transfert"
         },
         {
           "key": "freight-impact",
@@ -85,7 +85,7 @@ export const M5_M03 = {
         },
         {
           "key": "hide-costs",
-          "label": "Omettre les couts de fret a Marc"
+          "label": "Omettre les coûts de fret a Marc"
         }
       ],
       "scoring": {
@@ -110,7 +110,7 @@ export const M5_M03 = {
         },
         {
           "key": "present",
-          "label": "Presenter diagnostic et recommandation"
+          "label": "Présenter diagnostic et recommandation"
         },
         {
           "key": "defend",

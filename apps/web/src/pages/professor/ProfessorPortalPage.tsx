@@ -8,6 +8,7 @@ import { listProfessorAiInteractions } from "../../api/aiCoach.js";
 import {
   getProfessorPredictions,
   listProfessorCapstoneQueue,
+  reviewProfessorCapstoneSubmission,
 } from "../../api/capstone.js";
 import { issueProfessorGoldCertificate } from "../../api/certification.js";
 import {
@@ -206,11 +207,36 @@ export function ProfessorPortalPage(): ReactElement {
     }
   }
 
+  async function reviewCapstone(submissionId: string, approved: boolean): Promise<void> {
+    const label = approved ? "approuver" : "demander une revision de";
+    if (!window.confirm(`Confirmer : ${label} ce dossier Capstone ?`)) {
+      return;
+    }
+    try {
+      await reviewProfessorCapstoneSubmission(submissionId, {
+        approved,
+        notes: reason.trim().length >= 8 ? reason : undefined,
+      });
+      setStatus(approved ? "Capstone approuve." : "Capstone renvoye pour revision.");
+      await refresh();
+      if (selectedStudentId) {
+        setDetail(await getProfessorStudentDetail(selectedStudentId));
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Revue Capstone impossible");
+    }
+  }
+
   const missions = (detail?.missions as Array<Record<string, unknown>> | undefined) ?? [];
   const assessments = (detail?.assessments as Array<Record<string, unknown>> | undefined) ?? [];
   const pending = (detail?.pendingManualReviews as Array<Record<string, unknown>> | undefined) ?? [];
   const competencySummary = (detail?.competencySummary as string[] | undefined) ?? [];
   const moduleProgress = (detail?.moduleProgress as Array<Record<string, unknown>> | undefined) ?? [];
+  const pendingCapstoneCount = capstoneQueue.filter(
+    (submission) =>
+      String(submission.reviewStatus ?? "pending") === "pending" ||
+      String(submission.status) === "submitted",
+  ).length;
 
   return (
     <main className="workspace-page" data-testid="professor-portal-page">
@@ -236,7 +262,7 @@ export function ProfessorPortalPage(): ReactElement {
             ["analytics", "Analytics"],
             ["ai-usage", "Usage IA"],
             ["predictions", "Predictions"],
-            ["capstone", "Capstone"],
+            ["capstone", `Capstone${pendingCapstoneCount > 0 ? ` (${pendingCapstoneCount})` : ""}`],
             ["gold", "Gold"],
             ["certificates", "Certificats"],
             ["audit", "Audit"],
@@ -485,12 +511,43 @@ export function ProfessorPortalPage(): ReactElement {
 
       {tab === "capstone" ? (
         <section data-testid="professor-capstone-queue">
-          <h2>File capstone</h2>
+          <h2>File Capstone</h2>
+          <p data-testid="professor-capstone-pending-count">
+            Dossiers en attente de revue : {pendingCapstoneCount}
+          </p>
           <ul>
             {capstoneQueue.map((submission) => (
-              <li key={String(submission.id)}>
+              <li key={String(submission.id)} data-testid={`professor-capstone-item-${String(submission.id)}`}>
                 {String(submission.studentName ?? submission.employeeId)} — {String(submission.status)} —{" "}
                 {String(submission.reviewStatus ?? "en attente")}
+                {submission.employeeId ? (
+                  <button
+                    type="button"
+                    onClick={() => void openStudent(String(submission.employeeId))}
+                    data-testid={`professor-capstone-open-${String(submission.employeeId)}`}
+                  >
+                    Ouvrir l&apos;etudiant
+                  </button>
+                ) : null}
+                {String(submission.reviewStatus ?? "pending") === "pending" ||
+                String(submission.status) === "submitted" ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => void reviewCapstone(String(submission.id), true)}
+                      data-testid={`professor-capstone-approve-${String(submission.id)}`}
+                    >
+                      Approuver
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void reviewCapstone(String(submission.id), false)}
+                      data-testid={`professor-capstone-reject-${String(submission.id)}`}
+                    >
+                      Demander revision
+                    </button>
+                  </>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -500,19 +557,35 @@ export function ProfessorPortalPage(): ReactElement {
       {tab === "gold" ? (
         <section data-testid="professor-gold">
           <h2>Emission / revocation Gold</h2>
+          <p>
+            N&apos;emettez Gold que lorsque le Capstone est approuve et l&apos;evaluation Gold reussie.
+            L&apos;API refuse sinon (eligibilite serveur).
+          </p>
           <ul>
-            {students.map((student) => (
-              <li key={String(student.employeeId)}>
-                {String(student.displayName)}
-                <button
-                  type="button"
-                  onClick={() => void issueGold(String(student.employeeId))}
-                  data-testid={`professor-issue-gold-${String(student.employeeNumber)}`}
-                >
-                  Emettre Gold
-                </button>
-              </li>
-            ))}
+            {students.map((student) => {
+              const capstoneOk = String(student.capstoneStatus) === "approved";
+              const missionsOk = Number(student.completedMissions ?? 0) >= 30;
+              const eligibleHint = capstoneOk && missionsOk;
+              return (
+                <li key={String(student.employeeId)}>
+                  {String(student.displayName)} — Capstone: {String(student.capstoneStatus ?? "none")} —
+                  missions: {String(student.completedMissions ?? 0)}/30
+                  <button
+                    type="button"
+                    onClick={() => void issueGold(String(student.employeeId))}
+                    disabled={!eligibleHint}
+                    title={
+                      eligibleHint
+                        ? "Emettre Gold"
+                        : "Eligibilite incomplete (Capstone approuve + 30 missions requis cote UI; serveur valide aussi l'evaluation Gold)"
+                    }
+                    data-testid={`professor-issue-gold-${String(student.employeeNumber)}`}
+                  >
+                    Emettre Gold
+                  </button>
+                </li>
+              );
+            })}
           </ul>
           <h3>Revocation certificats</h3>
           <ul>

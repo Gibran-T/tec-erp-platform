@@ -6,10 +6,10 @@ export const M9_M03 = {
   "missionKey": "m9-m03-analyse-concurrentielle-ia",
   "missionCode": "M9-M03",
   "moduleCode": "M9",
-  "title": "Analyse concurrentielle et frontieres IA",
-  "preview": "Evaluez la concurrence HVAC institutionnelle et definissez les frontieres IA pour Equinoxe.",
+  "title": "Analyse concurrentielle et frontières IA",
+  "preview": "Évaluez la concurrence HVAC institutionnelle et definissez les frontières IA pour Equinoxe.",
   "briefing": "Bonjour,\n\nThermoRival propose des delais 30 % plus courts sur le segment institutionnel. Notre Coach IA peut aider les etudiants — mais pas decider a leur place.\n\nVotre role : analyser le positionnement concurrentiel et definir les frontieres ethiques de l'IA dans Equinoxe. Ou l'IA guide, ou elle recommande, ou elle reste silencieuse — jamais ou elle remplace la decision metier.\n\nL'IA est un outil pedagogique, pas un oracle.\n\nNadia Fontaine\nBusiness Intelligence — NordHabitat",
-  "unlockExplanation": "Completez d'abord « Tableau de bord du comite de direction » (presentation jeudi faite).",
+  "unlockExplanation": "Complétez d'abord « Tableau de bord du comite de direction » (presentation jeudi faite).",
   "sequence": 3,
   "estimatedMinutes": 50,
   "difficulty": "advanced",
@@ -66,7 +66,7 @@ export const M9_M03 = {
     {
       "id": "ai-boundaries",
       "type": "MULTI_CHOICE",
-      "prompt": "Quelles frontieres IA Equinoxe devez-vous formaliser ?",
+      "prompt": "Quelles frontières IA Equinoxe devez-vous formaliser ?",
       "options": [
         {
           "key": "no-approval",
@@ -102,7 +102,7 @@ export const M9_M03 = {
     {
       "id": "analysis-flow",
       "type": "ORDERING",
-      "prompt": "Ordonnez l'analyse concurrentielle et definition frontieres IA.",
+      "prompt": "Ordonnez l'analyse concurrentielle et définition frontières IA.",
       "options": [
         {
           "key": "benchmark",
@@ -114,7 +114,7 @@ export const M9_M03 = {
         },
         {
           "key": "ai-rules",
-          "label": "Formaliser frontieres IA par module"
+          "label": "Formaliser frontières IA par module"
         },
         {
           "key": "validate",
@@ -156,5 +156,5 @@ export const M9_M03 = {
       }
     }
   ],
-  "completionFeedback": "Analyse concurrentielle et frontieres IA validees. NordHabitat positionne sur tracabilite; Coach IA encadre pour M10 capstone.\n\nNadia Fontaine"
+  "completionFeedback": "Analyse concurrentielle et frontières IA validees. NordHabitat positionne sur tracabilite; Coach IA encadre pour M10 capstone.\n\nNadia Fontaine"
 } as const satisfies MissionDefinitionDocument;

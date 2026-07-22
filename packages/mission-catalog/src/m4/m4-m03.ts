@@ -9,7 +9,7 @@ export const M4_M03 = {
   "title": "Confirmer la livraison et cloturer",
   "preview": "Confirmez la sortie de marchandises, declenchez la facturation et cloturez le dossier Sacre-Coeur.",
   "briefing": "Bonjour,\n\nBonne nouvelle : les 40 unites sont livrees a l'aile pediatrique. Le Dr. Meunier a confirme la reception. Patrick envoie un message de remerciement.\n\nIl reste a poster la sortie de marchandises (GI), declencher la facturation client et mettre a jour le dossier AR. Marc attend la piece comptable propre.\n\nCloturez le cycle Order-to-Cash avec rigueur.\n\nElodie Moreau\nVentes institutionnelles — NordHabitat",
-  "unlockExplanation": "Completez d'abord « Allouer entre entrepots (DC) » (transfert STO-4408 execute).",
+  "unlockExplanation": "Complétez d'abord « Allouer entre entrepots (DC) » (transfert STO-4408 execute).",
   "sequence": 3,
   "estimatedMinutes": 35,
   "difficulty": "intermediate",
@@ -118,7 +118,7 @@ export const M4_M03 = {
         },
         {
           "key": "close",
-          "label": "Cloturer le dossier CRM et AR"
+          "label": "Clôturer le dossier CRM et AR"
         }
       ],
       "scoring": {
@@ -134,7 +134,7 @@ export const M4_M03 = {
     {
       "id": "invoice-amount",
       "type": "NUMERIC_INPUT",
-      "prompt": "Quel est le montant de la facture client (CAD) pour 40 unites a 1 250 CAD ?",
+      "prompt": "Quel est le montant de la facture client (CAD) pour 40 unités a 1 250 CAD ?",
       "scoring": {
         "maxPoints": 10,
         "numericTarget": 50000,

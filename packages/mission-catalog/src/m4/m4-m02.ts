@@ -9,7 +9,7 @@ export const M4_M02 = {
   "title": "Allouer entre entrepots (DC)",
   "preview": "Organisez le transfert d'urgence DC-MTL vers DC-TRT pour l'aile pediatrique.",
   "briefing": "Bonjour,\n\nElodie vient de confirmer : tu es le owner jusqu'a nouvel ordre pour Sacre-Coeur. Il manque 12 unites a DC-TRT.\n\nDenise propose un transfert d'urgence depuis DC-MTL. Tom peut preparer l'expedition demain matin, mais Marc veut une estimation de fret avant approbation.\n\nPatrick compte sur nous pour jeudi. Documente le plan d'allocation et le cout de fret.\n\nElodie Moreau\nVentes institutionnelles — NordHabitat",
-  "unlockExplanation": "Completez d'abord « Saisir la commande institutionnelle » (conflit ATP documente).",
+  "unlockExplanation": "Complétez d'abord « Saisir la commande institutionnelle » (conflit ATP documente).",
   "sequence": 2,
   "estimatedMinutes": 40,
   "difficulty": "intermediate",
@@ -20,19 +20,19 @@ export const M4_M02 = {
     {
       "key": "ctx-allocation",
       "title": "Besoin allocation SO-12047",
-      "body": "12 unites SKU-HVAC-4421 requises a DC-TRT; commande Sacre-Coeur 40 unites; stock TRT = 28; echeance livraison jeudi.",
+      "body": "12 unités SKU-HVAC-4421 requises a DC-TRT; commande Sacre-Coeur 40 unités; stock TRT = 28; echeance livraison jeudi.",
       "required": true
     },
     {
       "key": "ctx-stock-dc",
       "title": "Position stock inter-DC",
-      "body": "DC-MTL : 52 unites libres (couverture 47 jours). DC-TRT : 28 unites (couverture 14 jours). Article critique post-canicule.",
+      "body": "DC-MTL : 52 unités libres (couverture 47 jours). DC-TRT : 28 unités (couverture 14 jours). Article critique post-canicule.",
       "required": true
     },
     {
       "key": "ctx-freight",
       "title": "Devis fret express",
-      "body": "Transporteur NordLog : transfert MTL-TRT express 12 unites = 850 CAD; livraison 24 h; standard 3 jours = 320 CAD mais risque OTIF.",
+      "body": "Transporteur NordLog : transfert MTL-TRT express 12 unités = 850 CAD; livraison 24 h; standard 3 jours = 320 CAD mais risque OTIF.",
       "required": true
     }
   ],
@@ -69,7 +69,7 @@ export const M4_M02 = {
       "options": [
         {
           "key": "qty",
-          "label": "Quantite a transferer (12 unites)"
+          "label": "Quantite a transferer (12 unités)"
         },
         {
           "key": "freight",
@@ -105,7 +105,7 @@ export const M4_M02 = {
       "options": [
         {
           "key": "assess",
-          "label": "Evaluer stock et besoin (12 unites)"
+          "label": "Evaluer stock et besoin (12 unités)"
         },
         {
           "key": "transfer",

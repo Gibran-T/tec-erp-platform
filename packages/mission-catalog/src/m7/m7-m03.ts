@@ -6,10 +6,10 @@ export const M7_M03 = {
   "missionKey": "m7-m03-cloturer-cas-nps",
   "missionCode": "M7-M03",
   "moduleCode": "M7",
-  "title": "Cloturer le cas et recuperer le NPS",
+  "title": "Clôturer le cas et récupérer le NPS",
   "preview": "Cloturez CAS-7701, documentez la resolution et collectez le NPS institutionnel.",
   "briefing": "Bonjour,\n\nLes deux unites de remplacement sont installees; le Dr Meunier confirme le bon fonctionnement. Il est time de cloturer CAS-7701 proprement et de recuperer son NPS — c'est notre indicateur cle pour les comptes institutionnels.\n\nDocumentez cause racine, actions correctives et delai reel. Ne demandez pas le NPS avant confirmation explicite de resolution. Patrick veut un NPS >= 8 pour le comite CRM de septembre.\n\nCloture propre = apprentissage pour toute l'organisation.\n\nSophie Lambert\nService client — NordHabitat",
-  "unlockExplanation": "Completez d'abord « Coordonner l'escalade » (remplacement installe).",
+  "unlockExplanation": "Complétez d'abord « Coordonner l'escalade » (remplacement installe).",
   "sequence": 3,
   "estimatedMinutes": 35,
   "difficulty": "advanced",
@@ -20,7 +20,7 @@ export const M7_M03 = {
     {
       "key": "ctx-resolution",
       "title": "Resolution CAS-7701",
-      "body": "Remplacement 2 unites SN-4421-A17/B03; delai reel 22 h; cause lot LT-8842; action corrective QH-221 ouverte; client confirme satisfaction operationnelle.",
+      "body": "Remplacement 2 unités SN-4421-A17/B03; delai reel 22 h; cause lot LT-8842; action corrective QH-221 ouverte; client confirme satisfaction operationnelle.",
       "required": true
     },
     {

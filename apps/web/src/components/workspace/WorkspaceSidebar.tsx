@@ -1,12 +1,14 @@
 import type { ReactNode } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 
+import { useAuth } from "../../auth/AuthContext.js";
 import { ACCESS_PREPARING_LABEL } from "../../workspace/workspaceCopy.js";
 import { getAppPath, getSidebarApps } from "../../workspace/appRegistry.js";
 
 export function WorkspaceSidebar(): ReactNode {
   const location = useLocation();
-  const apps = getSidebarApps();
+  const { employee } = useAuth();
+  const apps = getSidebarApps(employee?.role);
 
   function isActive(appId: string): boolean {
     const path = getAppPath(appId);

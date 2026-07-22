@@ -6,10 +6,10 @@ export const M2_M02 = {
   "missionKey": "m2-m02-creer-donnees-reference",
   "missionCode": "M2-M02",
   "moduleCode": "M2",
-  "title": "Creer les donnees de reference essentielles",
-  "preview": "Creez clients, fournisseurs, articles et unites de mesure coherents.",
+  "title": "Creer les données de reference essentielles",
+  "preview": "Creez clients, fournisseurs, articles et unités de mesure coherents.",
   "briefing": "Bonjour,\n\nLa structure est en place. Creez les enregistrements maitre : client Sacre-Coeur, fournisseur ThermoControl, article SKU-HVAC-4421 et UoM EA.\n\nClaire Fontaine",
-  "unlockExplanation": "Completez d'abord la mission de structuration organisationnelle.",
+  "unlockExplanation": "Complétez d'abord la mission de structuration organisationnelle.",
   "sequence": 2,
   "estimatedMinutes": 35,
   "difficulty": "intro",
@@ -86,7 +86,7 @@ export const M2_M02 = {
     {
       "id": "create-order",
       "type": "ORDERING",
-      "prompt": "Ordonnez la creation des donnees de reference.",
+      "prompt": "Ordonnez la creation des données de reference.",
       "options": [
         {
           "key": "uom",
@@ -139,5 +139,5 @@ export const M2_M02 = {
       }
     }
   ],
-  "completionFeedback": "Donnees de reference creees. Passez a la qualite des donnees.\n\nClaire Fontaine"
+  "completionFeedback": "Donnees de reference creees. Passez a la qualite des données.\n\nClaire Fontaine"
 } as const satisfies MissionDefinitionDocument;

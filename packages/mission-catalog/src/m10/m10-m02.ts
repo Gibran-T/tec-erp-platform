@@ -9,7 +9,7 @@ export const M10_M02 = {
   "title": "Defi final Equinoxe (crise integree)",
   "preview": "Gerez la crise integree : lot LT-8842, ThermoRival et pression DG simultanees.",
   "briefing": "Bonjour,\n\nC'est le defi final. En une matinee, tout converge : nouveau signalement lot LT-8842 (5 unites), ThermoRival courtise Sacre-Coeur, Patrick demande PO d'urgence sans comite, Sophie a trois cas P1 ouverts.\n\nVous devez prioriser, coordonner et decider — sans contourner gouvernance, sans perdre le client, sans mentir au comite. C'est la crise integree Equinoxe.\n\nMontrez que vous maitrisez la chaine complete M1-M9.\n\nDirecteur General\nEquinoxe — NordHabitat",
-  "unlockExplanation": "Completez d'abord « Diapositive conseil et synthese executive » (DG debloque le defi).",
+  "unlockExplanation": "Complétez d'abord « Diapositive conseil et synthese executive » (DG debloque le defi).",
   "sequence": 2,
   "estimatedMinutes": 60,
   "difficulty": "expert",
@@ -21,7 +21,7 @@ export const M10_M02 = {
     {
       "key": "ctx-crisis-bundle",
       "title": "Bundle crise Equinoxe",
-      "body": "5 unites LT-8842 signalees; ThermoRival offre -10 % Sacre-Coeur; Patrick PO 28K sans comite; Sophie 3 cas P1; Marc demande impact marge immediate.",
+      "body": "5 unités LT-8842 signalees; ThermoRival offre -10 % Sacre-Coeur; Patrick PO 28K sans comite; Sophie 3 cas P1; Marc demande impact marge immediate.",
       "required": true
     },
     {
