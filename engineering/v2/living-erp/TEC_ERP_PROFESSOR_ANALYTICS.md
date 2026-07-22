@@ -5,7 +5,7 @@
 | Section | Source | UX |
 |---------|--------|----|
 | Overview metrics | cohorts/students/runs/unique-students/certs | Counts + attention |
-| Analytics | `getProfessorAnalyticsHeatmap` | Module intensity rows |
+| Analytics | `getProfessorAnalyticsHeatmap` | Per-student rows (`displayName`, `completedMissions`, `moduleCounts`, curriculum) — not a module-intensity matrix |
 | Competencies | `getProfessorCompetencySummary` | Score + evidence counts |
 | Assessments | student list summaries | High-level only |
 | Comparisons | `compareProfessorPedagogicalRuns` | JSON comparison with curriculum honesty warning |
@@ -15,7 +15,7 @@
 ## Policies
 
 1. **Official unique-student metric** uses institutional mode `OFFICIAL_COHORT_RESULT` — not AI volume proxies.
-2. Heatmap/competency labels prefer API labels; avoid showing literal `unknown` when a module/competency label exists (P2-8 — partial closure).
+2. Heatmap renders student completion rows + `moduleCounts`; competencies render `moduleCode` / `title` / `coveragePercent` (API DTO-aligned; P2-8 closed for CC lists).
 3. Run comparison must warn when curricula differ — modules are not auto-equivalent.
 4. No answer keys; no cross-company analytics.
 

@@ -91,10 +91,12 @@ export async function getProfessorAnalyticsHeatmap() {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
-  return parseJson<{ rows: Array<Record<string, unknown>> }>(
-    response,
-    "Impossible de charger la carte de chaleur.",
-  );
+  return parseJson<{
+    mode?: string;
+    enrolledStudentCount?: number;
+    curriculumVersionsPresent?: string[];
+    rows: Array<Record<string, unknown>>;
+  }>(response, "Impossible de charger la carte de chaleur.");
 }
 
 export async function getProfessorCompetencySummary() {
@@ -103,8 +105,9 @@ export async function getProfessorCompetencySummary() {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
-  return parseJson<{ competencies: Array<Record<string, unknown>> }>(
-    response,
-    "Impossible de charger le resume des competences.",
-  );
+  return parseJson<{
+    mode?: string;
+    enrolledStudentCount?: number;
+    competencies: Array<Record<string, unknown>>;
+  }>(response, "Impossible de charger le resume des competences.");
 }

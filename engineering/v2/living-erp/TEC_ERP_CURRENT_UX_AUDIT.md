@@ -78,7 +78,7 @@ Shell: `WorkspaceLayout` → `AppShell` (top nav / sidebar / main / context pane
 | 5 | Weak historical/current run distinction | Subtle or missing | **Addressed** on shell/home — `RunBadge` + historical chip; deepen elsewhere |
 | 6 | Mixed-language primary labels | FR UI + EN API strings | **Partial** — FR default + EN catalog for shell keys; many page bodies still FR-hardcoded |
 | 7 | Unexplained KPI cards | Value-only tiles | **Addressed** — `KpiExplainedCard` + `explainKpi` |
-| 8 | `unknown` Professor analytics labels where data exists | Opaque labels | **Partial** — heatmap/competency lists improved; Student 360 still dumps JSON |
+| 8 | `unknown` Professor analytics labels where data exists | Opaque labels | **Closed in CC** — heatmap/competency bind real API fields; Student 360 still dumps JSON |
 | 9 | Concatenated labels without spacing/hierarchy | Dense strings | **Partial** — chips/badges/sections; Mission Center legacy density remains |
 | 10 | Flat 30-mission presentation without module hierarchy | Single long list | **Addressed** — Learner journey cards + `ModuleHubPage` M1–M10 |
 

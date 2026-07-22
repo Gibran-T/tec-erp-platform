@@ -16,8 +16,8 @@ Roles: **PROFESSOR**, **ADMIN**. Others see unauthorized alert.
 | 5 | `documents` | Document-oriented audit/evidence list |
 | 6 | `exceptions` | Exception/recovery oriented audit list |
 | 7 | `assessments` | Attempt distribution summary (no answer keys) |
-| 8 | `competencies` | Competency summary rows |
-| 9 | `analytics` | Heatmap / intensity rows |
+| 8 | `competencies` | Module coverage rows (`moduleCode`, `title`, `coveragePercent`) |
+| 9 | `analytics` | Cohort heatmap as student rows + per-module counts |
 | 10 | `ai` | AI interaction oversight |
 | 11 | `capstone` | Queue — approve / issue Or actions |
 | 12 | `interventions` | Send pedagogical intervention to active runs |

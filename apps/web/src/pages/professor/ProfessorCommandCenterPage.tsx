@@ -68,6 +68,10 @@ export function ProfessorCommandCenterPage(): ReactElement {
   const [students, setStudents] = useState<Array<Record<string, unknown>>>([]);
   const [runs, setRuns] = useState<Array<Record<string, unknown>>>([]);
   const [heatmap, setHeatmap] = useState<Array<Record<string, unknown>>>([]);
+  const [heatmapMeta, setHeatmapMeta] = useState<{ enrolled: number; versions: string[] }>({
+    enrolled: 0,
+    versions: [],
+  });
   const [competencies, setCompetencies] = useState<Array<Record<string, unknown>>>([]);
   const [aiInteractions, setAiInteractions] = useState<Array<Record<string, unknown>>>([]);
   const [capstoneQueue, setCapstoneQueue] = useState<Array<Record<string, unknown>>>([]);
@@ -147,6 +151,12 @@ export function ProfessorCommandCenterPage(): ReactElement {
         setStudents(studentResponse.students);
         setRuns(runResponse);
         setHeatmap(heatmapResponse.rows ?? []);
+        setHeatmapMeta({
+          enrolled: Number(heatmapResponse.enrolledStudentCount ?? 0),
+          versions: Array.isArray(heatmapResponse.curriculumVersionsPresent)
+            ? heatmapResponse.curriculumVersionsPresent.map((value) => String(value))
+            : [],
+        });
         setCompetencies(competencyResponse.competencies ?? []);
         setAiInteractions(aiResponse.interactions ?? []);
         setCapstoneQueue(capstoneResponse.submissions ?? []);
@@ -441,12 +451,18 @@ export function ProfessorCommandCenterPage(): ReactElement {
         <section data-testid="professor-cc-competencies" className="living-home-section">
           <h2>{t("professor.competencies")}</h2>
           <ul>
-            {competencies.map((row, index) => (
-              <li key={`${labelOf(row.competencyKey, String(index))}`}>
-                {labelOf(row.label ?? row.competencyKey)} — score {labelOf(row.score ?? row.average)} —
-                preuves {labelOf(row.evidenceCount ?? row.attempts, "n/d")}
-              </li>
-            ))}
+            {competencies.map((row, index) => {
+              const moduleCode = labelOf(row.moduleCode, `M${index + 1}`);
+              const title = labelOf(row.title, moduleCode);
+              const coverage = Number(row.coveragePercent ?? 0);
+              const missionCount = Number(row.missionCount ?? 0);
+              return (
+                <li key={moduleCode}>
+                  {moduleCode} — {title} · couverture {Number.isFinite(coverage) ? `${coverage}%` : "n/d"}
+                  {missionCount > 0 ? ` · ${missionCount} missions` : ""}
+                </li>
+              );
+            })}
           </ul>
         </section>
       ) : null}
@@ -454,12 +470,30 @@ export function ProfessorCommandCenterPage(): ReactElement {
       {!loading && section === "analytics" ? (
         <section data-testid="professor-cc-analytics" className="living-home-section">
           <h2>{t("professor.analytics")}</h2>
+          <p className="living-lede">
+            Cohorte : {heatmapMeta.enrolled} étudiant(s)
+            {heatmapMeta.versions.length > 0
+              ? ` · curriculum ${heatmapMeta.versions.join(", ")}`
+              : ""}
+          </p>
           <ul>
-            {heatmap.map((row, index) => (
-              <li key={`${labelOf(row.moduleCode, String(index))}`}>
-                {labelOf(row.label ?? row.moduleCode)} — intensité {labelOf(row.intensity ?? row.score)}
-              </li>
-            ))}
+            {heatmap.map((row, index) => {
+              const name = labelOf(row.displayName, "Apprenant");
+              const completed = Number(row.completedMissions ?? 0);
+              const moduleCounts =
+                row.moduleCounts && typeof row.moduleCounts === "object"
+                  ? Object.entries(row.moduleCounts as Record<string, unknown>)
+                      .map(([code, count]) => `${code}:${String(count)}`)
+                      .join(" · ")
+                  : "";
+              return (
+                <li key={`${labelOf(row.studentId, String(index))}`}>
+                  {name} — {Number.isFinite(completed) ? completed : 0} missions
+                  {moduleCounts ? ` · ${moduleCounts}` : ""}
+                  {row.curriculumVersion ? ` · ${String(row.curriculumVersion)}` : ""}
+                </li>
+              );
+            })}
           </ul>
         </section>
       ) : null}
