@@ -1,0 +1,13 @@
+﻿{
+    "event":  "production_migration_deploy_start",
+    "operator":  "Gibran_QA / Cursor Sheriff",
+    "note":  "API startCommand runs pnpm migrate:deploy before node start",
+    "targetSha":  "76709d62368675d8d6517c592e66e41349569ff2",
+    "order":  [
+                  "deploy_api_with_migrate_on_start",
+                  "verify_api",
+                  "deploy_web",
+                  "smoke"
+              ],
+    "utc":  "2026-07-22T19:58:48.6102384Z"
+}
