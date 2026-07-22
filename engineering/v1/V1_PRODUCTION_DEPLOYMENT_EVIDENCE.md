@@ -1,152 +1,152 @@
 # TEC.ERP V1 — Production Deployment Evidence
 
-**Deployment timestamp (UTC):** 2026-07-21T20:49:09Z (API `server_started`)  
-**Baseline / product commit:** `fe61083b87ab9526bfc94cfc229eaf2929c22a07`  
-**Railway project:** `tec-erp` (`2b10414d-03ee-4375-af86-4cac4e363a1f`)  
-**Environment:** `production` (`eea7ceeb-2fdc-437b-a675-e102da6aa9b8`)  
-**PR #18:** merged 2026-07-21T20:36:13Z → merge SHA = baseline  
+**Initial Final Wave deploy (UTC):** 2026-07-21T20:49:09Z
+**Hotfix deploy (UTC):** 2026-07-22T04:24:06Z (API `server_started`)
+**Authoritative product SHA:** `bca6f462a99a705d9b65ac5f9590b6ee94b4ac32`
+**Railway project:** `tec-erp` (`2b10414d-03ee-4375-af86-4cac4e363a1f`)
+**Environment:** `production` (`eea7ceeb-2fdc-437b-a675-e102da6aa9b8`)
+**PR #18:** Final Wave merge → `fe61083b87ab9526bfc94cfc229eaf2929c22a07`
+**PR #19:** Hotfix — Restore Professor Analytics Routes → merge SHA = authoritative product SHA
 
 Secrets, tokens, passwords, and connection strings are intentionally omitted.
 
-## Services
+## Services (current production)
 
-| Service | Public URL | Deployment ID | Status |
-|---------|------------|---------------|--------|
-| `tec-erp-api` | https://tec-erp-api-production.up.railway.app | `54dae063-f97b-4209-8084-80c22e671a20` | SUCCESS |
-| `tec-erp-web` | https://tec-erp-web-production.up.railway.app | `bdf01d07-1275-448b-b62a-33922e586d3f` | SUCCESS |
-| Postgres | Railway managed volume `postgres-volume` | — | Online |
+| Service | Public URL | Deployment ID | Status | Message |
+|---------|------------|---------------|--------|---------|
+| `tec-erp-api` | https://tec-erp-api-production.up.railway.app | `372a494e-5927-41f4-95d2-312424f31b75` | SUCCESS | V1 hotfix professor analytics bca6f46 |
+| `tec-erp-web` | https://tec-erp-web-production.up.railway.app | `653392a3-0039-4305-885b-f6393db020f8` | SUCCESS | V1 hotfix professor analytics bca6f46 |
+| Postgres | Railway managed volume `postgres-volume` | — | Online | — |
+
+Prior Final Wave deployments (superseded): API `54dae063-…`, Web `bdf01d07-…` (REMOVED after hotfix).
 
 ## Deployed product SHA
 
-CLI upload from local `main` @ `fe61083b87ab9526bfc94cfc229eaf2929c22a07` for both API and Web.
+CLI upload from local `main` @ `bca6f462a99a705d9b65ac5f9590b6ee94b4ac32` for both API and Web.
 
-## Migration result (production)
+## Hotfix scope (PR #19)
+
+| Included | Not included |
+|----------|--------------|
+| Mount `createAnalyticsProfessorRouter` in `app.ts` | Migrations / schema |
+| `GET /analytics/heatmap` + `GET /analytics/competencies` | Seed / secret / config changes |
+| Service: cohort-scoped heatmap + deterministic competencies | Unrelated product features |
+| API unit/route tests + mission-center test hardening | Real-user data changes |
+
+## Migration result (hotfix redeploy)
 
 API startCommand runs `pnpm migrate:deploy` (no seed).
 
-- Prisma: **7 migrations found / migrate deploy completed successfully**
-- Production probe after deploy: migrations=7, modules=10, missions=30, company=`NORDHABITAT`
+- Prisma: **7 migrations found / migrate deploy completed successfully** (no new migration in hotfix)
+- No pending migration; no schema drift from hotfix
 
-## Configuration review (presence only)
-
-| Item | Result |
-|------|--------|
-| Project / environment | `tec-erp` / `production` |
-| API + Web + Postgres services | Present / Online |
-| `NODE_ENV` | `production` (API + Web) |
-| `DATABASE_URL` (API) | Present (internal Postgres) |
-| `DATABASE_PUBLIC_URL` (Postgres) | Present (TCP proxy; used only for controlled QA probe/cleanup) |
-| `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | Present / different |
-| `CORS_ORIGIN` | Present → production Web origin |
-| `VITE_API_BASE_URL` | Present → production API origin |
-| AI provider credentials | Absent (fallback path required) |
-| Seed in startCommand | Absent (`migrate:deploy` + `node …` only) |
-| Volume / restore capability | Postgres volume present |
-
-## Local validation (pre-deploy)
+## Local validation (pre-hotfix-deploy @ `bca6f46`)
 
 | Check | Result |
 |-------|--------|
 | `pnpm install --frozen-lockfile` | PASS |
-| lint | PASS (0 errors; 1 known web hooks warning) |
+| lint | PASS (0 errors; known web hooks warning) |
 | typecheck | PASS |
-| `erp-api` tests | **148 passed** |
+| `erp-api` tests | **156 passed** |
 | `erp-web` tests | **78 passed** |
 | mission-catalog tests | **4 passed** |
+| Focused professor analytics tests | **8 passed** |
+| Integration tests | **6 passed** |
 | build | PASS |
-| env:check | PASS (7 required keys) |
-| Empty DB migrate (RC01→Wave1→Wave2→Final) | PASS — 7 migrations |
-| Local Final smoke `--cleanup` | **90/90 PASS**, residue 0 |
+| env:check | PASS |
+| `git diff --check` | PASS |
 
-## Migration safety summary
+## Pre-deploy production health (before hotfix)
 
-Final Wave migration `20260723180000_v1_final_m7_m10_gold`:
+| Check | Result |
+|-------|--------|
+| API `/health` | 200 |
+| Web `/` | 200 |
+| Invalid public verify | 404 |
+| QA login (no active QA) | 401 |
+| Active failed deployment | None |
+| Pending migration | None |
 
-- Additive CREATE TABLE / FK / indexes
-- Catalog INSERTs for modules M7–M10, mission definitions, Gold assessment, dashboards, KPI formula versions, automation rules
-- No `DROP TABLE` / `DROP COLUMN` / `TRUNCATE` / mass user updates
-- No production user seed in deploy path
+## Professor analytics API smoke (production, temporary QA)
 
-## Production unauthenticated smoke
+Temporary QA via `final-smoke-seed.mjs` + 3 completed mission attempts for `#QA-STU-A`. Credentials never printed.
 
-| Check | Status | Timing |
-|-------|--------|--------|
-| API `/health` | 200 | 314 ms (post-deploy); 132 ms (post-cleanup) |
-| Web `/` | 200 | 234–244 ms |
-| Invalid login | 401 | controlled |
-| Public verify invalid token | 404 | 101–186 ms |
-| Stack/secret exposure | None observed in responses | — |
+| Check | Status | Timing (approx.) |
+|-------|--------|------------------|
+| Professor login | 200 | ~792 ms |
+| `GET /api/v1/professor/analytics/heatmap` | 200 | ~181 ms — 2 rows (`#QA-STU-A` completedMissions=3, `#QA-STU-B`) |
+| `GET /api/v1/professor/analytics/competencies` | 200 | ~161 ms — 10 modules ordered M1…M10 |
+| `GET /api/v1/professor/predictions/:studentId` | 200 | ~183 ms |
+| Student detail (assessments embedded) | 200 | ~160 ms |
+| Cohorts / students / audit / AI interactions / export.csv | 200 | 132–202 ms |
+| Student → heatmap / competencies | **403** | ~104–142 ms |
+| Unauthenticated → heatmap / competencies | **401** | ~95–134 ms |
+| Professor KPI with EQUINOXE-QA `companyId` | **403** | ~147 ms |
+| Heatmap non-QA rows | **0** | — |
+| Stack / secret leakage | None | — |
+| Admin `/admin/system-status` | 200 | ~219 ms |
 
-## Production authenticated API smoke
+## Professor browser smoke (production Web)
 
-Script: `pnpm --filter erp-api smoke:final -- --cleanup`  
-`API_BASE_URL=https://tec-erp-api-production.up.railway.app`  
-Temporary QA prefix `#QA-` / `QA-*` / `EQUINOXE-QA`
+| Step | Result |
+|------|--------|
+| Professor login | PASS |
+| Open Portail professeur | PASS — cohort `QA Final Wave Cohort — 2 etudiants` |
+| Direct route reload `/workspace/apps/portail-professeur` | PASS — no 404, no blank page |
+| Student roster | PASS — Etudiant QA A missions 3 / QA B missions 0 |
+| Student detail + assessment analytics | PASS — progression 90% rows; assessments empty controlled |
+| Analytics tab — heatmap / competencies sections | PASS — sections visible; network **200** (2 heatmap rows, 10 competencies); no missing-endpoint failure |
+| Predictions / Audit / Exporter CSV control | PASS |
+| Former blocker (analytics 404) | **CLOSED** |
 
-**Result: 90/90 PASS** including:
+## Focused regression smoke
 
-- Admin: companies, AI toggle, scenario draft/publish, mock integration, automation
-- Student A: First Day, M1–M10 (30 missions), Silver, dashboards, AI coach, Capstone, Gold assessment
-- Student B: isolation (cross-company 403, professor/admin 403, locked mission 409)
-- Professor: cohort, detail, AI interactions, predictions, Capstone approve, Gold issue/revoke/reissue, CSV, audit
-- Public verify: valid / revoked / invalid
+| Actor | Result |
+|-------|--------|
+| Student login + workspace | PASS |
+| Student `/api/v1/me/course`, inbox, dashboards | 200 |
+| AI Coach fallback `POST /api/v1/me/ai-coach/ask` | 200 |
+| Student Portail professeur UI | “Acces reserve aux comptes professeur.” |
+| Student professor API | 403 |
+| Public health / Web / invalid verify | 200 / 200 / 404 |
 
-## Browser smoke (production Web)
-
-| Actor | Evidence |
-|-------|----------|
-| Student A | Login → workspace; skip link present; Mission Center; Dashboards; AI Coach FR fallback response; logout → login |
-| Professor | Login → Portail professeur loads; **blocker**: UI refresh hits missing analytics routes (see below) |
-| Admin | Covered by API smoke (companies/AI/scenario/integration/automation); browser admin not re-run after QA cleanup |
-
-Responsive: 320px viewport on dashboards — `overflowX=false`, `scrollWidth=320`.  
-A11y: skip link “Passer au contenu principal”, `main`, `nav` present on student surfaces.
-
-## Blocker observed in production
-
-Professor portal `Promise.all` refresh calls:
-
-- `GET /api/v1/professor/analytics/heatmap` → **404**
-- `GET /api/v1/professor/analytics/competencies` → **404**
-
-Core professor APIs used by smoke (`/cohorts`, `/students`, `/ai-interactions`, `/predictions/:id`, `/capstone/submissions`, Gold, audit, CSV) return **200**.
-
-Hotfix branch (not deployed): `hotfix/v1-professor-analytics-routes` @ `e2f2ece`  
-Compare: https://github.com/Gibran-T/tec-erp-platform/compare/main...hotfix/v1-professor-analytics-routes?expand=1
-
-## QA identities
+## QA identities (hotfix validation)
 
 | Created | Count |
 |---------|-------|
 | QA employees (`#QA-*`) | 4 (admin, professor, student A, student B) |
 | QA cohorts | 2 (`QA-FINAL`, `QA-EQUINOXE`) |
 | Temporary company | 1 (`EQUINOXE-QA`) |
+| Temporary mission attempts | 3 (student A) |
 
 ## QA cleanup / residue
 
-After cleanup probe:
+After `final-smoke-seed.mjs --cleanup`:
 
 ```json
-{"qaEmployees":0,"qaCohorts":0,"equinoxe":0,"qaCerts":0,"qaCapstone":0,"qaAi":0,"qaAttempts":0,"companies":["NORDHABITAT"]}
+{"qaEmployees":0,"qaCohorts":0,"equinoxe":0,"qaAttempts":0,"qaAssessment":0}
 ```
 
-QA login after cleanup: **401**.  
+QA login after cleanup: **401**.
 **QA RESIDUE = 0**
 
 ## Post-cleanup health
 
-- API health 200
-- Web 200
-- Public verify invalid 404
-- Deployed services remain SUCCESS
-- No production seed executed
-- Real-user records not targeted by QA scripts (prefix-scoped cleanup only)
+| Check | Result |
+|-------|--------|
+| API `/health` | 200 (~360 ms) |
+| Web `/` | 200 (~252 ms) |
+| Public verify invalid | 404 |
+| QA login | 401 |
+| API / Web deployments | SUCCESS (IDs unchanged) |
+| Production seed | Not run |
+| Real-user records | Not modified (prefix-scoped QA only) |
 
-## Warnings
+## Warnings (non-blocking)
 
-1. Web app registry shows Professor/Admin apps as “Accès actif” for student role in UI chrome; API authorization still rejects student calls (403) — UX clarity warning, not auth bypass.
-2. Known eslint `react-hooks/exhaustive-deps` warning in `MissionInteractions.tsx` (pre-existing).
-3. Full browser completion of all 30 missions was not re-executed in UI (API smoke completed all 30 on production).
+1. Professor Analytics UI list labels still prefer legacy fields (`label` / `intensity` / `competencyKey`); API returns `displayName` / `completedMissions` / `moduleCode` / `title` / `coveragePercent`. Rows load with correct counts (2 / 10) and endpoints return 200; label text may show `undefined` until a follow-up display mapping fix (out of hotfix SHA scope).
+2. Student UI chrome still lists Professor/Admin apps as “Accès actif”; API authorization still rejects (403).
+3. Pre-existing eslint `react-hooks/exhaustive-deps` warning in `MissionInteractions.tsx`.
 
 ## Final verdict linkage
 

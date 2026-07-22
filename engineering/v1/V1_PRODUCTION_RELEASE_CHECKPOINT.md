@@ -1,55 +1,51 @@
 # TEC.ERP V1 — Production Release Checkpoint
 
-**Date:** 2026-07-21  
-**Baseline:** `main` @ `fe61083b87ab9526bfc94cfc229eaf2929c22a07` (PR #18 merged)  
-**Railway:** project `tec-erp` · environment `production`  
-**API deployment:** `54dae063-f97b-4209-8084-80c22e671a20`  
-**Web deployment:** `bdf01d07-1275-448b-b62a-33922e586d3f`  
+**Date:** 2026-07-22
+**Baseline:** `main` @ `bca6f462a99a705d9b65ac5f9590b6ee94b4ac32` (PR #19 merged)
+**Prior Final Wave baseline:** `fe61083b87ab9526bfc94cfc229eaf2929c22a07` (PR #18)
+**Railway:** project `tec-erp` · environment `production`
+**API deployment:** `372a494e-5927-41f4-95d2-312424f31b75` (SUCCESS)
+**Web deployment:** `653392a3-0039-4305-885b-f6393db020f8` (SUCCESS)
 **Evidence detail:** `engineering/v1/V1_PRODUCTION_DEPLOYMENT_EVIDENCE.md`
 
 ## Matrix summary
 
 | Area | Status |
 |------|--------|
-| Baseline SHA exact | PASS |
-| Local CI-equivalent validation | PASS |
-| Migration safety (additive Final Wave) | PASS |
+| Baseline SHA exact (`bca6f46`) | PASS |
+| Hotfix scope (analytics routes + tests only) | PASS |
+| Local CI-equivalent validation | PASS (API 156 / Web 78 / Catalog 4) |
+| Migration safety (no new migration in hotfix) | PASS |
 | Railway configuration | PASS (secrets present, not printed) |
 | API deploy + migrate | PASS |
 | Web deploy + HTTP 200 | PASS |
 | Unauthenticated production smoke | PASS |
-| Authenticated production API smoke | PASS (90/90) |
-| Student browser smoke | PASS (login, workspace, missions UI, dashboards, AI, logout) |
-| Professor browser smoke | **FAIL** — analytics routes 404 break portal refresh |
-| Admin browser smoke | PARTIAL — API admin smoke PASS; browser admin not revalidated post-cleanup |
-| M1–M10 / 30 missions (API prod) | PASS |
-| Assessments + Silver | PASS |
-| BI/KPI | PASS (student dashboards + KPI snapshot) |
-| AI Coach fallback FR | PASS (API + browser) |
-| Predictive analytics (professor API) | PASS |
-| Capstone + Gold + public verify | PASS |
+| Professor analytics API smoke | PASS (200 / authz 401·403 / isolation) |
+| Professor browser refresh + analytics | PASS (former 404 blocker closed) |
+| Focused student / admin / public regression | PASS |
 | Security / isolation | PASS |
-| Responsive 320px / skip link / landmarks | PASS (sampled) |
 | QA cleanup residue | **0** |
 | Post-cleanup health | PASS |
 
-## Blockers
+## Closed blocker
 
-1. **Professor advanced analytics UI blocked in production**  
-   Missing API routes:
-   - `GET /api/v1/professor/analytics/heatmap`
-   - `GET /api/v1/professor/analytics/competencies`  
-   Hotfix prepared (not deployed): `hotfix/v1-professor-analytics-routes` (`e2f2ece`).
+**Professor advanced analytics UI blocked in production** — CLOSED by PR #19 deploy.
+
+- `GET /api/v1/professor/analytics/heatmap` → **200**
+- `GET /api/v1/professor/analytics/competencies` → **200**
+- Browser direct reload of Portail professeur → PASS
+- No missing-endpoint network failure on analytics refresh
 
 ## Known warnings
 
+- Analytics list item labels may show `undefined` due to UI field aliases vs API field names (counts and 200 responses confirmed; follow-up display mapping recommended, not part of this SHA).
 - Student UI lists Professor/Admin apps as active chrome; API still enforces 403.
 - Pre-existing web hooks lint warning in mission interactions.
 
 ## Final verdict
 
-**PRODUCTION HOLD — BLOCKERS REMAIN**
+**PRODUCTION GREEN — TEC.ERP V1 RELEASED**
 
-Product commit `fe61083` is deployed and largely validated live (including full M1–M10 API journey and Gold/public verify). Release closure is held until professor analytics routes are hotfixed, redeployed, and re-smoked in production browser.
+Product SHA `bca6f46` (PR #19 hotfix on Final Wave) is deployed to Railway production, professor analytics live gates passed (API + browser), authorization/isolation confirmed, QA residue cleared to 0, and post-cleanup health is green.
 
-Do not merge this checkpoint PR as a product change. Do not begin new features until HOLD clears.
+Do not merge this checkpoint PR as a product change. Do not begin new features in this closure step.
