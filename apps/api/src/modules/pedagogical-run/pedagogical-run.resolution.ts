@@ -21,11 +21,37 @@ export interface ResolvedPedagogicalRun {
   readonly isHistorical: boolean;
 }
 
+function isDatabaseConfigured(): boolean {
+  return Boolean(process.env.DATABASE_URL?.trim());
+}
+
+function syntheticWritableRun(employeeId: string): ResolvedPedagogicalRun {
+  // In-memory unit stacks (CI quality job without DATABASE_URL): synthetic ACTIVE context.
+  return {
+    id: `pcr_synth_${employeeId}`,
+    employeeId,
+    companyId: "synthetic",
+    courseId: "course_tec_erp_v1",
+    status: "ACTIVE",
+    runCode: `SYNTH-${employeeId.slice(0, 16)}`,
+    runSequence: 1,
+    isWritable: true,
+    isHistorical: false,
+  };
+}
+
 export async function resolvePedagogicalRunForEmployee(input: {
   readonly employeeId: string;
   readonly explicitRunId?: string | null;
   readonly forWrite?: boolean;
 }): Promise<ResolvedPedagogicalRun | null> {
+  if (!isDatabaseConfigured()) {
+    if (input.forWrite) {
+      return syntheticWritableRun(input.employeeId);
+    }
+    return syntheticWritableRun(input.employeeId);
+  }
+
   const prisma = getPrismaClient();
   const forWrite = input.forWrite === true;
 
@@ -77,6 +103,10 @@ export async function requireWritableRun(input: {
   readonly employeeId: string;
   readonly explicitRunId?: string | null;
 }): Promise<ResolvedPedagogicalRun> {
+  if (!isDatabaseConfigured()) {
+    return syntheticWritableRun(input.employeeId);
+  }
+
   const resolved = await resolvePedagogicalRunForEmployee({
     employeeId: input.employeeId,
     explicitRunId: input.explicitRunId,
@@ -108,18 +138,8 @@ export async function requireWritableRun(input: {
     return bootstrapped;
   }
 
-  // In-memory test stacks (auth employee not persisted in Prisma): synthetic ACTIVE context.
-  return {
-    id: `pcr_synth_${input.employeeId}`,
-    employeeId: input.employeeId,
-    companyId: "synthetic",
-    courseId: "course_tec_erp_v1",
-    status: "ACTIVE",
-    runCode: `SYNTH-${input.employeeId.slice(0, 16)}`,
-    runSequence: 1,
-    isWritable: true,
-    isHistorical: false,
-  };
+  // Auth employee not persisted in Prisma (some route unit tests): synthetic ACTIVE context.
+  return syntheticWritableRun(input.employeeId);
 }
 
 async function tryBootstrapActiveRun(employeeId: string): Promise<ResolvedPedagogicalRun | null> {
