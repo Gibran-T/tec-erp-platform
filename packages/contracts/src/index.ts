@@ -167,6 +167,7 @@ export {
   CreateStudentMissionReflectionRequestSchema,
   PedagogicalCourseRunSchema,
   PedagogicalRunComparisonSchema,
+  CurriculumVersionLabelFr,
   PedagogicalRunStatusLabelFr,
   PedagogicalRunStatusSchema,
   PedagogicalRunTypeLabelFr,
