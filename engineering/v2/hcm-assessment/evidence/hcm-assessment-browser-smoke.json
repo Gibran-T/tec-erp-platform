@@ -1,0 +1,53 @@
+{
+  "checks": [
+    {
+      "section": "ui_locked_reason",
+      "ok": true,
+      "detail": "Complétez les trois missions HCM du Module 8 (M8-M01, M8-M02, M8-M03) pour débloquer cette évaluation."
+    },
+    {
+      "section": "ui_locked_no_start",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "section": "ui_eligible_start_visible",
+      "ok": true,
+      "detail": {
+        "count": 1
+      }
+    },
+    {
+      "section": "ui_question_panel",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "section": "ui_options_render",
+      "ok": true,
+      "detail": {
+        "count": 4
+      }
+    },
+    {
+      "section": "ui_professor_loaded",
+      "ok": true,
+      "detail": {
+        "url": "http://127.0.0.1:5174/workspace/apps/portail-professeur"
+      }
+    },
+    {
+      "section": "ui_admin_tab",
+      "ok": true,
+      "detail": {
+        "count": 1
+      }
+    },
+    {
+      "section": "ui_admin_assessments",
+      "ok": true,
+      "detail": {}
+    }
+  ],
+  "failed": 0
+}

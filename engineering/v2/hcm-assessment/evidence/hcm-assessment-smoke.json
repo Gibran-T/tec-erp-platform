@@ -1,0 +1,207 @@
+{
+  "capturedAt": "2026-07-22T22:28:10.317Z",
+  "api": "http://127.0.0.1:3010",
+  "web": "http://127.0.0.1:5174",
+  "checks": [
+    {
+      "section": "api_health",
+      "ok": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "section": "web_health",
+      "ok": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "section": "locked_visible",
+      "ok": true,
+      "detail": {
+        "found": true,
+        "status": "locked"
+      }
+    },
+    {
+      "section": "locked_status",
+      "ok": true,
+      "detail": {
+        "status": "locked",
+        "lockReason": "Complétez les trois missions HCM du Module 8 (M8-M01, M8-M02, M8-M03) pour débloquer cette évaluation."
+      }
+    },
+    {
+      "section": "locked_reason_fr",
+      "ok": true,
+      "detail": {
+        "lockReason": "Complétez les trois missions HCM du Module 8 (M8-M01, M8-M02, M8-M03) pour débloquer cette évaluation."
+      }
+    },
+    {
+      "section": "locked_cannot_start",
+      "ok": true,
+      "detail": {
+        "status": 409,
+        "body": {
+          "error": {
+            "code": "CONFLICT",
+            "message": "Complétez les trois missions HCM du Module 8 (M8-M01, M8-M02, M8-M03) pour débloquer cette évaluation.",
+            "requestId": "8352c048-4aef-42fb-a1eb-7e0f6944ed2e"
+          }
+        }
+      }
+    },
+    {
+      "section": "eligible_available",
+      "ok": true,
+      "detail": {
+        "status": "available"
+      }
+    },
+    {
+      "section": "eligible_start",
+      "ok": true,
+      "detail": {
+        "status": 201,
+        "questions": 20
+      }
+    },
+    {
+      "section": "eligible_20_questions",
+      "ok": true,
+      "detail": {
+        "count": 20
+      }
+    },
+    {
+      "section": "timer_present",
+      "ok": true,
+      "detail": {
+        "timeLimitSeconds": 2400
+      }
+    },
+    {
+      "section": "draft_persist",
+      "ok": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "section": "resume_after_draft",
+      "ok": true,
+      "detail": {
+        "status": 200,
+        "draftCount": 5
+      }
+    },
+    {
+      "section": "submit_pass",
+      "ok": true,
+      "detail": {
+        "status": 200,
+        "scorePercent": 100,
+        "passed": true,
+        "hasFeedback": true
+      }
+    },
+    {
+      "section": "feedback_mission_aligned",
+      "ok": true,
+      "detail": {
+        "feedbackPreview": "Évaluation HCM réussie (100%). Forces: M8-M01 / C-HCM-01 — Employee master — legal vs professional identity boundary | M"
+      }
+    },
+    {
+      "section": "v1_hcm_excluded",
+      "ok": true,
+      "detail": {
+        "codes": [
+          "GOLD_M7_M10",
+          "INTEGRATED_M3_M6",
+          "SILVER_M1_M2"
+        ]
+      }
+    },
+    {
+      "section": "professor_sees_hcm_attempt",
+      "ok": true,
+      "detail": {
+        "attempts": [
+          {
+            "status": "passed",
+            "scorePercent": 100,
+            "missionBreakdown": [
+              {
+                "max": 35,
+                "earned": 35,
+                "mission": "M8-M01",
+                "percent": 100
+              },
+              {
+                "max": 35,
+                "earned": 35,
+                "mission": "M8-M02",
+                "percent": 100
+              },
+              {
+                "max": 30,
+                "earned": 30,
+                "mission": "M8-M03",
+                "percent": 100
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "section": "professor_b_isolation",
+      "ok": true,
+      "detail": {
+        "count": 0
+      }
+    },
+    {
+      "section": "admin_bank_listed",
+      "ok": true,
+      "detail": {
+        "code": "HCM_M8",
+        "title": "Évaluation — Ressources humaines et HCM",
+        "moduleScope": "M8",
+        "passThresholdPercent": 70,
+        "maxAttempts": 2,
+        "timeLimitSeconds": 2400,
+        "curriculumVersion": "V2",
+        "kind": "hcm",
+        "modules": [
+          "M8"
+        ],
+        "questionCount": 20,
+        "attemptCount": 1,
+        "releaseStatus": "seeded"
+      }
+    },
+    {
+      "section": "admin_answer_key",
+      "ok": true,
+      "detail": {
+        "sampleKey": "HCM-M8-Q01",
+        "correctKeys": [
+          "a"
+        ]
+      }
+    },
+    {
+      "section": "learner_no_answer_key_leak",
+      "ok": true,
+      "detail": {
+        "leakedCorrectKeys": false
+      }
+    }
+  ],
+  "failed": 0
+}
