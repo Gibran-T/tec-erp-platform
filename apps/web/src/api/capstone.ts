@@ -37,6 +37,11 @@ export interface CapstoneSubmissionView {
   readonly executiveSummary: string | null;
   readonly submittedAt: string | null;
   readonly reviewStatus: string | null;
+  readonly lifecycleStatus?: string;
+  readonly lifecycleStatusLabel?: string;
+  readonly currentStage?: string | null;
+  readonly separateFromRegularMissions?: boolean;
+  readonly stages?: ReadonlyArray<{ readonly code: string; readonly title: string }>;
 }
 
 export interface CapstoneSubmitPayload {

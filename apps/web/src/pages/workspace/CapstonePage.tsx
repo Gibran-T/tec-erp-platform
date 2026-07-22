@@ -67,16 +67,24 @@ export function CapstonePage(): ReactElement {
   }
 
   const missionsReady = eligibility?.studentReadyChecklist.missionsComplete ?? false;
-  const lockedHint = !missionsReady
-    ? "État verrouillé / prérequis : complétez les 30 missions (M1–M10) avant de considérer le Capstone comme éligible au certificat Or. Vous pouvez néanmoins préparer votre dossier."
-    : null;
+  const lifecycleLabel =
+    submission?.lifecycleStatusLabel ??
+    (missionsReady ? "Disponible" : "Verrouillé");
+  const lockedHint =
+    submission?.lifecycleStatus === "LOCKED" || !missionsReady
+      ? "État verrouillé : le Capstone est un projet intégrateur séparé. Complétez les 30 missions régulières M1–M10 du curriculum actif avant soumission. L’Or exige ensuite l’approbation professeur."
+      : null;
 
   return (
     <main className="workspace-page" data-testid="capstone-page">
-      <h1>Capstone Équinoxe</h1>
+      <h1>MCapstone — Projet intégrateur Equinoxe</h1>
+      <p data-testid="capstone-lifecycle-status">
+        État : {lifecycleLabel}
+        {submission?.currentStage ? ` · Étape ${submission.currentStage}` : ""}
+      </p>
       <p>
-        Diagnostiquez, priorisez, exécutez, analysez et recommandez — puis soumettez votre résumé
-        exécutif.{" "}
+        Domaine distinct des 30 missions régulières. Diagnostiquez, priorisez, exécutez, analysez et
+        recommandez — puis soumettez votre résumé exécutif pour revue professeur.{" "}
         <Link to="/workspace/apps/certificats">Voir les certificats</Link>
       </p>
       {lockedHint ? (

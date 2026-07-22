@@ -696,21 +696,30 @@ export function MissionCenterPage(): ReactNode {
   }
 
   const summaries = missions?.missions ?? [];
-  const primaryModule = course?.modules[0] ?? null;
+  const modules = course?.modules ?? [];
+  const overallPercent =
+    modules.length === 0
+      ? 0
+      : Math.round(
+          modules.reduce((sum, module) => sum + module.percentComplete, 0) / modules.length,
+        );
 
   return (
     <section className="workspace-mission" data-testid="mission-center-page">
       <header className="workspace-mission__header">
         <h1>{MISSION_CENTER_TITLE}</h1>
         <p>
-          Consultez les responsabilités confiées par votre gestionnaire après votre première journée.
+          Dix blocs de compétences, trente missions opérationnelles et analytiques, un projet
+          intégrateur Equinoxe et une attestation fondée sur des preuves.
         </p>
+        {course?.curriculumVersionLabel ? (
+          <p data-testid="mission-curriculum-version">{course.curriculumVersionLabel}</p>
+        ) : null}
       </header>
-      {primaryModule ? (
-        <p className="workspace-mission__progress" data-testid="mission-course-progress">
-          {PROGRESS_LABEL} : {Math.round(primaryModule.percentComplete)} %
-        </p>
-      ) : null}
+      <p className="workspace-mission__progress" data-testid="mission-course-progress">
+        {PROGRESS_LABEL} : {overallPercent} % ({summaries.filter((m) => m.status === "completed").length}
+        /30)
+      </p>
       {refreshing ? (
         <p className="workspace-first-day__status" role="status" data-testid="mission-refreshing">
           Actualisation…
@@ -721,7 +730,49 @@ export function MissionCenterPage(): ReactNode {
           {loadError}
         </p>
       ) : null}
-      {summaries.length === 0 ? (
+      {modules.length > 0 ? (
+        <div className="workspace-mission__modules" data-testid="mission-module-list">
+          {modules.map((module) => (
+            <section
+              key={module.moduleCode}
+              className="workspace-mission__module"
+              data-testid={`mission-module-${module.moduleCode}`}
+            >
+              <header>
+                <h2>
+                  {module.moduleCode} — {module.title.replace(/^Module \d+\s*—\s*/, "")}
+                </h2>
+                <p data-testid={`mission-module-status-${module.moduleCode}`}>
+                  {MISSION_STATUS_LABELS[module.status as keyof typeof MISSION_STATUS_LABELS] ??
+                    module.status}{" "}
+                  · {Math.round(module.percentComplete)} %
+                </p>
+                {module.competencySummary ? <p>{module.competencySummary}</p> : null}
+              </header>
+              <div className="workspace-mission__list">
+                {module.missions.map((mission) => {
+                  const summary = summaries.find((item) => item.missionKey === mission.missionKey) ?? {
+                    missionKey: mission.missionKey,
+                    title: mission.title,
+                    status: mission.status,
+                    preview: "",
+                    unlockExplanation: mission.unlockExplanation,
+                  };
+                  return (
+                    <MissionSummaryCard
+                      key={mission.missionKey}
+                      detail={summary}
+                      onOpen={() => {
+                        void selectMission(mission.missionKey);
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            </section>
+          ))}
+        </div>
+      ) : summaries.length === 0 ? (
         <p data-testid="mission-center-empty">Aucune mission n’est disponible pour le moment.</p>
       ) : (
         <div className="workspace-mission__list">
@@ -736,6 +787,13 @@ export function MissionCenterPage(): ReactNode {
           ))}
         </div>
       )}
+      <aside data-testid="mission-capstone-entry">
+        <h2>MCapstone — Projet intégrateur Equinoxe</h2>
+        <p>
+          Domaine séparé des trente missions régulières. Ouvrez Capstone pour consulter
+          l’éligibilité et le cycle de revue professeur.
+        </p>
+      </aside>
     </section>
   );
 }
