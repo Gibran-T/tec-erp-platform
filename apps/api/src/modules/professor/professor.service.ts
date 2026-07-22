@@ -65,6 +65,7 @@ export function createProfessorService(client = getPrismaClient()) {
     },
 
     async listStudents(professorId: string) {
+      const { resolveOfficialRunIdForEmployee } = await import("../analytics/official-run-policy.js");
       const memberships = await client.cohortMembership.findMany({
         where: { employeeId: professorId, roleInCohort: "professor" },
       });
@@ -74,14 +75,29 @@ export function createProfessorService(client = getPrismaClient()) {
         include: { employee: true },
       });
 
-      const result = [];
+      const uniqueByEmployee = new Map<string, (typeof students)[number]>();
       for (const student of students) {
+        if (!uniqueByEmployee.has(student.employeeId)) {
+          uniqueByEmployee.set(student.employeeId, student);
+        }
+      }
+
+      const result = [];
+      for (const student of uniqueByEmployee.values()) {
+        const officialRunId = await resolveOfficialRunIdForEmployee(student.employeeId);
         const progress = await client.employeeModuleProgress.findMany({
-          where: { employeeId: student.employeeId },
+          where: {
+            employeeId: student.employeeId,
+            ...(officialRunId ? { pedagogicalCourseRunId: officialRunId } : {}),
+          },
           include: { module: true },
         });
         const completedMissions = await client.missionAttempt.count({
-          where: { employeeId: student.employeeId, status: "completed" },
+          where: {
+            employeeId: student.employeeId,
+            status: "completed",
+            ...(officialRunId ? { pedagogicalCourseRunId: officialRunId } : { pedagogicalCourseRunId: "__none__" }),
+          },
         });
         const certificate = await client.certificate.findFirst({
           where: { employeeId: student.employeeId, certificateType: "silver" },
@@ -100,7 +116,10 @@ export function createProfessorService(client = getPrismaClient()) {
           }
         }
         const capstone = await client.capstoneSubmission.findFirst({
-          where: { employeeId: student.employeeId },
+          where: {
+            employeeId: student.employeeId,
+            ...(officialRunId ? { pedagogicalCourseRunId: officialRunId } : {}),
+          },
           orderBy: { updatedAt: "desc" },
         });
         let capstoneStatus: "none" | "draft" | "submitted" | "approved" | "needs_revision" = "none";

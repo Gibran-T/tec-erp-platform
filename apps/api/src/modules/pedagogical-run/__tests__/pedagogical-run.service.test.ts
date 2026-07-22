@@ -37,25 +37,20 @@ describe("pedagogical run transition matrix", () => {
 
   it("keeps institutional unique-student metric from double counting", () => {
     const runs = [
-      { employeeId: "a", status: "COMPLETED", runSequence: 1 },
-      { employeeId: "a", status: "ACTIVE", runSequence: 2 },
-      { employeeId: "b", status: "COMPLETED", runSequence: 1 },
+      { id: "1", employeeId: "a", status: "COMPLETED", runSequence: 1, runType: "AUTONOMOUS" },
+      { id: "2", employeeId: "a", status: "ACTIVE", runSequence: 2, runType: "INSTRUCTOR_LED" },
+      { id: "3", employeeId: "b", status: "COMPLETED", runSequence: 1, runType: "AUTONOMOUS" },
+      { id: "4", employeeId: "c", status: "COMPLETED", runSequence: 1, runType: "DEMONSTRATION" },
     ];
-    const chosen = new Map<string, { status: string; runSequence: number }>();
-    for (const run of runs) {
-      const prev = chosen.get(run.employeeId);
-      if (!prev) {
-        chosen.set(run.employeeId, run);
-        continue;
-      }
-      if (run.status === "ACTIVE") {
-        chosen.set(run.employeeId, run);
-        continue;
-      }
-      if (prev.status !== "ACTIVE" && run.runSequence > prev.runSequence) {
-        chosen.set(run.employeeId, run);
-      }
+    const eligible = runs.filter(
+      (run) => run.runType !== "DEMONSTRATION" && run.status !== "CANCELLED",
+    );
+    const byEmployee = new Map<string, typeof eligible>();
+    for (const run of eligible) {
+      const list = byEmployee.get(run.employeeId) ?? [];
+      list.push(run);
+      byEmployee.set(run.employeeId, list);
     }
-    expect(chosen.size).toBe(2);
+    expect(byEmployee.size).toBe(2);
   });
 });
