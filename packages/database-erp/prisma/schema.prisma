@@ -35,22 +35,23 @@ model Company {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  employees            Employee[]
-  cohorts              Cohort[]
-  masterDataRecords    MasterDataRecord[]
-  businessDocuments    BusinessDocument[]
-  inventoryMovements   InventoryMovement[]
-  financialPostings    FinancialPosting[]
-  openItems            OpenItem[]
-  transactionEvents    TransactionEvent[]
-  auditEvents          AuditEvent[]
-  simulationSnapshots  SimulationSnapshot[]
-  configuration        CompanyConfiguration?
-  aiPolicy             AiPolicy?
-  kpiRecords           KpiRecord[]
-  aiInteractions       AiInteraction[]
+  employees              Employee[]
+  cohorts                Cohort[]
+  masterDataRecords      MasterDataRecord[]
+  businessDocuments      BusinessDocument[]
+  inventoryMovements     InventoryMovement[]
+  financialPostings      FinancialPosting[]
+  openItems              OpenItem[]
+  transactionEvents      TransactionEvent[]
+  auditEvents            AuditEvent[]
+  simulationSnapshots    SimulationSnapshot[]
+  configuration          CompanyConfiguration?
+  aiPolicy               AiPolicy?
+  kpiRecords             KpiRecord[]
+  aiInteractions         AiInteraction[]
   integrationConnections IntegrationConnection[]
-  featureFlags         FeatureFlag[]
+  featureFlags           FeatureFlag[]
+  pedagogicalCourseRuns  PedagogicalCourseRun[]
 
   @@map("company")
 }
@@ -72,28 +73,34 @@ model Employee {
 
   company Company @relation(fields: [companyId], references: [id])
 
-  messageStates EmployeeMessageState[]
-  taskStates    EmployeeTaskState[]
+  messageStates   EmployeeMessageState[]
+  taskStates      EmployeeTaskState[]
   missionAttempts EmployeeMissionAttempt[]
 
-  courseProgress       EmployeeCourseProgress[]
-  moduleProgress       EmployeeModuleProgress[]
-  v1MissionAttempts    MissionAttempt[]
-  unlockStates         UnlockState[]
-  cohortMemberships    CohortMembership[]
-  masterDataAudits     MasterDataAudit[]
-  approvalDecisions    ApprovalDecision[]
-  assessmentAttempts   AssessmentAttempt[]
-  certificates         Certificate[]
-  certificateAudits    CertificateAudit[]
-  auditEventsActed     AuditEvent[]              @relation("AuditActor")
-  aiInteractions       AiInteraction[]
-  capstoneSubmission   CapstoneSubmission?
-  missionDrafts        MissionDraft[]
-  missionVersions      MissionVersion[]          @relation("MissionVersionPublisher")
-  scenarioPublications ScenarioPublication[]
-  predictionRecords    PredictionRecord[]        @relation("PredictionStudent")
-  automationExecutions AutomationExecution[]
+  courseProgress             EmployeeCourseProgress[]
+  moduleProgress             EmployeeModuleProgress[]
+  v1MissionAttempts          MissionAttempt[]
+  unlockStates               UnlockState[]
+  cohortMemberships          CohortMembership[]
+  masterDataAudits           MasterDataAudit[]
+  approvalDecisions          ApprovalDecision[]
+  assessmentAttempts         AssessmentAttempt[]
+  certificates               Certificate[]
+  certificateAudits          CertificateAudit[]
+  auditEventsActed           AuditEvent[]                @relation("AuditActor")
+  aiInteractions             AiInteraction[]
+  capstoneSubmissions        CapstoneSubmission[]
+  missionDrafts              MissionDraft[]
+  missionVersions            MissionVersion[]            @relation("MissionVersionPublisher")
+  scenarioPublications       ScenarioPublication[]
+  predictionRecords          PredictionRecord[]          @relation("PredictionStudent")
+  automationExecutions       AutomationExecution[]
+  pedagogicalCourseRuns      PedagogicalCourseRun[]      @relation("PedagogicalRunStudent")
+  pedagogicalRunsAsProfessor PedagogicalCourseRun[]      @relation("PedagogicalRunProfessor")
+  pedagogicalRunsCreated     PedagogicalCourseRun[]      @relation("PedagogicalRunCreator")
+  professorInterventions     ProfessorIntervention[]
+  studentMissionReflections  StudentMissionReflection[]
+  pedagogicalRunAudits       PedagogicalCourseRunAudit[] @relation("PedagogicalRunAuditActor")
 
   @@index([companyId])
   @@map("employee")
@@ -101,12 +108,12 @@ model Employee {
 
 /// Per-employee read state for a static inbox message (content lives in code).
 model EmployeeMessageState {
-  id         String    @id @default(cuid())
+  id         String   @id @default(cuid())
   employeeId String
   messageKey String
   readAt     DateTime
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   employee Employee @relation(fields: [employeeId], references: [id])
 
@@ -166,10 +173,139 @@ model Course {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  modules  CourseModule[]
-  progress EmployeeCourseProgress[]
+  modules               CourseModule[]
+  progress              EmployeeCourseProgress[]
+  pedagogicalCourseRuns PedagogicalCourseRun[]
 
   @@map("course")
+}
+
+/// First-class versioned pedagogical course run (repeatable teaching without overwrite).
+model PedagogicalCourseRun {
+  id                 String    @id @default(cuid())
+  companyId          String
+  cohortId           String?
+  employeeId         String
+  professorId        String?
+  courseId           String
+  runCode            String    @unique
+  runSequence        Int
+  /// AUTONOMOUS | INSTRUCTOR_LED | REMEDIATION | DEMONSTRATION
+  runType            String
+  runLabel           String
+  language           String    @default("fr")
+  /// PLANNED | ACTIVE | PAUSED | COMPLETED | CANCELLED | ARCHIVED
+  status             String
+  sourceRunId        String?
+  startedAt          DateTime?
+  pausedAt           DateTime?
+  completedAt        DateTime?
+  cancelledAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  createdById        String
+  completionPercent  Float     @default(0)
+  /// When true, student may submit post-mission reflections for this run.
+  reflectionsEnabled Boolean   @default(false)
+  metadataJson       Json      @default("{}")
+
+  company     Company                @relation(fields: [companyId], references: [id])
+  cohort      Cohort?                @relation(fields: [cohortId], references: [id])
+  employee    Employee               @relation("PedagogicalRunStudent", fields: [employeeId], references: [id])
+  professor   Employee?              @relation("PedagogicalRunProfessor", fields: [professorId], references: [id])
+  course      Course                 @relation(fields: [courseId], references: [id])
+  createdBy   Employee               @relation("PedagogicalRunCreator", fields: [createdById], references: [id])
+  sourceRun   PedagogicalCourseRun?  @relation("PedagogicalRunLineage", fields: [sourceRunId], references: [id])
+  derivedRuns PedagogicalCourseRun[] @relation("PedagogicalRunLineage")
+
+  courseProgress      EmployeeCourseProgress[]
+  moduleProgress      EmployeeModuleProgress[]
+  missionAttempts     MissionAttempt[]
+  unlockStates        UnlockState[]
+  assessmentAttempts  AssessmentAttempt[]
+  capstoneSubmissions CapstoneSubmission[]
+  aiInteractions      AiInteraction[]
+  certificates        Certificate[]               @relation("CertificateSourceRun")
+  interventions       ProfessorIntervention[]
+  reflections         StudentMissionReflection[]
+  audits              PedagogicalCourseRunAudit[]
+
+  @@unique([employeeId, courseId, runSequence])
+  @@index([companyId])
+  @@index([employeeId, status])
+  @@index([cohortId])
+  @@map("pedagogical_course_run")
+}
+
+model PedagogicalCourseRunAudit {
+  id          String   @id @default(cuid())
+  runId       String
+  actorId     String
+  action      String
+  fromStatus  String?
+  toStatus    String?
+  reason      String?
+  payloadJson Json     @default("{}")
+  createdAt   DateTime @default(now())
+
+  run   PedagogicalCourseRun @relation(fields: [runId], references: [id])
+  actor Employee             @relation("PedagogicalRunAuditActor", fields: [actorId], references: [id])
+
+  @@index([runId, createdAt])
+  @@map("pedagogical_course_run_audit")
+}
+
+model ProfessorIntervention {
+  id                   String   @id @default(cuid())
+  runId                String
+  moduleCode           String?
+  missionCode          String?
+  professorId          String
+  /// NONE | CLARIFICATION | CONCEPT_EXPLANATION | PROCESS_DEMONSTRATION | TERMINOLOGY_SUPPORT | DATA_INTERPRETATION | ERROR_RECOVERY | BUSINESS_CONTEXT | KPI_EXPLANATION | AI_GOVERNANCE | FULL_RETEACH
+  interventionType     String
+  durationMinutes      Int?
+  reason               String
+  content              String
+  outcome              String?
+  shouldSystemTeach    Boolean?
+  learningHubCandidate Boolean?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  run       PedagogicalCourseRun @relation(fields: [runId], references: [id])
+  professor Employee             @relation(fields: [professorId], references: [id])
+
+  @@index([runId, createdAt])
+  @@map("professor_intervention")
+}
+
+model StudentMissionReflection {
+  id                          String   @id @default(cuid())
+  runId                       String
+  missionKey                  String
+  employeeId                  String
+  clarity                     Int
+  confidence                  Int
+  cognitiveLoad               Int
+  realism                     Int
+  relevance                   Int
+  navigationQuality           Int
+  feedbackQuality             Int
+  visualQuality               Int
+  aiUsefulness                Int?
+  biUsefulness                Int?
+  externalExplanationRequired Boolean  @default(false)
+  externalSlidesWouldHelp     Boolean  @default(false)
+  qualitativeNote             String?
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+
+  run      PedagogicalCourseRun @relation(fields: [runId], references: [id])
+  employee Employee             @relation(fields: [employeeId], references: [id])
+
+  @@unique([runId, missionKey, employeeId])
+  @@index([runId])
+  @@map("student_mission_reflection")
 }
 
 model CourseModule {
@@ -181,9 +317,9 @@ model CourseModule {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  course    Course                   @relation(fields: [courseId], references: [id])
-  missions  MissionDefinition[]
-  progress  EmployeeModuleProgress[]
+  course   Course                   @relation(fields: [courseId], references: [id])
+  missions MissionDefinition[]
+  progress EmployeeModuleProgress[]
 
   @@index([courseId])
   @@map("course_module")
@@ -204,7 +340,7 @@ model MissionDefinition {
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
-  module       CourseModule         @relation(fields: [moduleId], references: [id])
+  module       CourseModule        @relation(fields: [moduleId], references: [id])
   competencies MissionCompetency[]
   attempts     MissionAttempt[]
 
@@ -241,68 +377,77 @@ model MissionCompetency {
 }
 
 model EmployeeCourseProgress {
-  id              String   @id @default(cuid())
-  employeeId      String
-  courseId        String
-  percentComplete Float    @default(0)
-  status          String   @default("locked")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                     String   @id @default(cuid())
+  employeeId             String
+  courseId               String
+  pedagogicalCourseRunId String
+  percentComplete        Float    @default(0)
+  status                 String   @default("locked")
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 
-  employee Employee @relation(fields: [employeeId], references: [id])
-  course   Course   @relation(fields: [courseId], references: [id])
+  employee             Employee             @relation(fields: [employeeId], references: [id])
+  course               Course               @relation(fields: [courseId], references: [id])
+  pedagogicalCourseRun PedagogicalCourseRun @relation(fields: [pedagogicalCourseRunId], references: [id])
 
-  @@unique([employeeId, courseId])
+  @@unique([employeeId, courseId, pedagogicalCourseRunId])
   @@index([employeeId])
   @@index([courseId])
+  @@index([pedagogicalCourseRunId])
   @@map("employee_course_progress")
 }
 
 model EmployeeModuleProgress {
-  id              String   @id @default(cuid())
-  employeeId      String
-  moduleId        String
-  percentComplete Float    @default(0)
-  status          String   @default("locked")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                     String   @id @default(cuid())
+  employeeId             String
+  moduleId               String
+  pedagogicalCourseRunId String
+  percentComplete        Float    @default(0)
+  status                 String   @default("locked")
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 
-  employee Employee     @relation(fields: [employeeId], references: [id])
-  module   CourseModule @relation(fields: [moduleId], references: [id])
+  employee             Employee             @relation(fields: [employeeId], references: [id])
+  module               CourseModule         @relation(fields: [moduleId], references: [id])
+  pedagogicalCourseRun PedagogicalCourseRun @relation(fields: [pedagogicalCourseRunId], references: [id])
 
-  @@unique([employeeId, moduleId])
+  @@unique([employeeId, moduleId, pedagogicalCourseRunId])
   @@index([employeeId])
   @@index([moduleId])
+  @@index([pedagogicalCourseRunId])
   @@map("employee_module_progress")
 }
 
 /// Persisted attempt lifecycle. locked/available are derived, never stored.
 model MissionAttempt {
-  id                  String    @id @default(cuid())
-  employeeId          String
-  missionDefinitionId String
-  attemptNumber       Int
+  id                     String    @id @default(cuid())
+  employeeId             String
+  missionDefinitionId    String
+  pedagogicalCourseRunId String
+  attemptNumber          Int
   /// Persisted: in_progress | submitted | completed | needs_review | failed
-  status              String
-  startedAt           DateTime
-  submittedAt         DateTime?
-  completedAt         DateTime?
-  responsesJson       Json      @default("{}")
-  scorePercent        Float?
-  earnedPoints        Float?
-  maxPoints           Float?
-  feedbackJson        Json?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  status                 String
+  startedAt              DateTime
+  submittedAt            DateTime?
+  completedAt            DateTime?
+  responsesJson          Json      @default("{}")
+  scorePercent           Float?
+  earnedPoints           Float?
+  maxPoints              Float?
+  feedbackJson           Json?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
-  employee          Employee          @relation(fields: [employeeId], references: [id])
-  missionDefinition MissionDefinition @relation(fields: [missionDefinitionId], references: [id])
-  evidence          MissionEvidence[]
-  feedbackRecords   FeedbackRecord[]
+  employee             Employee             @relation(fields: [employeeId], references: [id])
+  missionDefinition    MissionDefinition    @relation(fields: [missionDefinitionId], references: [id])
+  pedagogicalCourseRun PedagogicalCourseRun @relation(fields: [pedagogicalCourseRunId], references: [id])
+  evidence             MissionEvidence[]
+  feedbackRecords      FeedbackRecord[]
 
-  @@unique([employeeId, missionDefinitionId, attemptNumber])
+  @@unique([employeeId, missionDefinitionId, pedagogicalCourseRunId, attemptNumber])
   @@index([employeeId])
   @@index([missionDefinitionId])
+  @@index([pedagogicalCourseRunId])
   @@map("mission_attempt")
 }
 
@@ -320,17 +465,20 @@ model MissionEvidence {
 }
 
 model UnlockState {
-  id           String   @id @default(cuid())
-  employeeId   String
-  resourceType String
-  resourceKey  String
-  unlockedAt   DateTime
-  createdAt    DateTime @default(now())
+  id                     String   @id @default(cuid())
+  employeeId             String
+  resourceType           String
+  resourceKey            String
+  pedagogicalCourseRunId String
+  unlockedAt             DateTime
+  createdAt              DateTime @default(now())
 
-  employee Employee @relation(fields: [employeeId], references: [id])
+  employee             Employee             @relation(fields: [employeeId], references: [id])
+  pedagogicalCourseRun PedagogicalCourseRun @relation(fields: [pedagogicalCourseRunId], references: [id])
 
-  @@unique([employeeId, resourceType, resourceKey])
+  @@unique([employeeId, resourceType, resourceKey, pedagogicalCourseRunId])
   @@index([employeeId])
+  @@index([pedagogicalCourseRunId])
   @@map("unlock_state")
 }
 
@@ -356,9 +504,10 @@ model Cohort {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  company     Company            @relation(fields: [companyId], references: [id])
-  memberships CohortMembership[]
-  certificates Certificate[]
+  company               Company                @relation(fields: [companyId], references: [id])
+  memberships           CohortMembership[]
+  certificates          Certificate[]
+  pedagogicalCourseRuns PedagogicalCourseRun[]
 
   @@index([companyId])
   @@map("cohort")
@@ -415,24 +564,24 @@ model MasterDataAudit {
 }
 
 model BusinessDocument {
-  id              String   @id @default(cuid())
-  companyId       String
-  employeeId      String?
-  documentType    String
-  documentNumber  String
-  status          String
-  payloadJson     Json
-  missionKey      String?
+  id               String   @id @default(cuid())
+  companyId        String
+  employeeId       String?
+  documentType     String
+  documentNumber   String
+  status           String
+  payloadJson      Json
+  missionKey       String?
   missionAttemptId String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  company    Company            @relation(fields: [companyId], references: [id])
-  lines      DocumentLine[]
-  approvals  ApprovalDecision[]
-  movements  InventoryMovement[]
-  postings   FinancialPosting[]
-  openItems  OpenItem[]
+  company   Company             @relation(fields: [companyId], references: [id])
+  lines     DocumentLine[]
+  approvals ApprovalDecision[]
+  movements InventoryMovement[]
+  postings  FinancialPosting[]
+  openItems OpenItem[]
 
   @@unique([companyId, documentType, documentNumber])
   @@index([companyId])
@@ -506,15 +655,15 @@ model FinancialPosting {
 }
 
 model OpenItem {
-  id          String   @id @default(cuid())
-  companyId   String
-  kind        String
-  documentId  String
-  amount      Float
-  openAmount  Float
-  status      String   @default("open")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  companyId  String
+  kind       String
+  documentId String
+  amount     Float
+  openAmount Float
+  status     String   @default("open")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   company  Company          @relation(fields: [companyId], references: [id])
   document BusinessDocument @relation(fields: [documentId], references: [id])
@@ -524,13 +673,13 @@ model OpenItem {
 }
 
 model TransactionEvent {
-  id         String   @id @default(cuid())
-  companyId  String
-  employeeId String?
-  eventType  String
+  id          String   @id @default(cuid())
+  companyId   String
+  employeeId  String?
+  eventType   String
   payloadJson Json
-  sequence   Int
-  createdAt  DateTime @default(now())
+  sequence    Int
+  createdAt   DateTime @default(now())
 
   company Company @relation(fields: [companyId], references: [id])
 
@@ -540,15 +689,15 @@ model TransactionEvent {
 }
 
 model AuditEvent {
-  id               String   @id @default(cuid())
-  companyId        String
-  actorEmployeeId  String
-  action           String
-  resourceType     String
-  resourceKey      String
-  reason           String?
-  payloadJson      Json?
-  createdAt        DateTime @default(now())
+  id              String   @id @default(cuid())
+  companyId       String
+  actorEmployeeId String
+  action          String
+  resourceType    String
+  resourceKey     String
+  reason          String?
+  payloadJson     Json?
+  createdAt       DateTime @default(now())
 
   company Company  @relation(fields: [companyId], references: [id])
   actor   Employee @relation("AuditActor", fields: [actorEmployeeId], references: [id])
@@ -607,44 +756,51 @@ model AssessmentQuestion {
 }
 
 model AssessmentAttempt {
-  id            String    @id @default(cuid())
-  employeeId    String
-  assessmentId  String
-  attemptNumber Int
-  status        String
-  startedAt     DateTime
-  submittedAt   DateTime?
-  scorePercent  Float?
-  responsesJson Json      @default("{}")
-  feedbackJson  Json?
+  id                     String    @id @default(cuid())
+  employeeId             String
+  assessmentId           String
+  pedagogicalCourseRunId String
+  attemptNumber          Int
+  status                 String
+  startedAt              DateTime
+  submittedAt            DateTime?
+  scorePercent           Float?
+  responsesJson          Json      @default("{}")
+  feedbackJson           Json?
 
-  employee   Employee             @relation(fields: [employeeId], references: [id])
-  assessment AssessmentDefinition @relation(fields: [assessmentId], references: [id])
+  employee             Employee             @relation(fields: [employeeId], references: [id])
+  assessment           AssessmentDefinition @relation(fields: [assessmentId], references: [id])
+  pedagogicalCourseRun PedagogicalCourseRun @relation(fields: [pedagogicalCourseRunId], references: [id])
 
-  @@unique([employeeId, assessmentId, attemptNumber])
+  @@unique([employeeId, assessmentId, pedagogicalCourseRunId, attemptNumber])
   @@index([employeeId])
+  @@index([pedagogicalCourseRunId])
   @@map("assessment_attempt")
 }
 
 model Certificate {
-  id                 String    @id @default(cuid())
-  employeeId         String
-  cohortId           String?
-  certificateType    String
-  certificateNumber  String    @unique
-  issuedAt           DateTime
-  status             String    @default("issued")
+  id                    String    @id @default(cuid())
+  employeeId            String
+  cohortId              String?
+  sourceRunId           String?
+  achievementType       String?
+  certificateType       String
+  certificateNumber     String    @unique
+  issuedAt              DateTime
+  status                String    @default("issued")
   competencySummaryJson Json
-  verificationStatus String    @default("valid")
-  revokedAt          DateTime?
-  revokeReason       String?
+  verificationStatus    String    @default("valid")
+  revokedAt             DateTime?
+  revokeReason          String?
 
-  employee Employee           @relation(fields: [employeeId], references: [id])
-  cohort   Cohort?            @relation(fields: [cohortId], references: [id])
-  audits                CertificateAudit[]
-  verificationTokens    PublicVerificationToken[]
+  employee           Employee                  @relation(fields: [employeeId], references: [id])
+  cohort             Cohort?                   @relation(fields: [cohortId], references: [id])
+  sourceRun          PedagogicalCourseRun?     @relation("CertificateSourceRun", fields: [sourceRunId], references: [id])
+  audits             CertificateAudit[]
+  verificationTokens PublicVerificationToken[]
 
   @@index([employeeId])
+  @@index([sourceRunId])
   @@map("certificate")
 }
 
@@ -716,19 +872,22 @@ model AiPolicy {
 }
 
 model AiInteraction {
-  id           String   @id @default(cuid())
-  employeeId   String
-  companyId    String
-  question     String
-  answer       String
-  refused      Boolean  @default(false)
-  metadataJson Json     @default("{}")
-  createdAt    DateTime @default(now())
+  id                     String   @id @default(cuid())
+  employeeId             String
+  companyId              String
+  pedagogicalCourseRunId String?
+  question               String
+  answer                 String
+  refused                Boolean  @default(false)
+  metadataJson           Json     @default("{}")
+  createdAt              DateTime @default(now())
 
-  employee Employee @relation(fields: [employeeId], references: [id])
-  company  Company  @relation(fields: [companyId], references: [id])
+  employee             Employee              @relation(fields: [employeeId], references: [id])
+  company              Company               @relation(fields: [companyId], references: [id])
+  pedagogicalCourseRun PedagogicalCourseRun? @relation(fields: [pedagogicalCourseRunId], references: [id])
 
   @@index([employeeId, createdAt])
+  @@index([pedagogicalCourseRunId])
   @@map("ai_interaction")
 }
 
@@ -747,26 +906,30 @@ model PredictionRecord {
 }
 
 model CapstoneSubmission {
-  id                  String    @id @default(cuid())
-  employeeId          String    @unique
-  missionKey          String    @default("m10-m03-presentation-capstone-or")
-  status              String    @default("draft")
-  diagnose            String?
-  prioritize          String?
-  execute             String?
-  analyze             String?
-  recommend           String?
-  executiveSummary    String?
-  submittedAt         DateTime?
-  reviewStatus        String?
-  professorApproved   Boolean   @default(false)
-  professorNotes      String?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  id                     String    @id @default(cuid())
+  employeeId             String
+  pedagogicalCourseRunId String
+  missionKey             String    @default("m10-m03-presentation-capstone-or")
+  status                 String    @default("draft")
+  diagnose               String?
+  prioritize             String?
+  execute                String?
+  analyze                String?
+  recommend              String?
+  executiveSummary       String?
+  submittedAt            DateTime?
+  reviewStatus           String?
+  professorApproved      Boolean   @default(false)
+  professorNotes         String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
-  employee Employee           @relation(fields: [employeeId], references: [id])
-  evidence CapstoneEvidence[]
+  employee             Employee             @relation(fields: [employeeId], references: [id])
+  pedagogicalCourseRun PedagogicalCourseRun @relation(fields: [pedagogicalCourseRunId], references: [id])
+  evidence             CapstoneEvidence[]
 
+  @@unique([employeeId, pedagogicalCourseRunId])
+  @@index([pedagogicalCourseRunId])
   @@map("capstone_submission")
 }
 
@@ -861,7 +1024,7 @@ model IntegrationRun {
   completedAt    DateTime?
 
   connection IntegrationConnection @relation(fields: [connectionId], references: [id])
-  events       IntegrationEvent[]
+  events     IntegrationEvent[]
 
   @@index([connectionId, startedAt])
   @@map("integration_run")
@@ -939,12 +1102,12 @@ model FeatureFlag {
 }
 
 model CertificateAudit {
-  id               String   @id @default(cuid())
-  certificateId    String
-  actorEmployeeId  String
-  action           String
-  reason           String?
-  createdAt        DateTime @default(now())
+  id              String   @id @default(cuid())
+  certificateId   String
+  actorEmployeeId String
+  action          String
+  reason          String?
+  createdAt       DateTime @default(now())
 
   certificate Certificate @relation(fields: [certificateId], references: [id])
   actor       Employee    @relation(fields: [actorEmployeeId], references: [id])

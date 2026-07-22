@@ -6,6 +6,10 @@ import {
 import { DomainError, Result } from "@tec-platform/core";
 
 import { getAuthenticatedEmployee } from "../../middleware/require-employee.js";
+import {
+  extractRunId,
+  withEmployeeRunContext,
+} from "../pedagogical-run/with-employee-run.js";
 import type { AssessmentService } from "./assessment.service.js";
 
 export function createAssessmentMeRouter(service: AssessmentService): Router {
@@ -14,7 +18,14 @@ export function createAssessmentMeRouter(service: AssessmentService): Router {
   router.get("/", async (req, res, next) => {
     try {
       const employee = getAuthenticatedEmployee(req);
-      res.status(200).json({ assessments: await service.listForEmployee(employee.id) });
+      res.status(200).json({
+        assessments: await withEmployeeRunContext({
+          employeeId: employee.id,
+          explicitRunId: extractRunId(req),
+          forWrite: false,
+          fn: () => service.listForEmployee(employee.id),
+        }),
+      });
     } catch (error) {
       next(error);
     }
@@ -45,7 +56,12 @@ export function createAssessmentMeRouter(service: AssessmentService): Router {
   router.get("/:code/attempt", async (req, res, next) => {
     try {
       const employee = getAuthenticatedEmployee(req);
-      const result = await service.getActiveAttempt(employee.id, req.params.code ?? "");
+      const result = await withEmployeeRunContext({
+        employeeId: employee.id,
+        explicitRunId: extractRunId(req),
+        forWrite: false,
+        fn: () => service.getActiveAttempt(employee.id, req.params.code ?? ""),
+      });
       if (Result.isFail(result)) {
         throw result.error;
       }
@@ -58,7 +74,12 @@ export function createAssessmentMeRouter(service: AssessmentService): Router {
   router.post("/:code/start", async (req, res, next) => {
     try {
       const employee = getAuthenticatedEmployee(req);
-      const result = await service.start(employee.id, req.params.code ?? "");
+      const result = await withEmployeeRunContext({
+        employeeId: employee.id,
+        explicitRunId: extractRunId(req),
+        forWrite: true,
+        fn: () => service.start(employee.id, req.params.code ?? ""),
+      });
       if (Result.isFail(result)) {
         throw result.error;
       }
@@ -75,7 +96,12 @@ export function createAssessmentMeRouter(service: AssessmentService): Router {
       if (!parsed.success) {
         throw DomainError.validation("Brouillon d'evaluation invalide.");
       }
-      const result = await service.saveDraft(employee.id, req.params.code ?? "", parsed.data);
+      const result = await withEmployeeRunContext({
+        employeeId: employee.id,
+        explicitRunId: extractRunId(req),
+        forWrite: true,
+        fn: () => service.saveDraft(employee.id, req.params.code ?? "", parsed.data),
+      });
       if (Result.isFail(result)) {
         throw result.error;
       }
@@ -92,7 +118,12 @@ export function createAssessmentMeRouter(service: AssessmentService): Router {
       if (!parsed.success) {
         throw DomainError.validation("Soumission d'evaluation invalide.");
       }
-      const result = await service.submit(employee.id, req.params.code ?? "", parsed.data);
+      const result = await withEmployeeRunContext({
+        employeeId: employee.id,
+        explicitRunId: extractRunId(req),
+        forWrite: true,
+        fn: () => service.submit(employee.id, req.params.code ?? "", parsed.data),
+      });
       if (Result.isFail(result)) {
         throw result.error;
       }

@@ -1,6 +1,11 @@
 import { DomainError, Result, type ResultType } from "@tec-platform/core";
 import { getPrismaClient, type Prisma } from "@tec-platform/database-erp";
 
+import {
+  getCurrentPedagogicalRun,
+  requireCurrentPedagogicalRunId,
+} from "../pedagogical-run/run-context.js";
+
 function toInputJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 }
@@ -43,7 +48,29 @@ function mapSubmission(row: {
 export function createCapstoneService(client = getPrismaClient()) {
   return {
     async getSubmission(employeeId: string) {
-      const row = await client.capstoneSubmission.findUnique({ where: { employeeId } });
+      const run = getCurrentPedagogicalRun();
+      if (!run) {
+        return {
+          id: "",
+          status: "draft",
+          diagnose: "",
+          prioritize: "",
+          execute: "",
+          analyze: "",
+          recommend: "",
+          executiveSummary: null,
+          submittedAt: null,
+          reviewStatus: null,
+        };
+      }
+      const row = await client.capstoneSubmission.findUnique({
+        where: {
+          employeeId_pedagogicalCourseRunId: {
+            employeeId,
+            pedagogicalCourseRunId: run.id,
+          },
+        },
+      });
       if (!row) {
         return {
           id: "",
@@ -65,6 +92,7 @@ export function createCapstoneService(client = getPrismaClient()) {
       employeeId: string,
       input: CapstoneSubmitInput,
     ): Promise<ResultType<ReturnType<typeof mapSubmission>>> {
+      const pedagogicalCourseRunId = requireCurrentPedagogicalRunId();
       const fields = [
         input.diagnose,
         input.prioritize,
@@ -81,9 +109,15 @@ export function createCapstoneService(client = getPrismaClient()) {
 
       const now = new Date();
       const row = await client.capstoneSubmission.upsert({
-        where: { employeeId },
+        where: {
+          employeeId_pedagogicalCourseRunId: {
+            employeeId,
+            pedagogicalCourseRunId,
+          },
+        },
         create: {
           employeeId,
+          pedagogicalCourseRunId,
           status: "submitted",
           diagnose: input.diagnose.trim(),
           prioritize: input.prioritize.trim(),

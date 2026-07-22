@@ -67,6 +67,12 @@ import { createTransactionsService } from "./modules/transactions/transactions.s
 import { createProfessorRouter } from "./modules/professor/professor.routes.js";
 import { createProfessorService } from "./modules/professor/professor.service.js";
 import { requireProfessor } from "./middleware/require-professor.js";
+import {
+  createPedagogicalRunAdminRouter,
+  createPedagogicalRunMeRouter,
+  createPedagogicalRunProfessorRouter,
+} from "./modules/pedagogical-run/pedagogical-run.routes.js";
+import { createPedagogicalRunService } from "./modules/pedagogical-run/pedagogical-run.service.js";
 import { createApiV1Router } from "./routes/api-v1.js";
 import { createOperationalRouter } from "./routes/operational.js";
 
@@ -173,10 +179,12 @@ export function createApp(
   const scenarioService = createScenarioService();
   const integrationService = createIntegrationService();
   const automationService = createAutomationService();
+  const pedagogicalRunService = createPedagogicalRunService();
 
   app.use(createOperationalRouter(dependencies));
   app.use("/api/v1/auth", createAuthRouter(authService));
   app.use("/api/v1/me", requireEmployee, createMeRouter(firstDayService));
+  app.use("/api/v1/me", requireEmployee, createPedagogicalRunMeRouter(pedagogicalRunService));
   app.use("/api/v1/me", requireEmployee, createMissionMeRouter(missionService));
   app.use("/api/v1/me", requireEmployee, createCourseMeRouter(courseService));
   app.use("/api/v1/me", requireEmployee, createOrganizationMeRouter(organizationService));
@@ -192,6 +200,12 @@ export function createApp(
     requireEmployee,
     requireProfessor,
     createProfessorRouter(professorService),
+  );
+  app.use(
+    "/api/v1/professor",
+    requireEmployee,
+    requireProfessor,
+    createPedagogicalRunProfessorRouter(pedagogicalRunService),
   );
   app.use(
     "/api/v1/professor",
@@ -229,6 +243,12 @@ export function createApp(
   app.use("/api/v1/me/certificates", requireEmployee, createCertificationMeRouter(certificationService));
   app.use("/api/v1/public", createCertificationPublicRouter(certificationService));
   app.use("/api/v1/admin", requireEmployee, requireAdmin, createAdminRouter(adminService));
+  app.use(
+    "/api/v1/admin",
+    requireEmployee,
+    requireAdmin,
+    createPedagogicalRunAdminRouter(pedagogicalRunService),
+  );
   app.use(
     "/api/v1/admin/scenarios",
     requireEmployee,

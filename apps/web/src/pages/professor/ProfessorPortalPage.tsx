@@ -22,11 +22,13 @@ import {
   revokeProfessorCertificate,
 } from "../../api/professor.js";
 import { useAuth } from "../../auth/AuthContext.js";
+import { PedagogicalRunsProfessorPanel } from "../../components/professor/PedagogicalRunsProfessorPanel.js";
 
 type PortalTab =
   | "cohorts"
   | "roster"
   | "detail"
+  | "runs"
   | "analytics"
   | "ai-usage"
   | "predictions"
@@ -259,6 +261,7 @@ export function ProfessorPortalPage(): ReactElement {
             ["cohorts", "Cohortes"],
             ["roster", "Etudiants"],
             ["detail", "Detail etudiant"],
+            ["runs", "Parcours pedagogiques"],
             ["analytics", "Analytics"],
             ["ai-usage", "Usage IA"],
             ["predictions", "Predictions"],
@@ -291,6 +294,8 @@ export function ProfessorPortalPage(): ReactElement {
           data-testid="professor-reason"
         />
       </label>
+
+      {tab === "runs" ? <PedagogicalRunsProfessorPanel /> : null}
 
       {tab === "cohorts" ? (
         <section data-testid="professor-cohorts">

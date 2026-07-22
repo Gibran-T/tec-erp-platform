@@ -55,11 +55,22 @@ export function createAnalyticsService(client = getPrismaClient()) {
     });
   }
 
-  async function getProfessorHeatmap(professorId: string) {
+  async function getProfessorHeatmap(
+    professorId: string,
+    options?: { readonly analyticsMode?: string; readonly selectedRunId?: string },
+  ) {
     const professor = await client.employee.findUnique({ where: { id: professorId } });
     if (!professor) {
       return Result.fail(DomainError.notFound("Professeur introuvable."));
     }
+
+    const {
+      parseAnalyticsMode,
+      resolveRunIdsForAnalytics,
+      pickOfficialRun,
+      isEligibleForOfficial,
+    } = await import("./official-run-policy.js");
+    const mode = parseAnalyticsMode(options?.analyticsMode);
 
     const memberships = await client.cohortMembership.findMany({
       where: { employeeId: professorId, roleInCohort: "professor" },
@@ -67,48 +78,105 @@ export function createAnalyticsService(client = getPrismaClient()) {
     });
     const cohortIds = memberships.map((item) => item.cohortId);
     if (cohortIds.length === 0) {
-      return Result.ok({ rows: [] as Array<Record<string, unknown>> });
+      return Result.ok({
+        mode,
+        enrolledStudentCount: 0,
+        rows: [] as Array<Record<string, unknown>>,
+      });
     }
 
     const students = await client.cohortMembership.findMany({
       where: { cohortId: { in: cohortIds }, roleInCohort: "student" },
-      include: {
-        employee: {
-          include: {
-            v1MissionAttempts: {
-              where: { status: "completed" },
-              include: {
-                missionDefinition: { select: { missionKey: true, moduleId: true } },
-              },
-            },
-          },
-        },
-      },
+      include: { employee: true },
     });
 
-    const rows = students.map((membership) => {
-      const completedKeys = membership.employee.v1MissionAttempts.map(
-        (attempt) => attempt.missionDefinition.missionKey,
-      );
+    // One institutional row per student (never per run).
+    const uniqueStudents = new Map<string, (typeof students)[number]>();
+    for (const membership of students) {
+      if (!uniqueStudents.has(membership.employeeId)) {
+        uniqueStudents.set(membership.employeeId, membership);
+      }
+    }
+
+    const rows: Array<Record<string, unknown>> = [];
+    for (const membership of uniqueStudents.values()) {
+      const runFilter = await resolveRunIdsForAnalytics({
+        employeeId: membership.employeeId,
+        mode,
+        selectedRunId: options?.selectedRunId,
+      });
+
+      const attemptWhere =
+        runFilter === "ALL"
+          ? {
+              employeeId: membership.employeeId,
+              status: "completed" as const,
+              pedagogicalCourseRun: {
+                runType: { not: "DEMONSTRATION" },
+                status: { not: "CANCELLED" },
+              },
+            }
+          : {
+              employeeId: membership.employeeId,
+              status: "completed" as const,
+              pedagogicalCourseRunId: { in: runFilter },
+            };
+
+      const attempts = await client.missionAttempt.findMany({
+        where: attemptWhere,
+        include: {
+          missionDefinition: { select: { missionKey: true, moduleId: true } },
+        },
+      });
+
+      // Deduplicate mission keys so ALL_RUNS does not inflate completion by replaying runs
+      const completedKeys =
+        mode === "ALL_RUNS"
+          ? [...new Set(attempts.map((attempt) => attempt.missionDefinition.missionKey))]
+          : attempts.map((attempt) => attempt.missionDefinition.missionKey);
+
       const moduleCounts: Record<string, number> = {};
       for (const key of completedKeys) {
         const moduleCode = key.split("-")[0]?.toUpperCase() ?? "M?";
         moduleCounts[moduleCode] = (moduleCounts[moduleCode] ?? 0) + 1;
       }
-      return {
+
+      const studentRuns = await client.pedagogicalCourseRun.findMany({
+        where: { employeeId: membership.employeeId },
+        select: {
+          id: true,
+          employeeId: true,
+          runSequence: true,
+          runType: true,
+          status: true,
+          runCode: true,
+        },
+      });
+      const official = pickOfficialRun(studentRuns);
+
+      rows.push({
         studentId: membership.employee.id,
         employeeNumber: membership.employee.employeeNumber,
         displayName: membership.employee.displayName,
         completedMissions: completedKeys.length,
         moduleCounts,
-      };
-    });
+        officialRunCode: official?.runCode ?? null,
+        runCount: studentRuns.filter(isEligibleForOfficial).length,
+      });
+    }
 
-    return Result.ok({ rows });
+    return Result.ok({
+      mode,
+      enrolledStudentCount: rows.length,
+      rows,
+    });
   }
 
-  async function getProfessorCompetencies(professorId: string) {
-    const heatmap = await getProfessorHeatmap(professorId);
+  async function getProfessorCompetencies(
+    professorId: string,
+    options?: { readonly analyticsMode?: string; readonly selectedRunId?: string },
+  ) {
+    const heatmap = await getProfessorHeatmap(professorId, options);
     if (Result.isFail(heatmap)) {
       return heatmap;
     }
@@ -124,7 +192,7 @@ export function createAnalyticsService(client = getPrismaClient()) {
         const counts = row.moduleCounts as Record<string, number>;
         return sum + (counts[module.moduleCode] ?? 0);
       }, 0);
-      const studentCount = Math.max(heatmap.value.rows.length, 1);
+      const studentCount = Math.max(heatmap.value.enrolledStudentCount, 1);
       const denominator = Math.max(missionCount * studentCount, 1);
       const coveragePercent = Math.round((completedAcrossStudents / denominator) * 100);
       return {
@@ -135,7 +203,11 @@ export function createAnalyticsService(client = getPrismaClient()) {
       };
     });
 
-    return Result.ok({ competencies });
+    return Result.ok({
+      mode: heatmap.value.mode,
+      enrolledStudentCount: heatmap.value.enrolledStudentCount,
+      competencies,
+    });
   }
 
   return {

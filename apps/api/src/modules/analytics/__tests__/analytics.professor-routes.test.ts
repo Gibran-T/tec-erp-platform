@@ -55,9 +55,13 @@ describe("professor analytics routes", () => {
   beforeEach(() => {
     getProfessorHeatmap.mockReset();
     getProfessorCompetencies.mockReset();
-    getProfessorHeatmap.mockResolvedValue(Result.ok({ rows: [] }));
+    getProfessorHeatmap.mockResolvedValue(
+      Result.ok({ mode: "OFFICIAL_COHORT_RESULT", enrolledStudentCount: 0, rows: [] }),
+    );
     getProfessorCompetencies.mockResolvedValue(
       Result.ok({
+        mode: "OFFICIAL_COHORT_RESULT",
+        enrolledStudentCount: 0,
         competencies: [
           {
             moduleCode: "M1",
@@ -91,13 +95,22 @@ describe("professor analytics routes", () => {
       .get("/analytics/heatmap")
       .expect(200);
 
-    expect(response.body).toEqual({ rows: [] });
-    expect(getProfessorHeatmap).toHaveBeenCalledWith("emp_prof");
+    expect(response.body).toEqual({
+      mode: "OFFICIAL_COHORT_RESULT",
+      enrolledStudentCount: 0,
+      rows: [],
+    });
+    expect(getProfessorHeatmap).toHaveBeenCalledWith("emp_prof", {
+      analyticsMode: undefined,
+      selectedRunId: undefined,
+    });
   });
 
   it("returns 200 competencies for an authenticated professor with deterministic module ordering payload", async () => {
     getProfessorCompetencies.mockResolvedValue(
       Result.ok({
+        mode: "OFFICIAL_COHORT_RESULT",
+        enrolledStudentCount: 1,
         competencies: [
           { moduleCode: "M1", title: "A", missionCount: 3, coveragePercent: 10 },
           { moduleCode: "M2", title: "B", missionCount: 3, coveragePercent: 20 },
@@ -112,7 +125,10 @@ describe("professor analytics routes", () => {
     expect(response.body.competencies).toHaveLength(2);
     expect(response.body.competencies[0]?.moduleCode).toBe("M1");
     expect(response.body.competencies[1]?.moduleCode).toBe("M2");
-    expect(getProfessorCompetencies).toHaveBeenCalledWith("emp_prof");
+    expect(getProfessorCompetencies).toHaveBeenCalledWith("emp_prof", {
+      analyticsMode: undefined,
+      selectedRunId: undefined,
+    });
   });
 
   it("rejects student access to heatmap and competencies", async () => {

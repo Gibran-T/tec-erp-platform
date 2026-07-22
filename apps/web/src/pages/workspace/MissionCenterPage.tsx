@@ -28,6 +28,8 @@ import {
   SUBMIT_MISSION_LABEL,
   SUBMIT_RESPONSES_LABEL,
 } from "../../mission/missionCopy.js";
+import { listMyPedagogicalRuns } from "../../api/pedagogical-runs.js";
+import { MissionReflectionForm } from "../../components/workspace/MissionReflectionForm.js";
 
 const JUSTIFICATION_MIN = 40;
 const JUSTIFICATION_MAX = 1000;
@@ -308,6 +310,28 @@ function MissionDetailView({
   const [justification, setJustification] = useState(detail.attempt?.justification ?? "");
   const [responses, setResponses] = useState<InteractionResponses>({});
   const [clientError, setClientError] = useState<string | null>(null);
+  const [reflectionRun, setReflectionRun] = useState<{ id: string; enabled: boolean } | null>(
+    null,
+  );
+
+  useEffect(() => {
+    void listMyPedagogicalRuns()
+      .then((runs) => {
+        const stored =
+          typeof window !== "undefined" ? window.localStorage.getItem("tec.erp.activeRunId") : null;
+        const selected =
+          runs.find((run) => run.id === stored) ??
+          runs.find((run) => run.status === "ACTIVE") ??
+          runs[0];
+        if (selected && typeof selected.id === "string") {
+          setReflectionRun({
+            id: selected.id,
+            enabled: selected.reflectionsEnabled === true,
+          });
+        }
+      })
+      .catch(() => setReflectionRun(null));
+  }, [detail.missionKey]);
 
   useEffect(() => {
     setAcknowledged(new Set(detail.attempt?.acknowledgedInputKeys ?? []));
@@ -604,6 +628,14 @@ function MissionDetailView({
             et ne sont pas des déductions de score.
           </p>
         </article>
+      ) : null}
+
+      {reflectionRun && (lastScore || completed) ? (
+        <MissionReflectionForm
+          runId={reflectionRun.id}
+          missionKey={detail.missionKey}
+          enabled={reflectionRun.enabled}
+        />
       ) : null}
 
       {detail.attempt?.feedbackBody ? (

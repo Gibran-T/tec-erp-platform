@@ -55,7 +55,10 @@ export function createAnalyticsProfessorRouter(service: AnalyticsService): Route
   router.get("/analytics/heatmap", async (req, res, next) => {
     try {
       const employee = getAuthenticatedEmployee(req);
-      const result = await service.getProfessorHeatmap(employee.id);
+      const result = await service.getProfessorHeatmap(employee.id, {
+        analyticsMode: typeof req.query.analyticsMode === "string" ? req.query.analyticsMode : undefined,
+        selectedRunId: typeof req.query.selectedRunId === "string" ? req.query.selectedRunId : undefined,
+      });
       if (Result.isFail(result)) {
         throw result.error;
       }
@@ -68,7 +71,10 @@ export function createAnalyticsProfessorRouter(service: AnalyticsService): Route
   router.get("/analytics/competencies", async (req, res, next) => {
     try {
       const employee = getAuthenticatedEmployee(req);
-      const result = await service.getProfessorCompetencies(employee.id);
+      const result = await service.getProfessorCompetencies(employee.id, {
+        analyticsMode: typeof req.query.analyticsMode === "string" ? req.query.analyticsMode : undefined,
+        selectedRunId: typeof req.query.selectedRunId === "string" ? req.query.selectedRunId : undefined,
+      });
       if (Result.isFail(result)) {
         throw result.error;
       }

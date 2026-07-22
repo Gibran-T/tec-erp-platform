@@ -1,6 +1,5 @@
 import type { MissionDetail } from "@tec-platform/contracts";
-import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 export type InteractionDefinition = NonNullable<MissionDetail["interactions"]>[number];
 
@@ -268,7 +267,7 @@ function DiagnosisRecommendationInteraction({
   disabled: boolean;
   onChange: (next: Array<{ leftKey: string; rightKey: string }>) => void;
 }): ReactNode {
-  const options = interaction.options ?? [];
+  const options = useMemo(() => interaction.options ?? [], [interaction.options]);
   const [leftKey, setLeftKey] = useState(options[0]?.key ?? "");
   const [rightKey, setRightKey] = useState(options[1]?.key ?? options[0]?.key ?? "");
 

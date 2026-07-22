@@ -66,10 +66,13 @@ export function createAiCoachService(client = getPrismaClient()) {
         ? "Je ne peux pas révéler les clés de réponse ou les solutions attendues. Reformulez votre question en termes de démarche ou de concepts."
         : buildDeterministicAiCoachAnswer(question, context);
 
+      const { getCurrentPedagogicalRun } = await import("../pedagogical-run/run-context.js");
+      const run = getCurrentPedagogicalRun();
       const interaction = await client.aiInteraction.create({
         data: {
           employeeId,
           companyId: employee.companyId,
+          pedagogicalCourseRunId: run?.id ?? null,
           question,
           answer,
           refused,
@@ -78,6 +81,7 @@ export function createAiCoachService(client = getPrismaClient()) {
             moduleCode: context.moduleCode ?? null,
             missionKey: context.missionKey ?? null,
             department: context.department ?? null,
+            runId: run?.id ?? null,
           }),
         },
       });

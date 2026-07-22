@@ -19,11 +19,13 @@ import {
   updateAdminFeatureFlag,
 } from "../../api/admin.js";
 import { useAuth } from "../../auth/AuthContext.js";
+import { PedagogicalRunsAdminPanel } from "../../components/admin/PedagogicalRunsAdminPanel.js";
 
 type AdminTab =
   | "companies"
   | "cohorts"
   | "employees"
+  | "runs"
   | "ai"
   | "flags"
   | "scenarios"
@@ -221,6 +223,7 @@ export function AdminPortalPage(): ReactElement {
             ["companies", "Entreprises"],
             ["cohorts", "Cohortes"],
             ["employees", "Employés / professeurs"],
+            ["runs", "Parcours pédagogiques"],
             ["ai", "Coach IA"],
             ["flags", "Indicateurs"],
             ["scenarios", "Scénarios"],
@@ -252,6 +255,8 @@ export function AdminPortalPage(): ReactElement {
           </ul>
         </section>
       ) : null}
+
+      {tab === "runs" ? <PedagogicalRunsAdminPanel /> : null}
 
       {tab === "employees" ? (
         <section data-testid="admin-employees">

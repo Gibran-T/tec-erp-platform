@@ -11,13 +11,24 @@
 export const NETWORK_ERROR_MESSAGE =
   "Impossible de contacter le serveur. Vérifiez votre connexion, puis réessayez.";
 
+const RUN_STORAGE_KEY = "tec.erp.activeRunId";
+
 export async function safeFetch(
   input: RequestInfo | URL,
   init?: RequestInit,
   networkErrorMessage: string = NETWORK_ERROR_MESSAGE,
 ): Promise<Response> {
   try {
-    return await fetch(input, init);
+    const headers = new Headers(init?.headers ?? undefined);
+    try {
+      const runId = window.localStorage.getItem(RUN_STORAGE_KEY);
+      if (runId && !headers.has("x-tec-run-id")) {
+        headers.set("x-tec-run-id", runId);
+      }
+    } catch {
+      // ignore storage access issues
+    }
+    return await fetch(input, { ...init, headers });
   } catch {
     throw new Error(networkErrorMessage);
   }
