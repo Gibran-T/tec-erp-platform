@@ -822,6 +822,16 @@ describe("mission center experience", () => {
       target: { value: "prob-coherence-donnees" },
     });
     fireEvent.click(screen.getByTestId("mission-add-mapping"));
+
+    // Wait for both mappings to commit before submit — avoids client-side
+    // validation short-circuit under CI scheduling (submit button is not gated
+    // on form completeness, only on `submitting`).
+    await waitFor(() => {
+      const mappingText = screen.getByTestId("mission-mapping-list").textContent ?? "";
+      expect(mappingText).toContain("Entrepôt");
+      expect(mappingText).toContain("TI");
+    });
+
     fireEvent.change(screen.getByTestId("mission-justification"), {
       target: {
         value:
@@ -830,6 +840,9 @@ describe("mission center experience", () => {
     });
 
     await waitFor(() => {
+      expect(screen.getByTestId("mission-justification")).toHaveValue(
+        "L’écart 40 versus 36 montre une fragmentation entre l’entrepôt et les systèmes TI.",
+      );
       expect(screen.getByTestId("mission-submit-button")).not.toBeDisabled();
     });
     fireEvent.click(screen.getByTestId("mission-submit-button"));
