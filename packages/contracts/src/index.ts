@@ -160,3 +160,22 @@ export {
   type ProfessorOverrideRequest,
   type ProfessorRevokeCertificateRequest,
 } from "./professor.js";
+export {
+  CreatePedagogicalCourseRunRequestSchema,
+  CreateProfessorInterventionRequestSchema,
+  CreateStudentMissionReflectionRequestSchema,
+  PedagogicalCourseRunSchema,
+  PedagogicalRunComparisonSchema,
+  PedagogicalRunStatusLabelFr,
+  PedagogicalRunStatusSchema,
+  PedagogicalRunTypeLabelFr,
+  PedagogicalRunTypeSchema,
+  ProfessorInterventionTypeSchema,
+  TransitionPedagogicalCourseRunRequestSchema,
+  type CreatePedagogicalCourseRunRequest,
+  type PedagogicalCourseRun,
+  type PedagogicalRunComparison,
+  type PedagogicalRunStatus,
+  type PedagogicalRunType,
+  type TransitionPedagogicalCourseRunRequest,
+} from "./pedagogical-run.js";
