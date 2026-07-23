@@ -10,7 +10,7 @@ import { listMyPedagogicalRuns } from "../../api/pedagogical-runs.js";
 import { useAuth } from "../../auth/AuthContext.js";
 import { AppLauncherGrid } from "../../components/workspace/AppLauncherGrid.js";
 import { useLocale } from "../../i18n/LocaleProvider.js";
-import { CurriculumBadge, ProgressBar } from "../../living-erp/components/Badges.js";
+import { ProgressBar } from "../../living-erp/components/Badges.js";
 import { EmptyState, ErrorState, SkeletonBlock } from "../../living-erp/components/States.js";
 import { StatusChip, toneForStatus, type StatusTone } from "../../living-erp/components/StatusChip.js";
 import { getAppPath } from "../../workspace/appRegistry.js";
@@ -32,6 +32,7 @@ export function LearnerHomePage(): ReactNode {
   const [capstoneLabel, setCapstoneLabel] = useState("—");
   const [goldLabel, setGoldLabel] = useState(t("certificate.gold"));
   const [goldTone, setGoldTone] = useState<StatusTone>("gray");
+  const [missionProgress, setMissionProgress] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -56,6 +57,10 @@ export function LearnerHomePage(): ReactNode {
         if (active) {
           setRunStatus(String(active.status ?? "—"));
           setHistorical(isHistorical);
+          if (typeof active.completionPercent === "number") {
+            const completed = Math.round((active.completionPercent / 100) * 30);
+            setMissionProgress(`${completed}/30`);
+          }
         }
         const rawLifecycle = String(
           capstone?.lifecycleStatus ?? capstone?.status ?? "—",
@@ -85,7 +90,7 @@ export function LearnerHomePage(): ReactNode {
         }
         const nextAttention: string[] = [];
         if (isHistorical) {
-          nextAttention.push("Parcours historique en lecture seule — aucun redémarrage actif.");
+          nextAttention.push(t("home.attention.historical"));
         }
         for (const module of courseResponse.modules) {
           for (const mission of module.missions) {
@@ -95,14 +100,14 @@ export function LearnerHomePage(): ReactNode {
           }
         }
         if (String(capstone?.lifecycleStatus ?? "") === "LOCKED") {
-          nextAttention.push("Capstone verrouillé — missions régulières requises.");
+          nextAttention.push(t("home.attention.capstoneLocked"));
         }
         if (
           String(capstone?.reviewStatus ?? "") === "revision_requested" ||
           String(capstone?.reviewStatus ?? "") === "needs_revision" ||
           String(capstone?.lifecycleStatus ?? "") === "REVISION_REQUESTED"
         ) {
-          nextAttention.push("Révision Capstone demandée par le professeur.");
+          nextAttention.push(t("home.attention.capstoneRevision"));
         }
         for (const row of exceptions.exceptions.slice(0, 3)) {
           nextAttention.push(row.summary);
@@ -145,63 +150,73 @@ export function LearnerHomePage(): ReactNode {
 
   return (
     <section data-testid="workspace-home-page" className="living-learner-home">
-      <header className="living-home-section">
-        <h1>Poste de travail</h1>
-        <p data-testid="workspace-welcome-message">
+      <header className="living-home-section living-home-section--primary living-card--l1">
+        <h1 className="living-type-page">{t("home.workstation")}</h1>
+        <p data-testid="workspace-welcome-message" className="living-lede">
           {historical
             ? buildHistoricalWelcomeMessage(employee.displayName)
             : buildWelcomeMessage(employee.displayName)}
         </p>
-        <div className="living-shell-controls">
-          <CurriculumBadge
-            label={`${t("shell.curriculum")}: ${
-              course?.curriculumVersionLabel ?? course?.curriculumVersion ?? course?.courseCode ?? "—"
-            }`}
-          />
-          <StatusChip label={statusLabel(runStatus)} tone={toneForStatus(runStatus)} />
-          {historical ? <StatusChip label={t("status.historical")} tone="gray" /> : null}
-          <StatusChip
-            label={`${Math.round(course?.percentComplete ?? 0)} %`}
-            tone={historical ? "gray" : "strong"}
-          />
-        </div>
       </header>
-
-      <AppLauncherGrid />
 
       {loading ? <SkeletonBlock testId="learner-home-loading" /> : null}
       {error ? <ErrorState message={error} /> : null}
 
       {!loading && !error && course ? (
         <>
-          <section className="living-home-section" data-testid="learner-home-current-state">
-            <h2>{t("home.currentState")}</h2>
+          <section
+            className="living-home-section living-home-summary living-card--l1"
+            data-testid="learner-home-current-state"
+          >
+            <h2 className="living-type-section">
+              {historical ? t("home.historicalSummary") : t("home.currentState")}
+            </h2>
+            <div className="living-home-summary__stats">
+              {historical ? (
+                <StatusChip label={t("home.parcoursTermine")} tone="green" testId="home-parcours-termine" />
+              ) : (
+                <StatusChip label={statusLabel(runStatus)} tone={toneForStatus(runStatus)} />
+              )}
+              {missionProgress ? (
+                <StatusChip label={missionProgress} tone={historical ? "green" : "strong"} testId="home-mission-progress" />
+              ) : (
+                <StatusChip
+                  label={`${Math.round(course.percentComplete)} %`}
+                  tone={historical ? "gray" : "strong"}
+                />
+              )}
+              <StatusChip label={capstoneLabel} tone={toneForStatus(capstoneStatusRaw)} testId="home-capstone-status" />
+              <StatusChip label={goldLabel} tone={goldTone} testId="home-gold-status" />
+              {historical ? (
+                <StatusChip label={t("status.readOnly")} tone="gray" testId="home-read-only" />
+              ) : null}
+            </div>
             <ProgressBar
               value={course.percentComplete}
               label={`${t("shell.progress")}: ${Math.round(course.percentComplete)} %`}
             />
             <p>
-              Bloc courant :{" "}
+              {historical ? t("home.currentBlock") : t("home.currentBlock")}{" "}
               {currentModule ? `${currentModule.moduleCode} — ${currentModule.title}` : "—"}
             </p>
             <p>
-              {historical ? "Mission active : aucune (parcours historique)" : "Prochaine mission : "}
+              {historical ? t("home.noActiveMission") : t("home.nextMission")}
               {!historical &&
                 (nextMission
-                  ? `${nextMission.mission.missionCode} — ${nextMission.mission.title}`
-                  : "Aucune mission active")}
-            </p>
-            <p>
-              Capstone :{" "}
-              <StatusChip label={capstoneLabel} tone={toneForStatus(capstoneStatusRaw)} />
+                  ? ` ${nextMission.mission.missionCode} — ${nextMission.mission.title}`
+                  : ` ${t("home.noActiveMission")}`)}
             </p>
             <p>
               <Link to={getAppPath("evaluations")}>{t("shell.assessments")}</Link>
+              {" · "}
+              <Link to={getAppPath("capstone")}>{t("shell.capstone")}</Link>
+              {" · "}
+              <Link to={getAppPath("certificats")}>{t("shell.certificates")}</Link>
             </p>
           </section>
 
-          <section className="living-home-section" data-testid="learner-home-journey">
-            <h2>{t("home.journey")}</h2>
+          <section className="living-home-section living-card--l2" data-testid="learner-home-journey">
+            <h2 className="living-type-section">{t("home.journey")}</h2>
             <div
               style={{
                 display: "grid",
@@ -217,11 +232,13 @@ export function LearnerHomePage(): ReactNode {
                   data-testid={`learner-home-module-${block.moduleCode}`}
                   style={{ textDecoration: "none", color: "inherit" }}
                 >
-                  <h3>{block.moduleCode}</h3>
+                  <h3 className="living-type-card">{block.moduleCode}</h3>
                   <p>{block.title.replace(/^Module \d+\s*—\s*/, "")}</p>
                   <StatusChip label={statusLabel(block.status)} tone={toneForStatus(block.status)} />
                   <ProgressBar value={block.percentComplete} />
-                  <p>{block.missions.length} missions</p>
+                  <p>
+                    {block.missions.length} {t("home.missionsCount")}
+                  </p>
                 </Link>
               ))}
               <Link
@@ -230,8 +247,8 @@ export function LearnerHomePage(): ReactNode {
                 data-testid="learner-home-capstone-milestone"
                 style={{ textDecoration: "none", color: "inherit" }}
               >
-                <h3>MCapstone</h3>
-                <p>Projet intégrateur</p>
+                <h3 className="living-type-card">{t("shell.capstone")}</h3>
+                <p>{t("home.capstoneProject")}</p>
                 <StatusChip label={capstoneLabel} tone={toneForStatus(capstoneStatusRaw)} />
               </Link>
               <Link
@@ -240,30 +257,34 @@ export function LearnerHomePage(): ReactNode {
                 data-testid="learner-home-gold-milestone"
                 style={{ textDecoration: "none", color: "inherit" }}
               >
-                <h3>Or</h3>
-                <p>Certification vérifiée</p>
+                <h3 className="living-type-card">{t("certificate.gold")}</h3>
+                <p>{t("home.verifiedCertification")}</p>
                 <StatusChip label={goldLabel} tone={goldTone} />
               </Link>
             </div>
           </section>
 
-          <section className="living-home-section" data-testid="learner-home-recent">
-            <h2>{historical ? t("home.firstDayHistory") : t("home.recent")}</h2>
+          <section className="living-home-section living-card--l2" data-testid="learner-home-recent">
+            <h2 className="living-type-section">
+              {historical ? t("home.firstDayHistory") : t("home.recent")}
+            </h2>
             <ul>
               {historical ? (
                 <>
-                  <li>Intégration initiale archivée dans la chronologie et les preuves de module.</li>
+                  <li>{t("home.history.archived")}</li>
                   <li>
-                    Capstone et certificats :{" "}
+                    {t("shell.capstone")} / {t("shell.certificates")} :{" "}
                     <Link to={getAppPath("capstone")}>{t("shell.capstone")}</Link> ·{" "}
                     <Link to={getAppPath("certificats")}>{t("shell.certificates")}</Link>
                   </li>
                 </>
               ) : (
                 <>
-                  <li>Dernier bloc suivi : {currentModule?.moduleCode ?? "—"}</li>
                   <li>
-                    Prochaine action :{" "}
+                    {t("home.lastBlock")}: {currentModule?.moduleCode ?? "—"}
+                  </li>
+                  <li>
+                    {t("home.nextAction")}:{" "}
                     {nextMission ? (
                       <Link
                         to={`${getAppPath("centre-mission")}?mission=${nextMission.mission.missionKey}`}
@@ -271,21 +292,22 @@ export function LearnerHomePage(): ReactNode {
                         {nextMission.mission.missionCode}
                       </Link>
                     ) : (
-                      "Parcours à jour"
+                      t("home.pathUpToDate")
                     )}
                   </li>
                 </>
               )}
               <li>
-                Chronologie ERP : <Link to={getAppPath("documents")}>{t("shell.documents")}</Link>
+                {t("home.erpTimeline")}:{" "}
+                <Link to={getAppPath("documents")}>{t("shell.documents")}</Link>
               </li>
             </ul>
           </section>
 
-          <section className="living-home-section" data-testid="learner-home-attention">
-            <h2>{t("home.attention")}</h2>
+          <section className="living-home-section living-card--l2" data-testid="learner-home-attention">
+            <h2 className="living-type-section">{t("home.attention")}</h2>
             {attention.length === 0 ? (
-              <p>Aucune alerte pédagogique active.</p>
+              <p>{t("home.noAlerts")}</p>
             ) : (
               <ul>
                 {attention.map((item) => (
@@ -295,12 +317,11 @@ export function LearnerHomePage(): ReactNode {
             )}
           </section>
 
-          <section className="living-home-section" data-testid="learner-home-competencies">
-            <h2>{t("home.competencies")}</h2>
+          <section className="living-home-section living-card--l3" data-testid="learner-home-competencies">
+            <h2 className="living-type-section">{t("home.competencies")}</h2>
             <p>
-              Instantané basé sur le curriculum{" "}
+              {t("home.competencySnapshot")}{" "}
               {course.curriculumVersionLabel ?? course.curriculumVersion ?? course.courseCode}.
-              Aucune comparaison trompeuse entre V1 et V2.
             </p>
             <ul>
               {course.modules
@@ -308,7 +329,7 @@ export function LearnerHomePage(): ReactNode {
                 .slice(0, 3)
                 .map((block) => (
                   <li key={`strong-${block.moduleCode}`}>
-                    Force : {block.moduleCode} — {block.competencySummary ?? block.title}
+                    {t("home.strength")}: {block.moduleCode} — {block.competencySummary ?? block.title}
                   </li>
                 ))}
               {course.modules
@@ -316,15 +337,21 @@ export function LearnerHomePage(): ReactNode {
                 .slice(0, 3)
                 .map((block) => (
                   <li key={`gap-${block.moduleCode}`}>
-                    À renforcer : {block.moduleCode} — {block.competencySummary ?? block.title}
+                    {t("home.toReinforce")}: {block.moduleCode} —{" "}
+                    {block.competencySummary ?? block.title}
                   </li>
                 ))}
             </ul>
           </section>
+
+          {/* Launcher is secondary — below primary learning summary */}
+          <AppLauncherGrid />
         </>
       ) : null}
 
       {!loading && !error && !course ? <EmptyState title={t("empty.generic")} /> : null}
+
+      {loading || error ? <AppLauncherGrid /> : null}
     </section>
   );
 }
