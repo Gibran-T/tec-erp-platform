@@ -30,7 +30,11 @@ function localizedRunHeading(run: Record<string, unknown>, t: (key: MessageKey) 
   return parts.join(" · ");
 }
 
-export function PedagogicalRunBanner(): ReactElement | null {
+export function PedagogicalRunBanner({
+  selectorOnly = false,
+}: {
+  readonly selectorOnly?: boolean;
+} = {}): ReactElement | null {
   const { t, statusLabel } = useLocale();
   const [runs, setRuns] = useState<Array<Record<string, unknown>>>([]);
   const [selectedRunId, setSelectedRunId] = useState<string>(() => {
@@ -74,25 +78,40 @@ export function PedagogicalRunBanner(): ReactElement | null {
     Boolean(selected?.isHistorical) || selected?.status === "COMPLETED" || selected?.isWritable === false;
   const isCurrent = Boolean(selected?.isWritable) || selected?.status === "ACTIVE";
 
+  if (selectorOnly && runs.length <= 1) {
+    return null;
+  }
+
   return (
-    <section className="pedagogical-run-banner" data-testid="pedagogical-run-banner" aria-label="Parcours pédagogique">
-      <div>
-        <strong data-testid="pedagogical-run-heading">{localizedRunHeading(selected ?? {}, t)}</strong>
-        <span>
-          {" "}
-          · {statusLabel(String(selected?.status ?? ""))} · {localizedRunType(selected ?? {}, t)}
-          {typeof selected?.completionPercent === "number" ? ` · ${selected.completionPercent} %` : ""}
-        </span>
-        {isHistorical ? (
-          <span data-testid="pedagogical-run-historical-badge"> · {t("status.historical")} (lecture seule)</span>
-        ) : null}
-        {isCurrent && !isHistorical ? (
-          <span data-testid="pedagogical-run-current-badge"> · Parcours courant</span>
-        ) : null}
-      </div>
+    <section
+      className={`pedagogical-run-banner${selectorOnly ? " pedagogical-run-banner--selector-only" : ""}`}
+      data-testid="pedagogical-run-banner"
+      aria-label={t("shell.run")}
+    >
+      {selectorOnly ? null : (
+        <div>
+          <strong data-testid="pedagogical-run-heading">{localizedRunHeading(selected ?? {}, t)}</strong>
+          <span>
+            {" "}
+            · {statusLabel(String(selected?.status ?? ""))} · {localizedRunType(selected ?? {}, t)}
+            {typeof selected?.completionPercent === "number"
+              ? ` · ${selected.completionPercent} %`
+              : ""}
+          </span>
+          {isHistorical ? (
+            <span data-testid="pedagogical-run-historical-badge">
+              {" "}
+              · {t("status.historical")} ({t("status.readOnly")})
+            </span>
+          ) : null}
+          {isCurrent && !isHistorical ? (
+            <span data-testid="pedagogical-run-current-badge"> · {t("shell.currentRun")}</span>
+          ) : null}
+        </div>
+      )}
       {runs.length > 1 ? (
         <label>
-          Parcours
+          {t("shell.run")}
           <select
             data-testid="pedagogical-run-selector"
             value={typeof selected?.id === "string" ? selected.id : ""}

@@ -4,19 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background-color: var(--living-canvas, #eef6fb);
-  color: var(--living-text, #1d2d3e);
-}
-
-.tec-app-shell {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;
-}
+/* Shell chrome, theme tokens, cards, signals, header, nav, and launcher
+ * are owned by living-erp.css (Theme Contract). Do not reintroduce
+ * hard-coded #ffffff / #0a6ed1 shell overrides here — that caused hybrid Dark. */
 
 /* Accessibility — skip link revealed only on keyboard focus. */
 .tec-skip-link {
@@ -25,8 +15,8 @@ body {
   top: -3rem;
   z-index: 100;
   padding: 0.5rem 1rem;
-  background: #0a6ed1;
-  color: #ffffff;
+  background: var(--signal-blue, #0a5bb8);
+  color: var(--living-text-inverse, #ffffff);
   border-radius: 0 0 0.375rem 0.375rem;
   text-decoration: none;
   transition: top 0.15s ease-in-out;
@@ -35,7 +25,7 @@ body {
 .tec-skip-link:focus,
 .tec-skip-link:focus-visible {
   top: 0;
-  outline: 2px solid #ffffff;
+  outline: 2px solid var(--living-text-inverse, #ffffff);
   outline-offset: 2px;
 }
 
@@ -43,230 +33,9 @@ body {
   outline: none;
 }
 
-.tec-app-shell__top-nav {
-  border-bottom: 1px solid #d1d5db;
-  background: #ffffff;
-  padding: 0.75rem 1.5rem;
-  min-width: 0;
-}
-
-.tec-app-shell__body {
-  display: grid;
-  grid-template-columns: 240px minmax(0, 1fr) auto;
-  flex: 1;
-  min-width: 0;
-}
-
-.tec-app-shell__sidebar {
-  border-right: 1px solid #d1d5db;
-  background: #ffffff;
-  padding: 1rem;
-  min-width: 0;
-}
-
-.tec-app-shell__main {
-  padding: 1.5rem;
-  min-width: 0;
-}
-
-.tec-app-shell__right-panel {
-  border-left: 1px solid #d1d5db;
-  background: #ffffff;
-  padding: 1rem;
-  width: 280px;
-  max-width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-}
-
-/* RC01 Slice B — Enterprise Workspace Shell */
-.workspace-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  min-width: 0;
-}
-
-.workspace-topbar__brand {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-}
-
-.workspace-topbar__logo {
-  font-weight: 700;
-  font-size: 1.125rem;
-  color: #0a6ed1;
-}
-
-.workspace-topbar__tagline {
-  font-size: 0.75rem;
-  color: #6b7280;
-}
-
-.workspace-employee-badge {
-  position: relative;
-}
-
-.workspace-employee-badge__trigger {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  background: #f9fafb;
-  padding: 0.375rem 0.75rem;
-  cursor: pointer;
-  text-align: left;
-}
-
-.workspace-employee-badge__avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 9999px;
-  background: #0a6ed1;
-  color: #ffffff;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.workspace-employee-badge__identity {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-}
-
-.workspace-employee-badge__name {
-  font-weight: 600;
-  font-size: 0.875rem;
-}
-
-.workspace-employee-badge__meta {
-  font-size: 0.75rem;
-  color: #6b7280;
-}
-
-.workspace-employee-badge__menu {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 0.5rem);
-  z-index: 10;
-  min-width: 12rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  background: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  padding: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.workspace-employee-badge__company {
-  margin: 0 0 0.25rem;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
-  color: #6b7280;
-}
-
-.workspace-employee-badge__menu a,
-.workspace-employee-badge__menu button {
-  border: none;
-  background: transparent;
-  text-align: left;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  cursor: pointer;
-  font: inherit;
-  color: inherit;
-  text-decoration: none;
-}
-
-.workspace-employee-badge__menu a:hover,
-.workspace-employee-badge__menu button:hover {
-  background: #f3f4f6;
-}
-
-.workspace-sidebar__heading {
-  margin: 0 0 0.75rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #6b7280;
-}
-
-.workspace-sidebar__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.workspace-sidebar__link {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  padding: 0.5rem 0.625rem;
-  border-radius: 0.375rem;
-  text-decoration: none;
-  color: #374151;
-  font-size: 0.875rem;
-}
-
-.workspace-sidebar__link--active {
-  background: #e8f4fd;
-  color: #0a6ed1;
-  font-weight: 600;
-}
-
 .workspace-sidebar__preparing {
   font-size: 0.6875rem;
-  color: #9ca3af;
-}
-
-.workspace-context-panel h2 {
-  margin: 0 0 1rem;
-  font-size: 1rem;
-}
-
-.workspace-context-panel__checklist {
-  margin: 0;
-  padding-left: 1.25rem;
-  font-size: 0.875rem;
-  color: #4b5563;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.workspace-context-panel__mission {
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-.workspace-context-panel__mission h3 {
-  margin: 0 0 0.5rem;
-  font-size: 0.9375rem;
-}
-
-.workspace-context-panel__mission-link {
-  display: inline-block;
-  margin-top: 0.5rem;
-  color: #1d4ed8;
-  text-decoration: none;
-}
-
-.workspace-context-panel__mission-link:focus-visible {
-  outline: 2px solid #2563eb;
-  outline-offset: 2px;
+  color: var(--living-muted, #5a6f84);
 }
 
 .workspace-home__header h1 {
@@ -314,52 +83,7 @@ body {
   color: #6b7280;
 }
 
-.workspace-app-launcher h2 {
-  margin: 0 0 1rem;
-  font-size: 1.125rem;
-}
-
-.workspace-app-launcher__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-  gap: 0.75rem;
-}
-
-.workspace-app-tile {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
-  text-decoration: none;
-  color: inherit;
-  background: #ffffff;
-  min-height: 5.5rem;
-}
-
-.workspace-app-tile--day1 {
-  border-color: #0a6ed1;
-}
-
-.workspace-app-tile--preparing {
-  opacity: 0.85;
-  background: #fafafa;
-}
-
-.workspace-app-tile__label {
-  font-weight: 600;
-  font-size: 0.875rem;
-}
-
-.workspace-app-tile__badge {
-  font-size: 0.6875rem;
-  color: #9ca3af;
-}
-
-.workspace-app-tile__badge--active {
-  color: #0a6ed1;
-}
+/* App launcher tile styles live in living-erp.css (semantic surfaces). */
 
 .workspace-empty-state {
   max-width: 36rem;

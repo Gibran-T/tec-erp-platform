@@ -7,9 +7,11 @@ import { ACCESS_PREPARING_LABEL } from "../../workspace/workspaceCopy.js";
 
 export interface AppTileProps {
   readonly app: WorkspaceAppDefinition;
+  /** Optional exceptional status — normal day-1 access shows no badge. */
+  readonly exceptionalLabel?: string | null;
 }
 
-export function AppTile({ app }: AppTileProps): ReactNode {
+export function AppTile({ app, exceptionalLabel = null }: AppTileProps): ReactNode {
   const preparing = app.access === "preparing";
 
   return (
@@ -23,9 +25,14 @@ export function AppTile({ app }: AppTileProps): ReactNode {
         <span className="workspace-app-tile__badge" data-testid="workspace-app-tile-preparing">
           {ACCESS_PREPARING_LABEL}
         </span>
-      ) : (
-        <span className="workspace-app-tile__badge workspace-app-tile__badge--active">Accès actif</span>
-      )}
+      ) : exceptionalLabel ? (
+        <span
+          className="workspace-app-tile__badge workspace-app-tile__badge--exception"
+          data-testid="workspace-app-tile-exception"
+        >
+          {exceptionalLabel}
+        </span>
+      ) : null}
     </Link>
   );
 }
