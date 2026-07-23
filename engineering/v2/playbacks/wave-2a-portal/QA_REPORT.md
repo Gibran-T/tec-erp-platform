@@ -11,8 +11,8 @@ Visual Revision 2 of isolated Playback Zero routes under `/playback/v2/*`.
 | Playback tests (`playback-v2.test.tsx`) | PASS (16) |
 | erp-web typecheck | PASS |
 | erp-web lint | PASS |
-| Full erp-web tests | see run log |
-| erp-web build | see run log |
+| Full erp-web tests | PASS (114 / 19 files) |
+| erp-web build (`turbo --filter=erp-web...`) | PASS |
 
 ## Manual checklist
 
