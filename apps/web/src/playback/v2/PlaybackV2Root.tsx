@@ -18,6 +18,7 @@ function PlaybackShell(): ReactNode {
       data-pb-theme={theme}
       data-pb-viewport={viewport}
       data-pb-locale={locale}
+      data-pb-owner-canvas="#eef4f8"
       lang={locale}
     >
       <div className="playback-marker" data-testid="playback-marker" role="status">

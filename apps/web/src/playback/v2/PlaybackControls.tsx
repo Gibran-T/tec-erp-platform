@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
+import type { BrandingMode } from "./branding.js";
 import {
   usePlayback,
   type AmbientEventId,
@@ -8,6 +9,7 @@ import {
   type PlaybackLocale,
   type PlaybackTheme,
   type PlaybackViewport,
+  type SimulationRole,
 } from "./PlaybackProvider.js";
 import { PLAYBACK_MODULES, type PlaybackModule } from "./modules.js";
 
@@ -26,6 +28,10 @@ export function PlaybackControls(): ReactNode {
     setSelectedModuleCode,
     ambientEvent,
     setAmbientEvent,
+    brandingMode,
+    setBrandingMode,
+    simulationRole,
+    setSimulationRole,
     controlsOpen,
     setControlsOpen,
   } = usePlayback();
@@ -43,10 +49,19 @@ export function PlaybackControls(): ReactNode {
           {copy.controls.open}
         </button>
       ) : (
-        <div className="playback-controls-panel" data-testid="playback-controls-panel" role="region" aria-label={copy.controls.title}>
+        <div
+          className="playback-controls-panel"
+          data-testid="playback-controls-panel"
+          role="region"
+          aria-label={copy.controls.title}
+        >
           <div className="playback-field-row">
             <strong>{copy.controls.title}</strong>
-            <button type="button" className="playback-btn playback-btn--small playback-btn--ghost" onClick={() => setControlsOpen(false)}>
+            <button
+              type="button"
+              className="playback-btn playback-btn--small playback-btn--ghost"
+              onClick={() => setControlsOpen(false)}
+            >
               {copy.controls.close}
             </button>
           </div>
@@ -70,9 +85,9 @@ export function PlaybackControls(): ReactNode {
               value={theme}
               onChange={(event) => setTheme(event.target.value as PlaybackTheme)}
             >
-              <option value="light">{copy.controls.light}</option>
-              <option value="dark">{copy.controls.dark}</option>
-              <option value="projector">{copy.controls.projector}</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="projector">Projector</option>
             </select>
           </label>
 
@@ -97,9 +112,9 @@ export function PlaybackControls(): ReactNode {
               value={level}
               onChange={(event) => setLevel(event.target.value as PlaybackLevel)}
             >
-              <option value="novice">{copy.controls.novice}</option>
-              <option value="intermediate">{copy.controls.intermediate}</option>
-              <option value="advanced">{copy.controls.advanced}</option>
+              <option value="novice">novice</option>
+              <option value="intermediate">intermediate</option>
+              <option value="advanced">advanced</option>
             </select>
           </label>
 
@@ -119,7 +134,7 @@ export function PlaybackControls(): ReactNode {
           </label>
 
           <label>
-            {copy.controls.event}
+            {copy.controls.ambient}
             <select
               data-testid="playback-ambient-event"
               value={ambientEvent}
@@ -133,7 +148,31 @@ export function PlaybackControls(): ReactNode {
           </label>
 
           <label>
-            {copy.controls.screen}
+            {copy.controls.branding}
+            <select
+              data-testid="playback-branding"
+              value={brandingMode}
+              onChange={(event) => setBrandingMode(event.target.value as BrandingMode)}
+            >
+              <option value="college">{copy.controls.brandingCollege}</option>
+              <option value="independent">{copy.controls.brandingIndependent}</option>
+            </select>
+          </label>
+
+          <label>
+            {copy.controls.simRole}
+            <select
+              data-testid="playback-sim-role"
+              value={simulationRole}
+              onChange={(event) => setSimulationRole(event.target.value as SimulationRole)}
+            >
+              <option value="learner">apprenant</option>
+              <option value="professor">professeur</option>
+            </select>
+          </label>
+
+          <label>
+            {copy.controls.page}
             <select
               data-testid="playback-screen"
               defaultValue="portal"
@@ -141,12 +180,12 @@ export function PlaybackControls(): ReactNode {
                 const value = event.target.value;
                 if (value === "portal") navigate("/playback/v2/portal");
                 if (value === "login") navigate("/playback/v2/login");
-                if (value === "orientation") navigate("/playback/v2/orientation");
+                if (value === "cockpit") navigate("/playback/v2/orientation");
               }}
             >
-              <option value="portal">portal</option>
-              <option value="login">login</option>
-              <option value="orientation">orientation</option>
+              <option value="portal">{copy.controls.pages.portal}</option>
+              <option value="login">{copy.controls.pages.login}</option>
+              <option value="cockpit">{copy.controls.pages.cockpit}</option>
             </select>
           </label>
         </div>

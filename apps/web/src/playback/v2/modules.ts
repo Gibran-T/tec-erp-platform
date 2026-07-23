@@ -11,8 +11,11 @@ export type ProfessionalStage =
   | "consultant"
   | "advisor";
 
+export type JourneyChapter = "foundations" | "operations" | "steering" | "governance";
+
 export interface PlaybackModule {
   code: "M1" | "M2" | "M3" | "M4" | "M5" | "M6" | "M7" | "M8" | "M9" | "M10";
+  chapter: JourneyChapter;
   titleFr: string;
   titleEn: string;
   businessAreaFr: string;
@@ -29,11 +32,25 @@ export interface PlaybackModule {
   impactEn: string;
   enterpriseChapterFr: string;
   enterpriseChapterEn: string;
+  professionalStepFr: string;
+  professionalStepEn: string;
 }
+
+export const JOURNEY_CHAPTERS: readonly {
+  id: JourneyChapter;
+  fr: string;
+  en: string;
+}[] = [
+  { id: "foundations", fr: "Fondations", en: "Foundations" },
+  { id: "operations", fr: "Opérations intégrées", en: "Integrated operations" },
+  { id: "steering", fr: "Pilotage de l’entreprise", en: "Enterprise steering" },
+  { id: "governance", fr: "Gouvernance et conseil", en: "Governance and advice" },
+] as const;
 
 export const PLAYBACK_MODULES: readonly PlaybackModule[] = [
   {
     code: "M1",
+    chapter: "foundations",
     titleFr: "Entreprise intégrée et processus",
     titleEn: "Integrated enterprise and processes",
     businessAreaFr: "Vue d’entreprise",
@@ -48,11 +65,14 @@ export const PLAYBACK_MODULES: readonly PlaybackModule[] = [
     evidenceEn: "Process map + framing notes",
     impactFr: "Orientation · langage professionnel",
     impactEn: "Orientation · professional language",
-    enterpriseChapterFr: "Découverte de l’entreprise",
-    enterpriseChapterEn: "Company discovery",
+    enterpriseChapterFr: "Découvrir l’entreprise",
+    enterpriseChapterEn: "Discover the company",
+    professionalStepFr: "Observateur",
+    professionalStepEn: "Observer",
   },
   {
     code: "M2",
+    chapter: "foundations",
     titleFr: "Données de base et intégrité",
     titleEn: "Master data and integrity",
     businessAreaFr: "Fondations de données",
@@ -67,11 +87,14 @@ export const PLAYBACK_MODULES: readonly PlaybackModule[] = [
     evidenceEn: "Documented anomalies + proposed fixes",
     impactFr: "Qualité · risques aval",
     impactEn: "Quality · downstream risk",
-    enterpriseChapterFr: "Fondation des données",
-    enterpriseChapterEn: "Data foundation",
+    enterpriseChapterFr: "Établir l’intégrité des données",
+    enterpriseChapterEn: "Establish data integrity",
+    professionalStepFr: "Analyste junior",
+    professionalStepEn: "Junior analyst",
   },
   {
     code: "M3",
+    chapter: "operations",
     titleFr: "Approvisionnement et Procure-to-Pay",
     titleEn: "Procurement and Procure-to-Pay",
     businessAreaFr: "Achats",
@@ -82,15 +105,18 @@ export const PLAYBACK_MODULES: readonly PlaybackModule[] = [
     mandateEn: "Secure a controlled purchase under pressure",
     role: "process",
     stakeholderComplexity: "medium",
-    evidenceFr: "PO · réception · justification d’écart",
-    evidenceEn: "PO · receipt · variance justification",
-    impactFr: "OTIF · stock · cash",
+    evidenceFr: "Bon de commande · réception · justification d’écart",
+    evidenceEn: "Purchase order · receipt · variance justification",
+    impactFr: "OTIF · stock · trésorerie",
     impactEn: "OTIF · inventory · cash",
-    enterpriseChapterFr: "Approvisionnement",
-    enterpriseChapterEn: "Procurement",
+    enterpriseChapterFr: "Piloter les opérations",
+    enterpriseChapterEn: "Steer operations",
+    professionalStepFr: "Analyste de processus",
+    professionalStepEn: "Process analyst",
   },
   {
     code: "M4",
+    chapter: "operations",
     titleFr: "Ventes et Order-to-Cash",
     titleEn: "Sales and Order-to-Cash",
     businessAreaFr: "Ventes",
@@ -105,11 +131,14 @@ export const PLAYBACK_MODULES: readonly PlaybackModule[] = [
     evidenceEn: "Order · delivery · service",
     impactFr: "Service · revenu",
     impactEn: "Service · revenue",
-    enterpriseChapterFr: "Ventes",
-    enterpriseChapterEn: "Sales",
+    enterpriseChapterFr: "Piloter les opérations",
+    enterpriseChapterEn: "Steer operations",
+    professionalStepFr: "Analyste de processus",
+    professionalStepEn: "Process analyst",
   },
   {
     code: "M5",
+    chapter: "operations",
     titleFr: "Stocks et Supply Chain",
     titleEn: "Inventory and Supply Chain",
     businessAreaFr: "Logistique",
@@ -124,16 +153,19 @@ export const PLAYBACK_MODULES: readonly PlaybackModule[] = [
     evidenceEn: "Movements · exception · capacity",
     impactFr: "Inventaire · délai · productivité",
     impactEn: "Inventory · lead time · productivity",
-    enterpriseChapterFr: "Inventaire",
-    enterpriseChapterEn: "Inventory",
+    enterpriseChapterFr: "Piloter les opérations",
+    enterpriseChapterEn: "Steer operations",
+    professionalStepFr: "Analyste de processus",
+    professionalStepEn: "Process analyst",
   },
   {
     code: "M6",
+    chapter: "steering",
     titleFr: "Finance et Record-to-Report",
     titleEn: "Finance and Record-to-Report",
     businessAreaFr: "Finance",
     businessAreaEn: "Finance",
-    processFr: "Record-to-Report / cash",
+    processFr: "Record-to-Report / trésorerie",
     processEn: "Record-to-Report / cash",
     mandateFr: "Lier transactions, contrôles et trésorerie",
     mandateEn: "Link transactions, controls and cash",
@@ -141,13 +173,16 @@ export const PLAYBACK_MODULES: readonly PlaybackModule[] = [
     stakeholderComplexity: "high",
     evidenceFr: "Écritures · contrôles · écarts",
     evidenceEn: "Postings · controls · variances",
-    impactFr: "Marge · cash · conformité",
+    impactFr: "Marge · trésorerie · conformité",
     impactEn: "Margin · cash · compliance",
-    enterpriseChapterFr: "Finance",
-    enterpriseChapterEn: "Finance",
+    enterpriseChapterFr: "Intégrer les fonctions",
+    enterpriseChapterEn: "Integrate functions",
+    professionalStepFr: "Consultant ERP",
+    professionalStepEn: "ERP consultant",
   },
   {
     code: "M7",
+    chapter: "steering",
     titleFr: "Client, service et relation",
     titleEn: "Customer, service and relationship",
     businessAreaFr: "Client",
@@ -162,11 +197,14 @@ export const PLAYBACK_MODULES: readonly PlaybackModule[] = [
     evidenceEn: "Service case · recovery",
     impactFr: "Satisfaction · risque relationnel",
     impactEn: "Satisfaction · relationship risk",
-    enterpriseChapterFr: "Client",
-    enterpriseChapterEn: "Customer",
+    enterpriseChapterFr: "Intégrer les fonctions",
+    enterpriseChapterEn: "Integrate functions",
+    professionalStepFr: "Consultant ERP",
+    professionalStepEn: "ERP consultant",
   },
   {
     code: "M8",
+    chapter: "steering",
     titleFr: "Ressources humaines et HCM",
     titleEn: "Human resources and HCM",
     businessAreaFr: "HCM",
@@ -181,11 +219,14 @@ export const PLAYBACK_MODULES: readonly PlaybackModule[] = [
     evidenceEn: "HCM file · time · skills",
     impactFr: "Productivité · disponibilité",
     impactEn: "Productivity · availability",
-    enterpriseChapterFr: "Effectifs",
-    enterpriseChapterEn: "Workforce",
+    enterpriseChapterFr: "Intégrer les fonctions",
+    enterpriseChapterEn: "Integrate functions",
+    professionalStepFr: "Consultant ERP",
+    professionalStepEn: "ERP consultant",
   },
   {
     code: "M9",
+    chapter: "governance",
     titleFr: "Gouvernance, accès et risques",
     titleEn: "Governance, access and risk",
     businessAreaFr: "Gouvernance",
@@ -200,11 +241,14 @@ export const PLAYBACK_MODULES: readonly PlaybackModule[] = [
     evidenceEn: "SoD · audit · recommendation",
     impactFr: "Risque · conformité",
     impactEn: "Risk · compliance",
-    enterpriseChapterFr: "Gouvernance",
-    enterpriseChapterEn: "Governance",
+    enterpriseChapterFr: "Gouverner et conseiller",
+    enterpriseChapterEn: "Govern and advise",
+    professionalStepFr: "Conseiller de confiance",
+    professionalStepEn: "Trusted advisor",
   },
   {
     code: "M10",
+    chapter: "governance",
     titleFr: "BI, KPI, IA et décision",
     titleEn: "BI, KPI, AI and decision",
     businessAreaFr: "Décision",
@@ -217,10 +261,12 @@ export const PLAYBACK_MODULES: readonly PlaybackModule[] = [
     stakeholderComplexity: "high",
     evidenceFr: "Interprétation KPI + synthèse",
     evidenceEn: "KPI interpretation + synthesis",
-    impactFr: "Décision · monitoring",
+    impactFr: "Décision · suivi",
     impactEn: "Decision · monitoring",
-    enterpriseChapterFr: "BI et conseil",
-    enterpriseChapterEn: "BI and consulting",
+    enterpriseChapterFr: "Gouverner et conseiller",
+    enterpriseChapterEn: "Govern and advise",
+    professionalStepFr: "Conseiller de confiance",
+    professionalStepEn: "Trusted advisor",
   },
 ] as const;
 
@@ -236,19 +282,136 @@ export const PROFESSIONAL_STAGES: readonly {
   { id: "advisor", fr: "Conseiller de confiance", en: "Trusted advisor" },
 ] as const;
 
-export const PROCESS_CHAIN_STEPS: readonly { fr: string; en: string }[] = [
-  { fr: "Demande client", en: "Customer demand" },
-  { fr: "Commande de vente", en: "Sales order" },
-  { fr: "Allocation stock", en: "Inventory allocation" },
-  { fr: "Besoin de réappro", en: "Replenishment need" },
-  { fr: "Bon de commande", en: "Purchase order" },
-  { fr: "Réponse fournisseur", en: "Supplier response" },
-  { fr: "Réception", en: "Receipt" },
-  { fr: "Facture", en: "Invoice" },
-  { fr: "Paiement", en: "Payment" },
-  { fr: "Comptabilisation", en: "Accounting update" },
-  { fr: "Mouvement KPI", en: "KPI movement" },
-  { fr: "Recommandation", en: "Consulting recommendation" },
+export const PROCESS_CHAIN_STEPS: readonly {
+  fr: string;
+  en: string;
+  documentFr: string;
+  documentEn: string;
+  consequenceFr: string;
+  consequenceEn: string;
+  stakeholderFr: string;
+  stakeholderEn: string;
+}[] = [
+  {
+    fr: "Demande client",
+    en: "Customer demand",
+    documentFr: "Demande client",
+    documentEn: "Customer request",
+    consequenceFr: "Engagement de service",
+    consequenceEn: "Service commitment",
+    stakeholderFr: "Client",
+    stakeholderEn: "Customer",
+  },
+  {
+    fr: "Commande de vente",
+    en: "Sales order",
+    documentFr: "SO-1048",
+    documentEn: "SO-1048",
+    consequenceFr: "Promesse client",
+    consequenceEn: "Customer promise",
+    stakeholderFr: "Ventes",
+    stakeholderEn: "Sales",
+  },
+  {
+    fr: "Allocation stock",
+    en: "Inventory allocation",
+    documentFr: "Allocation",
+    documentEn: "Allocation",
+    consequenceFr: "Disponibilité",
+    consequenceEn: "Availability",
+    stakeholderFr: "Stocks",
+    stakeholderEn: "Inventory",
+  },
+  {
+    fr: "Besoin de réappro",
+    en: "Replenishment need",
+    documentFr: "Demande d’achat",
+    documentEn: "Purchase requisition",
+    consequenceFr: "Délai",
+    consequenceEn: "Lead time",
+    stakeholderFr: "Achats",
+    stakeholderEn: "Procurement",
+  },
+  {
+    fr: "Bon de commande",
+    en: "Purchase order",
+    documentFr: "Bon de commande",
+    documentEn: "Purchase order",
+    consequenceFr: "Engagement fournisseur",
+    consequenceEn: "Supplier commitment",
+    stakeholderFr: "Fournisseur",
+    stakeholderEn: "Supplier",
+  },
+  {
+    fr: "Réponse fournisseur",
+    en: "Supplier response",
+    documentFr: "Confirmation",
+    documentEn: "Confirmation",
+    consequenceFr: "Délai +4 jours",
+    consequenceEn: "Lead time +4 days",
+    stakeholderFr: "Fournisseur",
+    stakeholderEn: "Supplier",
+  },
+  {
+    fr: "Réception",
+    en: "Receipt",
+    documentFr: "Bon de réception",
+    documentEn: "Goods receipt",
+    consequenceFr: "Capacité quai",
+    consequenceEn: "Dock capacity",
+    stakeholderFr: "Entrepôt",
+    stakeholderEn: "Warehouse",
+  },
+  {
+    fr: "Facture",
+    en: "Invoice",
+    documentFr: "Facture",
+    documentEn: "Invoice",
+    consequenceFr: "Coût",
+    consequenceEn: "Cost",
+    stakeholderFr: "Finance",
+    stakeholderEn: "Finance",
+  },
+  {
+    fr: "Paiement",
+    en: "Payment",
+    documentFr: "Paiement",
+    documentEn: "Payment",
+    consequenceFr: "Trésorerie",
+    consequenceEn: "Cash",
+    stakeholderFr: "Finance",
+    stakeholderEn: "Finance",
+  },
+  {
+    fr: "Comptabilisation",
+    en: "Accounting update",
+    documentFr: "Écriture comptable",
+    documentEn: "Accounting entry",
+    consequenceFr: "Service / KPI",
+    consequenceEn: "Service / KPI",
+    stakeholderFr: "Contrôle",
+    stakeholderEn: "Control",
+  },
+  {
+    fr: "Mouvement KPI",
+    en: "KPI movement",
+    documentFr: "Tableau de bord",
+    documentEn: "Dashboard",
+    consequenceFr: "OTIF / risque",
+    consequenceEn: "OTIF / risk",
+    stakeholderFr: "BI",
+    stakeholderEn: "BI",
+  },
+  {
+    fr: "Recommandation",
+    en: "Consulting recommendation",
+    documentFr: "Synthèse exécutive",
+    documentEn: "Executive synthesis",
+    consequenceFr: "Décision",
+    consequenceEn: "Decision",
+    stakeholderFr: "Direction",
+    stakeholderEn: "Management",
+  },
 ] as const;
 
 export const CAPSTONE_STAGES: readonly { id: string; fr: string; en: string }[] = [
@@ -260,3 +423,32 @@ export const CAPSTONE_STAGES: readonly { id: string; fr: string; en: string }[] 
   { id: "S6", fr: "Feuille de route", en: "Roadmap" },
   { id: "S7", fr: "Défense exécutive", en: "Executive defense" },
 ] as const;
+
+export const PULSE_NODES = [
+  { id: "customers", fr: "Client", en: "Customer", x: 8, y: 28 },
+  { id: "sales", fr: "Ventes", en: "Sales", x: 24, y: 18 },
+  { id: "inventory", fr: "Stocks", en: "Inventory", x: 42, y: 26 },
+  { id: "procurement", fr: "Achats", en: "Procurement", x: 34, y: 48 },
+  { id: "suppliers", fr: "Fournisseur", en: "Supplier", x: 14, y: 66 },
+  { id: "warehouse", fr: "Entrepôt", en: "Warehouse", x: 52, y: 58 },
+  { id: "finance", fr: "Finance", en: "Finance", x: 70, y: 42 },
+  { id: "hcm", fr: "HCM", en: "HCM", x: 66, y: 70 },
+  { id: "governance", fr: "Gouvernance", en: "Governance", x: 86, y: 24 },
+  { id: "bi", fr: "BI", en: "BI", x: 84, y: 56 },
+  { id: "management", fr: "Direction", en: "Management", x: 58, y: 12 },
+] as const;
+
+export type PulseNodeId = (typeof PULSE_NODES)[number]["id"];
+
+/** Active flow path used for pulse demonstration */
+export const ACTIVE_FLOW: readonly PulseNodeId[] = [
+  "customers",
+  "sales",
+  "inventory",
+  "procurement",
+  "suppliers",
+  "warehouse",
+  "finance",
+  "bi",
+  "management",
+];

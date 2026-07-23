@@ -1,484 +1,681 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useId, useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 
 import { usePlayback } from "./PlaybackProvider.js";
 import {
+  ACTIVE_FLOW,
   CAPSTONE_STAGES,
+  JOURNEY_CHAPTERS,
   PLAYBACK_MODULES,
   PROCESS_CHAIN_STEPS,
-  PROFESSIONAL_STAGES,
+  PULSE_NODES,
+  type JourneyChapter,
+  type PulseNodeId,
 } from "./modules.js";
 
-const NODE_LAYOUT: { id: keyof ReturnType<typeof usePlayback>["copy"]["nodes"]; left: string; top: string; tone?: string; labelFr: string; labelEn: string }[] = [
-  { id: "customers", left: "12%", top: "22%", labelFr: "Clients", labelEn: "Customers" },
-  { id: "sales", left: "28%", top: "18%", tone: "blue", labelFr: "Ventes", labelEn: "Sales" },
-  { id: "inventory", left: "46%", top: "28%", tone: "amber", labelFr: "Stocks", labelEn: "Inventory" },
-  { id: "procurement", left: "34%", top: "48%", labelFr: "Achats", labelEn: "Procurement" },
-  { id: "suppliers", left: "16%", top: "62%", labelFr: "Fournisseurs", labelEn: "Suppliers" },
-  { id: "warehouse", left: "52%", top: "58%", tone: "amber", labelFr: "Entrepôt", labelEn: "Warehouse" },
-  { id: "finance", left: "70%", top: "42%", tone: "green", labelFr: "Finance", labelEn: "Finance" },
-  { id: "hcm", left: "66%", top: "68%", labelFr: "HCM", labelEn: "HCM" },
-  { id: "governance", left: "84%", top: "28%", tone: "red", labelFr: "Gouvernance", labelEn: "Governance" },
-  { id: "bi", left: "82%", top: "58%", tone: "purple", labelFr: "BI", labelEn: "BI" },
-  { id: "management", left: "58%", top: "16%", tone: "gold", labelFr: "Direction", labelEn: "Management" },
-];
+function BrandHeader(): ReactNode {
+  const { branding, endorsement, copy } = usePlayback();
+  return (
+    <header className="playback-topnav">
+      <div className="playback-brand-block">
+        <div className="playback-brand" data-testid="playback-product-name">
+          {branding.productName}
+        </div>
+        {branding.showInstitution && endorsement ? (
+          <div className="playback-endorsement" data-testid="playback-institution-endorsement">
+            {endorsement}
+          </div>
+        ) : null}
+      </div>
+      <nav aria-label="Sections">
+        <ul className="playback-nav">
+          <li>
+            <a href="#promise">{copy.nav.promise}</a>
+          </li>
+          <li>
+            <a href="#enterprise">{copy.nav.enterprise}</a>
+          </li>
+          <li>
+            <a href="#missions">{copy.nav.missions}</a>
+          </li>
+          <li>
+            <a href="#modes">{copy.nav.modes}</a>
+          </li>
+          <li>
+            <a href="#journey">{copy.nav.journey}</a>
+          </li>
+          <li>
+            <a href="#process">{copy.nav.process}</a>
+          </li>
+          <li>
+            <a href="#impact">{copy.nav.impact}</a>
+          </li>
+          <li>
+            <a href="#ai">{copy.nav.ai}</a>
+          </li>
+          <li>
+            <a href="#professor">{copy.nav.professor}</a>
+          </li>
+          <li>
+            <a href="#capstone">{copy.nav.capstone}</a>
+          </li>
+          <li>
+            <Link to="/playback/v2/login">{copy.nav.login}</Link>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  );
+}
 
-export function PortalPage(): ReactNode {
-  const { copy, locale, tModuleTitle, tRole, selectedModule, setSelectedModuleCode, selectedModuleCode, ambientEvent } =
-    usePlayback();
-  const [navOpen, setNavOpen] = useState(false);
-  const [activeNode, setActiveNode] = useState<(typeof NODE_LAYOUT)[number]["id"]>("procurement");
-  const [processPulse, setProcessPulse] = useState(4);
+function HeroSection(): ReactNode {
+  const { copy } = usePlayback();
+  const h = copy.hero;
+  return (
+    <section id="promise" className="playback-section" aria-labelledby="hero-title">
+      <div className="pb-hero" data-testid="playback-hero">
+        <div className="pb-hero__copy">
+          <span className="playback-chip">{h.kicker}</span>
+          <h1 id="hero-title" className="pb-hero__title">
+            {h.title}
+          </h1>
+          <p className="pb-hero__subtitle">{h.subtitle}</p>
+          <div className="pb-hero__cta">
+            <Link className="playback-btn" to="/playback/v2/login" data-testid="hero-cta-primary">
+              {h.ctaPrimary}
+            </Link>
+            <a className="playback-btn playback-btn--ghost" href="#journey" data-testid="hero-cta-secondary">
+              {h.ctaSecondary}
+            </a>
+          </div>
+        </div>
+        <aside className="pb-live-preview" data-testid="hero-live-preview" aria-label={h.previewTitle}>
+          <div className="pb-live-preview__title">{h.previewTitle}</div>
+          <div className="pb-live-flow" aria-hidden="true" />
+          <dl className="pb-live-row">
+            <dt>{h.demandLabel}</dt>
+            <dd>{h.demandValue}</dd>
+          </dl>
+          <dl className="pb-live-row">
+            <dt>{h.processLabel}</dt>
+            <dd>{h.processValue}</dd>
+          </dl>
+          <dl className="pb-live-row">
+            <dt>{h.messageLabel}</dt>
+            <dd>{h.messageValue}</dd>
+          </dl>
+          <dl className="pb-live-row">
+            <dt>{h.impactLabel}</dt>
+            <dd>{h.impactValue}</dd>
+          </dl>
+          <dl className="pb-live-row pb-live-row--decision">
+            <dt>{h.decisionLabel}</dt>
+            <dd>{h.decisionValue}</dd>
+          </dl>
+          <span className="playback-demo-tag">{copy.demoData}</span>
+        </aside>
+      </div>
+    </section>
+  );
+}
 
-  const nodeDetail = copy.nodes[activeNode] ?? {
-    role: "—",
-    process: "—",
-    document: "—",
-    consequence: "—",
-  };
-  const complexityLabel =
-    selectedModule.stakeholderComplexity === "low"
-      ? locale === "fr"
-        ? "Faible"
-        : "Low"
-      : selectedModule.stakeholderComplexity === "medium"
-        ? locale === "fr"
-          ? "Moyenne"
-          : "Medium"
-        : locale === "fr"
-          ? "Élevée"
-          : "High";
+function nodeLabel(id: PulseNodeId, locale: "fr" | "en"): string {
+  const node = PULSE_NODES.find((n) => n.id === id)!;
+  return locale === "fr" ? node.fr : node.en;
+}
 
-  const ambientMessages = useMemo(() => {
-    const chain = {
-      supplier: {
-        fr: "Fournisseur: délai de livraison +4 jours si quantité > 120.",
-        en: "Supplier: delivery lead time +4 days if quantity > 120.",
-      },
-      warehouse: {
-        fr: "Entrepôt: quai B saturé jeudi — capacité partielle.",
-        en: "Warehouse: dock B saturated Thursday — partial capacity.",
-      },
-      finance: {
-        fr: "Finance: engagement cash anticipé de 18 k$ sur 30 jours.",
-        en: "Finance: anticipated cash commitment of $18k over 30 days.",
-      },
-      supervisor: {
-        fr: "Superviseur: justifiez l’arbitrage service vs coût avant le comité.",
-        en: "Supervisor: justify the service-vs-cost trade-off before the committee.",
-      },
-    };
-    return chain[ambientEvent];
-  }, [ambientEvent]);
+function EnterprisePulseMap(): ReactNode {
+  const { copy, locale } = usePlayback();
+  const [selected, setSelected] = useState<PulseNodeId>("sales");
+  const detail = copy.enterprise.nodes[selected]!;
+  const titleId = useId();
+
+  const pathD = useMemo(() => {
+    const pts = ACTIVE_FLOW.map((id) => {
+      const n = PULSE_NODES.find((p) => p.id === id)!;
+      return `${n.x},${n.y}`;
+    });
+    return `M ${pts.join(" L ")}`;
+  }, []);
 
   return (
-    <>
-      <header className="playback-header">
-        <div className="playback-brand">
-          <strong>TEC.ERP</strong>
-          <span>Collège de la Concorde</span>
-        </div>
-        <button
-          type="button"
-          className="playback-btn playback-btn--small playback-mobile-nav"
-          aria-expanded={navOpen}
-          aria-controls="playback-primary-nav"
-          onClick={() => setNavOpen((open) => !open)}
-        >
-          Menu
-        </button>
-        <nav id="playback-primary-nav" className="playback-nav" data-open={navOpen ? "true" : "false"} aria-label="Playback">
-          <a href="#experience" onClick={() => setNavOpen(false)}>
-            {copy.nav.experience}
-          </a>
-          <a href="#parcours" onClick={() => setNavOpen(false)}>
-            {copy.nav.journey}
-          </a>
-          <a href="#entreprise" onClick={() => setNavOpen(false)}>
-            {copy.nav.enterprise}
-          </a>
-          <a href="#bi-ia" onClick={() => setNavOpen(false)}>
-            {copy.nav.biAi}
-          </a>
-          <a href="#capstone" onClick={() => setNavOpen(false)}>
-            {copy.nav.capstone}
-          </a>
-        </nav>
-        <div className="playback-header-actions">
-          <Link className="playback-btn playback-btn--primary" to="/playback/v2/login">
-            {copy.nav.login}
-          </Link>
-        </div>
-      </header>
-
-      <div className="playback-main">
-        <section className="playback-hero" id="experience" aria-labelledby="hero-title">
-          <div>
-            <div className="playback-eyebrow">{copy.hero.eyebrow}</div>
-            <h1 id="hero-title">{copy.hero.title}</h1>
-            <p>{copy.hero.support}</p>
-            <div className="playback-hero-actions">
-              <Link className="playback-btn playback-btn--primary" to="/playback/v2/login" data-testid="playback-hero-primary">
-                {copy.hero.primaryCta}
-              </Link>
-              <a className="playback-btn" href="#parcours">
-                {copy.hero.secondaryCta}
-              </a>
-            </div>
-            <span className="playback-pill">{copy.hero.notLms}</span>
-          </div>
-          <div className="playback-detail" aria-label={copy.enterprise.title}>
-            <p className="playback-eyebrow">{locale === "fr" ? "Digital Twin" : "Digital Twin"}</p>
-            <h2 style={{ marginTop: 0 }}>{locale === "fr" ? "Equinoxe en un regard" : "Equinoxe at a glance"}</h2>
-            <p className="playback-lead" style={{ marginBottom: "1rem" }}>
-              {locale === "fr"
-                ? "Processus connectés · preuves · conséquences · mandats"
-                : "Connected processes · evidence · consequences · mandates"}
-            </p>
-            <dl>
-              <div>
-                <dt>{locale === "fr" ? "Entreprise" : "Enterprise"}</dt>
-                <dd>Equinoxe</dd>
-              </div>
-              <div>
-                <dt>{locale === "fr" ? "Progression" : "Progression"}</dt>
-                <dd>COMPRENDRE → AGIR → CONSEILLER</dd>
-              </div>
-              <div>
-                <dt>{locale === "fr" ? "Modes" : "Modes"}</dt>
-                <dd>Exploration · Pratique · Simulation · Évaluation</dd>
-              </div>
-            </dl>
-          </div>
-        </section>
-
-        <section className="playback-section" id="entreprise" aria-labelledby="enterprise-title">
-          <h2 id="enterprise-title">{copy.enterprise.title}</h2>
-          <p className="playback-lead">{copy.enterprise.support}</p>
-          <p className="playback-note">{copy.enterprise.hint}</p>
-          <div className="playback-map">
-            <div className="playback-constellation" role="group" aria-label={copy.enterprise.title}>
-              {NODE_LAYOUT.map((node) => (
-                <button
-                  key={node.id}
-                  type="button"
-                  className="playback-node"
-                  style={{ left: node.left, top: node.top }}
-                  data-active={activeNode === node.id ? "true" : "false"}
-                  data-tone={node.tone}
-                  onClick={() => setActiveNode(node.id)}
-                  onMouseEnter={() => setActiveNode(node.id)}
-                  onFocus={() => setActiveNode(node.id)}
-                >
-                  {locale === "fr" ? node.labelFr : node.labelEn}
-                </button>
-              ))}
-            </div>
-            <aside className="playback-detail">
-              <dl>
-                <div>
-                  <dt>{locale === "fr" ? "Rôle" : "Role"}</dt>
-                  <dd>{nodeDetail.role}</dd>
-                </div>
-                <div>
-                  <dt>{locale === "fr" ? "Processus" : "Process"}</dt>
-                  <dd>{nodeDetail.process}</dd>
-                </div>
-                <div>
-                  <dt>{locale === "fr" ? "Document" : "Document"}</dt>
-                  <dd>{nodeDetail.document}</dd>
-                </div>
-                <div>
-                  <dt>{locale === "fr" ? "Conséquence / KPI" : "Consequence / KPI"}</dt>
-                  <dd>{nodeDetail.consequence}</dd>
-                </div>
-              </dl>
-            </aside>
-          </div>
-        </section>
-
-        <section className="playback-section" id="consulting" aria-labelledby="consulting-title">
-          <h2 id="consulting-title">{copy.consulting.title}</h2>
-          <p className="playback-lead">{copy.consulting.support}</p>
-          <div className="playback-mission-flow" aria-hidden="true">
-            <span data-step>{copy.consulting.understand}</span>
-            <span>→</span>
-            <span data-step>{copy.consulting.act}</span>
-            <span>→</span>
-            <span data-step>{copy.consulting.advise}</span>
-          </div>
-          <div className="playback-mission-grid">
-            <article className="playback-mission" data-kind="diagnose">
-              <h3>{copy.consulting.m1Title}</h3>
-              <p>{copy.consulting.m1Body}</p>
-            </article>
-            <article className="playback-mission" data-kind="act">
-              <h3>{copy.consulting.m2Title}</h3>
-              <p>{copy.consulting.m2Body}</p>
-            </article>
-            <article className="playback-mission" data-kind="advise">
-              <h3>{copy.consulting.m3Title}</h3>
-              <p>{copy.consulting.m3Body}</p>
-            </article>
-          </div>
-        </section>
-
-        <section className="playback-section" aria-labelledby="modes-title">
-          <h2 id="modes-title">{copy.modes.title}</h2>
-          <p className="playback-lead">{copy.modes.support}</p>
-          <div className="playback-modes">
-            {(["exploration", "guided", "simulation", "evaluation"] as const).map((key) => {
-              const mode = copy.modes[key];
-              return (
-                <article key={key} className="playback-mode">
-                  <h3>{mode.name}</h3>
-                  <ul>
-                    <li>{mode.guidance}</li>
-                    <li>{mode.consequence}</li>
-                    <li>{mode.ai}</li>
-                    <li>{mode.evidence}</li>
-                    <li>{mode.score}</li>
-                  </ul>
-                </article>
-              );
-            })}
-          </div>
-        </section>
-
-        <section className="playback-section" id="parcours" aria-labelledby="journey-title">
-          <h2 id="journey-title">{copy.journey.title}</h2>
-          <p className="playback-lead">{copy.journey.support}</p>
-          <div className="playback-dual">
-            <article>
-              <strong>{copy.journey.enterpriseLabel}</strong>
-              <ol>
-                {PLAYBACK_MODULES.map((module) => (
-                  <li key={module.code}>{locale === "fr" ? module.enterpriseChapterFr : module.enterpriseChapterEn}</li>
-                ))}
-              </ol>
-            </article>
-            <article>
-              <strong>{copy.journey.professionalLabel}</strong>
-              <ol>
-                {PROFESSIONAL_STAGES.map((stage) => (
-                  <li key={stage.id}>{locale === "fr" ? stage.fr : stage.en}</li>
-                ))}
-              </ol>
-            </article>
-          </div>
-          <div className="playback-journey-rail" role="list" aria-label={copy.journey.title}>
-            {PLAYBACK_MODULES.map((module) => (
+    <section id="enterprise" className="playback-section" aria-labelledby={titleId}>
+      <div className="pb-pulse-section" data-testid="enterprise-pulse-map">
+        <h2 id={titleId} className="playback-section__title">
+          {copy.enterprise.title}
+        </h2>
+        <p className="playback-section__lead">{copy.enterprise.lead}</p>
+        <p className="playback-chip">
+          {copy.enterprise.twin} · {copy.enterprise.engine}
+        </p>
+        <div className="pb-pulse-layout">
+          <div className="pb-pulse-map" role="group" aria-label={copy.enterprise.selectHint}>
+            <svg className="pb-pulse-svg" viewBox="0 0 100 80" aria-hidden="true">
+              <path className="pb-pulse-path" d="M8,28 L24,18 L42,26 L34,48 L14,66 L52,58 L70,42 L66,70" />
+              <path className="pb-pulse-path" d="M70,42 L86,24 L84,56 L58,12" />
+              <path
+                id="pb-active-flow"
+                className="pb-pulse-path pb-pulse-path--active"
+                d={pathD}
+                data-testid="pulse-active-path"
+              />
+              <circle r="1.4" className="pb-pulse-marker">
+                <animateMotion dur="8s" repeatCount="indefinite" path={pathD} />
+              </circle>
+            </svg>
+            {PULSE_NODES.map((node) => (
               <button
-                key={module.code}
+                key={node.id}
                 type="button"
-                className="playback-journey-chip"
-                role="listitem"
-                data-active={selectedModuleCode === module.code ? "true" : "false"}
-                onClick={() => setSelectedModuleCode(module.code)}
+                className={`pb-pulse-node${
+                  node.id === "inventory" || node.id === "suppliers" || node.id === "warehouse"
+                    ? " pb-pulse-node--tension"
+                    : ""
+                }`}
+                style={{ left: `${node.x}%`, top: `${node.y}%` }}
+                aria-pressed={selected === node.id}
+                data-testid={`pulse-node-${node.id}`}
+                onClick={() => setSelected(node.id)}
               >
-                <strong>
-                  {module.code} · {tModuleTitle(module)}
-                </strong>
-                <span>{tRole(module.role)}</span>
+                {locale === "fr" ? node.fr : node.en}
               </button>
             ))}
-            <div className="playback-journey-chip playback-capstone-chip" role="listitem">
-              <strong>Capstone</strong>
-              <span>{copy.capstone.separate}</span>
-            </div>
+            <ol className="pb-pulse-a11y">
+              {ACTIVE_FLOW.map((id) => (
+                <li key={id}>{nodeLabel(id, locale)}</li>
+              ))}
+            </ol>
           </div>
-          <div className="playback-detail" style={{ marginTop: "1rem" }}>
-            <p className="playback-note">{copy.journey.selectHint}</p>
+          <aside className="pb-pulse-panel" data-testid="pulse-node-detail" aria-live="polite">
+            <h3>{nodeLabel(selected, locale)}</h3>
             <dl>
               <div>
-                <dt>{copy.journey.business}</dt>
-                <dd>{locale === "fr" ? selectedModule.businessAreaFr : selectedModule.businessAreaEn}</dd>
+                <dt>{copy.enterprise.detail.person}</dt>
+                <dd>
+                  {detail.person} · {detail.role}
+                </dd>
               </div>
               <div>
-                <dt>{copy.journey.role}</dt>
-                <dd>{tRole(selectedModule.role)}</dd>
+                <dt>{copy.enterprise.detail.process}</dt>
+                <dd>{detail.process}</dd>
               </div>
               <div>
-                <dt>{copy.journey.process}</dt>
-                <dd>{locale === "fr" ? selectedModule.processFr : selectedModule.processEn}</dd>
+                <dt>{copy.enterprise.detail.document}</dt>
+                <dd>{detail.document}</dd>
               </div>
               <div>
-                <dt>{copy.journey.mandate}</dt>
-                <dd>{locale === "fr" ? selectedModule.mandateFr : selectedModule.mandateEn}</dd>
+                <dt>{copy.enterprise.detail.situation}</dt>
+                <dd>{detail.situation}</dd>
               </div>
               <div>
-                <dt>{copy.journey.stakeholders}</dt>
-                <dd>{complexityLabel}</dd>
+                <dt>{copy.enterprise.detail.message}</dt>
+                <dd>{detail.message}</dd>
               </div>
               <div>
-                <dt>{copy.journey.evidence}</dt>
-                <dd>{locale === "fr" ? selectedModule.evidenceFr : selectedModule.evidenceEn}</dd>
+                <dt>{copy.enterprise.detail.consequence}</dt>
+                <dd>{detail.consequence}</dd>
               </div>
               <div>
-                <dt>{copy.journey.impact}</dt>
-                <dd>{locale === "fr" ? selectedModule.impactFr : selectedModule.impactEn}</dd>
+                <dt>{copy.enterprise.detail.kpi}</dt>
+                <dd>{detail.kpi}</dd>
+              </div>
+              <div>
+                <dt>{copy.enterprise.detail.dependency}</dt>
+                <dd>{detail.dependency}</dd>
               </div>
             </dl>
-          </div>
-        </section>
-
-        <section className="playback-section" aria-labelledby="process-title">
-          <h2 id="process-title">{copy.process.title}</h2>
-          <p className="playback-lead">{copy.process.support}</p>
-          <div className="playback-process" role="list">
-            {PROCESS_CHAIN_STEPS.map((step, index) => (
-              <div key={step.en} style={{ display: "contents" }}>
-                <button
-                  type="button"
-                  className="playback-process-step"
-                  role="listitem"
-                  data-pulse={processPulse === index ? "true" : "false"}
-                  onClick={() => setProcessPulse(index)}
-                  onFocus={() => setProcessPulse(index)}
-                >
-                  {locale === "fr" ? step.fr : step.en}
-                </button>
-                {index < PROCESS_CHAIN_STEPS.length - 1 ? (
-                  <span className="playback-process-arrow" aria-hidden="true">
-                    →
-                  </span>
-                ) : null}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="playback-section" id="bi-ia" aria-labelledby="impact-title">
-          <h2 id="impact-title">{copy.impact.title}</h2>
-          <p className="playback-lead">{copy.impact.support}</p>
-          <span className="playback-demo-label">{copy.impact.demoLabel}</span>
-          <div className="playback-kpi-grid">
-            {[
-              { label: "OTIF", value: "91% → 86%", tone: "amber", cause: "PO qty ↑", timing: locale === "fr" ? "Semaine +1" : "Week +1", who: locale === "fr" ? "Client / Achats" : "Customer / Procurement" },
-              { label: locale === "fr" ? "Stock" : "Inventory", value: "+6%", tone: "blue", cause: "Réception partielle", timing: locale === "fr" ? "Immédiat" : "Immediate", who: locale === "fr" ? "Entrepôt" : "Warehouse" },
-              { label: locale === "fr" ? "Marge" : "Margin", value: "-0.4 pt", tone: "red", cause: "Urgence fournisseur", timing: locale === "fr" ? "Mois" : "Month", who: "Finance" },
-              { label: locale === "fr" ? "Cash" : "Cash", value: "-18 k$", tone: "amber", cause: "Engagement anticipé", timing: "30j", who: "Finance" },
-              { label: locale === "fr" ? "Productivité" : "Productivity", value: "stable", tone: "green", cause: "Capacité quai", timing: locale === "fr" ? "Cycle" : "Cycle", who: locale === "fr" ? "Entrepôt" : "Warehouse" },
-              { label: "CSAT", value: "4.2 → 4.0", tone: "amber", cause: "Délai", timing: locale === "fr" ? "Semaine +2" : "Week +2", who: locale === "fr" ? "Client" : "Customer" },
-              { label: locale === "fr" ? "Risque" : "Risk", value: "↑ contrôle", tone: "red", cause: "Pression urgence", timing: locale === "fr" ? "Immédiat" : "Immediate", who: locale === "fr" ? "Gouvernance" : "Governance" },
-            ].map((kpi) => (
-              <article key={kpi.label} className="playback-kpi" data-tone={kpi.tone}>
-                <span className="playback-note">{kpi.label}</span>
-                <strong>{kpi.value}</strong>
-                <span className="playback-note">
-                  {copy.impact.cause}: {kpi.cause}
-                </span>
-                <span className="playback-note">
-                  {copy.impact.timing}: {kpi.timing}
-                </span>
-                <span className="playback-note">
-                  {copy.impact.stakeholder}: {kpi.who}
-                </span>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="playback-section" aria-labelledby="ai-title">
-          <h2 id="ai-title">{copy.ai.title}</h2>
-          <p className="playback-lead">{copy.ai.support}</p>
-          <div className="playback-ai-grid">
-            <article className="playback-ai-card" data-kind="visible">
-              <h3>{copy.ai.visibleTitle}</h3>
-              <p>{copy.ai.visibleBody}</p>
-            </article>
-            <article className="playback-ai-card" data-kind="ambient">
-              <h3>{copy.ai.ambientTitle}</h3>
-              <p>{copy.ai.ambientBody}</p>
-            </article>
-          </div>
-          <h3>{copy.ai.chainTitle}</h3>
-          <div className="playback-chain">
-            <div className="playback-chain-item">
-              <span className="playback-tag" data-kind="fact">
-                {copy.ai.fact}
-              </span>
-              <p>
-                {locale === "fr"
-                  ? "Quantité PO proposée portée de 100 à 140 unités."
-                  : "Proposed PO quantity raised from 100 to 140 units."}
-              </p>
-            </div>
-            <div className="playback-chain-item">
-              <span className="playback-tag" data-kind="stakeholder">
-                {copy.ai.stakeholder}
-              </span>
-              <p>{locale === "fr" ? ambientMessages.fr : ambientMessages.en}</p>
-            </div>
-            <div className="playback-chain-item">
-              <span className="playback-tag" data-kind="coach">
-                {copy.ai.coach}
-              </span>
-              <p>
-                {locale === "fr"
-                  ? "Quelles preuves justifient 140 plutôt que 120 ? Quel risque acceptez-vous ?"
-                  : "What evidence justifies 140 instead of 120? What risk are you accepting?"}
-              </p>
-            </div>
-            <div className="playback-chain-item">
-              <span className="playback-tag" data-kind="projection">
-                {copy.ai.projection}
-              </span>
-              <p>
-                {locale === "fr"
-                  ? "Projection: OTIF -5 pts sur 7 jours si le délai fournisseur se confirme."
-                  : "Projection: OTIF -5 pts over 7 days if the supplier delay is confirmed."}
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section className="playback-section" aria-labelledby="professor-title">
-          <div className="playback-professor">
-            <span className="playback-demo-label">{copy.professor.previewLabel}</span>
-            <h2 id="professor-title">{copy.professor.title}</h2>
-            <p className="playback-lead">{copy.professor.support}</p>
-            <ul>
-              {copy.professor.capabilities.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        <section className="playback-section" id="capstone" aria-labelledby="capstone-title">
-          <div className="playback-capstone">
-            <h2 id="capstone-title">{copy.capstone.title}</h2>
-            <p className="playback-lead">{copy.capstone.support}</p>
-            <p>
-              <strong>{copy.capstone.separate}</strong>
-            </p>
-            <div className="playback-capstone-stages">
-              {CAPSTONE_STAGES.map((stage) => (
-                <span key={stage.id}>
-                  {stage.id} · {locale === "fr" ? stage.fr : stage.en}
-                </span>
-              ))}
-            </div>
-            <p className="playback-note">{copy.capstone.approval}</p>
-          </div>
-        </section>
-
-        <section className="playback-section" aria-labelledby="cta-title">
-          <div className="playback-cta">
-            <h2 id="cta-title">{copy.cta.title}</h2>
-            <p className="playback-lead">{copy.cta.support}</p>
-            <div className="playback-hero-actions">
-              <Link className="playback-btn playback-btn--primary" to="/playback/v2/login">
-                {copy.cta.login}
-              </Link>
-              <a className="playback-btn" href="#entreprise">
-                {copy.cta.explore}
-              </a>
-            </div>
-          </div>
-        </section>
+          </aside>
+        </div>
+        <p className="pb-pulse-flow-label">{copy.enterprise.flowLabel}</p>
+        <span className="playback-demo-tag">{copy.demoData}</span>
       </div>
-    </>
+    </section>
+  );
+}
+
+function MissionsSection(): ReactNode {
+  const { copy } = usePlayback();
+  return (
+    <section id="missions" className="playback-section" data-testid="mission-transformation" aria-labelledby="missions-title">
+      <h2 id="missions-title" className="playback-section__title">
+        {copy.missions.title}
+      </h2>
+      <p className="playback-section__lead">{copy.missions.lead}</p>
+      <div className="pb-mission-transform">
+        {copy.missions.items.map((item, index) => (
+          <article key={item.title} className="pb-mission-step">
+            <div className="pb-mission-step__index">
+              {index === 0 ? "Comprendre" : index === 1 ? "Agir" : "Conseiller"}
+            </div>
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+            <div className="pb-mission-step__output">{item.output}</div>
+          </article>
+        ))}
+      </div>
+      <div className="pb-mission-chain" data-testid="mission-output-chain">
+        {copy.missions.chain}
+      </div>
+    </section>
+  );
+}
+
+function ModesSection(): ReactNode {
+  const { copy } = usePlayback();
+  const [active, setActive] = useState(1);
+  const axes = [
+    { label: copy.modes.axes.help, ...copy.modes.continuum[0]! },
+    { label: copy.modes.axes.autonomy, ...copy.modes.continuum[1]! },
+    { label: copy.modes.axes.consequences, ...copy.modes.continuum[2]! },
+    { label: copy.modes.axes.evidence, ...copy.modes.continuum[3]! },
+  ];
+  return (
+    <section id="modes" className="playback-section" data-testid="mode-continuum" aria-labelledby="modes-title">
+      <h2 id="modes-title" className="playback-section__title">
+        {copy.modes.title}
+      </h2>
+      <p className="playback-section__lead">{copy.modes.lead}</p>
+      <div className="pb-continuum">
+        <div className="pb-continuum-track">
+          {copy.modes.items.map((item, index) => (
+            <div key={item.title} className="pb-mode-stop" data-active={active === index}>
+              <button
+                type="button"
+                aria-label={item.title}
+                aria-pressed={active === index}
+                data-testid={`mode-stop-${index}`}
+                onClick={() => setActive(index)}
+              />
+              <strong>{item.title}</strong>
+              <span>{item.short}</span>
+            </div>
+          ))}
+        </div>
+        <div className="pb-axis-bands" aria-hidden="false">
+          {axes.map((axis) => (
+            <div key={axis.label} className="pb-axis">
+              <span>
+                {axis.label}: {axis.from}
+              </span>
+              <div className="pb-axis__bar" />
+              <span>{axis.to}</span>
+            </div>
+          ))}
+        </div>
+        <div className="pb-mode-detail" data-testid="mode-detail">
+          <strong>{copy.modes.items[active]!.title}</strong>
+          <p>{copy.modes.items[active]!.detail}</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function JourneySection(): ReactNode {
+  const { copy, locale, selectedModule, selectedModuleCode, setSelectedModuleCode, tModuleTitle, tRole } =
+    usePlayback();
+
+  const modulesByChapter = (chapter: JourneyChapter) =>
+    PLAYBACK_MODULES.filter((module) => module.chapter === chapter);
+
+  return (
+    <section id="journey" className="playback-section" data-testid="chapter-journey" aria-labelledby="journey-title">
+      <h2 id="journey-title" className="playback-section__title">
+        {copy.journey.title}
+      </h2>
+      <p className="playback-section__lead">{copy.journey.lead}</p>
+      <div className="pb-dual-strip" data-testid="dual-journey">
+        <div>
+          <strong>{copy.journey.enterpriseAxis}</strong>
+          <div>
+            {locale === "fr" ? selectedModule.enterpriseChapterFr : selectedModule.enterpriseChapterEn}
+          </div>
+        </div>
+        <div className="pb-dual-strip__arrow" aria-hidden="true">
+          →
+        </div>
+        <div>
+          <strong>{copy.journey.professionalAxis}</strong>
+          <div>
+            {locale === "fr" ? selectedModule.professionalStepFr : selectedModule.professionalStepEn}
+          </div>
+        </div>
+      </div>
+      <div className="pb-chapters">
+        {JOURNEY_CHAPTERS.map((chapter) => {
+          const modules = modulesByChapter(chapter.id);
+          const sample = modules[0]!;
+          return (
+            <div key={chapter.id} className="pb-chapter" data-testid={`chapter-${chapter.id}`}>
+              <div className="pb-chapter__head">
+                <h3>{locale === "fr" ? chapter.fr : chapter.en}</h3>
+                <div className="pb-chapter__axes">
+                  {(locale === "fr" ? sample.enterpriseChapterFr : sample.enterpriseChapterEn) +
+                    " → " +
+                    (locale === "fr" ? sample.professionalStepFr : sample.professionalStepEn)}
+                </div>
+              </div>
+              <div className="pb-module-grid">
+                {modules.map((module) => (
+                  <button
+                    key={module.code}
+                    type="button"
+                    className="pb-module-pill"
+                    aria-pressed={selectedModuleCode === module.code}
+                    data-testid={`module-${module.code}`}
+                    onClick={() => setSelectedModuleCode(module.code)}
+                  >
+                    <strong>
+                      {module.code} · {tModuleTitle(module)}
+                    </strong>
+                    <span>
+                      {(locale === "fr" ? module.enterpriseChapterFr : module.enterpriseChapterEn) +
+                        " → " +
+                        tRole(module.role)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <aside className="pb-journey-detail" data-testid="module-detail-panel" aria-live="polite">
+        <dl>
+          <div>
+            <dt>{copy.journey.detail.domain}</dt>
+            <dd>{locale === "fr" ? selectedModule.businessAreaFr : selectedModule.businessAreaEn}</dd>
+          </div>
+          <div>
+            <dt>{copy.journey.detail.role}</dt>
+            <dd>{tRole(selectedModule.role)}</dd>
+          </div>
+          <div>
+            <dt>{copy.journey.detail.process}</dt>
+            <dd>{locale === "fr" ? selectedModule.processFr : selectedModule.processEn}</dd>
+          </div>
+          <div>
+            <dt>{copy.journey.detail.mandate}</dt>
+            <dd>{locale === "fr" ? selectedModule.mandateFr : selectedModule.mandateEn}</dd>
+          </div>
+          <div>
+            <dt>{copy.journey.detail.stakeholders}</dt>
+            <dd>{selectedModule.stakeholderComplexity}</dd>
+          </div>
+          <div>
+            <dt>{copy.journey.detail.evidence}</dt>
+            <dd>{locale === "fr" ? selectedModule.evidenceFr : selectedModule.evidenceEn}</dd>
+          </div>
+          <div>
+            <dt>{copy.journey.detail.impact}</dt>
+            <dd>{locale === "fr" ? selectedModule.impactFr : selectedModule.impactEn}</dd>
+          </div>
+        </dl>
+      </aside>
+      <p data-testid="module-count" hidden>
+        {PLAYBACK_MODULES.length}
+      </p>
+    </section>
+  );
+}
+
+function ProcessSection(): ReactNode {
+  const { copy, locale } = usePlayback();
+  const [step, setStep] = useState(1);
+  const active = PROCESS_CHAIN_STEPS[step]!;
+  return (
+    <section id="process" className="playback-section" data-testid="process-teach" aria-labelledby="process-title">
+      <h2 id="process-title" className="playback-section__title">
+        {copy.process.title}
+      </h2>
+      <p className="playback-section__lead">{copy.process.lead}</p>
+      <div className="pb-process">
+        <div className="pb-process-layers">
+          <strong>{copy.process.documentFlow}</strong>
+          <div className="pb-process-row">
+            {PROCESS_CHAIN_STEPS.map((item, index) => (
+              <button
+                key={item.documentFr}
+                type="button"
+                className="pb-process-step"
+                aria-pressed={step === index}
+                data-testid={`process-step-${index}`}
+                onClick={() => setStep(index)}
+              >
+                {locale === "fr" ? item.documentFr : item.documentEn}
+              </button>
+            ))}
+          </div>
+          <strong>{copy.process.consequenceFlow}</strong>
+          <div className="pb-process-row">
+            {PROCESS_CHAIN_STEPS.map((item, index) => (
+              <button
+                key={item.consequenceFr}
+                type="button"
+                className="pb-process-step"
+                aria-pressed={step === index}
+                onClick={() => setStep(index)}
+              >
+                {locale === "fr" ? item.consequenceFr : item.consequenceEn}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="pb-process-active" data-testid="process-active">
+          <div>
+            <strong>{copy.process.activeDoc}</strong>
+            {locale === "fr" ? active.documentFr : active.documentEn}
+          </div>
+          <div>
+            <strong>{copy.process.activeStakeholder}</strong>
+            {locale === "fr" ? active.stakeholderFr : active.stakeholderEn}
+          </div>
+          <div>
+            <strong>{locale === "fr" ? "Conséquence" : "Consequence"}</strong>
+            {locale === "fr" ? active.consequenceFr : active.consequenceEn}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ImpactSection(): ReactNode {
+  const { copy } = usePlayback();
+  return (
+    <section id="impact" className="playback-section" data-testid="executive-impact-bi" aria-labelledby="impact-title">
+      <h2 id="impact-title" className="playback-section__title">
+        {copy.impact.title}
+      </h2>
+      <p className="playback-section__lead">{copy.impact.lead}</p>
+      <div className="pb-bi">
+        <div className="pb-bi__decision">
+          <span>{copy.impact.decision}</span>
+          <strong>{copy.impact.decisionValue}</strong>
+        </div>
+        <div className="pb-bi-grid">
+          {copy.impact.signals.map((signal) => (
+            <article key={signal.label} className="pb-signal" data-testid={`signal-${signal.label}`}>
+              <h3>{signal.label}</h3>
+              <div className="pb-signal__compare">
+                <del>
+                  {copy.impact.labels.baseline}: {signal.baseline}
+                </del>
+                <span>
+                  {copy.impact.labels.after}: {signal.next}
+                </span>
+              </div>
+              <svg className="pb-signal__spark" viewBox="0 0 100 28" aria-hidden="true">
+                <polyline
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  points="0,8 20,10 40,9 60,16 80,20 100,24"
+                />
+              </svg>
+              <dl>
+                <div>
+                  <dt>{copy.impact.labels.cause}</dt>
+                  <dd>{signal.cause}</dd>
+                </div>
+                <div>
+                  <dt>{copy.impact.labels.horizon}</dt>
+                  <dd>{signal.horizon}</dd>
+                </div>
+                <div>
+                  <dt>{copy.impact.labels.stakeholder}</dt>
+                  <dd>{signal.stakeholder}</dd>
+                </div>
+                <div>
+                  <dt>{copy.impact.labels.projection}</dt>
+                  <dd>{signal.confidence}</dd>
+                </div>
+              </dl>
+            </article>
+          ))}
+        </div>
+        <span className="playback-demo-tag">{copy.demoData}</span>
+      </div>
+    </section>
+  );
+}
+
+function AiSection(): ReactNode {
+  const { copy } = usePlayback();
+  return (
+    <section id="ai" className="playback-section" aria-labelledby="ai-title">
+      <div className="pb-ai-section" data-testid="ai-communication">
+        <h2 id="ai-title" className="playback-section__title">
+          {copy.ai.title}
+        </h2>
+        <p className="playback-section__lead">{copy.ai.lead}</p>
+        <div className="pb-ai-split">
+          <article className="pb-ai-card" data-testid="visible-ai">
+            <h3>{copy.ai.visibleTitle}</h3>
+            <p>{copy.ai.visibleBody}</p>
+          </article>
+          <article className="pb-ai-card pb-ai-card--ambient" data-testid="ambient-ai">
+            <h3>{copy.ai.ambientTitle}</h3>
+            <p>{copy.ai.ambientBody}</p>
+          </article>
+        </div>
+        <h3>{copy.ai.timelineTitle}</h3>
+        <div className="pb-ai-timeline" data-testid="ai-timeline">
+          {copy.ai.items.map((item) => (
+            <article key={`${item.time}-${item.classification}`} className="pb-ai-item" data-kind={item.kind}>
+              <time dateTime={item.time}>{item.time}</time>
+              <div>
+                <strong>{item.classification}</strong>
+                <p>{item.message}</p>
+                <div className="pb-ai-meta">
+                  <span>{item.source}</span>
+                  <span>{item.channel}</span>
+                  <span>{item.nature}</span>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ProfessorSection(): ReactNode {
+  const { copy } = usePlayback();
+  return (
+    <section id="professor" className="playback-section" aria-labelledby="professor-title">
+      <div className="pb-prof-section" data-testid="professor-orchestration">
+        <span className="pb-preview-badge">{copy.previewBadge}</span>
+        <h2 id="professor-title" className="playback-section__title">
+          {copy.professor.title}
+        </h2>
+        <p className="playback-section__lead">{copy.professor.lead}</p>
+        <div className="pb-classroom">
+          <div className="pb-classroom-board">
+            <p>
+              <strong>{copy.professor.classInProgress}</strong>
+            </p>
+            <p>{copy.professor.cohort}</p>
+            <p>{copy.professor.mandate}</p>
+            <div className="pb-decision-bars" aria-label={copy.professor.decisions}>
+              <div>
+                <span>Confirmer</span>
+                <i style={{ width: "70%" }} />
+                <span>11</span>
+              </div>
+              <div>
+                <span>Négocier</span>
+                <i style={{ width: "50%" }} />
+                <span>8</span>
+              </div>
+              <div>
+                <span>Replanifier</span>
+                <i style={{ width: "32%" }} />
+                <span>5</span>
+              </div>
+            </div>
+            <p>{copy.professor.misconception}</p>
+            <p>{copy.professor.simStatus}</p>
+            <p>{copy.professor.nextEvent}</p>
+            <p>{copy.professor.debrief}</p>
+            <p>{copy.professor.deck}</p>
+          </div>
+          <div className="pb-prof-controls">
+            {copy.professor.controls.map((label) => (
+              <button key={label} type="button" disabled title={copy.previewBadge}>
+                {label}
+                <div className="pb-preview-badge">{copy.previewBadge}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CapstoneSection(): ReactNode {
+  const { copy, locale } = usePlayback();
+  return (
+    <section id="capstone" className="playback-section" aria-labelledby="capstone-title">
+      <div className="pb-capstone" data-testid="capstone-culmination">
+        <div className="pb-capstone-badge">{copy.capstone.badge}</div>
+        <h2 id="capstone-title" className="playback-section__title">
+          {copy.capstone.title}
+        </h2>
+        <p>{copy.capstone.lead}</p>
+        <div className="pb-capstone-stages">
+          {CAPSTONE_STAGES.map((stage) => (
+            <span key={stage.id}>
+              {stage.id} · {locale === "fr" ? stage.fr : stage.en}
+            </span>
+          ))}
+        </div>
+        <div className="pb-capstone-meta">
+          <div>{copy.capstone.framing}</div>
+          <div>{copy.capstone.approval}</div>
+          <div>{copy.capstone.evidence}</div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function PortalPage(): ReactNode {
+  return (
+    <main className="playback-shell" data-testid="playback-portal">
+      <BrandHeader />
+      <HeroSection />
+      <EnterprisePulseMap />
+      <MissionsSection />
+      <ModesSection />
+      <JourneySection />
+      <ProcessSection />
+      <ImpactSection />
+      <AiSection />
+      <ProfessorSection />
+      <CapstoneSection />
+    </main>
   );
 }

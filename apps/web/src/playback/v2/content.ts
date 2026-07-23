@@ -1,675 +1,1205 @@
+/**
+ * Wave 2A Playback Zero — bilingual learner-facing copy (Revision 2).
+ * Professional French; no internal wave terminology in learner UI.
+ */
+
 export type PlaybackLocale = "fr" | "en";
 
 export interface PlaybackCopy {
   marker: string;
+  previewBadge: string;
+  demoData: string;
   nav: {
-    experience: string;
-    journey: string;
+    promise: string;
     enterprise: string;
-    biAi: string;
+    missions: string;
+    modes: string;
+    journey: string;
+    process: string;
+    impact: string;
+    ai: string;
+    professor: string;
     capstone: string;
     login: string;
   };
   hero: {
-    eyebrow: string;
+    kicker: string;
     title: string;
-    support: string;
-    primaryCta: string;
-    secondaryCta: string;
-    notLms: string;
+    subtitle: string;
+    ctaPrimary: string;
+    ctaSecondary: string;
+    previewTitle: string;
+    demandLabel: string;
+    demandValue: string;
+    processLabel: string;
+    processValue: string;
+    messageLabel: string;
+    messageValue: string;
+    impactLabel: string;
+    impactValue: string;
+    decisionLabel: string;
+    decisionValue: string;
   };
   enterprise: {
     title: string;
-    support: string;
-    hint: string;
+    lead: string;
+    twin: string;
+    engine: string;
+    selectHint: string;
+    flowLabel: string;
+    detail: {
+      person: string;
+      role: string;
+      process: string;
+      document: string;
+      situation: string;
+      message: string;
+      consequence: string;
+      kpi: string;
+      dependency: string;
+    };
+    nodes: Record<
+      string,
+      {
+        person: string;
+        role: string;
+        process: string;
+        document: string;
+        situation: string;
+        message: string;
+        consequence: string;
+        kpi: string;
+        dependency: string;
+      }
+    >;
   };
-  consulting: {
+  missions: {
     title: string;
-    support: string;
-    understand: string;
-    act: string;
-    advise: string;
-    m1Title: string;
-    m1Body: string;
-    m2Title: string;
-    m2Body: string;
-    m3Title: string;
-    m3Body: string;
+    lead: string;
+    chain: string;
+    items: { title: string; body: string; output: string }[];
   };
   modes: {
     title: string;
-    support: string;
-    exploration: { name: string; guidance: string; consequence: string; ai: string; evidence: string; score: string };
-    guided: { name: string; guidance: string; consequence: string; ai: string; evidence: string; score: string };
-    simulation: { name: string; guidance: string; consequence: string; ai: string; evidence: string; score: string };
-    evaluation: { name: string; guidance: string; consequence: string; ai: string; evidence: string; score: string };
+    lead: string;
+    axes: { help: string; autonomy: string; consequences: string; evidence: string };
+    continuum: { from: string; to: string }[];
+    items: { title: string; short: string; detail: string }[];
   };
   journey: {
     title: string;
-    support: string;
-    enterpriseLabel: string;
-    professionalLabel: string;
+    lead: string;
+    enterpriseAxis: string;
+    professionalAxis: string;
     selectHint: string;
-    business: string;
-    role: string;
-    process: string;
-    mandate: string;
-    stakeholders: string;
-    evidence: string;
-    impact: string;
+    detail: {
+      domain: string;
+      role: string;
+      process: string;
+      mandate: string;
+      stakeholders: string;
+      evidence: string;
+      impact: string;
+    };
   };
   process: {
     title: string;
-    support: string;
+    lead: string;
+    documentFlow: string;
+    consequenceFlow: string;
+    activeDoc: string;
+    activeStakeholder: string;
   };
   impact: {
     title: string;
-    support: string;
-    demoLabel: string;
-    baseline: string;
-    change: string;
-    cause: string;
-    timing: string;
-    stakeholder: string;
+    lead: string;
+    decision: string;
+    decisionValue: string;
+    signals: {
+      label: string;
+      baseline: string;
+      next: string;
+      cause: string;
+      horizon: string;
+      stakeholder: string;
+      confidence: string;
+    }[];
+    labels: {
+      cause: string;
+      horizon: string;
+      stakeholder: string;
+      projection: string;
+      baseline: string;
+      after: string;
+    };
   };
   ai: {
     title: string;
-    support: string;
+    lead: string;
     visibleTitle: string;
     visibleBody: string;
     ambientTitle: string;
     ambientBody: string;
-    chainTitle: string;
-    fact: string;
-    stakeholder: string;
-    coach: string;
-    projection: string;
+    timelineTitle: string;
+    items: {
+      source: string;
+      channel: string;
+      time: string;
+      message: string;
+      classification: string;
+      nature: string;
+      kind: "fact" | "stakeholder" | "ai" | "sim" | "risk";
+    }[];
   };
   professor: {
     title: string;
-    support: string;
-    previewLabel: string;
-    capabilities: string[];
+    lead: string;
+    classInProgress: string;
+    cohort: string;
+    mandate: string;
+    decisions: string;
+    misconception: string;
+    simStatus: string;
+    nextEvent: string;
+    debrief: string;
+    deck: string;
+    controls: string[];
   };
   capstone: {
     title: string;
-    support: string;
-    separate: string;
+    badge: string;
+    lead: string;
+    framing: string;
     approval: string;
-  };
-  cta: {
-    title: string;
-    support: string;
-    login: string;
-    explore: string;
+    evidence: string;
   };
   login: {
     title: string;
-    support: string;
+    lead: string;
     email: string;
     password: string;
     showPassword: string;
     hidePassword: string;
     submit: string;
     back: string;
-    prototypeNote: string;
-    demoEmail: string;
-    validationEmail: string;
-    validationPassword: string;
-    roleLearner: string;
-    roleProfessor: string;
+    signal: string;
+    promise: string;
   };
-  orientation: {
-    title: string;
-    where: string;
-    who: string;
-    mandate: string;
-    company: string;
-    next: string;
-    pulse: string;
-    evidence: string;
-    mode: string;
-    message: string;
+  cockpit: {
+    greeting: string;
+    role: string;
+    module: string;
+    classContext: string;
     professor: string;
-    continue: string;
-    backPortal: string;
+    mandateTitle: string;
+    situation: string;
+    decision: string;
+    cta: string;
+    pulseTitle: string;
+    inboxTitle: string;
+    evidenceTitle: string;
+    learningTitle: string;
+    mode: string;
+    progress: string;
+    capstoneNote: string;
+    evidenceStatus: string;
+    nextEvidence: string;
+    previewTitle: string;
+    previewLead: string;
+    previewClose: string;
   };
   controls: {
-    title: string;
     open: string;
     close: string;
+    title: string;
     locale: string;
     theme: string;
     viewport: string;
     level: string;
     module: string;
-    event: string;
-    screen: string;
-    light: string;
-    dark: string;
-    projector: string;
-    novice: string;
-    intermediate: string;
-    advanced: string;
+    ambient: string;
+    page: string;
+    branding: string;
+    brandingCollege: string;
+    brandingIndependent: string;
+    simRole: string;
+    pages: { portal: string; login: string; cockpit: string };
   };
-  nodes: Record<string, { role: string; process: string; document: string; consequence: string }>;
 }
 
-export const COPY: Record<PlaybackLocale, PlaybackCopy> = {
-  fr: {
-    marker: "PLAYBACK ZERO · NOT PRODUCTION",
-    nav: {
-      experience: "Expérience",
-      journey: "Parcours",
-      enterprise: "Entreprise",
-      biAi: "BI & IA",
-      capstone: "Capstone",
-      login: "Se connecter",
+const FR: PlaybackCopy = {
+  marker: "PLAYBACK ZERO · NOT PRODUCTION",
+  previewBadge: "APERÇU — NON IMPLÉMENTÉ",
+  demoData: "Données de démonstration",
+  nav: {
+    promise: "Promesse",
+    enterprise: "Entreprise",
+    missions: "Missions",
+    modes: "Modes",
+    journey: "Parcours",
+    process: "Processus",
+    impact: "Impact",
+    ai: "IA",
+    professor: "Professeur",
+    capstone: "Capstone",
+    login: "Connexion",
+  },
+  hero: {
+    kicker: "TEC.ERP · Digital Twin pédagogique",
+    title: "Entrez dans une entreprise vivante.\nDevenez analyste et consultant ERP.",
+    subtitle:
+      "Analysez les processus, exécutez des opérations ERP contrôlées, échangez avec les parties prenantes, observez les conséquences et défendez vos recommandations.",
+    ctaPrimary: "Commencer l’expérience",
+    ctaSecondary: "Explorer le parcours",
+    previewTitle: "Equinoxe · signal en cours",
+    demandLabel: "Demande client",
+    demandValue: "SO-1048 · 140 unités · échéance vendredi",
+    processLabel: "Processus",
+    processValue: "Ventes → Stock → Achats → Fournisseur",
+    messageLabel: "Message",
+    messageValue: "Fournisseur : +4 jours si quantité > 120",
+    impactLabel: "Impact",
+    impactValue: "OTIF 91 % → 86 %",
+    decisionLabel: "Décision",
+    decisionValue: "Confirmer 140, négocier 120 ou replanifier ?",
+  },
+  enterprise: {
+    title: "Equinoxe — carte du pouls de l’entreprise",
+    lead: "Le Digital Twin est le corps. Le moteur de vie de l’entreprise fait circuler messages, documents et KPI.",
+    twin: "Digital Twin — structure opérationnelle",
+    engine: "Moteur de vie — circulation et réaction",
+    selectHint: "Sélectionnez un nœud pour ouvrir le panneau opérationnel.",
+    flowLabel: "Flux actif : Client → Ventes → Stock → Achats → Fournisseur → Entrepôt → Finance → BI → Direction",
+    detail: {
+      person: "Responsable",
+      role: "Rôle",
+      process: "Processus actif",
+      document: "Document",
+      situation: "Situation",
+      message: "Message récent",
+      consequence: "Impact",
+      kpi: "KPI / risque",
+      dependency: "Dépendance suivante",
     },
-    hero: {
-      eyebrow: "TEC.ERP · Collège de la Concorde",
-      title: "Entrez dans une entreprise vivante.\nDevenez analyste et consultant ERP.",
-      support:
-        "Investigatez les processus, exécutez des actions ERP contrôlées, communiquez avec les parties prenantes, observez les conséquences et défendez vos recommandations.",
-      primaryCta: "Commencer l’expérience",
-      secondaryCta: "Explorer le parcours",
-      notLms: "Ce n’est pas un LMS. C’est une simulation professionnelle.",
-    },
-    enterprise: {
-      title: "Une entreprise persistante : Equinoxe",
-      support:
-        "Le même Digital Twin évolue du premier module au Capstone. Clients, ventes, stocks, achats, finance, HCM, gouvernance et BI restent connectés.",
-      hint: "Survolez ou sélectionnez un nœud pour voir rôle, processus, document et conséquence.",
-    },
-    consulting: {
-      title: "Vous travaillez par mandats de consultation",
-      support: "Chaque module contient trois missions distinctes — jamais trois tâches similaires.",
-      understand: "COMPRENDRE",
-      act: "AGIR",
-      advise: "CONSEILLER",
-      m1Title: "Mission 1 — Enquête et diagnostic",
-      m1Body: "Former une hypothèse, cartographier les preuves, cadrer le problème.",
-      m2Title: "Mission 2 — Intervention ERP et contrôle",
-      m2Body: "Exécuter sous contrôle et produire une preuve transactionnelle.",
-      m3Title: "Mission 3 — Conseil, récupération et décision",
-      m3Body: "Lire les conséquences, récupérer et défendre une recommandation.",
-    },
-    modes: {
-      title: "Quatre modes d’expérience",
-      support: "Le mode actif est toujours explicite. L’aide et les conséquences changent avec le mode.",
-      exploration: {
-        name: "Exploration",
-        guidance: "Orientation forte",
-        consequence: "Aucune mutation officielle",
-        ai: "Aide d’orientation",
-        evidence: "Orientative seulement",
-        score: "Sans score",
+    nodes: {
+      customers: {
+        person: "Nathalie Roy",
+        role: "Acheteuse client",
+        process: "Demande client",
+        document: "Demande · 140 u.",
+        situation: "Commande urgente pour vendredi",
+        message: "Pouvez-vous confirmer la disponibilité ?",
+        consequence: "Promesse sous pression",
+        kpi: "CSAT à risque",
+        dependency: "Confirmation ventes",
       },
-      guided: {
-        name: "Pratique guidée",
-        guidance: "Étapes et exemples",
-        consequence: "Voie d’entraînement bornée",
-        ai: "Soutien pédagogique borné",
-        evidence: "Séparée de la maîtrise officielle",
-        score: "Feedback, pas maîtrise finale",
+      sales: {
+        person: "Marc Tremblay",
+        role: "Directeur commercial",
+        process: "Order-to-Cash",
+        document: "SO-1048",
+        situation: "Promesse client à risque",
+        message: "Confirmation demandée avant 15 h",
+        consequence: "OTIF projeté −5 pts",
+        kpi: "OTIF 91 % → 86 %",
+        dependency: "Disponibilité fournisseur",
       },
-      simulation: {
-        name: "Simulation",
-        guidance: "Assistance limitée",
-        consequence: "Conséquences Twin persistantes",
-        ai: "Coach Visible · Ambient gouverné",
-        evidence: "Preuves officielles enregistrées",
-        score: "Jugement + preuves",
+      inventory: {
+        person: "Sofia Nguyen",
+        role: "Planificatrice stock",
+        process: "Allocation",
+        document: "Allocation famille A",
+        situation: "Stock famille A sous tension",
+        message: "Couverture insuffisante pour 140 u.",
+        consequence: "Besoin de réapprovisionnement",
+        kpi: "Couverture < 3 jours",
+        dependency: "Demande d’achat",
       },
-      evaluation: {
-        name: "Évaluation",
-        guidance: "Assistance restreinte",
-        consequence: "Environnement contrôlé",
-        ai: "Aide minimale",
-        evidence: "Preuves immuables",
-        score: "Séquence, diagnostic, jugement",
+      procurement: {
+        person: "Léa Martin",
+        role: "Acheteuse",
+        process: "Procure-to-Pay",
+        document: "Demande d’achat DA-77",
+        situation: "Quantité proposée 100 → 140",
+        message: "Fournisseur à solliciter immédiatement",
+        consequence: "Engagement coût et délai",
+        kpi: "Écart quantité +40 %",
+        dependency: "Réponse fournisseur",
+      },
+      suppliers: {
+        person: "NordLog Parts",
+        role: "Fournisseur",
+        process: "Confirmation délai",
+        document: "Confirmation partielle",
+        situation: "Capacité saturée",
+        message: "+4 jours si quantité > 120",
+        consequence: "Retard potentiel",
+        kpi: "Délai +4 j",
+        dependency: "Réception entrepôt",
+      },
+      warehouse: {
+        person: "Hugo Bélanger",
+        role: "Chef d’entrepôt",
+        process: "Réception / quai",
+        document: "Créneau quai Q-3",
+        situation: "Créneau vendredi saturé",
+        message: "Réception anticipée impossible sans réaffectation",
+        consequence: "Blocage logistique",
+        kpi: "Occupation quai 96 %",
+        dependency: "Finance / trésorerie",
+      },
+      finance: {
+        person: "Amira Benali",
+        role: "Contrôleuse financière",
+        process: "Record-to-Report",
+        document: "Engagement trésorerie",
+        situation: "Pression sur la trésorerie court terme",
+        message: "L’écart de quantité impacte le cash-flow de la semaine",
+        consequence: "Arbitrage coût / service",
+        kpi: "Trésorerie −12 k$",
+        dependency: "Lecture BI",
+      },
+      hcm: {
+        person: "Kim Lefebvre",
+        role: "Responsable HCM",
+        process: "Hire-to-Retire",
+        document: "Plan de capacité",
+        situation: "Équipe entrepôt en surcharge",
+        message: "Heures supplémentaires déjà maximales",
+        consequence: "Capacité humaine contrainte",
+        kpi: "Productivité −8 %",
+        dependency: "Gouvernance accès",
+      },
+      governance: {
+        person: "Paul Girard",
+        role: "Contrôle interne",
+        process: "Contrôles et accès",
+        document: "Alerte ségrégation",
+        situation: "Pression pour contourner un contrôle",
+        message: "Ne validez pas sans piste d’audit",
+        consequence: "Risque de conformité",
+        kpi: "Risque élevé",
+        dependency: "Décision BI",
+      },
+      bi: {
+        person: "Studio BI",
+        role: "Signal décisionnel",
+        process: "Data-to-Decision",
+        document: "Projection OTIF",
+        situation: "Dégradation service projetée",
+        message: "Trois scénarios disponibles pour la direction",
+        consequence: "Choix exécutif requis",
+        kpi: "Confiance projection 78 %",
+        dependency: "Direction",
+      },
+      management: {
+        person: "Direction Equinoxe",
+        role: "Comité opérationnel",
+        process: "Arbitrage exécutif",
+        document: "Décision à rendre",
+        situation: "Service vs coût vs risque",
+        message: "Quelle recommandation défendez-vous ?",
+        consequence: "Décision à documenter",
+        kpi: "Priorité : service client",
+        dependency: "Preuve consultante",
       },
     },
-    journey: {
-      title: "Parcours M1–M10 et identité professionnelle",
-      support: "Deux voyages simultanés : l’entreprise évolue, et votre rôle professionnel aussi.",
-      enterpriseLabel: "Évolution de l’entreprise",
-      professionalLabel: "Évolution professionnelle",
-      selectHint: "Sélectionnez un module",
-      business: "Domaine",
+  },
+  missions: {
+    title: "Trois missions de transformation",
+    lead: "Chaque mandat fait évoluer la production de l’apprenant : de l’hypothèse à la recommandation exécutive.",
+    chain: "Hypothèse → Preuve transactionnelle → Recommandation exécutive",
+    items: [
+      {
+        title: "Enquête et diagnostic",
+        body: "Recueillir des preuves, cartographier le flux et formuler une hypothèse testable.",
+        output: "Hypothèse fondée",
+      },
+      {
+        title: "Intervention ERP et contrôle",
+        body: "Exécuter des opérations contrôlées, produire des documents et franchir un point de contrôle.",
+        output: "Preuve transactionnelle",
+      },
+      {
+        title: "Conseil, récupération et décision",
+        body: "Lire les conséquences, comparer les alternatives et défendre une recommandation.",
+        output: "Recommandation exécutive",
+      },
+    ],
+  },
+  modes: {
+    title: "Continuum d’expérience",
+    lead: "L’aide diminue, l’autonomie augmente, les conséquences s’officialisent.",
+    axes: {
+      help: "Aide",
+      autonomy: "Autonomie",
+      consequences: "Conséquences",
+      evidence: "Preuves",
+    },
+    continuum: [
+      { from: "Forte", to: "Restreinte" },
+      { from: "Faible", to: "Élevée" },
+      { from: "Aucune mutation", to: "État officiel" },
+      { from: "Orientation", to: "Immuables" },
+    ],
+    items: [
+      {
+        title: "Exploration",
+        short: "Découvrir sans mutation",
+        detail: "Navigation sûre, orientation forte, preuves non officielles.",
+      },
+      {
+        title: "Pratique guidée",
+        short: "S’exercer avec filet",
+        detail: "Coach IA disponible, contrôles pédagogiques, erreurs récupérables.",
+      },
+      {
+        title: "Simulation",
+        short: "Décider sous tension",
+        detail: "État simulé mutable, parties prenantes actives, conséquences visibles.",
+      },
+      {
+        title: "Évaluation",
+        short: "Produire des preuves officielles",
+        detail: "IA restreinte, preuves immuables, jugement professoral.",
+      },
+    ],
+  },
+  journey: {
+    title: "Parcours M1–M10 · double évolution",
+    lead: "L’entreprise évolue. Le professionnel évolue. Capstone reste distinct — pas un onzième module.",
+    enterpriseAxis: "Évolution de l’entreprise",
+    professionalAxis: "Évolution professionnelle",
+    selectHint: "Sélectionnez un module pour le détail.",
+    detail: {
+      domain: "Domaine",
       role: "Rôle",
       process: "Processus",
       mandate: "Mandat",
       stakeholders: "Complexité parties prenantes",
-      evidence: "Preuves attendues",
-      impact: "Impacts",
+      evidence: "Preuves",
+      impact: "Impact",
     },
-    process: {
-      title: "Chaîne de bout en bout",
-      support: "Aucun module n’est isolé. Une demande client traverse ventes, stock, achats, finance, KPI et conseil.",
-    },
-    impact: {
-      title: "Impact exécutif — aperçu",
-      support: "Après une décision importante, le learner lit conséquences immédiates, processuelles, entreprise et temporelles.",
-      demoLabel: "APERÇU DE L’EXPÉRIENCE FUTURE · DONNÉES DE DÉMONSTRATION",
-      baseline: "Baseline",
-      change: "Variation",
+  },
+  process: {
+    title: "Processus de bout en bout",
+    lead: "Deux couches coordonnées : documents et conséquences d’affaires.",
+    documentFlow: "Flux documentaire",
+    consequenceFlow: "Flux de conséquences",
+    activeDoc: "Document actif",
+    activeStakeholder: "Partie prenante",
+  },
+  impact: {
+    title: "Impact exécutif",
+    lead: "Surface décisionnelle — pas une collection de cartes métriques.",
+    decision: "Décision",
+    decisionValue: "Quantité proposée portée de 100 à 140 unités",
+    signals: [
+      {
+        label: "OTIF",
+        baseline: "91 %",
+        next: "86 %",
+        cause: "Délai fournisseur +4 j",
+        horizon: "Cette semaine",
+        stakeholder: "Ventes / Client",
+        confidence: "Projection 78 %",
+      },
+      {
+        label: "Stock",
+        baseline: "Couverture 4 j",
+        next: "Couverture 2 j",
+        cause: "Allocation famille A",
+        horizon: "Immédiat",
+        stakeholder: "Planification",
+        confidence: "Mesure système",
+      },
+      {
+        label: "Marge",
+        baseline: "18,2 %",
+        next: "16,9 %",
+        cause: "Surcoût accélération",
+        horizon: "Cycle commande",
+        stakeholder: "Finance",
+        confidence: "Projection 72 %",
+      },
+      {
+        label: "Trésorerie",
+        baseline: "Planifiée",
+        next: "−12 k$",
+        cause: "Quantité du bon de commande +40 %",
+        horizon: "7 jours",
+        stakeholder: "Trésorerie",
+        confidence: "Projection 80 %",
+      },
+      {
+        label: "CSAT",
+        baseline: "Stable",
+        next: "Sous tension",
+        cause: "Promesse vendredi",
+        horizon: "Après livraison",
+        stakeholder: "Service client",
+        confidence: "Qualitatif",
+      },
+      {
+        label: "Risque",
+        baseline: "Modéré",
+        next: "Élevé",
+        cause: "Pression de contournement",
+        horizon: "Contrôle",
+        stakeholder: "Gouvernance",
+        confidence: "Alerte contrôle",
+      },
+    ],
+    labels: {
       cause: "Cause",
-      timing: "Horizon",
+      horizon: "Horizon",
       stakeholder: "Partie prenante",
+      projection: "Projection",
+      baseline: "Référence",
+      after: "Après",
     },
-    ai: {
-      title: "Deux formes d’IA, clairement distinctes",
-      support: "L’IA soutient le jugement. Elle ne le remplace pas. Le Twin reste la source de vérité.",
-      visibleTitle: "IA Visible — coach de raisonnement",
-      visibleBody: "Explique, questionne, expose les lacunes, compare des alternatives, exige votre synthèse.",
-      ambientTitle: "IA Ambient — vie de l’entreprise",
-      ambientBody: "Donne une voix gouvernée aux parties prenantes : fournisseur, entrepôt, finance, superviseur.",
-      chainTitle: "Chaîne représentative (contenu rédigé)",
-      fact: "Fait système",
-      stakeholder: "Message partie prenante",
-      coach: "Coach IA",
-      projection: "Projection simulée",
-    },
-    professor: {
-      title: "Le Professor reste central",
-      support: "TEC.ERP amplifie l’enseignement. Il ne réduit pas le Professor à un administrateur de scores.",
-      previewLabel: "APERÇU — non implémenté",
-      capabilities: [
-        "Présenter et démontrer",
-        "Mettre en pause la simulation",
-        "Déclencher un événement",
-        "Observer et comparer",
-        "Questionner et débriefer",
-        "Valider la progression",
-      ],
-    },
-    capstone: {
-      title: "Capstone — engagement culminant",
-      support: "Hors de M1–M10. Diagnostiquer, analyser, utiliser BI et IA de façon responsable, défendre une recommandation.",
-      separate: "Capstone distinct · pas M11",
-      approval: "Approbation Professor requise · pas d’approbation automatique",
-    },
-    cta: {
-      title: "Prêt à entrer dans Equinoxe ?",
-      support: "Connectez-vous pour l’orientation initiale — prototype local, hors production.",
-      login: "Ouvrir la connexion prototype",
-      explore: "Revenir à l’entreprise",
-    },
-    login: {
-      title: "Connexion à TEC.ERP",
-      support: "Simulation professionnelle Equinoxe · Collège de la Concorde",
-      email: "Adresse courriel",
-      password: "Mot de passe",
-      showPassword: "Afficher le mot de passe",
-      hidePassword: "Masquer le mot de passe",
-      submit: "Entrer dans l’orientation",
-      back: "Retour au portail",
-      prototypeNote: "Données de démonstration — non connectées à l’authentification production.",
-      demoEmail: "analyste.demo@playback.tec-erp.local",
-      validationEmail: "Indiquez une adresse courriel valide.",
-      validationPassword: "Le mot de passe est requis dans ce prototype.",
-      roleLearner: "Apprenant",
-      roleProfessor: "Professor",
-    },
-    orientation: {
-      title: "Orientation initiale",
-      where: "Où suis-je ?",
-      who: "Qui suis-je ?",
-      mandate: "Quel est mon mandat ?",
-      company: "Où en est l’entreprise ?",
-      next: "Que dois-je faire maintenant ?",
-      pulse: "Pouls d’Equinoxe",
-      evidence: "État des preuves",
-      mode: "Mode d’apprentissage",
-      message: "Message partie prenante",
-      professor: "Contexte de classe",
-      continue: "Continuer vers le parcours (Wave 3)",
-      backPortal: "Retour au portail",
-    },
-    controls: {
-      title: "Contrôles Playback",
-      open: "Contrôles",
-      close: "Fermer",
-      locale: "Langue",
-      theme: "Apparence",
-      viewport: "Viewport",
-      level: "Niveau learner",
-      module: "Module",
-      event: "Événement Ambient",
-      screen: "Écran",
-      light: "Clair",
-      dark: "Sombre",
-      projector: "Projecteur",
-      novice: "Novice",
-      intermediate: "Intermédiaire",
-      advanced: "Avancé",
+  },
+  ai: {
+    title: "IA visible et IA ambiante",
+    lead: "Même intelligence, deux postures : coach explicite et communication d’entreprise gouvernée.",
+    visibleTitle: "IA visible",
+    visibleBody: "Coach pédagogique explicite. Oriente, ne répond pas à la place de l’apprenant.",
+    ambientTitle: "IA ambiante",
+    ambientBody: "Messages d’entreprise gouvernés : fournisseur, entrepôt, finance, supervision.",
+    timelineTitle: "Flux de communication",
+    items: [
+      {
+        source: "Système ERP",
+        channel: "Événement système",
+        time: "08:12",
+        message: "SO-1048 créée · 140 unités · échéance vendredi",
+        classification: "Fait du système",
+        nature: "Factuel",
+        kind: "fact",
+      },
+      {
+        source: "NordLog Parts",
+        channel: "Message fournisseur",
+        time: "09:04",
+        message: "+4 jours si quantité > 120",
+        classification: "Message du fournisseur",
+        nature: "Factuel (partie prenante)",
+        kind: "stakeholder",
+      },
+      {
+        source: "Entrepôt Equinoxe",
+        channel: "Alerte opérationnelle",
+        time: "09:18",
+        message: "Créneau quai vendredi saturé",
+        classification: "Alerte de l’entrepôt",
+        nature: "Factuel",
+        kind: "risk",
+      },
+      {
+        source: "Contrôle financier",
+        channel: "Avertissement",
+        time: "09:41",
+        message: "Engagement trésorerie hors plan de la semaine",
+        classification: "Avertissement financier",
+        nature: "Factuel",
+        kind: "risk",
+      },
+      {
+        source: "Superviseure",
+        channel: "Question managériale",
+        time: "10:02",
+        message: "Quelle option défendez-vous avant 15 h ?",
+        classification: "Question du superviseur",
+        nature: "Factuel",
+        kind: "stakeholder",
+      },
+      {
+        source: "Coach IA",
+        channel: "IA visible",
+        time: "10:05",
+        message: "Quelles preuves manquent encore avant de recommander ?",
+        classification: "Coach IA",
+        nature: "Pédagogique (non factuel)",
+        kind: "ai",
+      },
+      {
+        source: "Simulation",
+        channel: "Projection",
+        time: "10:06",
+        message: "Scénario 140 u. : OTIF 86 %, trésorerie −12 k$",
+        classification: "Projection simulée",
+        nature: "Simulé",
+        kind: "sim",
+      },
+    ],
+  },
+  professor: {
+    title: "Orchestration professorale",
+    lead: "Le professeur reste l’autorité pédagogique : rythme, événements, comparaison, débrief.",
+    classInProgress: "Cohorte Equinoxe · séance en cours",
+    cohort: "24 apprenants",
+    mandate: "Mandat actif : SO-1048 sous tension",
+    decisions: "Décisions : 11 confirmer · 8 négocier · 5 replanifier",
+    misconception: "Idée fausse fréquente : « augmenter la quantité du bon de commande résout toujours le service »",
+    simStatus: "Simulation : active · pause disponible",
+    nextEvent: "Prochain événement : alerte quai",
+    debrief: "Question de débrief : Quel KPI doit primer ici ?",
+    deck: "Teaching Deck : prêt (aperçu)",
+    controls: [
+      "Mettre en pause",
+      "Déclencher l’événement",
+      "Comparer les décisions",
+      "Ouvrir le débrief",
+      "Afficher une preuve",
+    ],
+  },
+  capstone: {
+    title: "Capstone — engagement final de conseil",
+    badge: "Capstone distinct · pas M11",
+    lead: "Après M1–M10 : diagnostic, crise, feuille de route et défense devant un jury.",
+    framing: "Engagement exécutif · preuves · défense",
+    approval: "Approbation professorale requise",
+    evidence: "Dossier de preuves + recommandation défendue",
+  },
+  login: {
+    title: "Connexion",
+    lead: "Poursuivez vers votre mandat actif dans Equinoxe.",
+    email: "Adresse courriel",
+    password: "Mot de passe",
+    showPassword: "Afficher le mot de passe",
+    hidePassword: "Masquer le mot de passe",
+    submit: "Entrer dans Equinoxe",
+    back: "Retour au portail",
+    signal: "Signal actuel : SO-1048 · OTIF sous tension",
+    promise: "De l’enquête au conseil exécutif — dans une entreprise qui réagit.",
+  },
+  cockpit: {
+    greeting: "Bonjour Camille",
+    role: "Analyste junior · Mandat de diagnostic",
+    module: "M1 · Entreprise intégrée et processus",
+    classContext: "Cohorte Equinoxe · Groupe A",
+    professor: "Professeur disponible",
+    mandateTitle: "Mandat actif",
+    situation:
+      "Equinoxe reçoit une demande client urgente (140 unités). Le stock famille A est sous tension et le fournisseur signale un délai.",
+    decision: "Votre enquête doit établir ce qui menace la promesse client — avant toute intervention.",
+    cta: "Commencer l’enquête",
+    pulseTitle: "Pouls de l’entreprise",
+    inboxTitle: "Boîte de réception",
+    evidenceTitle: "Preuves du mandat",
+    learningTitle: "Contexte d’apprentissage",
+    mode: "Mode : Pratique guidée",
+    progress: "Progression M1 / M10",
+    capstoneNote: "Capstone distinct — hors M1–M10",
+    evidenceStatus: "0 / 3 preuves collectées",
+    nextEvidence: "Prochaine preuve : carte du processus Order-to-Cash",
+    previewTitle: "Mission 1 — Enquête et diagnostic",
+    previewLead:
+      "Aperçu sécurisé du mandat. L’expérience complète de mission sera disponible dans une prochaine livraison produit.",
+    previewClose: "Fermer l’aperçu",
+  },
+  controls: {
+    open: "Contrôles de lecture",
+    close: "Fermer",
+    title: "Contrôles Playback Zero",
+    locale: "Langue",
+    theme: "Thème",
+    viewport: "Viewport",
+    level: "Niveau apprenant",
+    module: "Module",
+    ambient: "Événement partie prenante",
+    page: "Page",
+    branding: "Identité institutionnelle",
+    brandingCollege: "Collège de la Concorde",
+    brandingIndependent: "TEC.ERP indépendant",
+    simRole: "Rôle simulé (contrôle)",
+    pages: { portal: "Portail", login: "Connexion", cockpit: "Cockpit de mission" },
+  },
+};
+
+const EN: PlaybackCopy = {
+  ...FR,
+  marker: "PLAYBACK ZERO · NOT PRODUCTION",
+  previewBadge: "PREVIEW — NOT IMPLEMENTED",
+  demoData: "Demonstration data",
+  nav: {
+    promise: "Promise",
+    enterprise: "Enterprise",
+    missions: "Missions",
+    modes: "Modes",
+    journey: "Journey",
+    process: "Process",
+    impact: "Impact",
+    ai: "AI",
+    professor: "Professor",
+    capstone: "Capstone",
+    login: "Sign in",
+  },
+  hero: {
+    kicker: "TEC.ERP · Pedagogical Digital Twin",
+    title: "Enter a living enterprise.\nBecome an ERP analyst and consultant.",
+    subtitle:
+      "Analyze processes, execute controlled ERP operations, engage stakeholders, observe consequences, and defend your recommendations.",
+    ctaPrimary: "Start the experience",
+    ctaSecondary: "Explore the journey",
+    previewTitle: "Equinoxe · live signal",
+    demandLabel: "Customer demand",
+    demandValue: "SO-1048 · 140 units · due Friday",
+    processLabel: "Process",
+    processValue: "Sales → Inventory → Procurement → Supplier",
+    messageLabel: "Message",
+    messageValue: "Supplier: +4 days if quantity > 120",
+    impactLabel: "Impact",
+    impactValue: "OTIF 91% → 86%",
+    decisionLabel: "Decision",
+    decisionValue: "Confirm 140, negotiate 120, or reschedule?",
+  },
+  enterprise: {
+    title: "Equinoxe — enterprise pulse map",
+    lead: "The Digital Twin is the body. The Enterprise Life Engine circulates messages, documents, and KPIs.",
+    twin: "Digital Twin — operating structure",
+    engine: "Life Engine — circulation and reaction",
+    selectHint: "Select a node to open the operational panel.",
+    flowLabel: "Active flow: Customer → Sales → Inventory → Procurement → Supplier → Warehouse → Finance → BI → Management",
+    detail: {
+      person: "Owner",
+      role: "Role",
+      process: "Active process",
+      document: "Document",
+      situation: "Situation",
+      message: "Recent message",
+      consequence: "Impact",
+      kpi: "KPI / risk",
+      dependency: "Next dependency",
     },
     nodes: {
       customers: {
-        role: "Client clé",
-        process: "Lead-to-Cash / Service",
-        document: "Commande · réclamation",
-        consequence: "Satisfaction · revenu",
+        person: "Nathalie Roy",
+        role: "Customer buyer",
+        process: "Customer demand",
+        document: "Request · 140 u.",
+        situation: "Urgent Friday order",
+        message: "Can you confirm availability?",
+        consequence: "Promise under pressure",
+        kpi: "CSAT at risk",
+        dependency: "Sales confirmation",
       },
       sales: {
-        role: "Vendeur",
+        person: "Marc Tremblay",
+        role: "Sales director",
         process: "Order-to-Cash",
-        document: "Bon de commande vente",
-        consequence: "Promesse client",
+        document: "SO-1048",
+        situation: "Customer promise at risk",
+        message: "Confirmation needed before 3 p.m.",
+        consequence: "Projected OTIF −5 pts",
+        kpi: "OTIF 91% → 86%",
+        dependency: "Supplier availability",
       },
       inventory: {
-        role: "Planificateur stock",
-        process: "Allocation / réappro",
-        document: "Mouvement de stock",
-        consequence: "OTIF · rupture",
+        person: "Sofia Nguyen",
+        role: "Inventory planner",
+        process: "Allocation",
+        document: "Family A allocation",
+        situation: "Family A stock under tension",
+        message: "Coverage insufficient for 140 units",
+        consequence: "Replenishment required",
+        kpi: "Coverage < 3 days",
+        dependency: "Purchase requisition",
       },
       procurement: {
-        role: "Acheteur",
+        person: "Léa Martin",
+        role: "Buyer",
         process: "Procure-to-Pay",
-        document: "Bon de commande",
-        consequence: "Délai fournisseur · coût",
+        document: "PR DA-77",
+        situation: "Proposed quantity 100 → 140",
+        message: "Supplier must be contacted now",
+        consequence: "Cost and lead-time commitment",
+        kpi: "Quantity variance +40%",
+        dependency: "Supplier response",
       },
       suppliers: {
-        role: "Fournisseur",
-        process: "Réponse / livraison",
-        document: "Confirmation · ASN",
-        consequence: "OTIF · risque appro",
+        person: "NordLog Parts",
+        role: "Supplier",
+        process: "Lead-time confirmation",
+        document: "Partial confirmation",
+        situation: "Capacity saturated",
+        message: "+4 days if quantity > 120",
+        consequence: "Potential delay",
+        kpi: "Lead time +4 days",
+        dependency: "Warehouse receipt",
       },
       warehouse: {
-        role: "Réceptionnaire",
-        process: "Réception / capacité",
-        document: "Bon de réception",
-        consequence: "Capacité · écart",
+        person: "Hugo Bélanger",
+        role: "Warehouse lead",
+        process: "Receipt / dock",
+        document: "Dock slot Q-3",
+        situation: "Friday dock slot saturated",
+        message: "Early receipt impossible without reassignment",
+        consequence: "Logistics block",
+        kpi: "Dock occupancy 96%",
+        dependency: "Finance / cash",
       },
       finance: {
-        role: "Contrôleur",
-        process: "Facture / paiement / R2R",
-        document: "Facture · écriture",
-        consequence: "Cash · marge",
+        person: "Amira Benali",
+        role: "Financial controller",
+        process: "Record-to-Report",
+        document: "Cash commitment",
+        situation: "Short-term cash pressure",
+        message: "Quantity variance hits this week’s cash-flow",
+        consequence: "Cost / service trade-off",
+        kpi: "Cash −12k",
+        dependency: "BI reading",
       },
       hcm: {
-        role: "RH / superviseur",
+        person: "Kim Lefebvre",
+        role: "HCM lead",
         process: "Hire-to-Retire",
-        document: "Dossier employé",
-        consequence: "Capacité humaine",
+        document: "Capacity plan",
+        situation: "Warehouse team overloaded",
+        message: "Overtime already at maximum",
+        consequence: "Human capacity constrained",
+        kpi: "Productivity −8%",
+        dependency: "Access governance",
       },
       governance: {
-        role: "Auditeur / conformité",
-        process: "Contrôles / SoD",
-        document: "Constat d’audit",
-        consequence: "Risque · accès",
+        person: "Paul Girard",
+        role: "Internal control",
+        process: "Controls and access",
+        document: "Segregation alert",
+        situation: "Pressure to bypass a control",
+        message: "Do not approve without an audit trail",
+        consequence: "Compliance risk",
+        kpi: "High risk",
+        dependency: "BI decision",
       },
       bi: {
-        role: "Analyste décision",
+        person: "BI Studio",
+        role: "Decision signal",
         process: "Data-to-Decision",
-        document: "Rapport KPI",
-        consequence: "Recommandation",
+        document: "OTIF projection",
+        situation: "Projected service degradation",
+        message: "Three scenarios ready for management",
+        consequence: "Executive choice required",
+        kpi: "Projection confidence 78%",
+        dependency: "Management",
       },
       management: {
-        role: "Sponsor exécutif",
-        process: "Comité / arbitrage",
-        document: "Synthèse exécutive",
-        consequence: "Décision · priorité",
+        person: "Equinoxe leadership",
+        role: "Operations committee",
+        process: "Executive trade-off",
+        document: "Decision pending",
+        situation: "Service vs cost vs risk",
+        message: "Which recommendation do you defend?",
+        consequence: "Decision to document",
+        kpi: "Priority: customer service",
+        dependency: "Consultant evidence",
       },
     },
   },
-  en: {
-    marker: "PLAYBACK ZERO · NOT PRODUCTION",
-    nav: {
-      experience: "Experience",
-      journey: "Journey",
-      enterprise: "Enterprise",
-      biAi: "BI & AI",
-      capstone: "Capstone",
-      login: "Sign in",
-    },
-    hero: {
-      eyebrow: "TEC.ERP · Collège de la Concorde",
-      title: "Enter a living enterprise.\nBecome an ERP analyst and consultant.",
-      support:
-        "Investigate processes, execute controlled ERP actions, communicate with stakeholders, observe business consequences and defend recommendations.",
-      primaryCta: "Start the experience",
-      secondaryCta: "Explore the journey",
-      notLms: "This is not an LMS. It is a professional simulation.",
-    },
-    enterprise: {
-      title: "One persistent enterprise: Equinoxe",
-      support:
-        "The same Digital Twin evolves from the first module to Capstone. Customers, sales, inventory, procurement, finance, HCM, governance and BI stay connected.",
-      hint: "Hover or select a node to reveal role, process, document and consequence.",
-    },
-    consulting: {
-      title: "You work through consulting mandates",
-      support: "Each module has three distinct missions — never three similar tasks.",
-      understand: "UNDERSTAND",
-      act: "ACT",
-      advise: "ADVISE",
-      m1Title: "Mission 1 — Investigation and diagnosis",
-      m1Body: "Form a hypothesis, map evidence, frame the problem.",
-      m2Title: "Mission 2 — ERP intervention and control",
-      m2Body: "Execute under control and produce transactional proof.",
-      m3Title: "Mission 3 — Advice, recovery and decision",
-      m3Body: "Read consequences, recover and defend a recommendation.",
-    },
-    modes: {
-      title: "Four experience modes",
-      support: "The active mode is always explicit. Help and consequences change with the mode.",
-      exploration: {
-        name: "Exploration",
-        guidance: "Strong orientation",
-        consequence: "No official mutation",
-        ai: "Orienting help",
-        evidence: "Orienting only",
-        score: "No scoring",
+  missions: {
+    title: "Three transformation missions",
+    lead: "Each mandate evolves the learner’s output: from hypothesis to executive recommendation.",
+    chain: "Hypothesis → Transactional evidence → Executive recommendation",
+    items: [
+      {
+        title: "Inquiry and diagnosis",
+        body: "Gather evidence, map the flow, and form a testable hypothesis.",
+        output: "Grounded hypothesis",
       },
-      guided: {
-        name: "Guided practice",
-        guidance: "Steps and examples",
-        consequence: "Bounded practice lane",
-        ai: "Bounded instructional support",
-        evidence: "Separated from official mastery",
-        score: "Feedback, not final mastery",
+      {
+        title: "ERP intervention and control",
+        body: "Execute controlled operations, produce documents, and pass a control checkpoint.",
+        output: "Transactional evidence",
       },
-      simulation: {
-        name: "Simulation",
-        guidance: "Limited assistance",
-        consequence: "Persistent Twin consequences",
-        ai: "Visible coach · governed Ambient",
-        evidence: "Official evidence recorded",
-        score: "Judgment + evidence",
+      {
+        title: "Advice, recovery and decision",
+        body: "Read consequences, compare alternatives, and defend a recommendation.",
+        output: "Executive recommendation",
       },
-      evaluation: {
-        name: "Evaluation",
-        guidance: "Restricted assistance",
-        consequence: "Controlled environment",
-        ai: "Minimal help",
-        evidence: "Immutable evidence",
-        score: "Sequence, diagnosis, judgment",
-      },
+    ],
+  },
+  modes: {
+    title: "Experience continuum",
+    lead: "Guidance decreases, autonomy rises, consequences become official.",
+    axes: {
+      help: "Help",
+      autonomy: "Autonomy",
+      consequences: "Consequences",
+      evidence: "Evidence",
     },
-    journey: {
-      title: "M1–M10 journey and professional identity",
-      support: "Two journeys at once: the company evolves, and so does your professional role.",
-      enterpriseLabel: "Enterprise evolution",
-      professionalLabel: "Professional evolution",
-      selectHint: "Select a module",
-      business: "Business area",
+    continuum: [
+      { from: "Strong", to: "Restricted" },
+      { from: "Low", to: "High" },
+      { from: "No mutation", to: "Official state" },
+      { from: "Orientation", to: "Immutable" },
+    ],
+    items: [
+      {
+        title: "Exploration",
+        short: "Discover without mutation",
+        detail: "Safe navigation, strong guidance, non-official evidence.",
+      },
+      {
+        title: "Guided practice",
+        short: "Practice with a safety net",
+        detail: "AI coach available, pedagogical controls, recoverable mistakes.",
+      },
+      {
+        title: "Simulation",
+        short: "Decide under tension",
+        detail: "Mutable simulated state, active stakeholders, visible consequences.",
+      },
+      {
+        title: "Evaluation",
+        short: "Produce official evidence",
+        detail: "Restricted AI, immutable evidence, professor judgment.",
+      },
+    ],
+  },
+  journey: {
+    title: "M1–M10 journey · dual evolution",
+    lead: "The enterprise evolves. The professional evolves. Capstone stays distinct — not an eleventh module.",
+    enterpriseAxis: "Enterprise evolution",
+    professionalAxis: "Professional evolution",
+    selectHint: "Select a module for detail.",
+    detail: {
+      domain: "Domain",
       role: "Role",
       process: "Process",
       mandate: "Mandate",
       stakeholders: "Stakeholder complexity",
-      evidence: "Expected evidence",
-      impact: "Impacts",
-    },
-    process: {
-      title: "End-to-end process chain",
-      support: "No module is isolated. Customer demand flows through sales, inventory, procurement, finance, KPIs and advice.",
-    },
-    impact: {
-      title: "Executive impact — preview",
-      support: "After an important decision, the learner reads immediate, process, enterprise and delayed consequences.",
-      demoLabel: "FUTURE EXPERIENCE PREVIEW · DEMONSTRATION DATA",
-      baseline: "Baseline",
-      change: "Change",
-      cause: "Cause",
-      timing: "Horizon",
-      stakeholder: "Stakeholder",
-    },
-    ai: {
-      title: "Two forms of AI, clearly distinct",
-      support: "AI supports judgment. It does not replace it. The Twin remains the source of truth.",
-      visibleTitle: "Visible AI — reasoning coach",
-      visibleBody: "Explains, questions, exposes gaps, compares alternatives, requires your synthesis.",
-      ambientTitle: "Ambient AI — enterprise life",
-      ambientBody: "Gives governed voice to stakeholders: supplier, warehouse, finance, supervisor.",
-      chainTitle: "Representative chain (authored content)",
-      fact: "System fact",
-      stakeholder: "Stakeholder message",
-      coach: "AI coach",
-      projection: "Simulated projection",
-    },
-    professor: {
-      title: "The Professor remains central",
-      support: "TEC.ERP amplifies teaching. It does not reduce the Professor to a score administrator.",
-      previewLabel: "PREVIEW — not implemented",
-      capabilities: [
-        "Present and demonstrate",
-        "Pause the simulation",
-        "Trigger an event",
-        "Observe and compare",
-        "Question and debrief",
-        "Validate progression",
-      ],
-    },
-    capstone: {
-      title: "Capstone — culminating engagement",
-      support: "Outside M1–M10. Diagnose, analyze, use BI and AI responsibly, defend a recommendation.",
-      separate: "Separate Capstone · not M11",
-      approval: "Professor approval required · no automatic approval",
-    },
-    cta: {
-      title: "Ready to enter Equinoxe?",
-      support: "Sign in for initial orientation — local prototype, outside production.",
-      login: "Open prototype login",
-      explore: "Back to the enterprise",
-    },
-    login: {
-      title: "Sign in to TEC.ERP",
-      support: "Equinoxe professional simulation · Collège de la Concorde",
-      email: "Email address",
-      password: "Password",
-      showPassword: "Show password",
-      hidePassword: "Hide password",
-      submit: "Enter orientation",
-      back: "Back to portal",
-      prototypeNote: "Demonstration data — not connected to production authentication.",
-      demoEmail: "analyste.demo@playback.tec-erp.local",
-      validationEmail: "Enter a valid email address.",
-      validationPassword: "Password is required in this prototype.",
-      roleLearner: "Learner",
-      roleProfessor: "Professor",
-    },
-    orientation: {
-      title: "Initial orientation",
-      where: "Where am I?",
-      who: "Who am I?",
-      mandate: "What is my mandate?",
-      company: "What is the company state?",
-      next: "What should I do now?",
-      pulse: "Equinoxe pulse",
-      evidence: "Evidence status",
-      mode: "Learning mode",
-      message: "Stakeholder message",
-      professor: "Class context",
-      continue: "Continue to journey (Wave 3)",
-      backPortal: "Back to portal",
-    },
-    controls: {
-      title: "Playback controls",
-      open: "Controls",
-      close: "Close",
-      locale: "Language",
-      theme: "Appearance",
-      viewport: "Viewport",
-      level: "Learner level",
-      module: "Module",
-      event: "Ambient event",
-      screen: "Screen",
-      light: "Light",
-      dark: "Dark",
-      projector: "Projector",
-      novice: "Novice",
-      intermediate: "Intermediate",
-      advanced: "Advanced",
-    },
-    nodes: {
-      customers: {
-        role: "Key customer",
-        process: "Lead-to-Cash / Service",
-        document: "Order · complaint",
-        consequence: "Satisfaction · revenue",
-      },
-      sales: {
-        role: "Salesperson",
-        process: "Order-to-Cash",
-        document: "Sales order",
-        consequence: "Customer promise",
-      },
-      inventory: {
-        role: "Inventory planner",
-        process: "Allocation / replenishment",
-        document: "Stock movement",
-        consequence: "OTIF · stockout",
-      },
-      procurement: {
-        role: "Buyer",
-        process: "Procure-to-Pay",
-        document: "Purchase order",
-        consequence: "Supplier lead time · cost",
-      },
-      suppliers: {
-        role: "Supplier",
-        process: "Response / delivery",
-        document: "Confirmation · ASN",
-        consequence: "OTIF · supply risk",
-      },
-      warehouse: {
-        role: "Receiver",
-        process: "Receipt / capacity",
-        document: "Goods receipt",
-        consequence: "Capacity · variance",
-      },
-      finance: {
-        role: "Controller",
-        process: "Invoice / payment / R2R",
-        document: "Invoice · posting",
-        consequence: "Cash · margin",
-      },
-      hcm: {
-        role: "HR / supervisor",
-        process: "Hire-to-Retire",
-        document: "Employee record",
-        consequence: "Workforce capacity",
-      },
-      governance: {
-        role: "Auditor / compliance",
-        process: "Controls / SoD",
-        document: "Audit finding",
-        consequence: "Risk · access",
-      },
-      bi: {
-        role: "Decision analyst",
-        process: "Data-to-Decision",
-        document: "KPI report",
-        consequence: "Recommendation",
-      },
-      management: {
-        role: "Executive sponsor",
-        process: "Committee / arbitration",
-        document: "Executive synthesis",
-        consequence: "Decision · priority",
-      },
+      evidence: "Evidence",
+      impact: "Impact",
     },
   },
+  process: {
+    title: "End-to-end process",
+    lead: "Two coordinated layers: documents and business consequences.",
+    documentFlow: "Document flow",
+    consequenceFlow: "Consequence flow",
+    activeDoc: "Active document",
+    activeStakeholder: "Stakeholder",
+  },
+  impact: {
+    title: "Executive impact",
+    lead: "Decision surface — not a metric-card collection.",
+    decision: "Decision",
+    decisionValue: "Proposed quantity raised from 100 to 140 units",
+    signals: [
+      {
+        label: "OTIF",
+        baseline: "91%",
+        next: "86%",
+        cause: "Supplier lead time +4 days",
+        horizon: "This week",
+        stakeholder: "Sales / Customer",
+        confidence: "Projection 78%",
+      },
+      {
+        label: "Inventory",
+        baseline: "Coverage 4 days",
+        next: "Coverage 2 days",
+        cause: "Family A allocation",
+        horizon: "Immediate",
+        stakeholder: "Planning",
+        confidence: "System measure",
+      },
+      {
+        label: "Margin",
+        baseline: "18.2%",
+        next: "16.9%",
+        cause: "Expedite surcharge",
+        horizon: "Order cycle",
+        stakeholder: "Finance",
+        confidence: "Projection 72%",
+      },
+      {
+        label: "Cash",
+        baseline: "Planned",
+        next: "−12k",
+        cause: "Purchase-order quantity +40%",
+        horizon: "7 days",
+        stakeholder: "Treasury",
+        confidence: "Projection 80%",
+      },
+      {
+        label: "CSAT",
+        baseline: "Stable",
+        next: "Under tension",
+        cause: "Friday promise",
+        horizon: "After delivery",
+        stakeholder: "Customer service",
+        confidence: "Qualitative",
+      },
+      {
+        label: "Risk",
+        baseline: "Moderate",
+        next: "High",
+        cause: "Bypass pressure",
+        horizon: "Control",
+        stakeholder: "Governance",
+        confidence: "Control alert",
+      },
+    ],
+    labels: {
+      cause: "Cause",
+      horizon: "Horizon",
+      stakeholder: "Stakeholder",
+      projection: "Projection",
+      baseline: "Baseline",
+      after: "After",
+    },
+  },
+  ai: {
+    title: "Visible AI and Ambient AI",
+    lead: "Same intelligence, two postures: explicit coach and governed enterprise communication.",
+    visibleTitle: "Visible AI",
+    visibleBody: "Explicit pedagogical coach. Guides — does not answer for the learner.",
+    ambientTitle: "Ambient AI",
+    ambientBody: "Governed enterprise messages: supplier, warehouse, finance, supervision.",
+    timelineTitle: "Communication stream",
+    items: [
+      {
+        source: "ERP system",
+        channel: "System event",
+        time: "08:12",
+        message: "SO-1048 created · 140 units · due Friday",
+        classification: "System fact",
+        nature: "Factual",
+        kind: "fact",
+      },
+      {
+        source: "NordLog Parts",
+        channel: "Supplier message",
+        time: "09:04",
+        message: "+4 days if quantity > 120",
+        classification: "Supplier message",
+        nature: "Factual (stakeholder)",
+        kind: "stakeholder",
+      },
+      {
+        source: "Equinoxe warehouse",
+        channel: "Operational alert",
+        time: "09:18",
+        message: "Friday dock slot saturated",
+        classification: "Warehouse alert",
+        nature: "Factual",
+        kind: "risk",
+      },
+      {
+        source: "Financial control",
+        channel: "Warning",
+        time: "09:41",
+        message: "Cash commitment outside this week’s plan",
+        classification: "Financial warning",
+        nature: "Factual",
+        kind: "risk",
+      },
+      {
+        source: "Supervisor",
+        channel: "Managerial question",
+        time: "10:02",
+        message: "Which option do you defend before 3 p.m.?",
+        classification: "Supervisor question",
+        nature: "Factual",
+        kind: "stakeholder",
+      },
+      {
+        source: "AI Coach",
+        channel: "Visible AI",
+        time: "10:05",
+        message: "Which evidence is still missing before you recommend?",
+        classification: "AI Coach",
+        nature: "Pedagogical (non-factual)",
+        kind: "ai",
+      },
+      {
+        source: "Simulation",
+        channel: "Projection",
+        time: "10:06",
+        message: "140-unit scenario: OTIF 86%, cash −12k",
+        classification: "Simulated projection",
+        nature: "Simulated",
+        kind: "sim",
+      },
+    ],
+  },
+  professor: {
+    title: "Professor orchestration",
+    lead: "The professor remains pedagogical authority: pacing, events, comparison, debrief.",
+    classInProgress: "Equinoxe cohort · session in progress",
+    cohort: "24 learners",
+    mandate: "Active mandate: SO-1048 under tension",
+    decisions: "Decisions: 11 confirm · 8 negotiate · 5 reschedule",
+    misconception:
+      "Common misconception: “raising the purchase-order quantity always fixes service”",
+    simStatus: "Simulation: active · pause available",
+    nextEvent: "Next event: dock alert",
+    debrief: "Debrief question: Which KPI should lead here?",
+    deck: "Teaching Deck: ready (preview)",
+    controls: ["Pause", "Trigger event", "Compare decisions", "Open debrief", "Show evidence"],
+  },
+  capstone: {
+    title: "Capstone — final consulting engagement",
+    badge: "Distinct Capstone · not M11",
+    lead: "After M1–M10: diagnosis, crisis, roadmap, and defense before a jury.",
+    framing: "Executive engagement · evidence · defense",
+    approval: "Professor approval required",
+    evidence: "Evidence dossier + defended recommendation",
+  },
+  login: {
+    title: "Sign in",
+    lead: "Continue toward your active mandate in Equinoxe.",
+    email: "Email address",
+    password: "Password",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
+    submit: "Enter Equinoxe",
+    back: "Back to portal",
+    signal: "Current signal: SO-1048 · OTIF under tension",
+    promise: "From inquiry to executive advice — inside a reacting enterprise.",
+  },
+  cockpit: {
+    greeting: "Hello Camille",
+    role: "Junior analyst · Diagnostic mandate",
+    module: "M1 · Integrated enterprise and processes",
+    classContext: "Equinoxe cohort · Group A",
+    professor: "Professor available",
+    mandateTitle: "Active mandate",
+    situation:
+      "Equinoxe receives an urgent customer demand (140 units). Family A stock is under tension and the supplier signals a delay.",
+    decision: "Your inquiry must establish what threatens the customer promise — before any intervention.",
+    cta: "Start the inquiry",
+    pulseTitle: "Enterprise pulse",
+    inboxTitle: "Inbox",
+    evidenceTitle: "Mandate evidence",
+    learningTitle: "Learning context",
+    mode: "Mode: Guided practice",
+    progress: "Progress M1 / M10",
+    capstoneNote: "Capstone distinct — outside M1–M10",
+    evidenceStatus: "0 / 3 evidence items collected",
+    nextEvidence: "Next evidence: Order-to-Cash process map",
+    previewTitle: "Mission 1 — Inquiry and diagnosis",
+    previewLead: "Safe mandate preview. The full mission experience will ship in a later product delivery.",
+    previewClose: "Close preview",
+  },
+  controls: {
+    open: "Playback controls",
+    close: "Close",
+    title: "Playback Zero controls",
+    locale: "Language",
+    theme: "Theme",
+    viewport: "Viewport",
+    level: "Learner level",
+    module: "Module",
+    ambient: "Stakeholder event",
+    page: "Page",
+    branding: "Institutional identity",
+    brandingCollege: "Collège de la Concorde",
+    brandingIndependent: "Independent TEC.ERP",
+    simRole: "Simulated role (control)",
+    pages: { portal: "Portal", login: "Sign in", cockpit: "Mission cockpit" },
+  },
 };
+
+export const COPY: Record<PlaybackLocale, PlaybackCopy> = { fr: FR, en: EN };
