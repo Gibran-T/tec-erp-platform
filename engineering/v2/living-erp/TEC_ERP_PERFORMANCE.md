@@ -4,30 +4,33 @@
 
 Keep the Living workspace responsive under normal pedagogical loads without introducing N+1 UI waterfalls or heavy client bundles for decorative chrome.
 
+## Measured (final gate, 2026-07-22)
+
+| Metric | Value |
+|--------|-------|
+| Web production build main JS | `dist/assets/index-Cpyf6WEK.js` **524.59 KB** (gzip **144.38 KB**) |
+| CSS | `29.58 KB` (gzip 6.43 KB) |
+| Vite warning | Chunk > 500 KB |
+| Assessment | No observed user-facing initial-load defect in local smoke at 1440/900/390 viewports |
+| Classification | **P2** — route-level lazy loading follow-up |
+
 ## Patterns in the worktree
 
 | Pattern | Where | Intent |
 |---------|-------|--------|
 | Parallel `Promise.all` | LearnerHome, ModuleHub, Dashboard, Professor CC | Collapse startup RTTs |
-| Non-critical `.catch` fallbacks | Capstone/exceptions on home; several professor feeds | Avoid hard-failing whole page |
-| Cancellation flags | `useEffect` cleanup on home/hub/professor | Prevent stale setState |
+| Typed empty DTO fallbacks | analytics heatmap/competencies | Avoid catch-union type holes without inventing fields |
+| Cancellation flags | `useEffect` cleanup | Prevent stale setState |
 | Skeleton / loading regions | Living `States` | Perceived performance |
 | Context panel collapse | AppShell class | Reduce layout work when unused |
-| CSS tokens / no image hero packs | `living-erp.css` | Light paint cost |
-
-## Sensitive queries
-
-- Professor Command Center loads many endpoints up front — acceptable for professor sessions; watch payload size of audit/AI lists (UI already slices top N in places).
-- Learner home should not fetch full transaction history; it links out to Documents.
-- KPI explanation is client-side enrichment — negligible cost.
 
 ## Guidance
 
 1. Prefer server aggregation for unique-students / heatmap over client joins.
-2. Avoid refetch storms on focus except where freshness matters (certificates already refreshes on focus — intentional).
+2. Next P2: `React.lazy` for Professor Command Center, Capstone, Assessment Center, Admin.
 3. Do not add large chart libraries solely for Living polish without a measured need.
 
 ## Partial
 
 - No dedicated Lighthouse CI gate in this pack.
-- Professor initial fan-out may need progressive section loading later.
+- Bundle warning remains documented P2 (not a smoke UX blocker).

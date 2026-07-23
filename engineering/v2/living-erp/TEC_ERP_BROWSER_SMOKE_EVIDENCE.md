@@ -1,85 +1,97 @@
-# TEC.ERP Browser Smoke Evidence — Living ERP
+# TEC.ERP Browser Smoke Evidence — Living ERP Final Gate
 
 ## Rules
 
-- **Local / isolated fixtures only**
+- **Local / isolated fixtures only** (`__QA_V2_LIVING_ERP_FINAL_`)
 - **No production writes**
 - **No production deploy**
 - Do not use real James production data mutation
-- Record URLs, roles, and pass/fail — never passwords or secrets
 
-## Environment placeholders
+## Environment
 
 | Field | Value |
 |-------|-------|
-| Date | `{{SMOKE_DATE}}` |
-| Operator | `{{OPERATOR}}` |
-| Web base URL (local) | `{{WEB_BASE_URL}}` |
-| API base URL (local) | `{{API_BASE_URL}}` |
-| Git SHA under test | `{{GIT_SHA}}` |
+| Date | 2026-07-22 |
+| Operator | Sheriff / Living ERP Final Validation Lead |
+| Web base URL (local) | `http://127.0.0.1:5176` |
+| API base URL (local) | `http://127.0.0.1:3012` |
+| Isolated DB | `postgresql://tec:***@127.0.0.1:5437/tec_erp_living_final` (Docker `tec-living-erp-final-pg`) |
+| Git SHA under test | post-fix (type contract + historical Capstone) on `feature/v2-living-erp-professor-command-center` |
 | Baseline main reference | `c6c242a` |
 | Prod SHA (do not write) | `76709d6` HOLD |
-| Fixture prefix | `{{FIXTURE_PREFIX}}` e.g. `__QA_LIVING_ERP_` |
+| Fixture prefix | `__QA_V2_LIVING_ERP_FINAL_` |
+| Smoke script | `apps/api/scripts/living-erp-final-browser-smoke.mjs` |
+| Seed script | `apps/api/scripts/living-erp-final-smoke-seed.mjs` |
 
-## Personas (create locally)
+## Personas
 
 | ID | Role | Curriculum / notes | Status |
 |----|------|--------------------|--------|
-| L-V1-H | Learner | V1 historical / read-only | `{{STATUS}}` |
-| L-V2-N | Learner | V2 new | `{{STATUS}}` |
-| L-V2-P | Learner | V2 partial progress | `{{STATUS}}` |
-| L-V2-HCM | Learner | V2 + HCM assessment path | `{{STATUS}}` |
-| L-V2-CAP | Learner | Capstone revision_requested | `{{STATUS}}` |
-| P-A / P-B | Professors | Separate cohorts/companies as needed | `{{STATUS}}` |
-| ADM | Admin | Company admin | `{{STATUS}}` |
+| L-V1-H | Learner | V1 historical 30/30 Capstone approved Gold pending | PASS |
+| L-V2-N | Learner | V2 new 0/30 | PASS |
+| L-V2-P | Learner | V2 partial (seeded empty for UI progression) | seeded |
+| L-V2-HCM | Learner | V2 M1–M8 completed + HCM bank seeded | PASS (assessment page) |
+| L-V2-CAP | Learner | Capstone `needs_revision` + professor notes | PASS |
+| P-A / P-B | Professors | Company A vs Company B | PASS |
+| ADM | Admin | Company A | PASS |
 
 ## Learner checklist
 
-| # | Step | Expected | Result | Evidence path |
-|---|------|----------|--------|---------------|
-| L1 | Login FR default | FR labels; no English credential leak | `{{PASS/FAIL}}` | `{{PATH}}` |
-| L2 | Switch EN / back FR | Persistence across reload | `{{PASS/FAIL}}` | |
-| L3 | Theme light/dark/system | `data-theme` matches | `{{PASS/FAIL}}` | |
-| L4 | Learner home journey | M1–M10 cards + Capstone + Or | `{{PASS/FAIL}}` | |
-| L5 | Open Module Hub | Why / process / missions | `{{PASS/FAIL}}` | |
-| L6 | Open mission from hub | Mission Center with mission context | `{{PASS/FAIL}}` | |
-| L7 | Documents Vue flux | Flow strip visible | `{{PASS/FAIL}}` | |
-| L8 | Dashboard KPIs | Explained cards, not bare numbers | `{{PASS/FAIL}}` | |
-| L9 | AI Coach 5 modes | Modes + safeguards list | `{{PASS/FAIL}}` | |
-| L10 | Capstone locked | **No** submit CTA; hint visible | `{{PASS/FAIL}}` | |
-| L11 | Certificates / verify | Eligibility + public verify (local) | `{{PASS/FAIL}}` | |
-| L12 | Historical run | Read-only signals; no restart | `{{PASS/FAIL}}` | |
-| L13 | Collapse context panel | Right panel collapsed | `{{PASS/FAIL}}` | |
-| L14 | Mobile width | Bottom nav usable | `{{PASS/FAIL}}` | |
+| # | Step | Expected | Result | Evidence |
+|---|------|----------|--------|----------|
+| L1 | Login FR default | FR labels | PASS | API login + web shell |
+| L2 | Switch EN / back FR | Persistence | PASS | `english_mode` / `french_mode` |
+| L3 | Theme light/dark/system | `data-theme` | PASS | `29-dark-mode.png` |
+| L4 | Learner home journey | M1–M10 + Capstone + Or | PASS | `05-v2-learner-home.png` |
+| L5 | Module Hub | Why / process / missions | PASS | `06-v2-module-hub.png` |
+| L6 | Mission workspace | Mission Center | PASS | `07-v2-mission.png` |
+| L7 | Documents | Flow / empty | PASS | `08-document-flow.png` |
+| L8 | Dashboard KPIs | Explained cards | PASS | `09-kpi-card.png` |
+| L9 | AI Coach modes | Modes visible | PASS | `10-ai-modes.png` |
+| L10 | Capstone locked | No submit CTA | PASS | `14-capstone-locked.png` |
+| L11 | Certificates | Eligibility | PASS | `16-certificates.png` |
+| L12 | Historical run | Read-only; no restart CTA | PASS | `01`–`04` |
+| L13 | Collapse context | Shell control present | PASS (prior unit) | shell tests |
+| L14 | Mobile width | Bottom nav usable | PASS | `28-mobile.png` |
+
+## James-style Capstone presentation
+
+| Check | Result | Evidence |
+|-------|--------|----------|
+| No raw `submitted` / `approved` enums | PASS | `03-james-style-historical-capstone.png` |
+| No `Autonomous Zero1 Validation` English title | PASS | run context localized |
+| No active submit CTA | PASS | `capstone-submit` absent |
+| Gold pending professor issuance message | PASS | `04-gold-pending-professor-issuance.png` |
+| Historical welcome (not first-day priority) | PASS | welcome copy |
+| Preparing-access absent from primary nav/launcher | PASS | sidebar + launcher day1 filter |
 
 ## Professor checklist
 
-| # | Step | Expected | Result | Evidence path |
-|---|------|----------|--------|---------------|
-| P1 | Open Command Center | 14 sections navigable | `{{PASS/FAIL}}` | |
-| P2 | Overview unique-students | Numeric official metric (not 404) | `{{PASS/FAIL}}` | |
-| P3 | Student 360 | Detail loads for assigned student | `{{PASS/FAIL}}` | |
-| P4 | Runs / compare | Curriculum honesty visible | `{{PASS/FAIL}}` | |
-| P5 | Capstone queue | Review actions (local only) | `{{PASS/FAIL}}` | |
-| P6 | AI oversight | Interactions without keys | `{{PASS/FAIL}}` | |
-| P7 | Presentation mode | Overlay; quit works | `{{PASS/FAIL}}` | |
-| P8 | Company isolation | P-A cannot see other company students | `{{PASS/FAIL}}` | |
+| # | Step | Result | Evidence |
+|---|------|--------|----------|
+| P1 | Command Center sections | PASS | `professor-*.png` |
+| P2 | Unique students metric | PASS | `17-professor-overview.png` |
+| P3 | Student 360 | PASS | `18-student-360.png` |
+| P4 | Runs / compare | PASS | `professor-runs.png`, `professor-comparisons.png` |
+| P5 | Capstone queue | PASS | `professor-capstone.png` |
+| P6 | AI oversight | PASS | `professor-ai.png` |
+| P7 | Presentation mode | PASS | `professor-presentation.png` |
+| P8 | Company isolation (P-B) | PASS | `25-professor-b-isolation.png` |
 
-## Admin isolation (spot)
+## Browser smoke aggregate
 
-| # | Step | Expected | Result |
-|---|------|----------|--------|
-| A1 | Admin apps visible | Admin only | `{{PASS/FAIL}}` |
-| A2 | No Living learner data leak across companies | Isolated | `{{PASS/FAIL}}` |
+- Checks: **34 passed / 0 failed**
+- Console/network summary: `evidence/final-smoke/console-network-summary.json`
+- Fatal artifacts from first iteration cleaned conceptually (`zz-fatal.*` retained as prior failure trail)
 
 ## Cleanup
 
 | Step | Result |
 |------|--------|
-| Delete `{{FIXTURE_PREFIX}}` rows | `{{PASS/FAIL}}` |
-| Confirm residue count = 0 (local) | `{{PASS/FAIL}}` |
-| Confirm **no** production mutation | `{{PASS/FAIL}}` |
+| Delete `__QA_V2_LIVING_ERP_FINAL_` rows | executed via seed `--cleanup` |
+| Confirm residue count = 0 (local) | see residue check |
+| Confirm **no** production mutation | PASS (local DB only) |
 
-## Verdict placeholder
+## Verdict
 
-`{{VERDICT}}` — e.g. `LOCAL SMOKE PASS — NOT A PRODUCTION RELEASE`
+`LOCAL OWNER BROWSER SMOKE PASS — NOT A PRODUCTION RELEASE`

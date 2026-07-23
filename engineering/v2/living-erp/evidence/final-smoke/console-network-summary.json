@@ -1,0 +1,181 @@
+{
+  "api": "http://127.0.0.1:3012",
+  "web": "http://127.0.0.1:5176",
+  "checks": [
+    {
+      "section": "v1_home",
+      "ok": true,
+      "detail": "learner home"
+    },
+    {
+      "section": "v1_welcome_historical",
+      "ok": true,
+      "detail": "Bienvenue chez NordHabitat, __QA_V2_LIVING_ERP_FINAL_ Student V1 Historical. Vous consultez un parcours historique en le"
+    },
+    {
+      "section": "v1_no_preparing_sidebar",
+      "ok": true,
+      "detail": "primary nav preparing absent"
+    },
+    {
+      "section": "v1_module",
+      "ok": true,
+      "detail": "http://127.0.0.1:5176/workspace/modules/M1"
+    },
+    {
+      "section": "v1_capstone_no_raw_submitted",
+      "ok": true,
+      "detail": "no raw submitted"
+    },
+    {
+      "section": "v1_capstone_no_zero1_english",
+      "ok": true,
+      "detail": "no Zero1 label"
+    },
+    {
+      "section": "v1_capstone_no_submit_cta",
+      "ok": true,
+      "detail": "submit hidden"
+    },
+    {
+      "section": "v1_gold_pending",
+      "ok": true,
+      "detail": "gold pending professor"
+    },
+    {
+      "section": "v2_home",
+      "ok": true,
+      "detail": "journey grid"
+    },
+    {
+      "section": "v2_capstone_locked",
+      "ok": true,
+      "detail": "locked hint"
+    },
+    {
+      "section": "v2_capstone_no_submit",
+      "ok": true,
+      "detail": "no submit"
+    },
+    {
+      "section": "capstone_revision",
+      "ok": true,
+      "detail": "revision visible"
+    },
+    {
+      "section": "capstone_professor_feedback",
+      "ok": true,
+      "detail": "professor notes"
+    },
+    {
+      "section": "professor_overview",
+      "ok": true,
+      "detail": "unique students metric"
+    },
+    {
+      "section": "professor_students",
+      "ok": true,
+      "detail": "students"
+    },
+    {
+      "section": "professor_runs",
+      "ok": true,
+      "detail": "runs"
+    },
+    {
+      "section": "professor_activity",
+      "ok": true,
+      "detail": "activity"
+    },
+    {
+      "section": "professor_exceptions",
+      "ok": true,
+      "detail": "exceptions"
+    },
+    {
+      "section": "professor_assessments",
+      "ok": true,
+      "detail": "assessments"
+    },
+    {
+      "section": "professor_competencies",
+      "ok": true,
+      "detail": "competencies"
+    },
+    {
+      "section": "professor_analytics",
+      "ok": true,
+      "detail": "analytics"
+    },
+    {
+      "section": "professor_ai",
+      "ok": true,
+      "detail": "ai"
+    },
+    {
+      "section": "professor_capstone",
+      "ok": true,
+      "detail": "capstone"
+    },
+    {
+      "section": "professor_comparisons",
+      "ok": true,
+      "detail": "comparisons"
+    },
+    {
+      "section": "professor_presentation",
+      "ok": true,
+      "detail": "presentation"
+    },
+    {
+      "section": "student_360",
+      "ok": true,
+      "detail": "detail"
+    },
+    {
+      "section": "professor_b_isolation",
+      "ok": true,
+      "detail": "Vue d’ensembleCohortes assignées : 1Apprenants inscrits : 1Apprenants uniques (métrique officielle) : 1Parcours visibles : 1Dossiers Capstone : 0Certificats : 0File d’attentionAucune intervention urge"
+    },
+    {
+      "section": "admin",
+      "ok": true,
+      "detail": "http://127.0.0.1:5176/workspace/apps/administration"
+    },
+    {
+      "section": "theme_dark",
+      "ok": true,
+      "detail": "dark"
+    },
+    {
+      "section": "tablet",
+      "ok": true,
+      "detail": "900px"
+    },
+    {
+      "section": "mobile",
+      "ok": true,
+      "detail": "mobile nav"
+    },
+    {
+      "section": "english_mode",
+      "ok": true,
+      "detail": "en"
+    },
+    {
+      "section": "french_mode",
+      "ok": true,
+      "detail": "fr"
+    },
+    {
+      "section": "hcm_assessment_page",
+      "ok": true,
+      "detail": "http://127.0.0.1:5176/workspace/apps/evaluations"
+    }
+  ],
+  "passed": 34,
+  "failed": 0,
+  "consoleErrors": [],
+  "networkFailures": [],
+  "timestamp": "2026-07-22T23:54:37.619Z"
+}

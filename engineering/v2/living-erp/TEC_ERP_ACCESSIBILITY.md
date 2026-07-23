@@ -12,16 +12,23 @@
 | Theme / contrast | Light/dark token sets; system preference supported |
 | Reduced motion | Progress bar transition disabled under `prefers-reduced-motion` |
 | Mobile nav | Bottom links for key learner destinations |
+| Presentation overlay | Quit control restores pointer access to nav |
 
-## Targets (ongoing)
+## Final gate notes (2026-07-22)
 
-- Keyboard operability across Mission Center legacy controls
-- Visible focus using `--living-focus`
-- Meaningful labels on icon-only controls (prefer text buttons — current Living CTAs are text)
-- Tables with column headers on dashboard/exceptions/runs
+| Surface | Automated | Manual spot |
+|---------|-----------|-------------|
+| Login / home / module / mission / assessment / Capstone | Visual smoke + roles | Keyboard not fully scripted |
+| Professor overview / Student 360 / Presentation | Smoke screenshots | Presentation quit verified |
+| Verdict | **No P0/P1 a11y blockers observed in smoke** | Not a full WCAG certification |
+
+## Targets (ongoing P2)
+
+- Formal axe-core suite on the nine listed routes
+- Student 360 structured headings instead of JSON dump
+- Visible focus audit on legacy Mission Center controls
 
 ## Partial / gaps
 
 - Not a full WCAG audit certificate for every legacy workspace page.
-- Student 360 JSON block is screen-reader heavy — needs structured headings/lists in a follow-up.
-- Some decorative flow arrows rely on characters; ensure surrounding headings provide context (present on hubs/documents).
+- Some decorative flow arrows rely on characters; surrounding headings provide context on hubs/documents.

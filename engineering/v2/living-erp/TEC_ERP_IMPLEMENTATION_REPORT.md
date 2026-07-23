@@ -4,84 +4,64 @@
 
 | Item | Value |
 |------|-------|
-| Worktree baseline / main reference | `c6c242a` |
+| Worktree | `C:\Projetos\tec-erp-wt-living-erp` |
+| Branch | `feature/v2-living-erp-professor-command-center` |
+| Pre-fix head | `80fda5e` |
+| Authoritative main | `c6c242a` |
+| PR | [#30](https://github.com/Gibran-T/tec-erp-platform/pull/30) Draft |
 | Production SHA | `76709d6` **HOLD** |
-| PR #26 | Open, independent, untouched |
-| Docs pack | `engineering/v2/living-erp/` (this folder) |
 
-## Delivered surfaces (worktree)
+## CI recovery (this gate)
 
-### Shell & preferences
+| Item | Detail |
+|------|--------|
+| Failed CI run | `29966167863` — Typecheck |
+| Package | `erp-web` |
+| Root cause | `ProfessorCommandCenterPage` `.catch(() => ({ rows: [] }))` narrowed heatmap DTO union; `enrolledStudentCount` / `curriculumVersionsPresent` inaccessible; implicit `any` on `.map` |
+| Fix | Explicit `ProfessorHeatmapResponse` / `ProfessorCompetencyResponse` DTOs + `EMPTY_*` fallbacks matching API contracts |
+| Local reproduction | `pnpm install --frozen-lockfile` + `pnpm typecheck` → same TS2339/TS7006 |
 
-- `ThemeProvider` (light/dark/system) wrapping app
-- `LocaleProvider` (FR default, EN switch, status/date helpers, login error localization)
-- `WorkspaceTopBar` run/curriculum badges + locale/theme + context collapse
-- `WorkspaceLayout` skip link, Living bottom nav, pedagogical banner
-- `living-erp.css` + StatusChip / Badges / States / KpiExplainedCard
+## Historical James-style Capstone
 
-### Learner
+| Defect | Fix |
+|--------|-----|
+| Active submit CTA on completed historical run | Capstone gates on `isHistorical` / `!isWritable` + terminal lifecycle |
+| English `Autonomous Zero1 Validation` runLabel | Localized `Run N · Parcours autonome · Curriculum Vx` |
+| Raw enum leakage | `statusLabel()` for dossier/review statuses |
+| First-day framing on completed run | Historical welcome + context panel history mode |
+| Gold pending unclear | `awaitingProfessorIssuance` + learner message |
+| Preparing-access in primary nav | Sidebar + launcher filter `access === "day1"` |
 
-| Surface | File | Status |
-|---------|------|--------|
-| Learner home | `LearnerHomePage.tsx` | **Implemented** — journey, attention, competencies |
-| Module hubs | `ModuleHubPage.tsx` + route | **Implemented** |
-| Document flow strip | `TransactionWorkspacePage.tsx` | **Implemented** (plus existing tabs) |
-| Explained KPIs | `DashboardPage.tsx` + `kpiCatalog.ts` | **Implemented** |
-| AI Coach modes | `AiCoachPage.tsx` | **Implemented** — 5 modes + safeguards |
-| Capstone locked CTA | `CapstonePage.tsx` | **Implemented** — S1–S7 stepper + CTA hide |
-| Certificates | `CertificatesPage.tsx` | **Retained / lightly integrated** |
-| Mission Center | `MissionCenterPage.tsx` | **Retained** — discovery via hubs/home |
+## Tests
 
-### Professor
+| Suite | Result |
+|-------|--------|
+| Web unit | **90** passed (17 files) |
+| API unit | **196** passed (47 files) |
+| Catalog | **8** passed |
+| Focused historical / DTO / RBAC | **7** passed |
+| Typecheck | **PASS** |
+| Build | **PASS** (web JS chunk ~525 KB — P2) |
+| env:check | **PASS** |
+| Browser smoke | **34/34 PASS** |
+| Local lint (Windows) | Blocked by Windows `MAX_PATH` / incomplete `@typescript-eslint` extract after node_modules surgery — **CI Linux lint remains authoritative** |
 
-| Surface | File | Status |
-|---------|------|--------|
-| Command Center | `ProfessorCommandCenterPage.tsx` | **Implemented** — 14 sections + presentation + legacy |
-| Unique-students alias | `pedagogical-run.routes.ts` + web API client | **Implemented** |
-| Student 360 | section in Command Center | **Partial** — functional, JSON-heavy |
-| Analytics / AI / interventions / compare | sections | **Implemented at explorer depth** |
+## Evidence
 
-### Tests added/extended (representative)
+- `engineering/v2/living-erp/TEC_ERP_BROWSER_SMOKE_EVIDENCE.md`
+- `engineering/v2/living-erp/evidence/final-smoke/`
 
-- `apps/web/src/__tests__/living-erp-shell.test.tsx` — locale, theme, context, login FR, Capstone locked CTA
-- `apps/api/src/modules/pedagogical-run/__tests__/professor-unique-students.route.test.ts`
-- Workspace shell tests updated for Living layout expectations
+## Remaining P2
 
-## Known P2 closures (wave)
-
-| # | Item | Closure |
-|---|------|---------|
-| 1 | EN login validation in FR | Closed (provider + test) |
-| 2 | Professor unique-students | Closed (alias + test) |
-| 3 | Capstone locked CTA | Closed (UI + test) |
-| 4 | Raw enum leakage | Partial — Living labels; legacy pages remain |
-| 5 | Historical vs current | Closed on shell/home; deepen elsewhere |
-| 6 | Mixed-language labels | Partial — catalogs for shell; page bodies mixed |
-| 7 | Unexplained KPIs | Closed (explained cards) |
-| 8 | Unknown professor labels | Partial |
-| 9 | Concatenated labels | Partial |
-| 10 | Flat 30-mission list | Closed via hubs/home hierarchy |
-
-## Remaining gaps (honest)
-
-1. Full EN translation of legacy Mission Center / transactions / Capstone body copy
+1. Route-level code splitting for ~525 KB main chunk
 2. Student 360 structured panels (replace JSON dump)
-3. Professor activity/documents/exceptions specialized explorers (beyond shared audit list)
-4. Per-KPI rich catalog entries beyond default template
-5. Mission Center visual Living homogenization
-6. Browser smoke evidence not yet filled (template only) — local only, no prod writes
-7. Production deploy still HOLD; James integrity / prod mutation out of scope
-8. AI mode as first-class persisted server enum (client framing today)
-9. Progressive loading for Professor Command Center fan-out
-10. Formal a11y audit beyond skip link / roles / reduced motion
+3. Full EN translation of mission body content
+4. Formal automated axe suite expansion
+5. Progressive Professor Command Center section loading
 
 ## Explicit non-delivery
 
 - No production deployment or production data writes
-- No merge/interference with PR #26
-- No assessment answer keys in docs or UI
-- No claim of full Living visual redesign of every pre-wave page
-
-## Documentation pack files
-
-See directory listing under `engineering/v2/living-erp/` — 21 markdown specifications including this report.
+- No James Run 2
+- No Thiago professor in production
+- No merge of PR #30 in this gate
