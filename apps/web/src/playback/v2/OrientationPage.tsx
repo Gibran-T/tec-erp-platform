@@ -48,6 +48,26 @@ export function OrientationPage(): ReactNode {
           <p>
             <strong>{c.decision}</strong>
           </p>
+          <div className="pb-mission-support">
+            <div>
+              <strong>{fr ? "Preuve attendue" : "Expected evidence"}</strong>
+              {c.nextEvidence}
+            </div>
+            <div>
+              <strong>{fr ? "Signal processus" : "Process signal"}</strong>
+              {fr
+                ? "Order-to-Cash (commande à encaissement) · SO-1048"
+                : "Order-to-Cash · SO-1048"}
+            </div>
+            <div>
+              <strong>{fr ? "Contexte d’apprentissage" : "Learning context"}</strong>
+              {c.mode}
+            </div>
+            <div>
+              <strong>{fr ? "Partie prenante active" : "Active stakeholder"}</strong>
+              {fr ? "Marc Tremblay · Directeur commercial" : "Marc Tremblay · Sales director"}
+            </div>
+          </div>
           <button
             type="button"
             className="playback-btn"
@@ -63,7 +83,7 @@ export function OrientationPage(): ReactNode {
             <h3 id="pulse-mini-title">{c.pulseTitle}</h3>
             <ul className="pb-pulse-mini">
               <li>OTIF 91 %</li>
-              <li>{fr ? "Stock famille A sous tension" : "Family A stock under tension"}</li>
+              <li>{fr ? "Stocks famille A sous tension" : "Family A inventory under tension"}</li>
               <li>{fr ? "Demande client active · 140 unités" : "Active customer demand · 140 units"}</li>
               <li>{fr ? "Dépendance fournisseur · +4 jours" : "Supplier dependency · +4 days"}</li>
               <li>{fr ? "Risque opérationnel : promesse vendredi" : "Operational risk: Friday promise"}</li>
@@ -91,8 +111,8 @@ export function OrientationPage(): ReactNode {
             <p>{c.nextEvidence}</p>
             <p style={{ color: "var(--pb-muted)", fontSize: "0.86rem" }}>
               {fr
-                ? "Types : carte processus · message partie prenante · signal KPI"
-                : "Types: process map · stakeholder message · KPI signal"}
+                ? "Types : carte processus · message partie prenante · indicateur clé de performance (KPI)"
+                : "Types: process map · stakeholder message · key performance indicator (KPI)"}
             </p>
           </section>
 

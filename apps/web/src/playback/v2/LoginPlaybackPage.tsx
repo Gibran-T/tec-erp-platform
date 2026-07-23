@@ -4,11 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { usePlayback } from "./PlaybackProvider.js";
 
 export function LoginPlaybackPage(): ReactNode {
-  const { copy, branding, endorsement } = usePlayback();
+  const { copy, branding, endorsement, locale } = usePlayback();
   const navigate = useNavigate();
   const [email, setEmail] = useState("camille.demo@example.com");
   const [password, setPassword] = useState("playback-only");
   const [showPassword, setShowPassword] = useState(false);
+  const fr = locale === "fr";
 
   function onSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
@@ -25,7 +26,11 @@ export function LoginPlaybackPage(): ReactNode {
               {branding.productName}
             </div>
             {branding.showInstitution && endorsement ? (
-              <p className="playback-endorsement" data-testid="login-institution-endorsement" style={{ color: "#d7e8f7" }}>
+              <p
+                className="playback-endorsement"
+                data-testid="login-institution-endorsement"
+                style={{ color: "#d7e8f7" }}
+              >
                 {endorsement}
               </p>
             ) : (
@@ -33,13 +38,22 @@ export function LoginPlaybackPage(): ReactNode {
                 {branding.productName}
               </p>
             )}
-            <p style={{ marginTop: "1.25rem", maxWidth: "36ch" }}>{copy.login.promise}</p>
+            <p style={{ marginTop: "0.85rem", maxWidth: "38ch" }}>{copy.login.promise}</p>
           </div>
-          <div>
-            <div className="pb-live-preview__title">{copy.hero.previewTitle}</div>
-            <div className="pb-live-flow" aria-hidden="true" />
-            <p style={{ margin: "0.65rem 0 0", fontWeight: 650 }}>{copy.login.signal}</p>
-            <p style={{ margin: "0.35rem 0 0", opacity: 0.85 }}>{copy.hero.processValue}</p>
+
+          <div className="pb-login__context-block">
+            <strong>{fr ? "Signal entreprise" : "Enterprise signal"}</strong>
+            {copy.login.signal}
+          </div>
+          <div className="pb-login__context-block">
+            <strong>{fr ? "Processus en cours" : "Active process"}</strong>
+            {copy.hero.processValue}
+          </div>
+          <div className="pb-login__context-block">
+            <strong>{fr ? "Prochaine étape" : "Next step"}</strong>
+            {fr
+              ? "Après connexion : Cockpit de mission · Mandat M1 · Commencer l’enquête"
+              : "After sign-in: Mission Cockpit · M1 mandate · Start the inquiry"}
           </div>
         </aside>
 
