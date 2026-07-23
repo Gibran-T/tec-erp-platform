@@ -114,3 +114,30 @@ Levier crise approvisionnement (S4).
 ## Pilot priority
 
 Wave 3 implementation pilot. SHALL NOT ship stub content.
+
+
+## Wave 1A Research Addendum
+
+### Consulting mandat hooks
+
+Populate per `TEC_ERP_CONSULTING_MANDATE_CONTRACT.md`: mandate title, executive sponsor, client problem, incomplete evidence, decision, facilitation notes. Mission 1=enquête; Mission 2=intervention; Mission 3=consequence/BI/reco.
+
+### Process chain contribution
+
+Procure-to-Pay (primary); feeds inventory/finance
+
+### Experience modes
+
+Exploration for discover/orient; Guided Practice for early practice; Simulation for mandat execution; Evaluation for assessed validation. Mode must be explicit on every activity.
+
+### Dual journey
+
+Company evolution: module position on enterprise journey. Professional identity: Junior → process analyst. Guidance fades per `TEC_ERP_COGNITIVE_LOAD_AND_GUIDANCE_FADING_STANDARD.md`.
+
+### Digital Twin
+
+Reads/writes the shared Equinoxe Twin for V2 Runs. Important changes require source event, consequences, evidence, learner/Professor visibility. V1 historical runs immutable.
+
+## Enterprise Life Engine (pilot candidate)
+
+Wave **5B** controlled pilot. Stakeholders: supplier · buyer supervisor · warehouse · finance · customer. Do not enable full company-wide Ambient AI from this blueprint alone.

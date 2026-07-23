@@ -35,5 +35,10 @@ Every module content pack SHALL populate sections **A–W**. Identical filler ac
 | U | Learner review | Post-class safe review |
 | V | Accessibility and language | FR/EN, contrast, no raw enums |
 | W | V1/V2 behavior | Historical vs current rules |
+| X | Consulting mandat | Sponsor, problem, incomplete evidence, decision (Wave 1A) |
+| Y | Process chain contribution | Which E2E chains this module owns/feeds |
+| Z | Experience modes | Where Exploration / Guided / Simulation / Evaluation apply |
+| AA | Dual journey | Company evolution + professional identity stage |
+| AB | Twin / ELE hooks | Twin state touched; stakeholder events if any (pilot) |
 
 Module-specific instances: `modules/M*_LEARNING_BLUEPRINT.md`.

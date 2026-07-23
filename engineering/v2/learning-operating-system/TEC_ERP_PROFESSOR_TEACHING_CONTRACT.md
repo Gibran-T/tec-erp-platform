@@ -10,22 +10,26 @@
 
 ## Professor capabilities
 
-prepare class · open Teaching Deck · demonstrate ERP · present BI · use anonymized evidence · ask questions · correct assessment · review errors · debrief · intervene · validate progression · review Capstone · issue Gold when eligible
+prepare class · open Teaching Deck · demonstrate ERP · present BI · use anonymized evidence · ask questions · correct assessment · review errors · debrief · intervene · validate progression · review Capstone · issue Gold when eligible · freeze simulation · reveal data · compare groups · replay a decision · trigger or suppress scenario events · hide answer keys · show consequences · collect final synthesis · control guidance level
 
 ## 3-hour class pattern
 
 | Block | Intent |
 |-------|--------|
-| Opening | Outcomes + business hook |
-| Concept | Microlearning focus |
+| Opening | Outcomes + business hook + mandat |
+| Concept | Microlearning focus (not theory wall) |
 | Demonstration | ERP + document + KPI |
-| Guided practice | OBSERVER → short practice |
-| Learner mission | PRATIQUER (selected mission) |
+| Guided practice | OBSERVER → Guided Practice |
+| Learner mission | Simulation (selected mission) |
 | Correction | Errors + evidence |
-| BI/AI | ANALYSER + RÉFLÉCHIR |
-| Debrief | DÉBRIEFER |
+| BI/AI | ANALYSER + Visible AI RÉFLÉCHIR |
+| Debrief | DÉBRIEFER + reapplication |
 | Follow-up | Next step / homework review |
 
 ## Privacy
 
 Projector and Teaching Deck default to anonymized evidence.
+
+## Wave 1A Research Addendum cross-links
+
+Preserves Wave 1 logic. Facilitation packages BEFORE/DURING/AFTER: `TEC_ERP_SIMULATION_FACILITATION_AND_DEBRIEF_CONTRACT.md`. Event controls: Wave 7 + ELE Wave 5B. Additional binding contracts listed in `README.md` §B.

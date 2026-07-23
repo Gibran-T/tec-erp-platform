@@ -30,3 +30,8 @@ Accueil · Enseignement · Cohortes · Étudiants · Progression · Évaluations
 ## Rules
 
 One primary path per intent · Historique distinct for V1 consultation · Capstone not buried inside Missions list as #30
+
+
+## Wave 1A Research Addendum cross-links
+
+Preserves Wave 1 logic. IA MUST surface: active mode · mandat · professional role · Twin consequence entry points · Visible vs Ambient AI channels when present. Companions: experience modes, dual journey, consulting mandate, ELE contracts in `README.md` §B.

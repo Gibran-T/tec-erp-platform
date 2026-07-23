@@ -29,3 +29,8 @@ What happened? Why? Which process caused it? What evidence proves it? What decis
 ## Non-goals
 
 No decorative charts without interpretation · No KPI without owner/formula · No AI fabricating KPI facts
+
+
+## Wave 1A Research Addendum cross-links
+
+Preserves Wave 1 logic. KPI movement requires traceable Twin cause; forecasts labeled as projections; executive impact panel consumes BI signals (`TEC_ERP_EXECUTIVE_IMPACT_AFTER_ACTION_CONTRACT.md`). See `README.md` §B.

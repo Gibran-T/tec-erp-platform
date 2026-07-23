@@ -37,3 +37,8 @@ portal → onboarding → module introduction → learning → demonstration →
 3. Historical completed runs MUST use **Consulter** and hide write controls.  
 4. Capstone remains outside the 30-mission list.  
 5. AI never changes score or unlocks progression.
+
+
+## Wave 1A Research Addendum cross-links
+
+Preserves Wave 1 logic. Dual journey (enterprise + professional): `TEC_ERP_DUAL_JOURNEY_ROADMAP_CONTRACT.md`. Professional identity stages: `TEC_ERP_PROFESSIONAL_IDENTITY_AND_SITUATED_LEARNING_CONTRACT.md`. Experience modes must be visible in journey IA. See `README.md` §B.

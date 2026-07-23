@@ -56,6 +56,15 @@ Professors teach from the platform using Teaching Decks, ERP demonstration, anon
 | P-08 | Capstone outside the 30 |
 | P-09 | Professor teaches; platform supports |
 | P-10 | FR/EN institutional quality |
+| P-11 | Professional learning simulation (not game / LMS / chatbot) |
+| P-12 | One persistent Digital Twin; narrative never contradicts facts |
+| P-13 | Visible AI coaches; Ambient AI animates; neither mutates Twin alone |
+| P-14 | Experience mode always explicit (Exploration / Guided / Simulation / Evaluation) |
+| P-15 | Important actions never disappear silently |
+
+## Research Addendum
+
+Wave 1A extends this product definition with serious simulation, case method, flight simulation, facilitation/debrief, cognitive load, reflection/transfer, professional identity, Digital Twin pedagogy, process chains, consulting mandates, experience modes, Enterprise Life Engine, executive impact, and dual journey. See `README.md` §B.
 
 ## Related contracts
 

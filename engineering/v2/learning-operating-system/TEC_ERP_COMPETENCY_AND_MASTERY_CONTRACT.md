@@ -36,3 +36,8 @@ missions · assessment · recovery · reflection · documents · transactions ·
 ## Display rules
 
 UI MUST show state + evidence basis. Raw enums alone are non-compliant.
+
+
+## Wave 1A Research Addendum cross-links
+
+Preserves Wave 1 logic. Additional binding contracts: research canon; serious simulation; case method; flight simulation; facilitation/debrief; cognitive load; reflection/transfer; professional identity; Digital Twin; process chains; consulting mandate; experience modes; Enterprise Life Engine; executive impact; dual journey. See `README.md` §B and `TEC_ERP_LEARNING_TRACEABILITY_MATRIX.md`.

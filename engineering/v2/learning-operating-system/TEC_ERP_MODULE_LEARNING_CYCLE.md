@@ -43,6 +43,19 @@ Mission evidence; assessment; competency validation; remediation; Professor appr
 ### 8. DÉBRIEFER
 Learning synthesis; process integration; previous/next module connection; reflection; next-step readiness.
 
+## Experience mode overlay (Wave 1A)
+
+| Cycle phase | Typical official mode |
+|-------------|----------------------|
+| DÉCOUVRIR / APPRENDRE / OBSERVER | Exploration or Guided Practice |
+| PRATIQUER Mission 1–2 | Guided Practice → Simulation |
+| PRATIQUER Mission 3 | Simulation |
+| ANALYSER / RÉFLÉCHIR | Simulation support (Visible AI) |
+| VALIDER | Evaluation where assessed |
+| DÉBRIEFER | Facilitation package AFTER + reflection/reapplication |
+
+Mode declaration remains mandatory (`TEC_ERP_EXPLORATION_GUIDED_SIMULATION_EVALUATION_CONTRACT.md`).
+
 ## Non-compliance
 
-Skipping ANALYSER or RÉFLÉCHIR, or collapsing three missions into identical tasks, violates this contract.
+Skipping ANALYSER or RÉFLÉCHIR, or collapsing three missions into identical tasks, violates this contract. Skipping debrief or reapplication after major simulation violates Wave 1A contracts.

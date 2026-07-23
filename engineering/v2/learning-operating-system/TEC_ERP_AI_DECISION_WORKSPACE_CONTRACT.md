@@ -6,7 +6,11 @@
 
 ---
 
-**Do not implement AI Decision Workspace in this wave.** Extends current Coach IA toward a full workspace.
+**Do not implement AI Decision Workspace in this wave.** Extends current Coach IA toward a full workspace. **Wave 5A.**
+
+## Classification
+
+This contract governs **Visible AI** only (learner reasoning coach). Ambient stakeholder AI is governed by `TEC_ERP_AI_STAKEHOLDER_AND_ENTERPRISE_LIFE_ENGINE_CONTRACT.md` (Wave 5B). Interfaces MUST keep Visible vs Ambient distinguishable.
 
 ## Official modes
 
@@ -22,8 +26,12 @@ clarify objective · request evidence · identify gaps · propose questions · c
 
 ## AI MUST NOT
 
-submit missions · unlock progression · change score · give hidden answer keys · approve Capstone · issue certificates · replace learner judgment · infer sensitive traits · fabricate evidence
+submit missions · unlock progression · change score · give hidden answer keys · approve Capstone · issue certificates · replace learner judgment · infer sensitive traits · fabricate evidence · **mutate authoritative Digital Twin state** · unlock Enterprise Life Engine privileges · impersonate Professor interventions without label
 
 ## Relationship to Coach IA
 
 Current Coach IA is a precursor (KEEP/REFINE). Workspace upgrades layout, evidence binding, and synthesis gate.
+
+## Relationship to Ambient AI
+
+Visible AI coaches the learner. Ambient AI voices stakeholders. Only governed rules/system actions mutate Twin state.

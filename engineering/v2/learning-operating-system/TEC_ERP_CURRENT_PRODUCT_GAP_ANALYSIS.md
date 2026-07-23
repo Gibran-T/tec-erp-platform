@@ -31,3 +31,17 @@ Evidence basis: production Living ERP Visual Foundation (PR #32), current routes
 ## Verdict of gap
 
 Structural V2 foundations: present. Pedagogical Learning OS: **not yet**. BI/AI/Teaching Deck: **contract-first, implement later waves**.
+
+## Wave 1A additional gaps (contract vs product)
+
+| Surface | Classification | Rationale |
+|---------|----------------|-----------|
+| Experience mode badges | REBUILD (new) | Modes not explicit on routes |
+| Consulting mandat framing | REBUILD (new) | Missions exist; mandat packaging incomplete |
+| Persistent Twin consequence panel | REBUILD (new) | Executive impact after-action absent |
+| Ambient stakeholder AI / ELE | REBUILD (new) | Wave 5B pilot only; not present |
+| Facilitation BEFORE/DURING/AFTER packs | REBUILD (new) | Professor teaching partial; packages absent |
+| Dual journey UI | REBUILD (new) | Enterprise + professional journeys not paired |
+| Guidance fading by level | REFINE | Not systematically leveled |
+
+Wave 1A closes **contract** gaps only — not product gaps.
