@@ -9,6 +9,7 @@ const repoRoot = join(root, "..", "..", "..");
 const required = [
   "README.md",
   "BASELINE_VERIFICATION.md",
+  "TEC_ERP_PRODUCT_VISION.md",
   "TEC_ERP_LEARNING_OPERATING_SYSTEM_PRODUCT_DEFINITION.md",
   "TEC_ERP_V1_V2_HISTORICAL_AND_CURRENT_CONTRACT.md",
   "TEC_ERP_V2_CURRICULUM_MASTER_MAP.md",
@@ -232,6 +233,51 @@ try {
   } else passes.push("branch vs main limited to learning-operating-system");
 } catch (e) {
   passes.push(`git scope check skipped: ${e.message.split("\n")[0]}`);
+}
+
+// Product Vision north star
+const visionPath = join(root, "TEC_ERP_PRODUCT_VISION.md");
+const vision = existsSync(visionPath) ? readFileSync(visionPath, "utf8") : "";
+const readme = readFileSync(join(root, "README.md"), "utf8");
+
+if (!existsSync(visionPath)) failures.push("missing TEC_ERP_PRODUCT_VISION.md");
+else passes.push("Product Vision file exists");
+
+if (!/AUTHORITATIVE PRODUCT NORTH STAR/i.test(readme))
+  failures.push("README missing AUTHORITATIVE PRODUCT NORTH STAR mark");
+else passes.push("README marks Product Vision as north star");
+
+const readmeListsVisionFirst =
+  /Reading order[\s\S]{0,400}?1\.\s+\*\*`?TEC_ERP_PRODUCT_VISION\.md`?\*\*/i.test(readme) ||
+  /Reading order[\s\S]{0,400}?1\.\s+\*\*Product Vision/i.test(readme) ||
+  /1\.\s+\*\*`TEC_ERP_PRODUCT_VISION\.md`\*\*/.test(readme);
+if (!readmeListsVisionFirst) failures.push("README does not list Product Vision first in reading order");
+else passes.push("README lists Product Vision first");
+
+for (let s = 1; s <= 15; s++) {
+  if (!new RegExp(`## ${s}\\.`).test(vision)) failures.push(`Product Vision missing section ${s}`);
+  else passes.push(`Product Vision section ${s}`);
+}
+
+for (let p = 1; p <= 25; p++) {
+  if (!new RegExp(`(?:^|\\n)${p}\\. `).test(vision)) failures.push(`Product Vision missing principle ${p}`);
+  else passes.push(`Product Vision principle ${p}`);
+}
+
+const visionNeedles = [
+  ["Professor centrality", /Professor/i],
+  ["historical immutability", /historical run|immutable|No historical run is rewritten/i],
+  ["Playback requirement", /Playback/i],
+  ["Digital Twin", /Digital Twin/],
+  ["Enterprise Life Engine", /Enterprise Life Engine/],
+  ["Visible AI", /Visible AI/],
+  ["Ambient AI", /Ambient AI/],
+  ["MCapstone / Capstone separate", /Capstone/],
+  ["V1/V2", /V1|V2/],
+];
+for (const [label, re] of visionNeedles) {
+  if (!re.test(vision)) failures.push(`Product Vision missing: ${label}`);
+  else passes.push(`Product Vision has ${label}`);
 }
 
 console.log("PASS count:", passes.length);

@@ -62,10 +62,14 @@ Professors teach from the platform using Teaching Decks, ERP demonstration, anon
 | P-14 | Experience mode always explicit (Exploration / Guided / Simulation / Evaluation) |
 | P-15 | Important actions never disappear silently |
 
+## Product Vision (north star)
+
+The authoritative product manifesto sits above this definition: `TEC_ERP_PRODUCT_VISION.md`. When a design choice is ambiguous, the Product Vision decides identity; this file and peer contracts decide operational detail.
+
 ## Research Addendum
 
-Wave 1A extends this product definition with serious simulation, case method, flight simulation, facilitation/debrief, cognitive load, reflection/transfer, professional identity, Digital Twin pedagogy, process chains, consulting mandates, experience modes, Enterprise Life Engine, executive impact, and dual journey. See `README.md` §B.
+Wave 1A extends this product definition with serious simulation, case method, flight simulation, facilitation/debrief, cognitive load, reflection/transfer, professional identity, Digital Twin pedagogy, process chains, consulting mandates, experience modes, Enterprise Life Engine, executive impact, and dual journey. See `README.md`.
 
 ## Related contracts
 
-See `README.md` for the authoritative document index.
+See `README.md` for the authoritative document index. Start with `TEC_ERP_PRODUCT_VISION.md`.
