@@ -3,51 +3,111 @@ import { NavLink, useLocation } from "react-router-dom";
 
 import { useAuth } from "../../auth/AuthContext.js";
 import { useLocale } from "../../i18n/LocaleProvider.js";
-import { ACCESS_PREPARING_LABEL } from "../../workspace/workspaceCopy.js";
-import { getAppPath, getSidebarApps } from "../../workspace/appRegistry.js";
+import { getAppPath, getWorkspaceApp } from "../../workspace/appRegistry.js";
 
 const MODULE_CODES = ["M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9", "M10"] as const;
+
+interface NavItem {
+  readonly id: string;
+  readonly labelKey?: string;
+  readonly label?: string;
+  readonly path: string;
+}
+
+function appNav(id: string, label?: string): NavItem | null {
+  const app = getWorkspaceApp(id);
+  if (!app) return null;
+  return {
+    id,
+    label: label ?? app.label,
+    path: getAppPath(id),
+  };
+}
 
 export function WorkspaceSidebar(): ReactNode {
   const location = useLocation();
   const { employee } = useAuth();
   const { t } = useLocale();
-  const apps = getSidebarApps(employee?.role);
+  const role = employee?.role;
 
-  function isActive(appId: string): boolean {
-    const path = getAppPath(appId);
-    if (appId === "accueil") {
+  const parcours: NavItem[] = [
+    appNav("accueil"),
+    { id: "modules", label: t("shell.nav.modules"), path: "/workspace/modules/M1" },
+    appNav("evaluations"),
+    appNav("capstone", t("shell.capstone")),
+  ].filter((item): item is NavItem => item !== null);
+
+  const operations: NavItem[] = [
+    appNav("documents"),
+    appNav("boite-reception"),
+    appNav("taches"),
+    appNav("centre-mission"),
+    appNav("erp", t("shell.nav.erp")),
+    appNav("tableaux-bord"),
+    appNav("coach-ia"),
+  ].filter((item): item is NavItem => item !== null);
+
+  const results: NavItem[] = [
+    appNav("certificats"),
+    {
+      id: "historique",
+      label: t("shell.nav.history"),
+      path: getAppPath("documents"),
+    },
+  ].filter((item): item is NavItem => item !== null);
+
+  const account: NavItem[] = [appNav("profil")].filter((item): item is NavItem => item !== null);
+
+  if (role === "PROFESSOR" || role === "ADMIN") {
+    const professor = appNav("portail-professeur");
+    if (professor) operations.push(professor);
+  }
+  if (role === "ADMIN") {
+    const admin = appNav("administration");
+    if (admin) account.push(admin);
+  }
+
+  function isActive(item: NavItem): boolean {
+    if (item.id === "accueil") {
       return location.pathname === "/workspace";
     }
-    return location.pathname === path;
+    if (item.id === "modules") {
+      return location.pathname.startsWith("/workspace/modules/");
+    }
+    if (item.id === "historique") {
+      return false;
+    }
+    return location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
+  }
+
+  function renderGroup(title: string, items: NavItem[], testId: string): ReactNode {
+    return (
+      <>
+        <p className="workspace-sidebar__section-title">{title}</p>
+        <ul className="workspace-sidebar__list" data-testid={testId}>
+          {items.map((item) => (
+            <li key={`${testId}-${item.id}`}>
+              <NavLink
+                to={item.path}
+                className={() =>
+                  `workspace-sidebar__link${isActive(item) ? " workspace-sidebar__link--active" : ""}`
+                }
+                data-testid={`workspace-sidebar-link-${item.id}`}
+              >
+                <span>{item.label}</span>
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </>
+    );
   }
 
   return (
-    <nav className="workspace-sidebar" aria-label="Applications" data-testid="workspace-sidebar">
-      <p className="workspace-sidebar__heading">Applications</p>
-      <ul className="workspace-sidebar__list">
-        {apps.map((app) => (
-          <li key={app.id}>
-            <NavLink
-              to={getAppPath(app.id)}
-              className={() =>
-                `workspace-sidebar__link${isActive(app.id) ? " workspace-sidebar__link--active" : ""}`
-              }
-              data-testid={`workspace-sidebar-link-${app.id}`}
-            >
-              <span>
-                {app.label}
-              </span>
-              {app.access === "preparing" ? (
-                <span className="workspace-sidebar__preparing">{ACCESS_PREPARING_LABEL}</span>
-              ) : null}
-            </NavLink>
-          </li>
-        ))}
-      </ul>
-
-      <p className="workspace-sidebar__section-title">{t("shell.modules")}</p>
-      <ul className="workspace-sidebar__list" data-testid="workspace-module-map">
+    <nav className="workspace-sidebar" aria-label={t("shell.nav.aria")} data-testid="workspace-sidebar">
+      {renderGroup(t("shell.nav.parcours"), parcours, "workspace-nav-parcours")}
+      <p className="workspace-sidebar__section-title">{t("shell.nav.modules")}</p>
+      <ul className="workspace-sidebar__list workspace-sidebar__modules" data-testid="workspace-module-map">
         {MODULE_CODES.map((code) => (
           <li key={code}>
             <NavLink
@@ -62,6 +122,9 @@ export function WorkspaceSidebar(): ReactNode {
           </li>
         ))}
       </ul>
+      {renderGroup(t("shell.nav.operations"), operations, "workspace-nav-operations")}
+      {renderGroup(t("shell.nav.results"), results, "workspace-nav-results")}
+      {renderGroup(t("shell.nav.account"), account, "workspace-nav-account")}
     </nav>
   );
 }
