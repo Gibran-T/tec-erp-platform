@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { AppRoutes } from "../App.js";
 import { AuthProvider } from "../auth/AuthContext.js";
 import { saveStoredTokens } from "../api/auth.js";
-import { getLauncherApps, getSidebarApps } from "../workspace/appRegistry.js";
+import { getLauncherApps } from "../workspace/appRegistry.js";
 
 function buildTestTokens() {
   return {
@@ -186,6 +186,32 @@ function renderWorkspace(
           } as Response;
         }
 
+        if (url.includes("/gold-eligibility") && method === "GET") {
+          return {
+            ok: true,
+            json: async () => ({
+              eligibleForProfessorIssue: false,
+              awaitingProfessorIssuance: false,
+              studentReadyChecklist: {
+                missionsComplete: false,
+                goldAssessmentPassed: false,
+                hcmAssessmentPassed: false,
+                capstoneSubmitted: false,
+                capstoneProfessorApproved: false,
+              },
+              reasons: [],
+              nextStepHint: "",
+            }),
+          } as Response;
+        }
+
+        if (url.includes("/me/certificates") && method === "GET") {
+          return {
+            ok: true,
+            json: async () => ({ certificates: [] }),
+          } as Response;
+        }
+
         throw new Error(`Unexpected request in workspace-shell test: ${method} ${url}`);
       }),
     );
@@ -253,7 +279,7 @@ describe("workspace shell accessibility", () => {
     expect(screen.getAllByRole("banner").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByRole("main")).toBeInTheDocument();
     expect(
-      screen.getByRole("navigation", { name: "Applications" }),
+      screen.getByRole("navigation", { name: "Navigation du poste de travail" }),
     ).toBeInTheDocument();
   });
 
@@ -269,14 +295,15 @@ describe("workspace shell accessibility", () => {
 });
 
 describe("employee identity from session", () => {
-  it("renders employee identity from session data in the badge", async () => {
+  it("renders employee identity from session data in the shell", async () => {
     renderWorkspace("/workspace");
 
     await waitFor(() => {
-      expect(screen.getByTestId("employee-identity")).toHaveTextContent("Analyste Démo");
+      expect(screen.getByTestId("shell-learner-identity")).toHaveTextContent("Analyste Démo");
     });
 
-    expect(screen.getByTestId("employee-identity")).toHaveTextContent("#NHE-DEMO");
+    expect(screen.getByTestId("shell-learner-identity")).toHaveTextContent("#NHE-DEMO");
+    expect(screen.getByTestId("shell-unified-context")).toBeInTheDocument();
   });
 
   it("renders session data on the employee profile page", async () => {
@@ -296,19 +323,21 @@ describe("employee identity from session", () => {
 });
 
 describe("navigation and placeholders", () => {
-  it("renders expected apps in the sidebar and app launcher", async () => {
+  it("renders expected apps in the grouped sidebar and compact launcher", async () => {
     renderWorkspace("/workspace");
 
     await waitFor(() => {
       expect(screen.getByTestId("workspace-app-launcher")).toBeInTheDocument();
     });
 
-    const visibleApps = getSidebarApps("JR_BUSINESS_ANALYST");
-    for (const app of visibleApps) {
-      expect(screen.getByTestId(`workspace-sidebar-link-${app.id}`)).toHaveTextContent(app.label);
-    }
+    expect(screen.getByTestId("workspace-nav-parcours")).toBeInTheDocument();
+    expect(screen.getByTestId("workspace-nav-operations")).toBeInTheDocument();
+    expect(screen.getByTestId("workspace-nav-results")).toBeInTheDocument();
+    expect(screen.getByTestId("workspace-nav-account")).toBeInTheDocument();
     expect(screen.queryByTestId("workspace-sidebar-link-administration")).not.toBeInTheDocument();
     expect(screen.queryByTestId("workspace-sidebar-link-portail-professeur")).not.toBeInTheDocument();
+    expect(screen.queryByText("Accès actif")).not.toBeInTheDocument();
+    expect(screen.queryByText("Accès en préparation")).not.toBeInTheDocument();
 
     const launcherApps = getLauncherApps("JR_BUSINESS_ANALYST").filter((app) => app.id !== "accueil");
     for (const app of launcherApps) {
