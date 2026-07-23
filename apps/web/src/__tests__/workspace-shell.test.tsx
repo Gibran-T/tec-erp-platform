@@ -304,6 +304,11 @@ describe("employee identity from session", () => {
 
     expect(screen.getByTestId("shell-learner-identity")).toHaveTextContent("#NHE-DEMO");
     expect(screen.getByTestId("shell-unified-context")).toBeInTheDocument();
+    const unified = screen.getByTestId("shell-unified-context");
+    const occurrences = (unified.textContent?.match(/Analyste Démo/g) ?? []).length;
+    expect(occurrences).toBe(1);
+    expect(screen.queryByText("MCapstone")).not.toBeInTheDocument();
+    expect(screen.getByTestId("workspace-sidebar-link-capstone")).toHaveTextContent("Capstone");
   });
 
   it("renders session data on the employee profile page", async () => {

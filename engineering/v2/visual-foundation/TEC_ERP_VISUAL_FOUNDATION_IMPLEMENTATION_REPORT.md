@@ -24,7 +24,7 @@ Recovered the Living ERP visual foundation: semantic Light/Dark/System theme con
 | James Run 2 | Not created |
 | Curriculum / scoring / Capstone policy | Unchanged |
 | Schema / production data | Unchanged |
-| Deploy / merge | Not performed |
+| Deploy / merge | Authorized — controlled Web deploy after green gates |
 
 ## Key files
 
@@ -37,6 +37,7 @@ Recovered the Living ERP visual foundation: semantic Light/Dark/System theme con
 - `apps/web/src/layouts/WorkspaceLayout.tsx`
 - `apps/web/src/pages/workspace/LearnerHomePage.tsx`
 - `apps/web/src/index.css` (shell hard-code removal)
+- `apps/api/scripts/visual-foundation-james-local-seed.mjs` (local fixture only)
 
 ## Documentation set
 
@@ -48,13 +49,20 @@ Recovered the Living ERP visual foundation: semantic Light/Dark/System theme con
 6. `TEC_ERP_CONTRAST_ACCESSIBILITY.md`
 7. `TEC_ERP_VISUAL_BEFORE_AFTER_REVIEW.md`
 8. `TEC_ERP_VISUAL_FOUNDATION_IMPLEMENTATION_REPORT.md` (this file)
+9. `TEC_ERP_PR32_FULL_APP_VALIDATION.md`
+10. `TEC_ERP_PR32_RELEASE_AND_DEPLOYMENT_EVIDENCE.md`
 
 ## Verification
 
-- Web unit tests (including visual-foundation-theme)
-- Typecheck / lint / build / env:check (recorded in PR gate)
-- No production deploy
+- Real full-app local validation (API 3013 + Web 5177 + James historical fixture)
+- Screenshots: `evidence/full-app-release/`
+- Web unit tests 97/97 (including visual-foundation-theme + shell regressions)
+- Typecheck / lint / build / env:check green
+- Scope remains visual/presentation only
 
-## Remaining owner gate
+## Full-app release fixes (Sheriff gate)
 
-Raster screenshot review at 1440×900 (Light/Dark/System × panel × tablet/mobile) against James historical local state.
+- Capstone label localization (`MCapstone` → `Capstone`)
+- Unified context accessibility duplication removed
+- Legacy Tailwind white/gray remap for ERP/organization theme coherence
+- Local seed first-day task key alignment for ERP unlock in fixture

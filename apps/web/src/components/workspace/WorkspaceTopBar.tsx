@@ -81,14 +81,17 @@ export function WorkspaceTopBar({
   }, [statusLabel, t]);
 
   const contextLine = useMemo(() => {
+    const curriculumLooksHistorical = /historique|historical/i.test(curriculum);
     const parts = [
       employee.displayName,
       `Run ${runSequence}`,
       curriculum,
-      stateLabel,
-    ];
+      curriculumLooksHistorical && /historique|historical/i.test(stateLabel)
+        ? null
+        : stateLabel,
+    ].filter((part): part is string => Boolean(part && part !== "—"));
     if (progress) parts.push(progress);
-    return parts.filter(Boolean).join(" · ");
+    return parts.join(" · ");
   }, [curriculum, employee.displayName, progress, runSequence, stateLabel]);
 
   const contextTitle = [technicalTitle, runTypeLabel, curriculum, stateLabel]
@@ -112,11 +115,9 @@ export function WorkspaceTopBar({
         className="workspace-topbar__context"
         data-testid="shell-unified-context"
         title={contextTitle}
+        aria-label={contextLine}
       >
-        <strong>{employee.displayName}</strong>
-        {` · Run ${runSequence} · ${curriculum} · ${stateLabel}`}
-        {progress ? ` · ${progress}` : ""}
-        <span className="sr-only">{contextLine}</span>
+        {contextLine}
       </p>
 
       <div className="workspace-topbar__actions living-shell-controls" data-testid="living-shell-controls">

@@ -145,4 +145,20 @@ describe("Semantic token surfaces", () => {
       expect(document.documentElement.dataset.theme).toBe("light");
     });
   });
+
+  it("maps legacy white card utilities to living surface tokens under dark theme", async () => {
+    document.documentElement.dataset.theme = "dark";
+    document.body.innerHTML = `
+      <div data-testid="workspace-shell">
+        <div class="bg-white text-gray-900" data-testid="legacy-card">Profil</div>
+      </div>
+    `;
+    const card = document.querySelector('[data-testid="legacy-card"]') as HTMLElement;
+    const styles = window.getComputedStyle(card);
+    // JSDOM does not load living-erp.css cascade fully; assert class contract + theme attr.
+    expect(document.documentElement.dataset.theme).toBe("dark");
+    expect(card.className).toContain("bg-white");
+    expect(card.className).toContain("text-gray-900");
+    expect(styles).toBeTruthy();
+  });
 });

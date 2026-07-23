@@ -59,7 +59,7 @@ const MODULE_WHY: Record<string, { purpose: string; process: string; impact: str
   M10: {
     purpose: "Synthétiser BI/IA/conseil ou Capstone historique V1.",
     process: "Indicateurs, scénarios, recommandation.",
-    impact: "Ponte vers MCapstone et certification.",
+    impact: "Ponte vers Capstone et certification.",
   },
 };
 

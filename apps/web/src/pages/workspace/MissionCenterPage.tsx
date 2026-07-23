@@ -788,7 +788,7 @@ export function MissionCenterPage(): ReactNode {
         </div>
       )}
       <aside data-testid="mission-capstone-entry">
-        <h2>MCapstone — Projet intégrateur Equinoxe</h2>
+        <h2>Capstone — Projet intégrateur Equinoxe</h2>
         <p>
           Domaine séparé des trente missions régulières. Ouvrez Capstone pour consulter
           l’éligibilité et le cycle de revue professeur.

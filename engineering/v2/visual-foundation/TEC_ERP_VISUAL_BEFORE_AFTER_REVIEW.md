@@ -26,7 +26,31 @@ Copy retained under this gate as immutable “before” evidence (do not overwri
 
 Close-ups required: compact header, navigation groups, primary summary, card hierarchy, right panel, green/yellow/red signals.
 
-## After evidence (captured)
+## Full-app release evidence (real React app — authoritative)
+
+Directory: `engineering/v2/visual-foundation/evidence/full-app-release/`
+
+Captured against local API `3013` + Web `5177` with James Timothy historical fixture (not static HTML).
+
+| # | File | Notes |
+|---|------|-------|
+| 1 | `01-light-home-context-closed.png` | Compact header; summary first |
+| 2 | `02-light-home-context-open.png` | Context panel readable |
+| 3 | `03-dark-home-context-closed.png` | Dark coherent surfaces |
+| 4 | `04-dark-home-context-open.png` | Right panel dark readable |
+| 5 | `05-system-resolved-light.png` | System → Light |
+| 6 | `06-system-resolved-dark.png` | System → Dark |
+| 7 | `07-light-erp.png` | ERP organisation title readable |
+| 8 | `08-dark-erp.png` | Elevated cards; no white-on-white |
+| 9 | `09-historical-module.png` | Module hub |
+| 10 | `10-historical-mission.png` | Mission center |
+| 11 | `11-capstone.png` | Historical Capstone |
+| 12 | `12-certificates.png` | Certificate history |
+| 13 | `13-profile-menu-open.png` | JT menu readable |
+| 14 | `14-signals-home.png` | Green/yellow/gray signals |
+| 15–19 | `15-tablet-home.png` … `19-mobile-historical-mission.png` | Responsive |
+
+## Static smoke after evidence (non-authoritative fixture)
 
 Directory: `engineering/v2/visual-foundation/evidence/after/`
 

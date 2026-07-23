@@ -1039,6 +1039,46 @@ body {
   outline-offset: 2px;
 }
 
+/* Remap legacy Tailwind gray/white utilities inside the Living workspace so ERP /
+   organization pages consume theme tokens in Light and Dark (no white-on-white). */
+[data-testid="workspace-shell"] .text-gray-900,
+[data-testid="workspace-shell"] .text-gray-800,
+[data-testid="workspace-shell"] .text-gray-700 {
+  color: var(--living-text);
+}
+
+[data-testid="workspace-shell"] .text-gray-600,
+[data-testid="workspace-shell"] .text-gray-500 {
+  color: var(--living-text-secondary);
+}
+
+[data-testid="workspace-shell"] .bg-white {
+  background: var(--living-surface-elevated);
+  color: var(--living-text);
+  box-shadow: var(--living-shadow);
+}
+
+[data-testid="workspace-shell"] .bg-gray-50,
+[data-testid="workspace-shell"] .hover\:bg-blue-50:hover {
+  background: var(--living-surface-muted);
+}
+
+[data-testid="workspace-shell"] .border-gray-200,
+[data-testid="workspace-shell"] .border-gray-100 {
+  border-color: var(--living-border);
+}
+
+[data-testid="workspace-shell"] .workspace-erp__header h1,
+[data-testid="organization-erp-page"] h1 {
+  color: var(--living-text);
+}
+
+[data-testid="organization-erp-page"] .rounded-lg.border.bg-white,
+[data-testid="organization-erp-page"] [class*="bg-white"] {
+  background: var(--living-surface-elevated);
+  color: var(--living-text);
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
