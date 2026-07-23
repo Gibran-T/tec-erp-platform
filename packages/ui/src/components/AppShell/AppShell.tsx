@@ -5,6 +5,8 @@ export interface AppShellProps {
   readonly sidebar?: ReactNode;
   readonly rightPanel?: ReactNode;
   readonly children: ReactNode;
+  readonly rightPanelCollapsed?: boolean;
+  readonly navCollapsed?: boolean;
 }
 
 export function AppShell({
@@ -12,9 +14,19 @@ export function AppShell({
   sidebar,
   rightPanel,
   children,
+  rightPanelCollapsed = false,
+  navCollapsed = false,
 }: AppShellProps): ReactNode {
+  const className = [
+    "tec-app-shell",
+    rightPanelCollapsed ? "tec-app-shell--context-collapsed" : "",
+    navCollapsed ? "tec-app-shell--nav-collapsed" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className="tec-app-shell" data-testid="tec-app-shell">
+    <div className={className} data-testid="tec-app-shell">
       {topNav ? (
         <header className="tec-app-shell__top-nav" data-testid="tec-app-shell-top-nav">
           {topNav}
@@ -30,7 +42,11 @@ export function AppShell({
           {children}
         </main>
         {rightPanel ? (
-          <aside className="tec-app-shell__right-panel" data-testid="tec-app-shell-right-panel">
+          <aside
+            className="tec-app-shell__right-panel"
+            data-testid="tec-app-shell-right-panel"
+            hidden={rightPanelCollapsed}
+          >
             {rightPanel}
           </aside>
         ) : null}

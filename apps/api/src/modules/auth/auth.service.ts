@@ -27,7 +27,7 @@ export interface AuthService {
   session(accessToken: string): Promise<ResultType<{ employee: AuthenticatedEmployee }>>;
 }
 
-const INVALID_CREDENTIALS = "Invalid email or password.";
+const INVALID_CREDENTIALS = "Courriel ou mot de passe invalide.";
 
 export function createAuthService(dependencies: AuthServiceDependencies): AuthService {
   const { employeeRepository, config } = dependencies;

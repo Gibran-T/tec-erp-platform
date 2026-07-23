@@ -112,12 +112,14 @@ export function getWorkspaceApp(appId: string): WorkspaceAppDefinition | undefin
 
 export function getSidebarApps(role?: EmployeeRole): WorkspaceAppDefinition[] {
   return [...WORKSPACE_APPS]
+    .filter((app) => app.access === "day1")
     .filter((app) => (role ? isWorkspaceAppVisibleToRole(app, role) : true))
     .sort((left, right) => left.sidebarOrder - right.sidebarOrder);
 }
 
 export function getLauncherApps(role?: EmployeeRole): WorkspaceAppDefinition[] {
   return [...WORKSPACE_APPS]
+    .filter((app) => app.access === "day1")
     .filter((app) => (role ? isWorkspaceAppVisibleToRole(app, role) : true))
     .sort((left, right) => left.launcherOrder - right.launcherOrder);
 }

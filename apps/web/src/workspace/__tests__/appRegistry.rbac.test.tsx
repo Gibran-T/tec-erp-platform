@@ -28,6 +28,14 @@ describe("Z1-001 workspace app RBAC", () => {
     expect(ids).toContain("portail-professeur");
   });
 
+  it("hides preparing-access apps from primary learner sidebar navigation", () => {
+    const ids = getSidebarApps("JR_BUSINESS_ANALYST").map((app) => app.id);
+    expect(ids).not.toContain("calendrier");
+    expect(ids).not.toContain("centre-services-ti");
+    expect(ids).toContain("centre-mission");
+    expect(ids).toContain("capstone");
+  });
+
   it("never marks role-gated apps as visible without matching role", () => {
     const adminApp = WORKSPACE_APPS.find((app) => app.id === "administration");
     const professorApp = WORKSPACE_APPS.find((app) => app.id === "portail-professeur");

@@ -7,8 +7,13 @@ import {
   type AnalyticsExceptionRow,
   type AnalyticsKpiCard,
 } from "../../api/analytics.js";
+import { useLocale } from "../../i18n/LocaleProvider.js";
+import { KpiExplainedCard } from "../../living-erp/components/KpiExplainedCard.js";
+import { StatusChip, toneForStatus } from "../../living-erp/components/StatusChip.js";
+import { explainKpi } from "../../living-erp/kpiCatalog.js";
 
 export function DashboardPage(): ReactElement {
+  const { t, statusLabel, formatDate } = useLocale();
   const [summaryText, setSummaryText] = useState<string>("");
   const [dashboardTitle, setDashboardTitle] = useState<string>("");
   const [kpis, setKpis] = useState<AnalyticsKpiCard[]>([]);
@@ -27,74 +32,69 @@ export function DashboardPage(): ReactElement {
           getAnalyticsExceptions(),
         ]);
         setSummaryText(dashboardResponse.summaryText);
-        setDashboardTitle(dashboardResponse.dashboards[0]?.title ?? "Tableaux de bord");
+        setDashboardTitle(dashboardResponse.dashboards[0]?.title ?? t("shell.dashboard"));
         setKpis(kpiResponse.kpis);
         setExceptions(exceptionResponse.exceptions);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Chargement impossible.");
+        setError(err instanceof Error ? err.message : t("error.generic"));
       } finally {
         setLoading(false);
       }
     }
     void load();
-  }, []);
+  }, [t]);
 
   return (
     <main className="workspace-page" data-testid="dashboard-page">
-      <h1>Tableaux de bord</h1>
-      <p>Indicateurs operationnels NordHabitat — lecture seule.</p>
+      <h1>{t("shell.dashboard")}</h1>
+      <p>Indicateurs opérationnels NordHabitat — chaque chiffre est expliqué.</p>
       {error ? (
         <p role="alert" data-testid="dashboard-error">
           {error}
         </p>
       ) : null}
-      {loading ? <p role="status">Chargement des indicateurs…</p> : null}
+      {loading ? <p role="status">{t("loading.generic")}</p> : null}
 
       {!loading && !error ? (
         <>
-          <section aria-label="Resume analytique" data-testid="dashboard-summary">
+          <section aria-label="Résumé analytique" data-testid="dashboard-summary">
             <h2>{dashboardTitle}</h2>
-            <p>{summaryText || "Aucun resume disponible pour le moment."}</p>
+            <p>{summaryText || t("empty.generic")}</p>
           </section>
 
-          <section aria-label="Indicateurs cles" data-testid="dashboard-kpis">
-            <h2>Indicateurs cles</h2>
-            {kpis.length === 0 ? <p>Aucun indicateur calcule.</p> : null}
-            <div style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit, minmax(12rem, 1fr))" }}>
+          <section aria-label="Indicateurs expliqués" data-testid="dashboard-kpis">
+            <h2>Indicateurs expliqués</h2>
+            {kpis.length === 0 ? <p>{t("empty.generic")}</p> : null}
+            <div style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit, minmax(18rem, 1fr))" }}>
               {kpis.map((kpi) => (
-                <article key={kpi.key} data-testid={`dashboard-kpi-${kpi.key}`}>
-                  <h3>{kpi.label}</h3>
-                  <p>
-                    <strong>{kpi.formattedValue}</strong>
-                    {kpi.stale ? " (donnees anciennes)" : ""}
-                  </p>
-                  <p>Tendance : {kpi.trend}</p>
-                </article>
+                <KpiExplainedCard key={kpi.key} {...explainKpi(kpi)} />
               ))}
             </div>
           </section>
 
           <section aria-label="Exceptions" data-testid="dashboard-exceptions">
-            <h2>Exceptions detectees</h2>
+            <h2>Exceptions détectées</h2>
             {exceptions.length === 0 ? <p>Aucune exception active.</p> : null}
             <table>
               <thead>
                 <tr>
-                  <th scope="col">Categorie</th>
-                  <th scope="col">Severite</th>
-                  <th scope="col">Resume</th>
+                  <th scope="col">Catégorie</th>
+                  <th scope="col">Sévérité</th>
+                  <th scope="col">Résumé</th>
                   <th scope="col">Source</th>
-                  <th scope="col">Detectee le</th>
+                  <th scope="col">Détectée le</th>
                 </tr>
               </thead>
               <tbody>
                 {exceptions.map((row) => (
                   <tr key={row.id} data-testid={`dashboard-exception-${row.id}`}>
                     <td>{row.category}</td>
-                    <td>{row.severity}</td>
+                    <td>
+                      <StatusChip label={statusLabel(row.severity)} tone={toneForStatus(row.severity)} />
+                    </td>
                     <td>{row.summary}</td>
                     <td>{row.sourceType}</td>
-                    <td>{row.detectedAt}</td>
+                    <td>{formatDate(row.detectedAt)}</td>
                   </tr>
                 ))}
               </tbody>

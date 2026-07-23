@@ -117,25 +117,36 @@ export function createCertificationService(client = getPrismaClient()) {
   return {
     async getGoldEligibility(employeeId: string) {
       const eligibility = await loadEligibility(employeeId, false);
+      const checklist = {
+        missionsComplete: !eligibility.reasons.some((reason) => reason.startsWith("Missions")),
+        goldAssessmentPassed: !eligibility.reasons.some((reason) => reason.includes("GOLD_M7_M10")),
+        hcmAssessmentPassed: !eligibility.reasons.some((reason) => reason.includes("HCM_M8")),
+        capstoneSubmitted: !eligibility.reasons.some((reason) => reason.includes("non soumis")),
+        capstoneProfessorApproved: !eligibility.reasons.some((reason) =>
+          reason.includes("Approbation professeur"),
+        ),
+      };
+      const studentReasons = eligibility.reasons.filter(
+        (reason) => !reason.includes("Validation professeur Or"),
+      );
+      const awaitingProfessorIssuance =
+        checklist.missionsComplete &&
+        checklist.goldAssessmentPassed &&
+        checklist.capstoneSubmitted &&
+        checklist.capstoneProfessorApproved &&
+        studentReasons.length === 0;
       return {
         eligibleForProfessorIssue: false,
-        studentReadyChecklist: {
-          missionsComplete: !eligibility.reasons.some((reason) => reason.startsWith("Missions")),
-          goldAssessmentPassed: !eligibility.reasons.some((reason) => reason.includes("GOLD_M7_M10")),
-          hcmAssessmentPassed: !eligibility.reasons.some((reason) => reason.includes("HCM_M8")),
-          capstoneSubmitted: !eligibility.reasons.some((reason) => reason.includes("non soumis")),
-          capstoneProfessorApproved: !eligibility.reasons.some((reason) =>
-            reason.includes("Approbation professeur"),
-          ),
-        },
-        reasons: eligibility.reasons.filter(
-          (reason) => !reason.includes("Validation professeur Or"),
-        ),
-        nextStepHint: eligibility.reasons.some((reason) => reason.includes("Approbation professeur"))
-          ? "Votre dossier Capstone est en attente de revue professeur. Le certificat Or n'est émis qu'après approbation et validation professeur."
-          : eligibility.reasons.some((reason) => reason.includes("non soumis"))
-            ? "Soumettez votre dossier Capstone lorsque les 30 missions et l'évaluation Or sont réussies."
-            : "Lorsque le Capstone est approuvé, votre professeur peut émettre le certificat Or.",
+        awaitingProfessorIssuance,
+        studentReadyChecklist: checklist,
+        reasons: studentReasons,
+        nextStepHint: checklist.capstoneProfessorApproved && awaitingProfessorIssuance
+          ? "Capstone approuvé — certificat Or en attente d’émission par le professeur."
+          : eligibility.reasons.some((reason) => reason.includes("Approbation professeur"))
+            ? "Votre dossier Capstone est en attente de revue professeur. Le certificat Or n'est émis qu'après approbation et validation professeur."
+            : eligibility.reasons.some((reason) => reason.includes("non soumis"))
+              ? "Soumettez votre dossier Capstone lorsque les 30 missions et l'évaluation Or sont réussies."
+              : "Lorsque le Capstone est approuvé, votre professeur peut émettre le certificat Or.",
       };
     },
 

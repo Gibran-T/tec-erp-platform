@@ -1,10 +1,37 @@
 import { useEffect, useState, type ReactElement } from "react";
 
 import { listMyPedagogicalRuns } from "../../api/pedagogical-runs.js";
+import { useLocale } from "../../i18n/LocaleProvider.js";
+import type { MessageKey } from "../../i18n/messages/fr.js";
 
 const STORAGE_KEY = "tec.erp.activeRunId";
 
+function localizedRunType(
+  run: Record<string, unknown>,
+  t: (key: MessageKey) => string,
+): string {
+  const runType = String(run.runType ?? "");
+  if (runType === "AUTONOMOUS") return t("run.type.AUTONOMOUS");
+  if (runType === "COHORT") return t("run.type.COHORT");
+  if (runType === "REMEDIATION") return t("run.type.REMEDIATION");
+  const label = typeof run.runTypeLabel === "string" ? run.runTypeLabel : "";
+  if (label && !/autonomous zero1/i.test(label)) return label;
+  return runType || "—";
+}
+
+function localizedRunHeading(run: Record<string, unknown>, t: (key: MessageKey) => string): string {
+  const sequence = Number(run.runSequence ?? 1);
+  const curriculum = String(run.curriculumVersionLabel ?? run.curriculumVersion ?? "");
+  const parts = [
+    `Run ${Number.isFinite(sequence) ? sequence : 1}`,
+    localizedRunType(run, t),
+  ];
+  if (curriculum) parts.push(curriculum);
+  return parts.join(" · ");
+}
+
 export function PedagogicalRunBanner(): ReactElement | null {
+  const { t, statusLabel } = useLocale();
   const [runs, setRuns] = useState<Array<Record<string, unknown>>>([]);
   const [selectedRunId, setSelectedRunId] = useState<string>(() => {
     try {
@@ -43,39 +70,46 @@ export function PedagogicalRunBanner(): ReactElement | null {
   }
 
   const selected = runs.find((run) => run.id === selectedRunId) ?? runs[0];
+  const isHistorical =
+    Boolean(selected?.isHistorical) || selected?.status === "COMPLETED" || selected?.isWritable === false;
+  const isCurrent = Boolean(selected?.isWritable) || selected?.status === "ACTIVE";
 
   return (
     <section className="pedagogical-run-banner" data-testid="pedagogical-run-banner" aria-label="Parcours pédagogique">
       <div>
-        <strong>{String(selected?.runLabel ?? "Parcours")}</strong>
+        <strong data-testid="pedagogical-run-heading">{localizedRunHeading(selected ?? {}, t)}</strong>
         <span>
           {" "}
-          · {String(selected?.statusLabel ?? selected?.status ?? "")} ·{" "}
-          {String(selected?.runTypeLabel ?? selected?.runType ?? "")}
+          · {statusLabel(String(selected?.status ?? ""))} · {localizedRunType(selected ?? {}, t)}
+          {typeof selected?.completionPercent === "number" ? ` · ${selected.completionPercent} %` : ""}
         </span>
-        {typeof selected?.completionPercent === "number" ? (
-          <span> · {selected.completionPercent} %</span>
+        {isHistorical ? (
+          <span data-testid="pedagogical-run-historical-badge"> · {t("status.historical")} (lecture seule)</span>
+        ) : null}
+        {isCurrent && !isHistorical ? (
+          <span data-testid="pedagogical-run-current-badge"> · Parcours courant</span>
         ) : null}
       </div>
-      <label>
-        Parcours
-        <select
-          data-testid="pedagogical-run-selector"
-          value={typeof selected?.id === "string" ? selected.id : ""}
-          onChange={(event) => {
-            setSelectedRunId(event.target.value);
-            window.localStorage.setItem(STORAGE_KEY, event.target.value);
-          }}
-        >
-          {runs.map((run) => (
-            <option key={String(run.id)} value={String(run.id)}>
-              {String(run.runCode)} — {String(run.statusLabel ?? run.status)}
-              {run.isHistorical ? " (historique)" : ""}
-              {run.isWritable ? " (courant)" : ""}
-            </option>
-          ))}
-        </select>
-      </label>
+      {runs.length > 1 ? (
+        <label>
+          Parcours
+          <select
+            data-testid="pedagogical-run-selector"
+            value={typeof selected?.id === "string" ? selected.id : ""}
+            onChange={(event) => {
+              setSelectedRunId(event.target.value);
+              window.localStorage.setItem(STORAGE_KEY, event.target.value);
+            }}
+          >
+            {runs.map((run) => (
+              <option key={String(run.id)} value={String(run.id)}>
+                {localizedRunHeading(run, t)}
+                {run.isHistorical ? ` (${t("status.historical")})` : ""}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
     </section>
   );
 }

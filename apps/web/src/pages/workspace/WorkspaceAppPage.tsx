@@ -9,7 +9,7 @@ import {
   PREPARING_ACCESS_DESCRIPTION,
 } from "../../workspace/workspaceCopy.js";
 import { AdminPortalPage } from "../admin/AdminPortalPage.js";
-import { ProfessorPortalPage } from "../professor/ProfessorPortalPage.js";
+import { ProfessorCommandCenterPage } from "../professor/ProfessorCommandCenterPage.js";
 import { AiCoachPage } from "./AiCoachPage.js";
 import { AssessmentCenterPage } from "./AssessmentCenterPage.js";
 import { CapstonePage } from "./CapstonePage.js";
@@ -50,7 +50,7 @@ export function WorkspaceAppPage(): ReactNode {
   }
 
   if (appId === "portail-professeur") {
-    return <ProfessorPortalPage />;
+    return <ProfessorCommandCenterPage />;
   }
 
   if (appId === "erp") {

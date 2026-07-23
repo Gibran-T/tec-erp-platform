@@ -37,6 +37,7 @@ export interface CapstoneSubmissionView {
   readonly executiveSummary: string | null;
   readonly submittedAt: string | null;
   readonly reviewStatus: string | null;
+  readonly professorNotes?: string | null;
   readonly lifecycleStatus?: string;
   readonly lifecycleStatusLabel?: string;
   readonly currentStage?: string | null;

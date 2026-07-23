@@ -85,25 +85,70 @@ export async function getAnalyticsExceptions() {
   );
 }
 
-export async function getProfessorAnalyticsHeatmap() {
+/** Matches `GET /api/v1/professor/analytics/heatmap` (analytics.service). */
+export interface ProfessorHeatmapStudentRow {
+  readonly studentId: string;
+  readonly employeeNumber: string;
+  readonly displayName: string;
+  readonly completedMissions: number;
+  readonly moduleCounts: Record<string, number>;
+  readonly curriculumVersion: string;
+  readonly officialRunCode: string | null;
+  readonly runCount: number;
+  readonly note: string;
+}
+
+export interface ProfessorHeatmapResponse {
+  readonly mode?: string;
+  readonly enrolledStudentCount: number;
+  readonly curriculumVersionsPresent: string[];
+  readonly rows: ProfessorHeatmapStudentRow[];
+}
+
+/** Matches `GET /api/v1/professor/analytics/competencies`. */
+export interface ProfessorCompetencyRow {
+  readonly moduleCode: string;
+  readonly title: string;
+  readonly missionCount: number;
+  readonly coveragePercent: number;
+}
+
+export interface ProfessorCompetencyResponse {
+  readonly mode?: string;
+  readonly enrolledStudentCount: number;
+  readonly competencies: ProfessorCompetencyRow[];
+}
+
+export const EMPTY_PROFESSOR_HEATMAP: ProfessorHeatmapResponse = {
+  enrolledStudentCount: 0,
+  curriculumVersionsPresent: [],
+  rows: [],
+};
+
+export const EMPTY_PROFESSOR_COMPETENCIES: ProfessorCompetencyResponse = {
+  enrolledStudentCount: 0,
+  competencies: [],
+};
+
+export async function getProfessorAnalyticsHeatmap(): Promise<ProfessorHeatmapResponse> {
   const token = requireAccessToken();
   const response = await safeFetch(`${getApiBaseUrl()}/api/v1/professor/analytics/heatmap`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
-  return parseJson<{ rows: Array<Record<string, unknown>> }>(
+  return parseJson<ProfessorHeatmapResponse>(
     response,
     "Impossible de charger la carte de chaleur.",
   );
 }
 
-export async function getProfessorCompetencySummary() {
+export async function getProfessorCompetencySummary(): Promise<ProfessorCompetencyResponse> {
   const token = requireAccessToken();
   const response = await safeFetch(`${getApiBaseUrl()}/api/v1/professor/analytics/competencies`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
-  return parseJson<{ competencies: Array<Record<string, unknown>> }>(
+  return parseJson<ProfessorCompetencyResponse>(
     response,
     "Impossible de charger le resume des competences.",
   );

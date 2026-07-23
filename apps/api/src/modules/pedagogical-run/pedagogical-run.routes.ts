@@ -222,6 +222,20 @@ export function createPedagogicalRunProfessorRouter(service: PedagogicalRunServi
     }
   });
 
+  // Professor alias for institutional unique-student metric (OBS-2 / Living ERP P2).
+  // Must remain before `/:runId` routes so "metrics" is never captured as a run id.
+  router.get("/pedagogical-course-runs/metrics/unique-students", async (req, res, next) => {
+    try {
+      const actor = getAuthenticatedEmployee(req);
+      const count = await service.countDistinctStudentsForInstitutionalMetric(
+        await resolveActorCompanyId(actor.id),
+      );
+      res.status(200).json({ mode: "OFFICIAL_COHORT_RESULT", studentCount: count });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   router.post("/pedagogical-course-runs/:runId/interventions", async (req, res, next) => {
     try {
       const actor = getAuthenticatedEmployee(req);

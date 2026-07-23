@@ -136,6 +136,20 @@ export function CertificatesPage(): ReactElement {
       {certificates.length === 0 && !loading ? <p>Aucun certificat émis.</p> : null}
       {certificates.map((certificate) => {
         const revoked = certificate.status === "revoked";
+        const typeLabel =
+          certificate.certificateType === "gold"
+            ? "Or"
+            : certificate.certificateType === "silver"
+              ? "Argent"
+              : certificate.certificateType;
+        const statusLabel =
+          certificate.status === "issued"
+            ? "Émis (actif)"
+            : certificate.status === "revoked"
+              ? "Révoqué"
+              : certificate.status === "superseded"
+                ? "Remplacé"
+                : certificate.status;
         return (
           <article
             key={certificate.certificateNumber}
@@ -143,7 +157,10 @@ export function CertificatesPage(): ReactElement {
             data-certificate-type={certificate.certificateType}
             data-status={certificate.status}
           >
-            <h2>Certificat {certificate.certificateType.toUpperCase()}</h2>
+            <h2>
+              Certificat {typeLabel}
+            </h2>
+            <p data-testid="certificate-status-label">Statut : {statusLabel}</p>
             <p>
               <strong>{certificate.studentName}</strong>
             </p>
@@ -157,7 +174,12 @@ export function CertificatesPage(): ReactElement {
               </p>
             ) : (
               <p>
-                Statut : {certificate.status} / vérification {certificate.verificationStatus}
+                Vérification :{" "}
+                {certificate.verificationStatus === "valid"
+                  ? "valide"
+                  : certificate.verificationStatus === "revoked"
+                    ? "révoquée"
+                    : certificate.verificationStatus}
               </p>
             )}
             {!revoked ? (

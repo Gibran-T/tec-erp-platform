@@ -21,4 +21,22 @@ describe("AppShell", () => {
     expect(screen.getByTestId("tec-app-shell-main")).toHaveTextContent("Main Content");
     expect(screen.getByTestId("tec-app-shell-right-panel")).toHaveTextContent("Context Panel");
   });
+
+  it("supports a collapsed context panel", () => {
+    const { container } = render(
+      <AppShell
+        topNav={<div>Top</div>}
+        sidebar={<nav>Side</nav>}
+        rightPanel={<aside>Context</aside>}
+        rightPanelCollapsed
+      >
+        <div>Main</div>
+      </AppShell>,
+    );
+
+    const shell = container.querySelector('[data-testid="tec-app-shell"]');
+    const panel = container.querySelector('[data-testid="tec-app-shell-right-panel"]');
+    expect(shell).toHaveClass("tec-app-shell--context-collapsed");
+    expect(panel).toHaveAttribute("hidden");
+  });
 });
