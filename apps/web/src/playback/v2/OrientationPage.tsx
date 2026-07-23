@@ -3,101 +3,135 @@ import { Link } from "react-router-dom";
 
 import { usePlayback } from "./PlaybackProvider.js";
 
+/**
+ * Mission Cockpit (route may remain /orientation during Wave 2A).
+ * First post-login destination: active mandate, not generic curriculum.
+ * Future route recommendation: /playback/v2/mission-cockpit
+ */
 export function OrientationPage(): ReactNode {
-  const { copy, locale, selectedModule, tModuleTitle, tRole, level } = usePlayback();
-
-  const modeLabel =
-    level === "novice"
-      ? copy.modes.guided.name
-      : level === "intermediate"
-        ? copy.modes.simulation.name
-        : copy.modes.evaluation.name;
+  const { copy, branding, endorsement, locale, missionPreviewOpen, setMissionPreviewOpen } = usePlayback();
+  const c = copy.cockpit;
+  const fr = locale === "fr";
 
   return (
-    <main className="playback-orientation" data-testid="playback-orientation">
-      <p className="playback-eyebrow">TEC.ERP · Equinoxe</p>
-      <h1>{copy.orientation.title}</h1>
-      <p className="playback-note">
-        {locale === "fr" ? "Pont d’orientation — Wave 3 à venir" : "Orientation bridge — Wave 3 upcoming"}
-      </p>
-
-      <div className="playback-orientation-grid">
-        <article className="playback-orientation-card">
-          <h3>{copy.orientation.where}</h3>
-          <p>
-            {locale === "fr"
-              ? "Portail TEC.ERP → orientation Equinoxe"
-              : "TEC.ERP portal → Equinoxe orientation"}
-          </p>
-        </article>
-        <article className="playback-orientation-card">
-          <h3>{copy.orientation.who}</h3>
-          <p>
-            {locale === "fr" ? "Camille Tremblay" : "Camille Tremblay"} · {tRole(selectedModule.role)}
-          </p>
-        </article>
-        <article className="playback-orientation-card">
-          <h3>{copy.orientation.mandate}</h3>
-          <p>
-            {selectedModule.code} — {locale === "fr" ? selectedModule.mandateFr : selectedModule.mandateEn}
-          </p>
-        </article>
-        <article className="playback-orientation-card">
-          <h3>{copy.orientation.company}</h3>
-          <p>{copy.orientation.pulse}: OTIF 91% · {locale === "fr" ? "stock tendu sur famille A" : "tight stock on family A"}</p>
-        </article>
-        <article className="playback-orientation-card">
-          <h3>{copy.orientation.next}</h3>
-          <p>
-            {locale === "fr"
-              ? `Ouvrir le mandat ${selectedModule.code} (${tModuleTitle(selectedModule)}) — Mission 1 enquête`
-              : `Open mandate ${selectedModule.code} (${tModuleTitle(selectedModule)}) — Mission 1 investigation`}
-          </p>
-        </article>
-        <article className="playback-orientation-card">
-          <h3>{copy.orientation.mode}</h3>
-          <p>{modeLabel}</p>
-        </article>
-        <article className="playback-orientation-card">
-          <h3>{copy.orientation.evidence}</h3>
-          <p>
-            {locale === "fr"
-              ? "0 / 3 preuves de mandat · dossier ouvert"
-              : "0 / 3 mandate evidence items · dossier open"}
-          </p>
-        </article>
-        <article className="playback-orientation-card">
-          <h3>{copy.orientation.message}</h3>
-          <p>
-            {locale === "fr"
-              ? "Superviseur: préparez le cadrage avant le comité de 10 h."
-              : "Supervisor: prepare framing before the 10:00 committee."}
-          </p>
-        </article>
-        <article className="playback-orientation-card">
-          <h3>{copy.orientation.professor}</h3>
-          <p>
-            {locale === "fr"
-              ? "Classe en cours · Professor disponible pour débrief"
-              : "Class in session · Professor available for debrief"}
-          </p>
-        </article>
-        <article className="playback-orientation-card">
-          <h3>{locale === "fr" ? "Position M1–M10" : "M1–M10 position"}</h3>
-          <p>
-            {selectedModule.code} / M10 · Capstone {locale === "fr" ? "séparé" : "separate"}
-          </p>
-        </article>
-      </div>
-
-      <div className="playback-hero-actions" style={{ marginTop: "1.25rem" }}>
-        <Link className="playback-btn playback-btn--primary" to="/playback/v2/portal#parcours">
-          {copy.orientation.continue}
-        </Link>
-        <Link className="playback-btn" to="/playback/v2/portal">
-          {copy.orientation.backPortal}
+    <main className="playback-shell" data-testid="mission-cockpit">
+      <div className="pb-cockpit-top">
+        <div>
+          <strong data-testid="cockpit-greeting">{c.greeting}</strong>
+          <div className="pb-cockpit-meta">
+            <span>{c.role}</span>
+            <span>{c.module}</span>
+            <span>{c.classContext}</span>
+            <span>{c.professor}</span>
+          </div>
+          <div className="playback-brand" style={{ marginTop: "0.55rem", fontSize: "1rem" }}>
+            {branding.productName}
+            {branding.showInstitution && endorsement ? (
+              <span className="playback-endorsement" style={{ marginLeft: "0.65rem" }}>
+                {endorsement}
+              </span>
+            ) : null}
+          </div>
+        </div>
+        <Link className="playback-btn playback-btn--ghost playback-btn--small" to="/playback/v2/portal">
+          {copy.login.back}
         </Link>
       </div>
+
+      <div className="pb-cockpit-grid">
+        <section className="pb-mission-primary" aria-labelledby="mandate-title" data-testid="cockpit-primary">
+          <span className="playback-chip">{c.mandateTitle}</span>
+          <h1 id="mandate-title" style={{ margin: "0.35rem 0 0.65rem", fontSize: "1.55rem" }}>
+            {fr ? "SO-1048 · promesse client sous tension" : "SO-1048 · customer promise under tension"}
+          </h1>
+          <p>{c.situation}</p>
+          <p>
+            <strong>{c.decision}</strong>
+          </p>
+          <button
+            type="button"
+            className="playback-btn"
+            data-testid="cockpit-primary-cta"
+            onClick={() => setMissionPreviewOpen(true)}
+          >
+            {c.cta}
+          </button>
+        </section>
+
+        <aside className="pb-cockpit-side">
+          <section className="pb-panel" data-testid="cockpit-enterprise-pulse" aria-labelledby="pulse-mini-title">
+            <h3 id="pulse-mini-title">{c.pulseTitle}</h3>
+            <ul className="pb-pulse-mini">
+              <li>OTIF 91 %</li>
+              <li>{fr ? "Stock famille A sous tension" : "Family A stock under tension"}</li>
+              <li>{fr ? "Demande client active · 140 unités" : "Active customer demand · 140 units"}</li>
+              <li>{fr ? "Dépendance fournisseur · +4 jours" : "Supplier dependency · +4 days"}</li>
+              <li>{fr ? "Risque opérationnel : promesse vendredi" : "Operational risk: Friday promise"}</li>
+            </ul>
+          </section>
+
+          <section className="pb-panel" data-testid="cockpit-inbox" aria-labelledby="inbox-title">
+            <h3 id="inbox-title">{c.inboxTitle}</h3>
+            <div className="pb-inbox-item">
+              <strong>{fr ? "Marc Tremblay · Directeur commercial" : "Marc Tremblay · Sales director"}</strong>
+              <span className="pb-urgency">{fr ? "Urgent" : "Urgent"}</span>
+              <span>{fr ? "Confirmation demandée avant 15 h" : "Confirmation requested before 3 p.m."}</span>
+              <span>{fr ? "Action : établir les preuves de risque" : "Action: establish risk evidence"}</span>
+            </div>
+            <div className="pb-inbox-item">
+              <strong>{fr ? "NordLog Parts · Fournisseur" : "NordLog Parts · Supplier"}</strong>
+              <span>{fr ? "+4 jours si quantité > 120" : "+4 days if quantity > 120"}</span>
+              <span>{fr ? "Action : intégrer au diagnostic" : "Action: include in diagnosis"}</span>
+            </div>
+          </section>
+
+          <section className="pb-panel" data-testid="cockpit-evidence" aria-labelledby="evidence-title">
+            <h3 id="evidence-title">{c.evidenceTitle}</h3>
+            <p>{c.evidenceStatus}</p>
+            <p>{c.nextEvidence}</p>
+            <p style={{ color: "var(--pb-muted)", fontSize: "0.86rem" }}>
+              {fr
+                ? "Types : carte processus · message partie prenante · signal KPI"
+                : "Types: process map · stakeholder message · KPI signal"}
+            </p>
+          </section>
+
+          <section className="pb-panel" data-testid="cockpit-learning" aria-labelledby="learning-title">
+            <h3 id="learning-title">{c.learningTitle}</h3>
+            <p>{c.mode}</p>
+            <p>{c.professor}</p>
+            <p>{c.progress}</p>
+            <p>{c.capstoneNote}</p>
+          </section>
+        </aside>
+      </div>
+
+      {missionPreviewOpen ? (
+        <div className="pb-modal-backdrop" role="presentation">
+          <div
+            className="pb-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="mission-preview-title"
+            data-testid="mission-preview"
+          >
+            <span className="pb-preview-badge">{copy.previewBadge}</span>
+            <h2 id="mission-preview-title">{c.previewTitle}</h2>
+            <p>{c.previewLead}</p>
+            <p>
+              <strong>M1 → Mandat actif → Mission 1 — Enquête et diagnostic</strong>
+            </p>
+            <button
+              type="button"
+              className="playback-btn"
+              data-testid="mission-preview-close"
+              onClick={() => setMissionPreviewOpen(false)}
+            >
+              {c.previewClose}
+            </button>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
