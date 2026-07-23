@@ -85,11 +85,26 @@ describe("Wave 2A Playback Zero — Revision 2", () => {
   it("shows Professor orchestration preview and executive BI panel", () => {
     renderPlayback();
     expect(screen.getByTestId("professor-orchestration")).toHaveTextContent(/APERÇU|PREVIEW/);
+    const pause = screen.getByRole("button", { name: /Mettre en pause/i });
+    expect(pause).toBeDisabled();
+    expect(pause.textContent).toMatch(/Mettre en pause/);
+    expect(pause.textContent).toMatch(/APERÇU — NON IMPLÉMENTÉ/);
+    expect(pause.querySelector(".pb-prof-control__badge")).toBeTruthy();
     expect(screen.getByTestId("executive-impact-bi")).toBeInTheDocument();
     expect(screen.getByTestId("signal-Trésorerie")).toBeInTheDocument();
+    expect(screen.getByTestId("signal-Stocks")).toBeInTheDocument();
     const impact = screen.getByTestId("executive-impact-bi").textContent ?? "";
     expect(impact).not.toMatch(/PO qty/);
     expect(impact).not.toMatch(/Cause:.*Horizon:.*Partie prenante/);
+  });
+
+  it("translates stakeholder complexity and avoids Teaching Deck / raw low", () => {
+    renderPlayback();
+    fireEvent.click(screen.getByTestId("module-M1"));
+    expect(screen.getByTestId("module-detail-panel")).toHaveTextContent(/Faible/);
+    expect(screen.getByTestId("module-detail-panel").textContent).not.toMatch(/\blow\b/);
+    const portal = screen.getByTestId("playback-portal").textContent ?? "";
+    expect(portal).not.toMatch(/Teaching Deck/);
   });
 
   it("has no learner-facing Wave terminology or English learner token in FR", () => {

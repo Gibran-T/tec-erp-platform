@@ -255,7 +255,7 @@ const FR: PlaybackCopy = {
     demandLabel: "Demande client",
     demandValue: "SO-1048 · 140 unités · échéance vendredi",
     processLabel: "Processus",
-    processValue: "Ventes → Stock → Achats → Fournisseur",
+    processValue: "Ventes → Stocks → Achats → Fournisseur",
     messageLabel: "Message",
     messageValue: "Fournisseur : +4 jours si quantité > 120",
     impactLabel: "Impact",
@@ -265,11 +265,13 @@ const FR: PlaybackCopy = {
   },
   enterprise: {
     title: "Equinoxe — carte du pouls de l’entreprise",
-    lead: "Le Digital Twin est le corps. Le moteur de vie de l’entreprise fait circuler messages, documents et KPI.",
+    lead:
+      "Le Digital Twin est le corps. Le moteur de vie de l’entreprise fait circuler messages, documents et indicateurs clés de performance (KPI).",
     twin: "Digital Twin — structure opérationnelle",
     engine: "Moteur de vie — circulation et réaction",
     selectHint: "Sélectionnez un nœud pour ouvrir le panneau opérationnel.",
-    flowLabel: "Flux actif : Client → Ventes → Stock → Achats → Fournisseur → Entrepôt → Finance → BI → Direction",
+    flowLabel:
+      "Flux actif : Client → Ventes → Stocks → Achats → Fournisseur → Entrepôt → Finance → BI → Direction",
     detail: {
       person: "Responsable",
       role: "Rôle",
@@ -278,7 +280,7 @@ const FR: PlaybackCopy = {
       situation: "Situation",
       message: "Message récent",
       consequence: "Impact",
-      kpi: "KPI / risque",
+      kpi: "Indicateur clé de performance (KPI) / risque",
       dependency: "Dépendance suivante",
     },
     nodes: {
@@ -296,7 +298,7 @@ const FR: PlaybackCopy = {
       sales: {
         person: "Marc Tremblay",
         role: "Directeur commercial",
-        process: "Order-to-Cash",
+        process: "Order-to-Cash (commande à encaissement)",
         document: "SO-1048",
         situation: "Promesse client à risque",
         message: "Confirmation demandée avant 15 h",
@@ -306,10 +308,10 @@ const FR: PlaybackCopy = {
       },
       inventory: {
         person: "Sofia Nguyen",
-        role: "Planificatrice stock",
+        role: "Planificatrice des stocks",
         process: "Allocation",
         document: "Allocation famille A",
-        situation: "Stock famille A sous tension",
+        situation: "Stocks famille A sous tension",
         message: "Couverture insuffisante pour 140 u.",
         consequence: "Besoin de réapprovisionnement",
         kpi: "Couverture < 3 jours",
@@ -318,7 +320,7 @@ const FR: PlaybackCopy = {
       procurement: {
         person: "Léa Martin",
         role: "Acheteuse",
-        process: "Procure-to-Pay",
+        process: "Procure-to-Pay (approvisionnement)",
         document: "Demande d’achat DA-77",
         situation: "Quantité proposée 100 → 140",
         message: "Fournisseur à solliciter immédiatement",
@@ -329,7 +331,7 @@ const FR: PlaybackCopy = {
       suppliers: {
         person: "NordLog Parts",
         role: "Fournisseur",
-        process: "Confirmation délai",
+        process: "Confirmation de délai",
         document: "Confirmation partielle",
         situation: "Capacité saturée",
         message: "+4 jours si quantité > 120",
@@ -351,10 +353,10 @@ const FR: PlaybackCopy = {
       finance: {
         person: "Amira Benali",
         role: "Contrôleuse financière",
-        process: "Record-to-Report",
+        process: "Record-to-Report (clôture et reporting)",
         document: "Engagement trésorerie",
-        situation: "Pression sur la trésorerie court terme",
-        message: "L’écart de quantité impacte le cash-flow de la semaine",
+        situation: "Pression sur la trésorerie à court terme",
+        message: "L’écart de quantité impacte la trésorerie de la semaine",
         consequence: "Arbitrage coût / service",
         kpi: "Trésorerie −12 k$",
         dependency: "Lecture BI",
@@ -362,17 +364,17 @@ const FR: PlaybackCopy = {
       hcm: {
         person: "Kim Lefebvre",
         role: "Responsable HCM",
-        process: "Hire-to-Retire",
+        process: "Hire-to-Retire (cycle RH)",
         document: "Plan de capacité",
         situation: "Équipe entrepôt en surcharge",
         message: "Heures supplémentaires déjà maximales",
         consequence: "Capacité humaine contrainte",
         kpi: "Productivité −8 %",
-        dependency: "Gouvernance accès",
+        dependency: "Gouvernance des accès",
       },
       governance: {
         person: "Paul Girard",
-        role: "Contrôle interne",
+        role: "Responsable du contrôle interne",
         process: "Contrôles et accès",
         document: "Alerte ségrégation",
         situation: "Pression pour contourner un contrôle",
@@ -384,12 +386,12 @@ const FR: PlaybackCopy = {
       bi: {
         person: "Studio BI",
         role: "Signal décisionnel",
-        process: "Data-to-Decision",
+        process: "Data-to-Decision (données vers décision)",
         document: "Projection OTIF",
-        situation: "Dégradation service projetée",
+        situation: "Dégradation de service projetée",
         message: "Trois scénarios disponibles pour la direction",
         consequence: "Choix exécutif requis",
-        kpi: "Confiance projection 78 %",
+        kpi: "Confiance de projection 78 %",
         dependency: "Direction",
       },
       management: {
@@ -451,7 +453,7 @@ const FR: PlaybackCopy = {
       {
         title: "Pratique guidée",
         short: "S’exercer avec filet",
-        detail: "Coach IA disponible, contrôles pédagogiques, erreurs récupérables.",
+        detail: "IA visible (Coach IA) disponible, contrôles pédagogiques, erreurs récupérables.",
       },
       {
         title: "Simulation",
@@ -505,7 +507,7 @@ const FR: PlaybackCopy = {
         confidence: "Projection 78 %",
       },
       {
-        label: "Stock",
+        label: "Stocks",
         baseline: "Couverture 4 j",
         next: "Couverture 2 j",
         cause: "Allocation famille A",
@@ -561,9 +563,11 @@ const FR: PlaybackCopy = {
   },
   ai: {
     title: "IA visible et IA ambiante",
-    lead: "Même intelligence, deux postures : coach explicite et communication d’entreprise gouvernée.",
+    lead:
+      "Même intelligence, deux postures : IA visible (Coach IA) explicite et IA ambiante pour la communication d’entreprise gouvernée.",
     visibleTitle: "IA visible",
-    visibleBody: "Coach pédagogique explicite. Oriente, ne répond pas à la place de l’apprenant.",
+    visibleBody:
+      "IA visible (Coach IA) : coach pédagogique explicite. Oriente, ne répond pas à la place de l’apprenant.",
     ambientTitle: "IA ambiante",
     ambientBody: "Messages d’entreprise gouvernés : fournisseur, entrepôt, finance, supervision.",
     timelineTitle: "Flux de communication",
@@ -614,11 +618,11 @@ const FR: PlaybackCopy = {
         kind: "stakeholder",
       },
       {
-        source: "Coach IA",
-        channel: "IA visible",
+        source: "IA visible",
+        channel: "Coach IA",
         time: "10:05",
         message: "Quelles preuves manquent encore avant de recommander ?",
-        classification: "Coach IA",
+        classification: "IA visible (Coach IA)",
         nature: "Pédagogique (non factuel)",
         kind: "ai",
       },
@@ -640,11 +644,13 @@ const FR: PlaybackCopy = {
     cohort: "24 apprenants",
     mandate: "Mandat actif : SO-1048 sous tension",
     decisions: "Décisions : 11 confirmer · 8 négocier · 5 replanifier",
-    misconception: "Idée fausse fréquente : « augmenter la quantité du bon de commande résout toujours le service »",
+    misconception:
+      "Idée fausse fréquente : « augmenter la quantité du bon de commande résout toujours le service »",
     simStatus: "Simulation : active · pause disponible",
     nextEvent: "Prochain événement : alerte quai",
-    debrief: "Question de débrief : Quel KPI doit primer ici ?",
-    deck: "Teaching Deck : prêt (aperçu)",
+    debrief:
+      "Question de débrief : Quel indicateur clé de performance (KPI) doit primer ici ?",
+    deck: "Support pédagogique : prêt (aperçu)",
     controls: [
       "Mettre en pause",
       "Déclencher l’événement",
@@ -1136,7 +1142,7 @@ const EN: PlaybackCopy = {
     simStatus: "Simulation: active · pause available",
     nextEvent: "Next event: dock alert",
     debrief: "Debrief question: Which KPI should lead here?",
-    deck: "Teaching Deck: ready (preview)",
+    deck: "Teaching support: ready (preview)",
     controls: ["Pause", "Trigger event", "Compare decisions", "Open debrief", "Show evidence"],
   },
   capstone: {
