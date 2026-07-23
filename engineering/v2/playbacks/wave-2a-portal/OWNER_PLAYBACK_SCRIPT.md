@@ -1,67 +1,57 @@
-# Owner Playback Script — Wave 2A Portal Playback Zero
+# Owner Playback Script — Wave 2A Portal Playback Zero (Revision 2)
 
-> **PLAYBACK ZERO ONLY — NOT PRODUCTION — OWNER VISUAL APPROVAL REQUIRED**  
-> Duration: approximately **10–15 minutes**
+**PR:** Draft #34  
+**Marker:** `PLAYBACK ZERO · NOT PRODUCTION`  
+**Local URL:** http://localhost:5173/playback/v2/portal  
 
-## How to open
+Owner visual verdict (prior): **WAVE 2A — REVISE** (architecture GREEN · visual expression REVISE).  
+This script is for the **Revision 2** Owner playback gate.
+
+## Start
 
 ```bash
 cd C:\Projetos\tec-erp-wt-portal-playback-zero
-pnpm install
-pnpm --filter erp-web dev
+pnpm --filter erp-web dev -- --host 127.0.0.1 --port 5173
 ```
 
-Open:
+Open: http://localhost:5173/playback/v2/portal  
+Playback controls: bottom-right drawer.
 
-- Portal: http://localhost:5173/playback/v2/portal  
-- Login: http://localhost:5173/playback/v2/login  
-- Orientation: http://localhost:5173/playback/v2/orientation  
+## Playback order
 
-Use the discreet **Contrôles / Controls** button (bottom-right) for FR/EN, Light/Dark/Projector, viewport, module, Ambient event, and screen jumps.
+1. Open portal in **FR / Light / College branding**.
+2. Evaluate five-second promise (headline + professional identity).
+3. Inspect **live hero preview** (demand, process, message, impact, decision).
+4. Follow the **Enterprise Pulse Map** (connected departments + active flow).
+5. Select at least three departments; read the operational detail panel.
+6. Inspect **mission transformation** (Comprendre → Agir → Conseiller).
+7. Inspect **guidance continuum** (Exploration → Évaluation).
+8. Inspect **M1–M10 chapter journey** (no horizontal scroll).
+9. Select **M1, M3, M8 and M10**; confirm dual enterprise/professional mapping.
+10. Inspect **end-to-end process** (document + consequence layers).
+11. Inspect **Executive Impact** BI decision surface.
+12. Inspect **AI communication timeline** (IA visible vs IA ambiante).
+13. Inspect **Professor orchestration** preview (`APERÇU — NON IMPLÉMENTÉ`).
+14. Inspect **Capstone** culmination (distinct · not M11).
+15. Open **login**.
+16. Confirm institutional continuity (TEC.ERP primary · College endorsement).
+17. Enter **Mission Cockpit** (`/orientation` route; concept = cockpit).
+18. Confirm one obvious next action: **Commencer l’enquête**.
+19. Switch to **independent TEC.ERP** branding (College endorsement hidden).
+20. Switch to **Dark**.
+21. Switch to **Projector**.
+22. Inspect **mobile** viewport (390).
+23. Approve / revise / reject each area.
 
-## Sequence
+## Critical Owner question
 
-| # | Step | Look for |
-|---|------|----------|
-| 1 | Open portal in French / Light | Marker `PLAYBACK ZERO · NOT PRODUCTION` |
-| 2 | First five seconds | TEC.ERP identity; living enterprise; investigate/act/advise; clear CTA |
-| 3 | Living enterprise visual | Hover/select ≥3 nodes; role/process/document/consequence |
-| 4 | Consulting logic | Three distinct missions; COMPRENDRE → AGIR → CONSEILLER |
-| 5 | M1–M10 dual journey | Exactly 10 modules; Capstone separate; enterprise + professional evolution |
-| 6 | End-to-end process | Demand → … → recommendation chain |
-| 7 | Executive impact | Demo-labeled KPIs with cause/timing/stakeholder |
-| 8 | Visible / Ambient AI | Distinct labels; authored chain; no live AI |
-| 9 | Professor preview | Pedagogical capabilities; preview label |
-| 10 | Capstone | Outside M1–M10; S1–S7; Professor approval |
-| 11 | Switch to English | Layout and terminology hold |
-| 12 | Switch to Dark | Contrast remains readable |
-| 13 | Switch to Projector | Larger text, stronger contrast, simpler density |
-| 14 | Open login | Trust layout; prototype data note; password visibility |
-| 15 | Open orientation | Answers where/who/mandate/company/next |
-| 16 | Inspect mobile (viewport 390) | Coherent story; menu; CTA |
-| 17 | Scorecard | Approve / Revise / Reject per area |
+> Does the enterprise now feel alive, or does the page still mainly explain that it is alive?
 
-## Scorecard
+## Non-goals (do not expect)
 
-| Area | GREEN | REVISE | REJECT | Comment |
-|------|-------|--------|--------|---------|
-| First five seconds | | | | |
-| Product identity | | | | |
-| Living enterprise | | | | |
-| Consulting missions | | | | |
-| M1–M10 journey | | | | |
-| Dual journey | | | | |
-| Process chain | | | | |
-| Executive impact | | | | |
-| Visible / Ambient AI | | | | |
-| Professor presence | | | | |
-| Capstone separation | | | | |
-| Login continuity | | | | |
-| Orientation bridge | | | | |
-| FR/EN | | | | |
-| Light/Dark/Projector | | | | |
-| Mobile | | | | |
-| Accessibility | | | | |
-| Overall portal story | | | | |
-
-**Owner decision for Wave 2B:** ☐ Approve · ☐ Revise · ☐ Reject
+- Live AI integration  
+- Full Enterprise Life Engine  
+- Production auth / production portal replacement  
+- Wave 2B / Wave 3 module implementation  
+- Real Mission 1 route  
+- Full white-label multi-tenant platform  
