@@ -1,0 +1,81 @@
+              migration_name               |          finished_at          
+-------------------------------------------+-------------------------------
+ 20260724120000_v1_pedagogical_course_runs | 2026-07-22 20:01:21.119819+00
+ 20260724131000_v1_run_reflections_enabled | 2026-07-22 20:01:21.146002+00
+(2 rows)
+
+ runs 
+------
+    1
+(1 row)
+
+        runCode        | runSequence |  runType   |  status   | completionPercent | reflectionsEnabled | professorId 
+-----------------------+-------------+------------+-----------+-------------------+--------------------+-------------
+ TECERP-PILOT-001-RUN1 |           1 | AUTONOMOUS | COMPLETED |               100 | f                  | 
+(1 row)
+
+ null_mission_fk 
+-----------------
+               0
+(1 row)
+
+ null_course_fk 
+----------------
+              0
+(1 row)
+
+ null_assess_fk 
+----------------
+              0
+(1 row)
+
+ null_capstone_fk 
+------------------
+                0
+(1 row)
+
+ seq_ge_2 
+----------
+        0
+(1 row)
+
+ active_runs 
+-------------
+           0
+(1 row)
+
+ employees 
+-----------
+         1
+(1 row)
+
+ professors 
+------------
+          0
+(1 row)
+
+ certs | issued | revoked 
+-------+--------+---------
+     3 |      2 |       1
+(1 row)
+
+  status   | reviewStatus 
+-----------+--------------
+ submitted | approved
+(1 row)
+
+ ai 
+----
+  1
+(1 row)
+
+ mission_attempts 
+------------------
+               30
+(1 row)
+
+ qa_employees 
+--------------
+            0
+(1 row)
+

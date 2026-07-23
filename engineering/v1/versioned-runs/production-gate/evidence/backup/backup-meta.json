@@ -1,0 +1,14 @@
+﻿{
+    "operator":  "Gibran_QA / Cursor Sheriff",
+    "exitCode":  0,
+    "method":  "pg_dump --format=custom --no-owner --no-privileges via docker postgres:18-alpine (host IP resolved on Windows)",
+    "restoreProcedure":  "pg_restore --no-owner --no-privileges --dbname=$TARGET_URL /path/to/tec-erp-prod-20260722T195537Z.dump (Postgres 18 client)",
+    "utc":  "2026-07-22T19:55:54.0672858Z",
+    "sizeBytes":  148775,
+    "environment":  "production",
+    "sha256":  "BBC9D01F80CC3F5689E4AADC748778481EB6F682309268DC8B2DA6FA89183948",
+    "serverVersion":  "18.4",
+    "stamp":  "20260722T195537Z",
+    "retentionNote":  "Local evidence backup; retain until owner confirms production stability.",
+    "file":  "tec-erp-prod-20260722T195537Z.dump"
+}

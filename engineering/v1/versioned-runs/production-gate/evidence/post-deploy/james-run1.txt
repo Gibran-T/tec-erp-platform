@@ -1,0 +1,5 @@
+        runCode        | runSequence |  runType   |  status   | completionPercent | reflectionsEnabled | attempts | completed | certs_linked | ai_linked 
+-----------------------+-------------+------------+-----------+-------------------+--------------------+----------+-----------+--------------+-----------
+ TECERP-PILOT-001-RUN1 |           1 | AUTONOMOUS | COMPLETED |               100 | f                  |       30 |        30 |            3 |         1
+(1 row)
+
