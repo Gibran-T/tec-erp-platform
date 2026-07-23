@@ -9,12 +9,31 @@ import {
   PLAYBACK_MODULES,
   PROCESS_CHAIN_STEPS,
   PULSE_NODES,
+  SECONDARY_LINKS,
+  buildActiveFlowPath,
   type JourneyChapter,
   type PulseNodeId,
 } from "./modules.js";
 
+const COMPLEXITY_LABEL = {
+  fr: { low: "Faible", medium: "Moyenne", high: "Élevée" },
+  en: { low: "Low", medium: "Medium", high: "High" },
+} as const;
+
 function BrandHeader(): ReactNode {
   const { branding, endorsement, copy } = usePlayback();
+  const links = [
+    { href: "#promise", label: copy.nav.promise },
+    { href: "#enterprise", label: copy.nav.enterprise },
+    { href: "#missions", label: copy.nav.missions },
+    { href: "#modes", label: copy.nav.modes },
+    { href: "#journey", label: copy.nav.journey },
+    { href: "#process", label: copy.nav.process },
+    { href: "#impact", label: copy.nav.impact },
+    { href: "#ai", label: copy.nav.ai },
+    { href: "#professor", label: copy.nav.professor },
+    { href: "#capstone", label: copy.nav.capstone },
+  ] as const;
   return (
     <header className="playback-topnav">
       <div className="playback-brand-block">
@@ -27,40 +46,17 @@ function BrandHeader(): ReactNode {
           </div>
         ) : null}
       </div>
-      <nav aria-label="Sections">
+      <nav className="playback-nav-wrap" aria-label="Sections">
         <ul className="playback-nav">
+          {links.map((link) => (
+            <li key={link.href}>
+              <a href={link.href}>{link.label}</a>
+            </li>
+          ))}
           <li>
-            <a href="#promise">{copy.nav.promise}</a>
-          </li>
-          <li>
-            <a href="#enterprise">{copy.nav.enterprise}</a>
-          </li>
-          <li>
-            <a href="#missions">{copy.nav.missions}</a>
-          </li>
-          <li>
-            <a href="#modes">{copy.nav.modes}</a>
-          </li>
-          <li>
-            <a href="#journey">{copy.nav.journey}</a>
-          </li>
-          <li>
-            <a href="#process">{copy.nav.process}</a>
-          </li>
-          <li>
-            <a href="#impact">{copy.nav.impact}</a>
-          </li>
-          <li>
-            <a href="#ai">{copy.nav.ai}</a>
-          </li>
-          <li>
-            <a href="#professor">{copy.nav.professor}</a>
-          </li>
-          <li>
-            <a href="#capstone">{copy.nav.capstone}</a>
-          </li>
-          <li>
-            <Link to="/playback/v2/login">{copy.nav.login}</Link>
+            <Link className="playback-nav__cta" to="/playback/v2/login">
+              {copy.nav.login}
+            </Link>
           </li>
         </ul>
       </nav>
@@ -129,15 +125,7 @@ function EnterprisePulseMap(): ReactNode {
   const [selected, setSelected] = useState<PulseNodeId>("sales");
   const detail = copy.enterprise.nodes[selected]!;
   const titleId = useId();
-
-  const pathD = useMemo(() => {
-    const pts = ACTIVE_FLOW.map((id) => {
-      const n = PULSE_NODES.find((p) => p.id === id)!;
-      return `${n.x},${n.y}`;
-    });
-    return `M ${pts.join(" L ")}`;
-  }, []);
-
+  const pathD = useMemo(() => buildActiveFlowPath(), []);
   return (
     <section id="enterprise" className="playback-section" aria-labelledby={titleId}>
       <div className="pb-pulse-section" data-testid="enterprise-pulse-map">
@@ -148,19 +136,47 @@ function EnterprisePulseMap(): ReactNode {
         <p className="playback-chip">
           {copy.enterprise.twin} · {copy.enterprise.engine}
         </p>
+        <div className="pb-pulse-legend" aria-hidden="true">
+          <span className="pb-pulse-legend__primary">{locale === "fr" ? "Flux actif" : "Active flow"}</span>
+          <span className="pb-pulse-legend__secondary">
+            {locale === "fr" ? "Dépendances secondaires" : "Secondary dependencies"}
+          </span>
+        </div>
         <div className="pb-pulse-layout">
           <div className="pb-pulse-map" role="group" aria-label={copy.enterprise.selectHint}>
             <svg className="pb-pulse-svg" viewBox="0 0 100 80" aria-hidden="true">
-              <path className="pb-pulse-path" d="M8,28 L24,18 L42,26 L34,48 L14,66 L52,58 L70,42 L66,70" />
-              <path className="pb-pulse-path" d="M70,42 L86,24 L84,56 L58,12" />
+              <defs>
+                <marker
+                  id="pb-flow-arrow"
+                  markerWidth="4"
+                  markerHeight="4"
+                  refX="3"
+                  refY="2"
+                  orient="auto"
+                >
+                  <path d="M0,0 L4,2 L0,4 Z" fill="#7ec4f5" />
+                </marker>
+              </defs>
+              {SECONDARY_LINKS.map(([from, to]) => {
+                const a = PULSE_NODES.find((n) => n.id === from)!;
+                const b = PULSE_NODES.find((n) => n.id === to)!;
+                return (
+                  <path
+                    key={`${from}-${to}`}
+                    className="pb-pulse-path pb-pulse-path--secondary"
+                    d={`M ${a.x},${a.y} Q ${(a.x + b.x) / 2},${(a.y + b.y) / 2 + 4} ${b.x},${b.y}`}
+                  />
+                );
+              })}
               <path
                 id="pb-active-flow"
                 className="pb-pulse-path pb-pulse-path--active"
                 d={pathD}
+                markerMid="url(#pb-flow-arrow)"
                 data-testid="pulse-active-path"
               />
-              <circle r="1.4" className="pb-pulse-marker">
-                <animateMotion dur="8s" repeatCount="indefinite" path={pathD} />
+              <circle r="1.15" className="pb-pulse-marker">
+                <animateMotion dur="10s" repeatCount="indefinite" path={pathD} />
               </circle>
             </svg>
             {PULSE_NODES.map((node) => (
@@ -171,7 +187,7 @@ function EnterprisePulseMap(): ReactNode {
                   node.id === "inventory" || node.id === "suppliers" || node.id === "warehouse"
                     ? " pb-pulse-node--tension"
                     : ""
-                }`}
+                }${ACTIVE_FLOW.includes(node.id) ? " pb-pulse-node--on-flow" : ""}`}
                 style={{ left: `${node.x}%`, top: `${node.y}%` }}
                 aria-pressed={selected === node.id}
                 data-testid={`pulse-node-${node.id}`}
@@ -400,7 +416,7 @@ function JourneySection(): ReactNode {
           </div>
           <div>
             <dt>{copy.journey.detail.stakeholders}</dt>
-            <dd>{selectedModule.stakeholderComplexity}</dd>
+            <dd>{COMPLEXITY_LABEL[locale][selectedModule.stakeholderComplexity]}</dd>
           </div>
           <div>
             <dt>{copy.journey.detail.evidence}</dt>
@@ -481,7 +497,30 @@ function ProcessSection(): ReactNode {
 }
 
 function ImpactSection(): ReactNode {
-  const { copy } = usePlayback();
+  const { copy, locale } = usePlayback();
+  const groups: { id: string; title: string; labels: string[] }[] = [
+    {
+      id: "ops",
+      title: locale === "fr" ? "Impact opérationnel" : "Operational impact",
+      labels: locale === "fr" ? ["OTIF", "Stocks"] : ["OTIF", "Inventory"],
+    },
+    {
+      id: "client",
+      title: locale === "fr" ? "Impact client" : "Customer impact",
+      labels: ["CSAT"],
+    },
+    {
+      id: "finance",
+      title: locale === "fr" ? "Impact financier" : "Financial impact",
+      labels: locale === "fr" ? ["Marge", "Trésorerie"] : ["Margin", "Cash"],
+    },
+    {
+      id: "gov",
+      title: locale === "fr" ? "Impact gouvernance" : "Governance impact",
+      labels: locale === "fr" ? ["Risque"] : ["Risk"],
+    },
+  ];
+
   return (
     <section id="impact" className="playback-section" data-testid="executive-impact-bi" aria-labelledby="impact-title">
       <h2 id="impact-title" className="playback-section__title">
@@ -493,46 +532,60 @@ function ImpactSection(): ReactNode {
           <span>{copy.impact.decision}</span>
           <strong>{copy.impact.decisionValue}</strong>
         </div>
-        <div className="pb-bi-grid">
-          {copy.impact.signals.map((signal) => (
-            <article key={signal.label} className="pb-signal" data-testid={`signal-${signal.label}`}>
-              <h3>{signal.label}</h3>
-              <div className="pb-signal__compare">
-                <del>
-                  {copy.impact.labels.baseline}: {signal.baseline}
-                </del>
-                <span>
-                  {copy.impact.labels.after}: {signal.next}
-                </span>
+        <div className="pb-bi-groups">
+          {groups.map((group) => {
+            const signals = copy.impact.signals.filter((signal) => group.labels.includes(signal.label));
+            if (signals.length === 0) return null;
+            return (
+              <div key={group.id} className="pb-bi-group" data-testid={`impact-group-${group.id}`}>
+                <h3 className="pb-bi-group__title">{group.title}</h3>
+                <div className="pb-bi-grid">
+                  {signals.map((signal) => (
+                    <article key={signal.label} className="pb-signal" data-testid={`signal-${signal.label}`}>
+                      <h4>{signal.label}</h4>
+                      <div className="pb-signal__compare">
+                        <span className="pb-signal__before">
+                          <em>{copy.impact.labels.baseline}</em> {signal.baseline}
+                        </span>
+                        <span className="pb-signal__arrow" aria-hidden="true">
+                          →
+                        </span>
+                        <span className="pb-signal__after">
+                          <em>{copy.impact.labels.after}</em> {signal.next}
+                        </span>
+                      </div>
+                      <svg className="pb-signal__spark" viewBox="0 0 100 28" aria-hidden="true">
+                        <polyline
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          points="0,8 20,10 40,9 60,16 80,20 100,24"
+                        />
+                      </svg>
+                      <dl>
+                        <div>
+                          <dt>{copy.impact.labels.cause}</dt>
+                          <dd>{signal.cause}</dd>
+                        </div>
+                        <div>
+                          <dt>{copy.impact.labels.horizon}</dt>
+                          <dd>{signal.horizon}</dd>
+                        </div>
+                        <div>
+                          <dt>{copy.impact.labels.stakeholder}</dt>
+                          <dd>{signal.stakeholder}</dd>
+                        </div>
+                        <div>
+                          <dt>{copy.impact.labels.projection}</dt>
+                          <dd>{signal.confidence}</dd>
+                        </div>
+                      </dl>
+                    </article>
+                  ))}
+                </div>
               </div>
-              <svg className="pb-signal__spark" viewBox="0 0 100 28" aria-hidden="true">
-                <polyline
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  points="0,8 20,10 40,9 60,16 80,20 100,24"
-                />
-              </svg>
-              <dl>
-                <div>
-                  <dt>{copy.impact.labels.cause}</dt>
-                  <dd>{signal.cause}</dd>
-                </div>
-                <div>
-                  <dt>{copy.impact.labels.horizon}</dt>
-                  <dd>{signal.horizon}</dd>
-                </div>
-                <div>
-                  <dt>{copy.impact.labels.stakeholder}</dt>
-                  <dd>{signal.stakeholder}</dd>
-                </div>
-                <div>
-                  <dt>{copy.impact.labels.projection}</dt>
-                  <dd>{signal.confidence}</dd>
-                </div>
-              </dl>
-            </article>
-          ))}
+            );
+          })}
         </div>
         <span className="playback-demo-tag">{copy.demoData}</span>
       </div>
@@ -621,11 +674,18 @@ function ProfessorSection(): ReactNode {
             <p>{copy.professor.debrief}</p>
             <p>{copy.professor.deck}</p>
           </div>
-          <div className="pb-prof-controls">
+          <div className="pb-prof-controls" data-testid="professor-preview-controls">
             {copy.professor.controls.map((label) => (
-              <button key={label} type="button" disabled title={copy.previewBadge}>
-                {label}
-                <div className="pb-preview-badge">{copy.previewBadge}</div>
+              <button
+                key={label}
+                type="button"
+                className="pb-prof-control"
+                disabled
+                aria-disabled="true"
+                title={copy.previewBadge}
+              >
+                <span className="pb-prof-control__label">{label}</span>
+                <span className="pb-prof-control__badge">{copy.previewBadge}</span>
               </button>
             ))}
           </div>

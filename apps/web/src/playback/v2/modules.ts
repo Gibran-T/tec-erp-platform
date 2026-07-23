@@ -425,17 +425,17 @@ export const CAPSTONE_STAGES: readonly { id: string; fr: string; en: string }[] 
 ] as const;
 
 export const PULSE_NODES = [
-  { id: "customers", fr: "Client", en: "Customer", x: 8, y: 28 },
-  { id: "sales", fr: "Ventes", en: "Sales", x: 24, y: 18 },
-  { id: "inventory", fr: "Stocks", en: "Inventory", x: 42, y: 26 },
-  { id: "procurement", fr: "Achats", en: "Procurement", x: 34, y: 48 },
-  { id: "suppliers", fr: "Fournisseur", en: "Supplier", x: 14, y: 66 },
-  { id: "warehouse", fr: "Entrepôt", en: "Warehouse", x: 52, y: 58 },
-  { id: "finance", fr: "Finance", en: "Finance", x: 70, y: 42 },
-  { id: "hcm", fr: "HCM", en: "HCM", x: 66, y: 70 },
-  { id: "governance", fr: "Gouvernance", en: "Governance", x: 86, y: 24 },
-  { id: "bi", fr: "BI", en: "BI", x: 84, y: 56 },
-  { id: "management", fr: "Direction", en: "Management", x: 58, y: 12 },
+  { id: "customers", fr: "Client", en: "Customer", x: 7, y: 24 },
+  { id: "sales", fr: "Ventes", en: "Sales", x: 24, y: 16 },
+  { id: "inventory", fr: "Stocks", en: "Inventory", x: 42, y: 24 },
+  { id: "procurement", fr: "Achats", en: "Procurement", x: 42, y: 46 },
+  { id: "suppliers", fr: "Fournisseur", en: "Supplier", x: 20, y: 64 },
+  { id: "warehouse", fr: "Entrepôt", en: "Warehouse", x: 58, y: 60 },
+  { id: "finance", fr: "Finance", en: "Finance", x: 72, y: 40 },
+  { id: "hcm", fr: "HCM", en: "HCM", x: 74, y: 70 },
+  { id: "governance", fr: "Gouvernance", en: "Governance", x: 90, y: 20 },
+  { id: "bi", fr: "BI", en: "BI", x: 88, y: 50 },
+  { id: "management", fr: "Direction", en: "Management", x: 60, y: 10 },
 ] as const;
 
 export type PulseNodeId = (typeof PULSE_NODES)[number]["id"];
@@ -452,3 +452,30 @@ export const ACTIVE_FLOW: readonly PulseNodeId[] = [
   "bi",
   "management",
 ];
+
+/** Secondary dependency edges (thinner, non-animated) */
+export const SECONDARY_LINKS: readonly [PulseNodeId, PulseNodeId][] = [
+  ["warehouse", "hcm"],
+  ["finance", "governance"],
+  ["bi", "governance"],
+];
+
+/** Smooth SVG path through ACTIVE_FLOW node centers */
+export function buildActiveFlowPath(): string {
+  const pts = ACTIVE_FLOW.map((id) => {
+    const n = PULSE_NODES.find((p) => p.id === id)!;
+    return { x: n.x, y: n.y };
+  });
+  if (pts.length < 2) return "";
+  let d = `M ${pts[0]!.x},${pts[0]!.y}`;
+  for (let i = 1; i < pts.length; i += 1) {
+    const prev = pts[i - 1]!;
+    const curr = pts[i]!;
+    const c1x = prev.x + (curr.x - prev.x) * 0.45;
+    const c1y = prev.y;
+    const c2x = prev.x + (curr.x - prev.x) * 0.55;
+    const c2y = curr.y;
+    d += ` C ${c1x},${c1y} ${c2x},${c2y} ${curr.x},${curr.y}`;
+  }
+  return d;
+}

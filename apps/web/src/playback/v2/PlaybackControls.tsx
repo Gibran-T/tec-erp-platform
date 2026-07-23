@@ -38,11 +38,11 @@ export function PlaybackControls(): ReactNode {
   const navigate = useNavigate();
 
   return (
-    <div className="playback-controls">
+    <div className="playback-controls" data-testid="playback-controls" data-pb-playback-only="true">
       {!controlsOpen ? (
         <button
           type="button"
-          className="playback-btn playback-btn--small"
+          className="playback-btn playback-btn--small playback-controls__toggle"
           data-testid="playback-controls-open"
           onClick={() => setControlsOpen(true)}
         >
@@ -55,6 +55,9 @@ export function PlaybackControls(): ReactNode {
           role="region"
           aria-label={copy.controls.title}
         >
+          <div className="playback-controls-banner" data-testid="playback-controls-banner">
+            PLAYBACK ONLY · NOT PRODUCTION
+          </div>
           <div className="playback-field-row">
             <strong>{copy.controls.title}</strong>
             <button
