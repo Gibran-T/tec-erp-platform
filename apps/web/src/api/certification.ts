@@ -58,6 +58,7 @@ export async function getGoldEligibility() {
 
 export interface GoldEligibilityView {
   readonly eligibleForProfessorIssue: boolean;
+  readonly awaitingProfessorIssuance?: boolean;
   readonly studentReadyChecklist: {
     readonly missionsComplete: boolean;
     readonly goldAssessmentPassed: boolean;

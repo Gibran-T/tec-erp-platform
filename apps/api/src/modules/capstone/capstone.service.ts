@@ -42,6 +42,7 @@ function mapSubmission(
     executiveSummary: string | null;
     submittedAt: Date | null;
     reviewStatus: string | null;
+    professorNotes?: string | null;
     professorApproved?: boolean;
     lifecycleStatus?: string | null;
     currentStage?: string | null;
@@ -59,6 +60,7 @@ function mapSubmission(
     executiveSummary: row.executiveSummary,
     submittedAt: row.submittedAt?.toISOString() ?? null,
     reviewStatus: row.reviewStatus,
+    professorNotes: row.professorNotes ?? null,
     lifecycleStatus,
     lifecycleStatusLabel: CAPSTONE_LIFECYCLE_LABEL_FR[lifecycleStatus],
     currentStage: row.currentStage ?? (lifecycleStatus === "LOCKED" ? null : "S1"),
