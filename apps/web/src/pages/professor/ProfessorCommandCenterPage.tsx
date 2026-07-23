@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useState, type ReactElement } from "react";
 
 import {
+  EMPTY_PROFESSOR_COMPETENCIES,
+  EMPTY_PROFESSOR_HEATMAP,
   getProfessorAnalyticsHeatmap,
   getProfessorCompetencySummary,
+  type ProfessorCompetencyRow,
+  type ProfessorHeatmapStudentRow,
 } from "../../api/analytics.js";
 import { listProfessorAiInteractions } from "../../api/aiCoach.js";
 import {
@@ -67,12 +71,12 @@ export function ProfessorCommandCenterPage(): ReactElement {
   const [cohorts, setCohorts] = useState<Array<Record<string, unknown>>>([]);
   const [students, setStudents] = useState<Array<Record<string, unknown>>>([]);
   const [runs, setRuns] = useState<Array<Record<string, unknown>>>([]);
-  const [heatmap, setHeatmap] = useState<Array<Record<string, unknown>>>([]);
+  const [heatmap, setHeatmap] = useState<ProfessorHeatmapStudentRow[]>([]);
   const [heatmapMeta, setHeatmapMeta] = useState<{ enrolled: number; versions: string[] }>({
     enrolled: 0,
     versions: [],
   });
-  const [competencies, setCompetencies] = useState<Array<Record<string, unknown>>>([]);
+  const [competencies, setCompetencies] = useState<ProfessorCompetencyRow[]>([]);
   const [aiInteractions, setAiInteractions] = useState<Array<Record<string, unknown>>>([]);
   const [capstoneQueue, setCapstoneQueue] = useState<Array<Record<string, unknown>>>([]);
   const [certificates, setCertificates] = useState<Array<Record<string, unknown>>>([]);
@@ -130,10 +134,8 @@ export function ProfessorCommandCenterPage(): ReactElement {
           listProfessorCohorts(),
           listProfessorStudents(),
           listProfessorPedagogicalRuns().catch(() => []),
-          getProfessorAnalyticsHeatmap().catch(() => ({ rows: [] as Array<Record<string, unknown>> })),
-          getProfessorCompetencySummary().catch(() => ({
-            competencies: [] as Array<Record<string, unknown>>,
-          })),
+          getProfessorAnalyticsHeatmap().catch(() => EMPTY_PROFESSOR_HEATMAP),
+          getProfessorCompetencySummary().catch(() => EMPTY_PROFESSOR_COMPETENCIES),
           listProfessorAiInteractions().catch(() => ({
             interactions: [] as Array<Record<string, unknown>>,
           })),
@@ -150,14 +152,12 @@ export function ProfessorCommandCenterPage(): ReactElement {
         setCohorts(cohortResponse.cohorts);
         setStudents(studentResponse.students);
         setRuns(runResponse);
-        setHeatmap(heatmapResponse.rows ?? []);
+        setHeatmap(heatmapResponse.rows);
         setHeatmapMeta({
-          enrolled: Number(heatmapResponse.enrolledStudentCount ?? 0),
-          versions: Array.isArray(heatmapResponse.curriculumVersionsPresent)
-            ? heatmapResponse.curriculumVersionsPresent.map((value) => String(value))
-            : [],
+          enrolled: heatmapResponse.enrolledStudentCount,
+          versions: heatmapResponse.curriculumVersionsPresent.map((value) => String(value)),
         });
-        setCompetencies(competencyResponse.competencies ?? []);
+        setCompetencies(competencyResponse.competencies);
         setAiInteractions(aiResponse.interactions ?? []);
         setCapstoneQueue(capstoneResponse.submissions ?? []);
         setCertificates(certificateResponse.certificates ?? []);
@@ -188,7 +188,11 @@ export function ProfessorCommandCenterPage(): ReactElement {
       }
     }
     for (const submission of capstoneQueue) {
-      if (String(submission.reviewStatus ?? "") === "revision_requested") {
+      if (
+        String(submission.reviewStatus ?? "") === "revision_requested" ||
+        String(submission.reviewStatus ?? "") === "needs_revision" ||
+        String(submission.lifecycleStatus ?? "") === "REVISION_REQUESTED"
+      ) {
         items.push(
           `${labelOf(submission.studentName, "Apprenant")} — révision Capstone demandée`,
         );
@@ -452,12 +456,12 @@ export function ProfessorCommandCenterPage(): ReactElement {
           <h2>{t("professor.competencies")}</h2>
           <ul>
             {competencies.map((row, index) => {
-              const moduleCode = labelOf(row.moduleCode, `M${index + 1}`);
-              const title = labelOf(row.title, moduleCode);
-              const coverage = Number(row.coveragePercent ?? 0);
-              const missionCount = Number(row.missionCount ?? 0);
+              const moduleCode = row.moduleCode || `M${index + 1}`;
+              const title = row.title || moduleCode;
+              const coverage = row.coveragePercent;
+              const missionCount = row.missionCount;
               return (
-                <li key={moduleCode}>
+                <li key={moduleCode} data-testid={`professor-cc-competency-${moduleCode}`}>
                   {moduleCode} — {title} · couverture {Number.isFinite(coverage) ? `${coverage}%` : "n/d"}
                   {missionCount > 0 ? ` · ${missionCount} missions` : ""}
                 </li>
@@ -478,19 +482,20 @@ export function ProfessorCommandCenterPage(): ReactElement {
           </p>
           <ul>
             {heatmap.map((row, index) => {
-              const name = labelOf(row.displayName, "Apprenant");
-              const completed = Number(row.completedMissions ?? 0);
-              const moduleCounts =
-                row.moduleCounts && typeof row.moduleCounts === "object"
-                  ? Object.entries(row.moduleCounts as Record<string, unknown>)
-                      .map(([code, count]) => `${code}:${String(count)}`)
-                      .join(" · ")
-                  : "";
+              const name = row.displayName || "Apprenant";
+              const completed = row.completedMissions;
+              const moduleCounts = Object.entries(row.moduleCounts)
+                .map(([code, count]) => `${code}:${String(count)}`)
+                .join(" · ");
               return (
-                <li key={`${labelOf(row.studentId, String(index))}`}>
+                <li
+                  key={row.studentId || String(index)}
+                  data-testid={`professor-cc-heatmap-${row.studentId || index}`}
+                >
                   {name} — {Number.isFinite(completed) ? completed : 0} missions
                   {moduleCounts ? ` · ${moduleCounts}` : ""}
-                  {row.curriculumVersion ? ` · ${String(row.curriculumVersion)}` : ""}
+                  {row.curriculumVersion ? ` · ${row.curriculumVersion}` : ""}
+                  {row.officialRunCode ? ` · ${row.officialRunCode}` : ""}
                 </li>
               );
             })}

@@ -3,6 +3,8 @@ import { useEffect, useState, type ReactElement } from "react";
 import {
   getProfessorAnalyticsHeatmap,
   getProfessorCompetencySummary,
+  type ProfessorCompetencyRow,
+  type ProfessorHeatmapStudentRow,
 } from "../../api/analytics.js";
 import { listProfessorAiInteractions } from "../../api/aiCoach.js";
 import {
@@ -45,8 +47,8 @@ export function ProfessorPortalPage(): ReactElement {
   const [detail, setDetail] = useState<Record<string, unknown> | null>(null);
   const [certificates, setCertificates] = useState<Array<Record<string, unknown>>>([]);
   const [audit, setAudit] = useState<Array<Record<string, unknown>>>([]);
-  const [heatmap, setHeatmap] = useState<Array<Record<string, unknown>>>([]);
-  const [competencies, setCompetencies] = useState<Array<Record<string, unknown>>>([]);
+  const [heatmap, setHeatmap] = useState<ProfessorHeatmapStudentRow[]>([]);
+  const [competencies, setCompetencies] = useState<ProfessorCompetencyRow[]>([]);
   const [aiInteractions, setAiInteractions] = useState<Array<Record<string, unknown>>>([]);
   const [predictions, setPredictions] = useState<Record<string, unknown> | null>(null);
   const [capstoneQueue, setCapstoneQueue] = useState<Array<Record<string, unknown>>>([]);
@@ -469,17 +471,25 @@ export function ProfessorPortalPage(): ReactElement {
         <section data-testid="professor-analytics">
           <h2>Carte de chaleur</h2>
           <ul>
-            {heatmap.map((row, index) => (
-              <li key={String(row.key ?? index)}>
-                {String(row.label ?? row.moduleCode)} — {String(row.intensity ?? row.score ?? "—")}
-              </li>
-            ))}
+            {heatmap.map((row, index) => {
+              const moduleCounts = Object.entries(row.moduleCounts)
+                .map(([code, count]) => `${code}:${count}`)
+                .join(" · ");
+              return (
+                <li key={row.studentId || String(index)}>
+                  {row.displayName} — {row.completedMissions} missions
+                  {moduleCounts ? ` · ${moduleCounts}` : ""}
+                  {row.curriculumVersion ? ` · ${row.curriculumVersion}` : ""}
+                </li>
+              );
+            })}
           </ul>
           <h2>Resume des competences</h2>
           <ul>
             {competencies.map((item, index) => (
-              <li key={String(item.competencyKey ?? index)}>
-                {String(item.label ?? item.competencyKey)} — {String(item.level ?? item.summary ?? "—")}
+              <li key={item.moduleCode || String(index)}>
+                {item.moduleCode} — {item.title} · couverture {item.coveragePercent}%
+                {item.missionCount > 0 ? ` · ${item.missionCount} missions` : ""}
               </li>
             ))}
           </ul>
