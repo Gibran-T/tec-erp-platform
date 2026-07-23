@@ -15,6 +15,7 @@ const STATUS_KEY_MAP: Record<string, MessageKey> = {
   cancelled: "status.cancelled",
   historical: "status.historical",
   revision_requested: "status.revision_requested",
+  needs_revision: "status.revision_requested",
   approved: "status.approved",
   rejected: "status.rejected",
   submitted: "status.submitted",
@@ -33,6 +34,12 @@ const STATUS_KEY_MAP: Record<string, MessageKey> = {
   REJECTED: "status.rejected",
   SUBMITTED: "status.submitted",
   REVISION_REQUESTED: "status.revision_requested",
+  UNDER_REVIEW: "status.under_review",
+  under_review: "status.under_review",
+  ARCHIVED: "status.archived",
+  archived: "status.archived",
+  PLANNED: "status.planned",
+  planned: "status.planned",
 };
 
 export function statusMessageKey(raw: string | null | undefined): MessageKey {

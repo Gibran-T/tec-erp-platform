@@ -38,6 +38,14 @@ export function buildWelcomeMessage(displayName: string): string {
   ].join(" ");
 }
 
+export function buildHistoricalWelcomeMessage(displayName: string): string {
+  return [
+    `Bienvenue chez NordHabitat, ${displayName}.`,
+    "Vous consultez un parcours historique en lecture seule.",
+    "Les missions, preuves et le Capstone restent consultables; aucun redémarrage ni nouvelle soumission n’est disponible sur ce parcours.",
+  ].join(" ");
+}
+
 export const EMPTY_STATE_COPY: Record<string, { title: string; description: string }> = {
   documents: {
     title: "Documents",

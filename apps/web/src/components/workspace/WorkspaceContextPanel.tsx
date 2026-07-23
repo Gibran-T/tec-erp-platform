@@ -1,7 +1,9 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 
+import { listMyPedagogicalRuns } from "../../api/pedagogical-runs.js";
 import { useFirstDayData } from "../../first-day/FirstDayDataContext.js";
+import { useLocale } from "../../i18n/LocaleProvider.js";
 import { useMissionData } from "../../mission/MissionDataContext.js";
 import {
   MISSION_ACTUELLE_TITLE,
@@ -16,8 +18,24 @@ import {
 import { getAppPath } from "../../workspace/appRegistry.js";
 
 export function WorkspaceContextPanel(): ReactNode {
+  const { t } = useLocale();
   const { inbox, tasks, initialLoading, refreshing } = useFirstDayData();
   const { summaryStatus, initialLoading: missionLoading } = useMissionData();
+  const [historical, setHistorical] = useState(false);
+
+  useEffect(() => {
+    void listMyPedagogicalRuns()
+      .then((runs) => {
+        const active =
+          runs.find((run) => run.status === "ACTIVE") ?? runs[runs.length - 1] ?? null;
+        setHistorical(
+          Boolean(active?.isHistorical) ||
+            active?.status === "COMPLETED" ||
+            active?.isWritable === false,
+        );
+      })
+      .catch(() => setHistorical(false));
+  }, []);
 
   const managerMessageRead =
     inbox?.messages.some((message) => message.readAt !== null) ?? false;
@@ -45,8 +63,14 @@ export function WorkspaceContextPanel(): ReactNode {
 
   return (
     <aside className="workspace-context-panel" data-testid="workspace-context-panel">
-      <h2>{CONTEXT_PANEL_TITLE}</h2>
-      {showInitialLoading ? (
+      <h2>{historical ? t("home.firstDayHistory") : CONTEXT_PANEL_TITLE}</h2>
+      {historical ? (
+        <ul className="workspace-context-panel__checklist" data-testid="workspace-context-history">
+          <li>Parcours historique — lecture seule</li>
+          <li>Preuves et chronologie disponibles dans Documents et modules</li>
+          <li>Capstone et certificats consultables sans nouvelle soumission</li>
+        </ul>
+      ) : showInitialLoading ? (
         <p className="workspace-context-panel__status" role="status">
           Mise à jour de votre progression…
         </p>
@@ -74,20 +98,24 @@ export function WorkspaceContextPanel(): ReactNode {
         data-testid="workspace-context-mission"
         aria-labelledby="mission-actuelle-heading"
       >
-        <h3 id="mission-actuelle-heading">{MISSION_ACTUELLE_TITLE}</h3>
+        <h3 id="mission-actuelle-heading">
+          {historical ? "Synthèse du parcours" : MISSION_ACTUELLE_TITLE}
+        </h3>
         {missionLoading && summaryStatus === null ? (
           <p className="workspace-context-panel__status" role="status">
             Chargement de la mission…
           </p>
         ) : (
           <>
-            <p data-testid="workspace-context-mission-status">{missionLabel}</p>
+            <p data-testid="workspace-context-mission-status">
+              {historical ? t("status.historical") : missionLabel}
+            </p>
             <Link
               className="workspace-context-panel__mission-link"
-              to={getAppPath("centre-mission")}
+              to={historical ? getAppPath("documents") : getAppPath("centre-mission")}
               data-testid="workspace-context-mission-link"
             >
-              {OPEN_MISSION_CENTER_LABEL}
+              {historical ? t("shell.documents") : OPEN_MISSION_CENTER_LABEL}
             </Link>
           </>
         )}

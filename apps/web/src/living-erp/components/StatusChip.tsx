@@ -40,10 +40,10 @@ export function toneForStatus(raw: string | null | undefined): StatusTone {
   const value = (raw ?? "").toLowerCase();
   if (["completed", "approved", "issued", "resolved", "passed"].includes(value)) return "green";
   if (["active", "in_progress", "available", "sent"].includes(value)) return "strong";
-  if (["paused", "revision_requested", "stale", "warning"].includes(value)) return "amber";
+  if (["paused", "revision_requested", "needs_revision", "stale", "warning"].includes(value)) return "amber";
   if (["failed", "rejected", "revoked", "cancelled", "error", "locked"].includes(value)) return "red";
   if (["gold", "silver"].includes(value)) return "gold";
   if (["ai", "coach", "purple"].includes(value)) return "purple";
-  if (["historical", "completed_run", "archived", "draft"].includes(value)) return "gray";
+  if (["historical", "completed_run", "archived", "draft", "submitted", "under_review"].includes(value)) return "gray";
   return "pale";
 }

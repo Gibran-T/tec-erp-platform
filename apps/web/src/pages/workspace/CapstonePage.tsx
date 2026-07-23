@@ -6,7 +6,11 @@ import {
   submitCapstoneExecutiveSummary,
   type CapstoneSubmissionView,
 } from "../../api/capstone.js";
-import { getGoldEligibility, type GoldEligibilityView } from "../../api/certification.js";
+import { getGoldEligibility, listMyCertificates, type GoldEligibilityView } from "../../api/certification.js";
+import { listMyPedagogicalRuns } from "../../api/pedagogical-runs.js";
+import { useLocale } from "../../i18n/LocaleProvider.js";
+import type { MessageKey } from "../../i18n/messages/fr.js";
+import { StatusChip, toneForStatus } from "../../living-erp/components/StatusChip.js";
 
 const EMPTY_SECTIONS = {
   diagnose: "",
@@ -17,17 +21,51 @@ const EMPTY_SECTIONS = {
   executiveSummary: "",
 };
 
+const TERMINAL_LIFECYCLES = new Set(["APPROVED", "REJECTED", "SUBMITTED", "UNDER_REVIEW"]);
+const REVISION_LIFECYCLES = new Set(["REVISION_REQUESTED"]);
+
+function localizeRunContext(
+  run: Record<string, unknown>,
+  t: (key: MessageKey) => string,
+  statusLabel: (raw: string) => string,
+): string {
+  const sequence = Number(run.runSequence ?? 1);
+  const curriculum = String(run.curriculumVersionLabel ?? run.curriculumVersion ?? "");
+  const runType = String(run.runType ?? "");
+  let typeLabel = "";
+  if (runType === "AUTONOMOUS") typeLabel = t("run.type.AUTONOMOUS");
+  else if (runType === "COHORT") typeLabel = t("run.type.COHORT");
+  else if (runType === "REMEDIATION") typeLabel = t("run.type.REMEDIATION");
+  else if (typeof run.runTypeLabel === "string" && run.runTypeLabel && !/autonomous zero1/i.test(run.runTypeLabel)) {
+    typeLabel = run.runTypeLabel;
+  } else if (runType) {
+    typeLabel = statusLabel(runType);
+  }
+  const parts = [`Run ${Number.isFinite(sequence) ? sequence : 1}`, typeLabel];
+  if (curriculum) parts.push(curriculum);
+  return parts.filter(Boolean).join(" · ");
+}
+
 export function CapstonePage(): ReactElement {
+  const { t, statusLabel } = useLocale();
   const [sections, setSections] = useState(EMPTY_SECTIONS);
   const [submission, setSubmission] = useState<CapstoneSubmissionView | null>(null);
   const [eligibility, setEligibility] = useState<GoldEligibilityView | null>(null);
+  const [goldIssued, setGoldIssued] = useState(false);
+  const [runReadOnly, setRunReadOnly] = useState(false);
+  const [runContext, setRunContext] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    void Promise.all([getCapstoneSubmission(), getGoldEligibility()])
-      .then(([loaded, gold]) => {
+    void Promise.all([
+      getCapstoneSubmission(),
+      getGoldEligibility(),
+      listMyPedagogicalRuns().catch(() => [] as Array<Record<string, unknown>>),
+      listMyCertificates().catch(() => ({ certificates: [] })),
+    ])
+      .then(([loaded, gold, runs, certs]) => {
         setSubmission(loaded);
         setEligibility(gold);
         setSections({
@@ -38,9 +76,26 @@ export function CapstonePage(): ReactElement {
           recommend: loaded.recommend,
           executiveSummary: loaded.executiveSummary ?? "",
         });
+        const active =
+          runs.find((run) => run.status === "ACTIVE") ?? runs[runs.length - 1] ?? null;
+        const historical =
+          Boolean(active?.isHistorical) ||
+          active?.status === "COMPLETED" ||
+          active?.isWritable === false;
+        setRunReadOnly(historical);
+        if (active) {
+          setRunContext(localizeRunContext(active, t, statusLabel));
+        }
+        setGoldIssued(
+          certs.certificates.some(
+            (certificate) =>
+              String(certificate.certificateType).toUpperCase().includes("GOLD") &&
+              certificate.status === "issued",
+          ),
+        );
       })
       .catch((err: Error) => setError(err.message));
-  }, []);
+  }, [statusLabel, t]);
 
   function updateField(field: keyof typeof EMPTY_SECTIONS, value: string): void {
     setSections((current) => ({ ...current, [field]: value }));
@@ -69,18 +124,30 @@ export function CapstonePage(): ReactElement {
   const missionsReady = eligibility?.studentReadyChecklist.missionsComplete ?? false;
   const lifecycleStatus = submission?.lifecycleStatus ?? (missionsReady ? "AVAILABLE" : "LOCKED");
   const isLocked = lifecycleStatus === "LOCKED" || !missionsReady;
-  const isHistoricalReadOnly =
-    lifecycleStatus === "APPROVED" ||
-    lifecycleStatus === "REJECTED" ||
+  const reviewApproved =
+    submission?.reviewStatus === "approved" ||
     submission?.status === "approved" ||
-    submission?.status === "rejected";
-  const canSubmit = !isLocked && !isHistoricalReadOnly && !submitting;
+    lifecycleStatus === "APPROVED";
+  const allowsRevisionResubmit =
+    !runReadOnly &&
+    (REVISION_LIFECYCLES.has(lifecycleStatus) ||
+      submission?.reviewStatus === "needs_revision" ||
+      submission?.reviewStatus === "revision_requested");
+  const isHistoricalReadOnly =
+    runReadOnly ||
+    reviewApproved ||
+    lifecycleStatus === "REJECTED" ||
+    submission?.status === "rejected" ||
+    (TERMINAL_LIFECYCLES.has(lifecycleStatus) && !allowsRevisionResubmit);
+  const canSubmit =
+    !isLocked && !isHistoricalReadOnly && (allowsRevisionResubmit || !TERMINAL_LIFECYCLES.has(lifecycleStatus)) && !submitting;
   const lifecycleLabel =
     submission?.lifecycleStatusLabel ??
-    (missionsReady ? "Disponible" : "Verrouillé");
+    statusLabel(lifecycleStatus) ??
+    (missionsReady ? t("status.available") : t("status.locked"));
   const lockedHint = isLocked
-      ? "État verrouillé : le Capstone est un projet intégrateur séparé. Complétez les 30 missions régulières M1–M10 du curriculum actif avant soumission. L’Or exige ensuite l’approbation professeur."
-      : null;
+    ? "État verrouillé : le Capstone est un projet intégrateur séparé. Complétez les 30 missions régulières M1–M10 du curriculum actif avant soumission. L’Or exige ensuite l’approbation professeur."
+    : null;
 
   const stages: ReadonlyArray<{ code: string; label: string }> = [
     { code: "S1", label: "Prise en charge du mandat" },
@@ -105,9 +172,21 @@ export function CapstonePage(): ReactElement {
     }
   }
 
+  const awaitingGoldIssue =
+    Boolean(eligibility?.awaitingProfessorIssuance) ||
+    (Boolean(eligibility?.studentReadyChecklist.capstoneProfessorApproved) &&
+      !goldIssued &&
+      (eligibility?.reasons.length ?? 0) === 0);
+
   return (
     <main className="workspace-page living-capstone" data-testid="capstone-page">
       <h1>MCapstone — Projet intégrateur Equinoxe</h1>
+      {runContext ? (
+        <p data-testid="capstone-run-context">
+          {runContext}
+          {runReadOnly ? ` · ${t("status.historical")}` : ""}
+        </p>
+      ) : null}
       <p data-testid="capstone-lifecycle-status">
         État : {lifecycleLabel}
         {currentStage ? ` · Étape ${currentStage}` : ""}
@@ -150,28 +229,15 @@ export function CapstonePage(): ReactElement {
       {submission ? (
         <p role="status" data-testid="capstone-submission-status">
           Statut dossier :{" "}
-          <span data-testid="capstone-submission-status-label">
-            {submission.status === "draft"
-              ? "Brouillon"
-              : submission.status === "submitted"
-                ? "Soumis"
-                : submission.status === "approved"
-                  ? "Approuvé"
-                  : submission.status === "rejected"
-                    ? "Refusé"
-                    : submission.status}
-          </span>
+          <StatusChip
+            label={statusLabel(submission.status)}
+            tone={toneForStatus(submission.status)}
+          />
           {submission.reviewStatus ? (
             <>
               {" — revue "}
               <span data-testid="capstone-review-status-label">
-                {submission.reviewStatus === "pending"
-                  ? "en attente"
-                  : submission.reviewStatus === "approved"
-                    ? "approuvée"
-                    : submission.reviewStatus === "revision_requested"
-                      ? "révision demandée"
-                      : submission.reviewStatus}
+                {statusLabel(submission.reviewStatus)}
               </span>
             </>
           ) : null}
@@ -179,19 +245,29 @@ export function CapstonePage(): ReactElement {
       ) : (
         <p role="status">Aucun dossier soumis pour le moment.</p>
       )}
+      {submission?.professorNotes ? (
+        <section data-testid="capstone-professor-feedback">
+          <h2>{t("capstone.professorFeedback")}</h2>
+          <p>{submission.professorNotes}</p>
+        </section>
+      ) : null}
       {eligibility ? (
         <section data-testid="capstone-gold-status">
           <h2>Statut certificat Or</h2>
-          <p>{eligibility.nextStepHint}</p>
+          {goldIssued ? (
+            <p data-testid="capstone-gold-issued">{t("status.gold_issued")}</p>
+          ) : awaitingGoldIssue ? (
+            <p data-testid="capstone-gold-pending-issue">{t("status.gold_pending_issue")}</p>
+          ) : (
+            <p>{eligibility.nextStepHint}</p>
+          )}
           {eligibility.reasons.length > 0 ? (
             <ul>
               {eligibility.reasons.map((reason) => (
                 <li key={reason}>{reason}</li>
               ))}
             </ul>
-          ) : (
-            <p>Prérequis étudiants satisfaits — émission Or par le professeur uniquement.</p>
-          )}
+          ) : null}
         </section>
       ) : null}
       {error ? (
@@ -246,9 +322,7 @@ export function CapstonePage(): ReactElement {
           </button>
         ) : (
           <p role="status" data-testid="capstone-submit-unavailable">
-            {isLocked
-              ? "Soumission indisponible tant que le Capstone est verrouillé."
-              : "Soumission indisponible — dossier en lecture seule."}
+            {isLocked ? t("capstone.lockedSubmit") : t("capstone.readOnly")}
           </p>
         )}
       </section>
