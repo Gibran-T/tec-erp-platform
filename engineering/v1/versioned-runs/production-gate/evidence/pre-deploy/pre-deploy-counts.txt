@@ -1,0 +1,34 @@
+            entity            | n  
+------------------------------+----
+ ai_interaction               |  1
+ assessment_attempt           |  3
+ assessment_definition        |  3
+ capstone_submission          |  1
+ certificate                  |  3
+ cohort                       |  1
+ cohort_membership            |  1
+ company                      |  2
+ employee                     |  1
+ employee_course_progress     |  1
+ employee_module_progress     |  9
+ mission_attempt              | 30
+ pedagogical_course_run_table |  0
+ qa_employee_prefix           |  0
+(14 rows)
+
+ employees_with_learning 
+-------------------------
+                       1
+(1 row)
+
+                   migration_name                    | finished 
+-----------------------------------------------------+----------
+ 20250701000000_init_platform_schema                 | t
+ 20260708120000_rc01_auth_identity                   | t
+ 20260709120000_rc01_first_day_foundation            | t
+ 20260713120000_rc01_mission_discovery               | t
+ 20260721180000_v1_course_mission_engine             | t
+ 20260722140000_v1_wave2_simulation_professor_silver | t
+ 20260723180000_v1_final_m7_m10_gold                 | t
+(7 rows)
+

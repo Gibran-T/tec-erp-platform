@@ -1,0 +1,22 @@
+﻿{
+    "legacyIntegrityHash":  "83dea106c47c80ace90ff50656986e13cf2d36b70fcc4185578a10c163571da4",
+    "run":  {
+                "runCode":  "TECERP-PILOT-001-RUN1",
+                "runSequence":  1,
+                "runType":  "AUTONOMOUS",
+                "status":  "COMPLETED",
+                "completionPercent":  100,
+                "reflectionsEnabled":  false,
+                "attempts":  30,
+                "completed":  30,
+                "certsLinked":  3,
+                "aiLinked":  1,
+                "professorId":  null,
+                "runSequenceGe2":  0
+            },
+    "employeeNumber":  "TECERP-2026-PILOT-001",
+    "role":  "JR_BUSINESS_ANALYST",
+    "companyCode":  "TECERP-PILOT",
+    "cohortCode":  "TECERP-PILOT-001",
+    "versionedRunIntegrityHash":  "203e1cfd0c89ec78f2bf4c060d7298d848e6b164b7b9c93179c3918005a618f0"
+}

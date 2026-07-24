@@ -1,0 +1,14 @@
+﻿{
+    "ok":  true,
+    "qa_residue":  0,
+    "checks":  [
+                   "run1_reflection_rejected",
+                   "run2_reflection_ok",
+                   "professor_read_ok",
+                   "professor_b_denied",
+                   "intervention_ok",
+                   "pause_resume_ok",
+                   "official_count_one",
+                   "two_runs_present_before_cleanup"
+               ]
+}
