@@ -1,0 +1,169 @@
+{
+  "at": "2026-07-22T14:24:16.974Z",
+  "results": [
+    {
+      "integrated": {
+        "status": 200,
+        "body": {
+          "scorePercent": 100,
+          "passed": true,
+          "feedback": "Evaluation reussie."
+        }
+      }
+    },
+    {
+      "capstone": {
+        "status": 200,
+        "body": {
+          "id": "cmrw6b90g009as701ntxxd1e4",
+          "status": "submitted",
+          "diagnose": "Diagnostic capstone smoke — ecarts inventaire, qualite master data et friction CRM escaladee.",
+          "prioritize": "Prioriser rapprochement trois voies, OTIF entrepots et gouvernance SoD sous pression operationnelle.",
+          "execute": "Executer correctifs reference, flux P2P/O2C et coordination service client avec preuves transactionnelles.",
+          "analyze": "Analyser KPI OTIF, marge, taux d exception et lignee des donnees sur tableaux de bord comite.",
+          "recommend": "Recommander matrice approbation, revue acces et plan d integration modules M7 a M10.",
+          "executiveSummary": "Synthese executive Equinoxe — demarche integrée couvrant achats, ventes, stock, finance, CRM et gouvernance.",
+          "submittedAt": "2026-07-22T14:24:13.406Z",
+          "reviewStatus": "pending"
+        }
+      }
+    },
+    {
+      "silverIssue": {
+        "status": 201,
+        "body": {
+          "certificateNumber": "SILVER-TECERP-2026-PILOT-001-1784730253612",
+          "certificateType": "silver",
+          "studentName": "James Timothy",
+          "cohortName": "TECERP-PILOT-001",
+          "issuedAt": "2026-07-22T14:24:13.612Z",
+          "revokedAt": null,
+          "status": "issued",
+          "verificationStatus": "valid",
+          "competencySummary": {
+            "modules": [
+              "M1",
+              "M2"
+            ],
+            "assessment": "SILVER_M1_M2",
+            "scorePercent": 100
+          }
+        }
+      }
+    },
+    {
+      "capstoneQueue": {
+        "status": 200,
+        "body": {
+          "submissions": [
+            {
+              "id": "cmrw6b90g009as701ntxxd1e4",
+              "status": "submitted",
+              "diagnose": "Diagnostic capstone smoke — ecarts inventaire, qualite master data et friction CRM escaladee.",
+              "prioritize": "Prioriser rapprochement trois voies, OTIF entrepots et gouvernance SoD sous pression operationnelle.",
+              "execute": "Executer correctifs reference, flux P2P/O2C et coordination service client avec preuves transactionnelles.",
+              "analyze": "Analyser KPI OTIF, marge, taux d exception et lignee des donnees sur tableaux de bord comite.",
+              "recommend": "Recommander matrice approbation, revue acces et plan d integration modules M7 a M10.",
+              "executiveSummary": "Synthese executive Equinoxe — demarche integrée couvrant achats, ventes, stock, finance, CRM et gouvernance.",
+              "submittedAt": "2026-07-22T14:24:13.406Z",
+              "reviewStatus": "pending",
+              "employeeId": "cmrw5vjk10008wow872j1diu1",
+              "studentName": "James Timothy",
+              "professorApproved": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "capstoneReview": {
+        "status": 200,
+        "body": {
+          "ok": true
+        }
+      },
+      "submissionId": "cmrw6b90g009as701ntxxd1e4"
+    },
+    {
+      "gold": {
+        "status": 404,
+        "body": {
+          "error": {
+            "code": "NOT_FOUND",
+            "message": "Route not found: POST /api/v1/professor/certificates/gold/cmrw5vjk10008wow872j1diu1",
+            "requestId": "b9ee7ebb-123d-47c8-830a-0642b37c8842"
+          }
+        }
+      },
+      "goldAlt": {
+        "status": 404,
+        "body": {
+          "error": {
+            "code": "NOT_FOUND",
+            "message": "Route not found: POST /api/v1/professor/certificates/gold",
+            "requestId": "06a9e3c6-8feb-4eac-9820-1d8f8ae9f5ef"
+          }
+        }
+      }
+    },
+    {
+      "certificates": {
+        "status": 200,
+        "body": {
+          "certificates": [
+            {
+              "certificateNumber": "SILVER-TECERP-2026-PILOT-001-1784730253612",
+              "certificateType": "silver",
+              "studentName": "James Timothy",
+              "cohortName": "TECERP-PILOT-001",
+              "issuedAt": "2026-07-22T14:24:13.612Z",
+              "revokedAt": null,
+              "status": "issued",
+              "verificationStatus": "valid",
+              "competencySummary": {
+                "modules": [
+                  "M1",
+                  "M2"
+                ],
+                "assessment": "SILVER_M1_M2",
+                "scorePercent": 100
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "publicVerify": {
+        "status": 200,
+        "body": {
+          "found": true,
+          "status": "valid",
+          "certificateNumber": "SILVER-TECERP-2026-PILOT-001-1784730253612",
+          "certificateType": "silver",
+          "studentName": "James Timothy",
+          "issuedAt": "2026-07-22T14:24:13.612Z",
+          "revokedAt": null,
+          "message": "Certificat valide."
+        },
+        "hasEmail": false
+      }
+    },
+    {
+      "admin": {
+        "companiesStatus": 200,
+        "systemStatus": 200,
+        "companyCodes": [
+          "NORDHABITAT",
+          "TECERP-PILOT"
+        ]
+      }
+    },
+    {
+      "professorStudents": {
+        "status": 200,
+        "preview": "{\"students\":[{\"employeeId\":\"cmrw5vjk10008wow872j1diu1\",\"employeeNumber\":\"TECERP-2026-PILOT-001\",\"displayName\":\"James Timothy\",\"email\":\"james.timothy.pilot001@tec-erp.pilot\",\"completedMissions\":30,\"moduleProgress\":[{\"moduleCode\":\"M9\",\"status\":\"completed\",\"percentComplete\":100},{\"moduleCode\":\"M1\",\"status\":\"completed\",\"percentComplete\":100},{\"moduleCode\":\"M2\",\"status\":\"completed\",\"percentComplete\":100},{\"moduleCode\":\"M3\",\"status\":\"completed\",\"percentComplete\":100},{\"moduleCode\":\"M4\",\"status\":\"completed\",\"percentComplete\":100},{\"moduleCode\":\"M5\",\"status\":\"completed\",\"percentComplete\":100},{\"moduleCode\":\"M6\",\"status\":\"completed\",\"percentComplete\":100},{\"moduleCode\":\"M7\",\"status\":\"completed\",\"percentComplete\":100},{\"moduleCode\":\"M8\",\"status\":\"completed\",\"percentComplete\":100}],\"silverStatus\":\"is"
+      }
+    }
+  ]
+}
