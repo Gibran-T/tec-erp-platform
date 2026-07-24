@@ -12,6 +12,7 @@ import { CertificateVerifyPage } from "./pages/public/CertificateVerifyPage.js";
 import { LearnerHomePage } from "./pages/workspace/LearnerHomePage.js";
 import { ModuleHubPage } from "./pages/workspace/modules/ModuleHubPage.js";
 import { WorkspaceAppPage } from "./pages/workspace/WorkspaceAppPage.js";
+import { PlaybackV2Root } from "./playback/v2/PlaybackV2Root.js";
 import { ThemeProvider } from "./theme/ThemeProvider.js";
 
 export function AppRoutes(): ReactNode {
@@ -19,6 +20,8 @@ export function AppRoutes(): ReactNode {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/verify/:token" element={<CertificateVerifyPage />} />
+      {/* Wave 2A Playback Zero — isolated prototype, not production navigation */}
+      <Route path="/playback/v2/*" element={<PlaybackV2Root />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<WorkspaceLayout />}>
           <Route index element={<Navigate to="/workspace" replace />} />
