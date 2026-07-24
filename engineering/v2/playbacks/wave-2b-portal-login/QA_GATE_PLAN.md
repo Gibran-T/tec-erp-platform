@@ -1,73 +1,90 @@
-# Wave 2B — QA Gate Plan
+# Wave 2B — QA Gate Plan (Revision 1)
 
-> **Status:** PLAN ONLY — TESTS NOT YET EXTENDED IN THIS GATE  
-> **Implementation:** NOT STARTED  
-> **Deploy / James Run 2 / Professor implementation:** NOT AUTHORIZED  
+> **Status:** PLAN ONLY — IMPLEMENTATION NOT AUTHORIZED  
+> **Revision:** 1 — Behavioral acceptance for functional SO-1048 Mission 1 entry  
+> **Deploy / Push / James Run 2 / Professor implementation:** NOT AUTHORIZED  
 > **Baseline:** `3e23022e8cdf6b0b5b9bc273b34f285d93bd7bd9`  
 > **Branch / worktree:** `feature/v2-portal-login-wave2b` @ `C:\Projetos\tec-erp-wt-wave2b-portal-login`
 
-## Existing baseline to preserve
+## Principle
 
-Wave 2A suite in `apps/web/src/playback/v2/__tests__/playback-v2.test.tsx` (17 tests Owner Green). Must remain green.
+Wave 2B QA must prove **behavior**, not merely that routes render, text appears, a modal opens, or themes work.
 
-## Exact tests to add or strengthen (future implementation gate)
+Wave 2A render/isolation suite remains green as regression baseline.
 
-1. **Production isolation** — playback routes do not render `production-login` / `login-page`  
-2. **Marker present** on portal, login, cockpit  
-3. **Journey** — portal → login → orientation (cockpit) navigation  
-4. **CTA** — `Commencer l’enquête` / Start the inquiry visible and opens Mission 1 preview  
-5. **Preview framing** — states full mission not yet delivered / secure preview  
-6. **No M11** — module count 10; Capstone separate  
-7. **Visible vs Ambient AI** — distinguishable labels; no hybrid “IA Ambient” FR regression  
-8. **Owner canvas** — `#eef4f8` attribute preserved  
-9. **Professor preview badge** — preview-not-implemented separation  
-10. **Theme attributes** — light/dark/projector toggle updates `data-pb-theme`  
-11. **Locale** — FR/EN switch updates headings without residual hybrid terms introduced by Wave 2B  
-12. **Reduced motion / keyboard** — focusable pulse nodes; motion-sensitive paths gated (manual + automated where feasible)  
+---
 
-## Production-isolation assertions
+## A. Behavioral acceptance criteria (required)
 
-- `/playback/v2/*` outside `ProtectedRoute` (static review of `App.tsx`)  
-- No `useAuth` import under `playback/v2/`  
-- No fetch/XHR during playback journey (spy `fetch` / `globalThis.fetch` in tests)  
-- No navigation to production `/workspace` from playback login submit  
+| ID | Criterion | Pass condition |
+|----|-----------|----------------|
+| B1 | Session start | CTA starts Mission 1 session → state `IN_PROGRESS` + ledger `MISSION_1_STARTED` + stable `sessionId` |
+| B2 | Evidence collection | Collecting an authored evidence item increments governed count + ledger `EVIDENCE_ADDED` |
+| B3 | Constrained decision | Selecting one of three threat options → `DECISION_RECORDED` + ledger entry with `optionId` |
+| B4 | Deterministic consequence | Same decision always yields same authored pulse/inbox/KPI consequence view + ledger `CONSEQUENCE_APPLIED` |
+| B5 | Completion gate | `COMPLETED` rejected unless ≥1 evidence + decision + consequence applied + debrief ack |
+| B6 | Resume | After reload (sessionStorage path) or service restore, session returns to last valid state without `fetch`/API |
+| B7 | Illegal transitions | e.g. complete from `NOT_STARTED` throws/rejects; ledger unchanged |
+| B8 | Production isolation | No `useAuth`; no navigation to `/workspace`; production `/login` not rendered by playback |
+| B9 | No network | `fetch` not called during mission-entry loop |
+| B10 | Professor boundary | Preview-only; no Professor control-plane dependency |
+| B11 | James boundary | No Run scripts; Run 2 remains 0 by governance check |
 
-## No-fetch / no-mutation assertions
+---
 
-- `vi.spyOn(globalThis, "fetch")` expect not called during portal/login/cockpit/preview  
-- No Prisma / API scripts invoked by web tests  
-- Confirm no seed scripts run as part of Wave 2B QA  
+## B. Exact tests to add (future implementation)
 
-## Responsive / theme / a11y coverage
+### B1. Pure engine unit tests (`mission-entry/__tests__`)
 
-| Mode | Coverage |
-|------|----------|
-| Light / Dark / Projector | Automated attribute + Owner manual |
-| Desktop / laptop / tablet / mobile | Playback viewport control + Owner manual |
-| Keyboard | Pulse node, nav, CTA, controls |
-| Reduced motion | OS setting / Owner script |
+1. state machine happy path NOT_STARTED→…→COMPLETED  
+2. reject COMPLETED without evidence  
+3. reject COMPLETED without decision  
+4. evidence append ledger  
+5. decision options constrained (invalid option rejected)  
+6. consequence map determinism (table-driven for three options)  
+7. ledger append-only (no rewrite API)  
+8. sessionStorage adapter round-trip resume  
+9. abandon/recover policy  
 
-## Package gates (future)
+### B2. Integration / UI behavioral tests
+
+1. Cockpit CTA starts session (not preview-only done-state)  
+2. Evidence collect updates UI count from engine  
+3. Decision + visible consequence panels  
+4. Completion blocked then allowed  
+5. Resume banner / restored state after simulated reload  
+6. `fetch` spy never called  
+7. Production login isolation regression from Wave 2A  
+
+### B3. Wave 2A regression (keep)
+
+Marker · portal/login/cockpit mount · M1–M10/Capstone · themes/locale · pulse map · Visible vs Ambient labels · no M11  
+
+---
+
+## C. Package gates (future)
 
 ```text
 pnpm --filter erp-web test
-pnpm --filter erp-web typecheck   # or repo-equivalent
-pnpm --filter erp-web lint        # or repo-equivalent
+pnpm --filter erp-web typecheck
+pnpm --filter erp-web lint
 pnpm turbo --filter=erp-web... build
 ```
 
-## Governance checks (every PR)
+## D. Manual / a11y / responsive (still required, not sufficient alone)
 
-- James Run 1 untouched  
-- James Run 2 count remains 0  
-- Professor not implemented  
-- No schema/backend/data files in diff  
+Light/Dark/Projector · desktop/tablet/mobile · keyboard · reduced-motion  
+
+## E. Governance checks (every PR)
+
+- Diff limited to authorized file plan  
+- No `apps/api`, Prisma, auth, James mutation scripts  
 - Learning-contract worktree not used  
+- **IMPLEMENTATION** only after Implementation Checkpoint  
 
-## Pass criteria
+## F. Pass / Fail
 
-All automated tests green · Owner playback accepted · Isolation proven · No prohibited files in diff.
+**Pass:** All B1–B11 proven + regressions green + Owner functional loop accepted.  
+**Fail / HOLD:** Preview-modal-only “done” · render-only tests · network/auth/schema · missing ledger/resume · unauthorized push/deploy.
 
-## Fail / HOLD criteria
-
-Any production auth coupling · network AI · schema change · James mutation · implementation without checkpoint authorization.
+**IMPLEMENTATION NOT AUTHORIZED by this plan.**
