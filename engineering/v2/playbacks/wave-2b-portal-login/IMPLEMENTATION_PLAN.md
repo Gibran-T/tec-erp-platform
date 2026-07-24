@@ -1,89 +1,73 @@
-# Wave 2B — Implementation Plan (Revision 1)
+# Wave 2B — Implementation Plan (Revision 2)
 
 > **Status:** PLAN ONLY — IMPLEMENTATION NOT AUTHORIZED  
-> **Revision:** 1 — Functional SO-1048 Mission 1 entry  
-> **Deploy:** NOT AUTHORIZED  
-> **Push:** NOT AUTHORIZED  
-> **James Run 2:** NOT AUTHORIZED  
-> **Professor:** NOT IMPLEMENTED / NOT AUTHORIZED  
+> **Revision:** 2 — Persistence, ledger and governance contract freeze  
+> **Deploy / Push:** NOT AUTHORIZED  
+> **James Run 2 / Professor:** NOT AUTHORIZED  
 > **Baseline:** `3e23022e8cdf6b0b5b9bc273b34f285d93bd7bd9`  
 > **Branch (current):** `feature/v2-portal-login-wave2b`  
-> **Rename recommendation (document only):** `feature/v2-so1048-mission-entry-wave2b`  
-> **Worktree:** `C:\Projetos\tec-erp-wt-wave2b-portal-login`
+> **Branch rename:** **RENAME REQUIRED BEFORE IMPLEMENTATION** → `feature/v2-so1048-mission-entry-wave2b` (**do not rename here**)  
+> **Worktree:** `C:\Projetos\tec-erp-wt-wave2b-portal-login`  
+> **Findings closed:** R1-01 · R1-02 · R1-03 · R1-04 · R1-05 = **CLOSED**
 
 ## Goal
 
-Unlike Wave 2A, Wave 2B will deliver a **functional isolated SO-1048 Mission 1 entry session**: evidence collection → one constrained decision → deterministic consequence → resume/complete with an append-only ledger.
+Deliver the frozen SO-1048 Mission 1 entry engine: versioned session envelope, append-only ledger (exact event catalog), four-option decision, exactly-once consequence, corruption recovery, resume with `SESSION_RESUMED`.
 
-**Not a goal:** cosmetic refinement of Wave 2A playback screens.
+**Not a goal:** Wave 2A cosmetic polish.
 
 ## Preconditions (blocking)
 
-1. Architecture Revision 1 **re-approved** by Owner/governance  
-2. Implementation Checkpoint gate authorized  
-3. Worktree clean on authorized branch  
-4. Learning-contract worktree untouched  
-5. No deploy/push authorization claimed by this plan  
+1. Final Architecture Re-Approval of Revision 2  
+2. Implementation Checkpoint authorized  
+3. Branch renamed to recommended name **before implementation starts** (separate authorized step)  
+4. Worktree clean · learning-contract untouched  
+5. No push/deploy claimed  
 
 ## Sequencing (proposed — not started)
 
-### Step 0 — Freeze Revision 1 architecture
-- Confirm re-approval of this pack  
-- Confirm non-goals still binding  
-- Branch rename remains optional documentation recommendation only until separately authorized  
+### Step 0 — Freeze & rename gate
+- Confirm Revision 2 re-approved  
+- Perform authorized branch rename to `feature/v2-so1048-mission-entry-wave2b` before code work  
 
-### Step 1 — Mission-entry engine (pure logic)
-- Create isolated module (`playback/v2/mission-entry/` or `v2/mission-entry/`)  
-- State machine: `NOT_STARTED → IN_PROGRESS → DECISION_RECORDED → CONSEQUENCE_APPLIED → COMPLETED` (+ `ABANDONED`)  
-- Evidence catalog + collect API  
-- Decision `dec-primary-threat` with three options  
-- Deterministic consequence map  
-- Append-only ledger  
-- In-memory service + optional sessionStorage adapter  
-- Unit tests (no DOM)
+### Step 1 — Engine core (pure logic)
+- Types: `MissionSessionEnvelopeV1`, `MissionLedgerEvent`, event catalog  
+- State machine + invalid transition rejections  
+- Evidence collect → `EVIDENCE_COLLECTED`  
+- Four options → `DECISION_RECORDED`  
+- Consequence map → `CONSEQUENCE_APPLIED` exactly once  
+- Debrief → `DEBRIEF_ACKNOWLEDGED` → `MISSION_1_COMPLETED`  
+- Abandon → `SESSION_ABANDONED`  
 
-### Step 2 — Wire Cockpit CTA to session start
-- CTA **Commencer l’enquête** starts Mission 1 session (`MISSION_1_STARTED`)  
-- Navigate/render mission-entry surface under `/playback/v2/*`  
-- Preview modal may remain secondary help — **not** completion  
+### Step 2 — Persistence adapters
+- In-memory SoT  
+- sessionStorage key `tec.erp.playback.v2.so1048.m1.session.v1`  
+- JSON + ISO-8601 UTC  
+- Corruption classes → safe reset + `SESSION_RECOVERY_RESET` on new session  
+- Resume → `SESSION_RESUMED`  
+- **No** localStorage / API / DB / auth  
 
-### Step 3 — Mission-entry UI (thin)
-- Evidence collection UI bound to engine  
-- Decision UI (constrained options)  
-- Consequence presentation (pulse/inbox/KPI view model)  
-- Completion / debrief acknowledgement  
-- Resume banner when session restored  
+### Step 3 — Thin UI + Cockpit CTA
+- CTA starts session (`MISSION_1_STARTED`)  
+- Mission-entry surface under `/playback/v2/*`  
+- Recovery notice UI (non-production)  
+- Ledger history visibility for Owner/QA  
+- Preview modal ≠ done-state  
 
-### Step 4 — Presentation shell hygiene
-- Keep Portal/Login/Cockpit as shell  
-- Marker non-production  
-- No `useAuth` / production coupling  
-- No Prisma/API  
+### Step 4 — Behavioral QA + Owner loop
+- Execute `QA_GATE_PLAN.md` Revision 2 suites  
+- Execute `OWNER_PLAYBACK_PLAN.md` Revision 2 (incl. corruption simulation)  
 
-### Step 5 — Authored AI labels (non-authoritative)
-- Visible AI may coach structure; Ambient AI may show authored reaction lines  
-- Neither mutates ledger as authority  
+### Step 5 — Governance (later)
+- Code review · merge auth · post-merge  
+- Deploy remains unauthorized  
 
-### Step 6 — Behavioral QA automation
-- Execute `QA_GATE_PLAN.md` Revision 1 tests  
-- Package typecheck/lint/test/build  
+## Definition of done
 
-### Step 7 — Owner playback (functional loop)
-- Execute `OWNER_PLAYBACK_PLAN.md` Revision 1  
-- Capture evidence of start → evidence → decision → consequence → resume → complete  
-
-### Step 8 — Governance / merge gates (later)
-- Code review · merge authorization · post-merge verification  
-- Deploy remains separately unauthorized  
-
-## Out of sequence forever for Wave 2B
-
-- James Run 2 · Professor implementation · production login replacement · schema/backend/data · `/orientation` rename · College logo invention · Wave 2A P2/P3 cleanup · ELE / BI Studio / Teaching Deck full · cosmetic-only “polish wave”
-
-## Definition of done (Wave 2B product slice)
-
-Behavioral criteria in Architecture Pack §19 / `QA_GATE_PLAN.md` all pass · Owner Green on functional loop · production isolation proven · James Run 1 untouched · James Run 2 = 0 · Professor preview-only · **no deploy** · **IMPLEMENTATION remains unauthorized until Implementation Checkpoint**
+All Revision 2 behavioral criteria green · Owner Green on functional + recovery loop · isolation proven · James 1 untouched · James 2 = 0 · Professor preview-only · **no deploy**.
 
 ## Rollback
 
-Revert PR · unmount mission-entry · clear sessionStorage key · production unaffected
+Revert PR · unmount mission-entry · clear sessionStorage key · production unaffected.
+
+**IMPLEMENTATION NOT AUTHORIZED.**

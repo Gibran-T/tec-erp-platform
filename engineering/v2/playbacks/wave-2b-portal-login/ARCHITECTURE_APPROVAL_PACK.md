@@ -1,12 +1,12 @@
-# Wave 2B — Architecture Approval Pack (Revision 1)
+# Wave 2B — Architecture Approval Pack (Revision 2)
 
 > **Document type:** Governance / architecture approval pack  
 > **Wave:** 2B — Functional SO-1048 Mission 1 Entry  
-> **Revision:** 1 — Functional mission-entry delta (closes Architecture REVISE)  
-> **Status:** READY FOR ARCHITECTURE RE-APPROVAL  
+> **Revision:** 2 — Persistence, ledger and governance contract freeze  
+> **Status:** READY FOR FINAL ARCHITECTURE RE-APPROVAL  
 > **Implementation:** NOT AUTHORIZED  
 > **Deploy:** NOT AUTHORIZED  
-> **Push:** NOT AUTHORIZED (branch remains local until separately authorized)  
+> **Push:** NOT AUTHORIZED (branch remains local)  
 > **James Run 2:** NOT AUTHORIZED (must remain 0)  
 > **Professor implementation:** NOT AUTHORIZED (preview-only)
 
@@ -15,229 +15,267 @@
 | Repository | `Gibran-T/tec-erp-platform` |
 | Baseline SHA | `3e23022e8cdf6b0b5b9bc273b34f285d93bd7bd9` |
 | Branch (current) | `feature/v2-portal-login-wave2b` |
-| Branch rename recommendation | `feature/v2-so1048-mission-entry-wave2b` — **document only; do not rename in this revision** |
+| Branch rename | **RENAME REQUIRED BEFORE IMPLEMENTATION** → `feature/v2-so1048-mission-entry-wave2b` (**do not rename in this revision**) |
 | Worktree | `C:\Projetos\tec-erp-wt-wave2b-portal-login` |
-| Scope source | Wave 2B Scope Authorization + Architecture REVISE findings (2026-07-24) |
+| Prior findings closed | R1-01 · R1-02 · R1-03 · R1-04 · R1-05 (**CLOSED** in Revision 2) |
 | Wave 2A | MERGED AND POST-MERGE GREEN (PR #34 @ `3e23022`) |
 
 ---
 
 ## Unlike Wave 2A, Wave 2B will…
 
-Unlike Wave 2A, Wave 2B will run an **isolated SO-1048 Mission 1 entry session** where the learner **collects governed evidence**, makes **one constrained diagnostic decision**, observes a **deterministic consequence**, and can **resume or complete** that session with an **auditable client-side event ledger** — without touching production auth, schema, or James runs.
+Unlike Wave 2A, Wave 2B will run an **isolated SO-1048 Mission 1 entry session** where the learner **collects governed evidence**, makes **one constrained diagnostic decision** among four options, observes a **deterministic consequence**, and can **resume or complete** that session with an **auditable append-only ledger** and **versioned sessionStorage resume** — without touching production auth, schema, or James runs.
 
 Cosmetic refinement of Wave 2A screens is **out of goal**.
 
 ---
 
+## Finding closure (Revision 2)
+
+| Finding | Status |
+|---------|--------|
+| **R1-01** persistence serialization/versioning/corruption recovery | **CLOSED** |
+| **R1-02** ledger schema and event catalog | **CLOSED** |
+| **R1-03** decision-option alignment (four options) | **CLOSED** |
+| **R1-04** risk-register structure | **CLOSED** (see `RISK_REGISTER.md`) |
+| **R1-05** consequence idempotency and resume event | **CLOSED** |
+
+---
+
 ## 1. Objective
 
-Deliver a **functional, isolated V2 Mission 1 entry vertical slice** for Mandat SO-1048:
+Functional isolated V2 Mission 1 entry for Mandat SO-1048:
 
-Portal / Login (presentation) → Mission Cockpit → **start Mission 1 session** → evidence → decision → consequence → resume/complete
+Presentation shell → Cockpit CTA → **mission session** → evidence → decision → consequence (exactly once) → resume/complete with frozen ledger + persistence contracts.
 
-Preserve production isolation. Do not implement Professor, ELE runtime, BI Studio, James Run 2, or full M1 Mission 2/3.
+**IMPLEMENTATION NOT AUTHORIZED** by this document.
 
-## 2. Scope
+## 2. Scope / non-goals
 
-- Keep `/playback/v2/*` as presentation/orientation shell
-- Add **separate mission-entry engine** (Option C)
-- Mission session state machine
-- Governed evidence collection (≥1 item)
-- One constrained learner decision
-- Deterministic authored consequence rules
-- Append-only client-side event ledger
-- Resume via isolated in-memory service + optional `sessionStorage`
-- Behavioral acceptance tests and Owner playback of the functional loop
-- FR/EN, themes, a11y retained from Wave 2A presentation
+Unchanged from Revision 1 functional scope. Non-goals remain: full M1–M10, Mission 2/3, Professor, BI Studio, ELE runtime, network AI, Prisma/schema/data, production login/auth, James Run 2, College rename, College logo, deploy, push without separate authorization.
 
-## 3. Non-goals / prohibitions
+## 3. Wave 2A vs Wave 2B delta (summary)
 
-Full M1–M10 runtime · full Mission 2/3 · Professor workspace · live BI Studio · College logo invention · `/orientation` rename · Capstone · production deploy · James Run 2 · production `/login`/auth replacement · backend rewrite · Prisma/schema/data changes · network AI · multi-tenant · certification automation · full assessment engine · Wave 2A P2/P3 cleanup · ELE Wave 5B · Teaching Deck full · Thiago Professor · Master Contract rewrite · production data mutation · James Run 1 modification · push without separate authorization · **IMPLEMENTATION NOT AUTHORIZED by this document**
+Genuine new (C): Mission 1 session · governed evidence · four-option decision · deterministic consequence · append-only ledger · versioned resume · corruption recovery · explicit COMPLETED.
 
 ---
 
-## 4. Wave 2A versus Wave 2B delta matrix
+## 4. Code boundary (Option C) — frozen
 
-| Capability | Wave 2A | Wave 2B (Revision 1) | Class |
-|------------|---------|----------------------|-------|
-| Portal | Implemented (playback) | Reuse as presentation shell | Already in 2A / reuse |
-| Login (fake) | Implemented | Reuse as presentation shell | Already in 2A / reuse |
-| Mission Cockpit | Implemented | Reuse + CTA starts **session** | Evolved |
-| Mandat SO-1048 | Authored display | Binding mission context for session | Evolved |
-| Mission 1 preview modal | Implemented | May remain as secondary help; **not** done-state | Already in 2A |
-| Mission 1 **entry session** | Absent | **Required** | **Genuine new (C)** |
-| Governed evidence collection | Display only (0/3) | Collect ≥1; ledgered | **Genuine new (C)** |
-| Constrained learner decision | Absent | One diagnostic decision | **Genuine new (C)** |
-| Deterministic consequence | Static demo text | Rule-mapped reaction | **Genuine new (C)** |
-| Event ledger | Absent | Append-only client ledger | **Genuine new (C)** |
-| Session resume | Absent | In-memory + optional sessionStorage | **Genuine new (C)** |
-| Completion state | Preview close ≠ complete | Explicit COMPLETED criteria | **Genuine new (C)** |
-| Visible / Ambient AI | Authored previews | Authored; may narrate consequence; never authoritative | Static + bound |
-| Professor | Preview-only | Preview-only | Out / unchanged |
-| James Run 2 | 0 | Remains 0 | Out |
-| Prisma / production persistence | None | None | Out |
-| Cosmetic-only polish as goal | N/A | **Forbidden as Wave 2B goal** | Out |
+| Layer | Location | Responsibility |
+|-------|----------|----------------|
+| Presentation shell | `apps/web/src/playback/v2/*` pages | Portal, login, cockpit chrome |
+| Mission-entry engine | `apps/web/src/playback/v2/mission-entry/` (or `apps/web/src/v2/mission-entry/`) | Pure state machine, evidence, decision, consequence, ledger, persistence — **testable without DOM** |
+| Thin UI | mission-entry views | Bind UI; no business rules in JSX |
 
 ---
 
-## 5. Route architecture
+## 5. Persistence envelope — frozen (closes R1-01)
 
-| Decision | Choice |
-|----------|--------|
-| Presentation routes | Preserve `/playback/v2/{portal,login,orientation}` |
-| Mission entry surface | Isolated route under `/playback/v2/*` (e.g. `mission-1` or `mission-entry`) — **not** production routes |
-| `/orientation` rename | **Not in this wave** |
-| Production `/login` | Untouched |
-| Marker | Non-production marker required |
-
-## 6. Component / code boundary (Option C)
-
-| Layer | Location (proposed) | Responsibility |
-|-------|---------------------|----------------|
-| Presentation shell | Existing `apps/web/src/playback/v2/*` pages | Portal, login, cockpit chrome |
-| Mission-entry engine | **New** `apps/web/src/playback/v2/mission-entry/` (or `apps/web/src/v2/mission-entry/`) | Session state machine, evidence, decision, consequence, ledger, storage adapter — **pure logic testable without DOM** |
-| Mission-entry UI | Thin views under mission-entry | Bind UI to engine; no business rules in JSX |
-
-**Do not** treat page polish alone as the product. Engine must be separable for future V2 migration and rollback.
-
-## 7. Mission session state machine
-
-```text
-NOT_STARTED
-  → (CTA start) IN_PROGRESS          [ledger: MISSION_1_STARTED]
-  → (evidence add) IN_PROGRESS       [ledger: EVIDENCE_ADDED]
-  → (decision) DECISION_RECORDED     [ledger: DECISION_RECORDED]
-  → (rules apply) CONSEQUENCE_APPLIED[ledger: CONSEQUENCE_APPLIED]
-  → (complete OK) COMPLETED          [ledger: MISSION_1_COMPLETED]
-  → (abandon) ABANDONED              [ledger: MISSION_1_ABANDONED]  (recoverable → IN_PROGRESS or restart policy)
-```
-
-Illegal transitions (e.g. COMPLETED without decision + ≥1 evidence) **must be rejected**.
-
-## 8. Governed evidence collection
-
-Authored evidence catalog (SO-1048):
-
-| Evidence ID | Type | Label (FR intent) |
-|-------------|------|-------------------|
-| `ev-otc-map` | process map | Carte processus Order-to-Cash |
-| `ev-supplier-delay` | document | Note délai fournisseur NordLog |
-| `ev-stock-kpi` | KPI signal | Stocks famille A / OTIF tension |
-| `ev-marc-urgency` | stakeholder | Message urgent Marc Tremblay |
-
-Rules:
-
-- Learner may collect items from the catalog (select/inspect/pin)
-- At least **one** evidence required before completion
-- Each collection appends ledger `EVIDENCE_ADDED`
-- Evidence does not invent Twin facts outside authored catalog
-
-## 9. Constrained learner decision
-
-**Decision ID:** `dec-primary-threat`  
-**Prompt:** What is the primary threat to the Friday customer promise?  
-**Options (exactly one):**
-
-| Option ID | Meaning |
-|-----------|---------|
-| `threat-inventory` | Family A inventory tension is primary |
-| `threat-supplier` | Supplier delay (+4 days / qty > 120) is primary |
-| `threat-demand` | Demand surge (140 units) is primary |
-
-Decision requires session `IN_PROGRESS` and is recorded once (or explicitly revised per engine policy — default: single commit then consequence).
-
-## 10. Deterministic consequence rules
-
-Authored map (no network AI, no random drift):
-
-| Decision | Pulse / KPI effect (authored) | Inbox reaction (authored) |
-|----------|-------------------------------|---------------------------|
-| `threat-inventory` | Highlight Family A stock risk; OTIF pressure framing | Warehouse / ops note |
-| `threat-supplier` | Highlight supplier dependency +4 days | NordLog / buyer supervisor note |
-| `threat-demand` | Highlight demand 140 vs promise | Sales (Marc) confirmation pressure |
-
-Consequence application is pure function: `(decisionId, twinSnapshot) → consequenceViewModel` + ledger `CONSEQUENCE_APPLIED`.
-
-## 11. Append-only client-side event ledger
-
-Entry shape:
+Deterministic session envelope (`schemaVersion = 1`):
 
 ```ts
-{
-  ts: string;           // ISO timestamp
-  type: string;         // MISSION_1_STARTED | EVIDENCE_ADDED | DECISION_RECORDED | ...
-  actor: "learner" | "system";
+type MissionSessionEnvelopeV1 = {
+  schemaVersion: 1;
   sessionId: string;
-  payload: Record<string, unknown>;
-}
+  missionId: "SO-1048-M1";
+  learnerId: "playback-demo";
+  status:
+    | "NOT_STARTED"
+    | "IN_PROGRESS"
+    | "DECISION_RECORDED"
+    | "CONSEQUENCE_APPLIED"
+    | "COMPLETED"
+    | "ABANDONED";
+  evidenceIds: string[];
+  decisionId: string | null;
+  consequenceId: string | null;
+  debriefAcknowledged: boolean;
+  ledger: MissionLedgerEvent[];
+  createdAt: string; // ISO-8601 UTC
+  updatedAt: string; // ISO-8601 UTC
+};
 ```
 
-Rules: append-only · no silent rewrite · Visible AI must not be ledger authority · exportable for QA snapshots.
+| Rule | Value |
+|------|-------|
+| Serialization | JSON (`JSON.stringify` / `JSON.parse`) |
+| Timestamps | Stable ISO-8601 **UTC** (`...Z`) |
+| Field names | Exact camelCase names above — deterministic |
+| `schemaVersion` | `1` only for this freeze |
+| Storage key | `tec.erp.playback.v2.so1048.m1.session.v1` |
+| Source of truth | **In-memory mission service** |
+| Resume adapter | **sessionStorage only** |
+| Forbidden | `localStorage` · backend · database · production auth/session reuse |
 
-## 12. Persistence / resume
+---
 
-| Store | Role |
-|-------|------|
-| Isolated **in-memory mission service** | Source of truth while tab alive |
-| Optional **`sessionStorage`** | Resume after refresh within browser session |
-| Prisma / production DB / API | **Forbidden** |
+## 6. Corruption recovery — frozen (closes R1-01)
 
-No auth tokens in storage. Storage key namespaced (e.g. `tec-erp.v2.wave2b.so1048.session`). Clearable on rollback.
+When stored state is **missing**, **invalid JSON**, **unsupported `schemaVersion`**, **missing required fields**, **invalid status/transition**, or has **duplicate/malformed ledger entries**:
 
-## 13. Auth isolation
+| Step | Behavior |
+|------|----------|
+| 1 | Do **not** crash |
+| 2 | Do **not** partially hydrate |
+| 3 | Preserve **no** corrupt authoritative state in memory |
+| 4 | Quarantine/discard invalid stored value (remove sessionStorage key) |
+| 5 | Start clean session at `NOT_STARTED` with new `sessionId` |
+| 6 | Expose non-production **recovery notice** in playback UI |
+| 7 | Append **no** fake historical events from corrupt payload |
+| 8 | On the **new** clean session only, may append `SESSION_RECOVERY_RESET` (payload describes recovery class; **no corrupted payload copied**) |
+| 9 | Learner may restart safely |
 
-Playback login remains fake navigation into Cockpit. No `useAuth`, JWT, or production login coupling. Mission engine never calls API.
+Corruption classes and required tests: see `QA_GATE_PLAN.md` § Persistence.
 
-## 14. Digital Twin / ELE / AI boundaries
+---
 
-- **Twin:** authored Equinoxe snapshot; consequence updates **view model** only, not production Twin  
-- **ELE:** no runtime engine; authored reactions only via consequence map  
-- **Visible AI:** may clarify / structure; must not decide, score, unlock, or authoritatively mutate ledger  
-- **Ambient AI:** authored stakeholder lines tied to consequence; no generative network AI  
-- **Professor:** preview-only; no dependency  
+## 7. Ledger schema — frozen (closes R1-02)
 
-## 15. James Run boundary
+```ts
+type MissionLedgerEventType =
+  | "MISSION_1_STARTED"
+  | "EVIDENCE_COLLECTED"
+  | "DECISION_RECORDED"
+  | "CONSEQUENCE_APPLIED"
+  | "DEBRIEF_ACKNOWLEDGED"
+  | "MISSION_1_COMPLETED"
+  | "SESSION_RESUMED"
+  | "SESSION_ABANDONED"
+  | "SESSION_RECOVERY_RESET";
 
-James Run 1 untouched · James Run 2 remains 0 · Wave 2B is not Run 2 readiness
+type MissionLedgerEvent = {
+  id: string;              // unique per event
+  sessionId: string;
+  timestamp: string;       // ISO-8601 UTC
+  type: MissionLedgerEventType;
+  actor: "LEARNER" | "SYSTEM" | "VISIBLE_AI" | "AMBIENT_STAKEHOLDER";
+  payload: Record<string, unknown>;
+  version: 1;
+};
+```
 
-## 16. Production isolation
+| Rule | Requirement |
+|------|-------------|
+| Append-only | Yes |
+| Immutable event objects | No in-place edits |
+| Ordering | Monotonically non-decreasing timestamps within a session |
+| IDs | Unique event IDs |
+| Deletions | None during a session |
+| AI authority | Visible AI / Ambient AI **must not** rewrite ledger |
+| Resume | Adds `SESSION_RESUMED` |
+| Corruption reset | Adds `SESSION_RECOVERY_RESET` only on **new** clean session; no corrupt payload copied |
 
-Outside `ProtectedRoute` / `WorkspaceLayout` · marker required · no production nav link · no deploy · no schema
+---
 
-## 17. Rollback
+## 8. Decision contract — frozen (closes R1-03)
 
-- Revert PR / unmount mission-entry routes  
-- Clear sessionStorage key  
-- Presentation shell can remain; engine removable independently  
-- Production `/login` and James data unaffected  
+**Decision ID:** `dec-primary-threat`  
+**Question:** What is the primary threat to the Friday customer promise?  
+**Options (exactly one of four):**
 
-## 18. Approval gates
+| Option ID | Meaning (learner-facing, non-scoring) |
+|-----------|----------------------------------------|
+| `DEMAND_QUANTITY` | Demand quantity (140 units) threatens the promise |
+| `SUPPLIER_DELAY` | Supplier delay threatens the promise |
+| `STOCK_AVAILABILITY` | Stock availability (Family A) threatens the promise |
+| `WAREHOUSE_CAPACITY` | Warehouse capacity / quai constraint threatens the promise |
 
-1. Scope approval — DONE  
-2. Architecture approval — **REVISE → Revision 1 → re-approval required**  
-3. Implementation Checkpoint — **NOT AUTHORIZED**  
-4. Automated behavioral validation  
-5. Manual QA  
-6. Owner playback (functional loop)  
-7. Governance review  
-8. Code review  
-9. Merge authorization  
-10. Post-merge verification  
-11. James Run 2 — later  
-12. Deploy — separate  
+**Must not surface:** answer-key wording · score · grade · hidden “correct” labels.  
+Architecture **may** retain an internal strongest-diagnosis hint for later debrief authoring — **never** as scoring UI.
 
-## 19. Behavioral acceptance criteria (summary)
+---
 
-See `QA_GATE_PLAN.md`. Implementation approval requires proving session start, evidence, decision, consequence, resume, completion — **not** merely that routes render.
+## 9. Deterministic consequence contract — frozen (closes R1-05)
 
-## 20. Branch-name recommendation (document only)
+| Decision | Consequence ID | Pulse / KPI (authored) | Inbox (authored) | Debrief prompt (authored) |
+|----------|----------------|------------------------|------------------|---------------------------|
+| `DEMAND_QUANTITY` | `cns-demand-01` | Demand 140 vs Friday promise pressure | Marc Tremblay urgency framing | What evidence best supports demand as primary? |
+| `SUPPLIER_DELAY` | `cns-supplier-01` | Supplier +4 days / qty>120 dependency | NordLog / buyer supervisor note | What breaks if supplier delay is primary? |
+| `STOCK_AVAILABILITY` | `cns-stock-01` | Family A stock tension / OTIF framing | Warehouse / ops stock note | How does stock availability limit promise keeping? |
+| `WAREHOUSE_CAPACITY` | `cns-warehouse-01` | Quai / capacity bottleneck signal | Warehouse capacity constraint note | How does capacity constrain fulfillment timing? |
 
-Current: `feature/v2-portal-login-wave2b` — acceptable but imprecise.  
-Recommended before implementation: `feature/v2-so1048-mission-entry-wave2b`.  
-**Do not rename in this documentation revision.**
+| Rule | Requirement |
+|------|-------------|
+| Evaluation | Pure function `(decisionId, twinSnapshot) → consequenceViewModel` |
+| Determinism | Same decision → same `consequenceId` + same authored outputs |
+| Exactly once | `CONSEQUENCE_APPLIED` appended **exactly once** |
+| Re-apply | Rejected or no-op; **no** second ledger append |
+| Decision change after consequence | **Prohibited** in this slice |
+| Network / generative AI / ELE / backend | **Forbidden** |
+
+Ledger payload for `CONSEQUENCE_APPLIED` includes `{ decisionId, consequenceId }` and view-model refs (authored IDs only).
+
+---
+
+## 10. State-transition table — frozen
+
+### Allowed transitions
+
+| From | To | Trigger | Ledger |
+|------|----|---------|--------|
+| `NOT_STARTED` | `IN_PROGRESS` | CTA start | `MISSION_1_STARTED` |
+| `IN_PROGRESS` | `DECISION_RECORDED` | Valid decision | `DECISION_RECORDED` |
+| `IN_PROGRESS` | `ABANDONED` | Abandon | `SESSION_ABANDONED` |
+| `DECISION_RECORDED` | `CONSEQUENCE_APPLIED` | Apply consequence | `CONSEQUENCE_APPLIED` (once) |
+| `DECISION_RECORDED` | `ABANDONED` | Abandon | `SESSION_ABANDONED` |
+| `CONSEQUENCE_APPLIED` | `COMPLETED` | Debrief ack + criteria | `DEBRIEF_ACKNOWLEDGED` then `MISSION_1_COMPLETED` |
+| `CONSEQUENCE_APPLIED` | `ABANDONED` | Abandon | `SESSION_ABANDONED` |
+| `ABANDONED` | `IN_PROGRESS` | Resume/restart flow only | `SESSION_RESUMED` (and/or restart policy) |
+| `COMPLETED` | — | **Terminal** | no further status transition |
+
+Evidence collection occurs while `IN_PROGRESS` (and may continue until decision per engine policy); each collect → `EVIDENCE_COLLECTED` without changing status away from `IN_PROGRESS` until decision.
+
+### Invalid transitions (reject; no status change; no ledger mutation except optional structured error log outside mission ledger)
+
+Examples: `NOT_STARTED → COMPLETED` · `IN_PROGRESS → COMPLETED` · `COMPLETED → *` · `CONSEQUENCE_APPLIED → DECISION_RECORDED` · second `CONSEQUENCE_APPLIED` · decision change after consequence.
+
+### Resume
+
+- `SESSION_RESUMED` is a **ledger event**, **not** a mission `status`
+- Resume restores the **last valid** envelope status from in-memory/sessionStorage
+- Corrupt storage → recovery contract (§6), not partial resume
+
+### Completion requires all of
+
+1. ≥1 evidence item in `evidenceIds`  
+2. `decisionId` set  
+3. `consequenceId` set / status `CONSEQUENCE_APPLIED` or completing from it  
+4. `debriefAcknowledged === true`  
+
+---
+
+## 11. AI / Professor / James boundaries
+
+- **Visible AI:** clarify/structure only; no decide/score/unlock/ledger rewrite  
+- **Ambient AI:** authored stakeholder lines only; deterministic; no network/ELE runtime  
+- **Professor:** preview-only; no control-plane dependency  
+- **James Run 1:** immutable  
+- **James Run 2:** remains 0  
+
+## 12. Production isolation / rollback
+
+Outside `ProtectedRoute`/`WorkspaceLayout` · marker required · no production nav · no deploy.  
+Rollback: revert PR · unmount mission-entry · clear `tec.erp.playback.v2.so1048.m1.session.v1` · production unaffected.
+
+## 13. Branch rename (document only)
+
+| Item | Value |
+|------|-------|
+| Current | `feature/v2-portal-login-wave2b` |
+| Verdict | **RENAME REQUIRED BEFORE IMPLEMENTATION** |
+| Recommended | `feature/v2-so1048-mission-entry-wave2b` |
+| This revision | **Do not rename** |
+
+## 14. Approval gates
+
+1. Scope — DONE  
+2. Architecture Rev1 — REVISE  
+3. Architecture Rev2 — **re-approval required**  
+4. Implementation Checkpoint — **NOT AUTHORIZED**  
+5–12. Automated behavioral QA · Manual QA · Owner playback · Governance · Code review · Merge · Post-merge · James Run 2 (later) · Deploy (separate)
 
 ---
 
 **IMPLEMENTATION NOT AUTHORIZED.**  
-**This Revision 1 pack is ready for Architecture Re-Approval only.**
+**Revision 2 freezes persistence and ledger contracts for final Architecture Re-Approval only.**
