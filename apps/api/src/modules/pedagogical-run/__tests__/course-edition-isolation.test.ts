@@ -26,9 +26,9 @@ const { pedagogicalCourseRun } = vi.hoisted(() => ({
 }));
 
 vi.mock("@tec-platform/database-erp", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@tec-platform/database-erp")>();
+  const actual = await importOriginal();
   return {
-    ...actual,
+    ...(actual as Record<string, unknown>),
     getPrismaClient: () => ({
       pedagogicalCourseRun,
       courseEditionProgress: {
@@ -105,9 +105,21 @@ async function login(app: ReturnType<typeof createApp>, email: string): Promise<
   return response.body.tokens.accessToken as string;
 }
 
+function resetPedagogicalRunMutationSpies(): void {
+  pedagogicalCourseRun.create.mockClear();
+  pedagogicalCourseRun.update.mockClear();
+  pedagogicalCourseRun.delete.mockClear();
+}
+
+function expectNoPedagogicalRunMutation(): void {
+  expect(pedagogicalCourseRun.create).not.toHaveBeenCalled();
+  expect(pedagogicalCourseRun.update).not.toHaveBeenCalled();
+  expect(pedagogicalCourseRun.delete).not.toHaveBeenCalled();
+}
+
 describe("Course Edition persistence isolation from PedagogicalCourseRun", () => {
-  it("GET without a run does not create a run and returns null progress", async () => {
-    pedagogicalCourseRun.create.mockClear();
+  it("GET without a run does not create, update, or delete a pedagogical run", async () => {
+    resetPedagogicalRunMutationSpies();
     const { app } = createIsolationApp();
     const token = await login(app, "demo.analyste@nordhabitat.ca");
 
@@ -117,12 +129,11 @@ describe("Course Edition persistence isolation from PedagogicalCourseRun", () =>
       .expect(200);
 
     expect(response.body.progress).toBeNull();
-    expect(pedagogicalCourseRun.create).not.toHaveBeenCalled();
+    expectNoPedagogicalRunMutation();
   });
 
-  it("PUT without a run persists Course Edition and does not create a run", async () => {
-    pedagogicalCourseRun.create.mockClear();
-    pedagogicalCourseRun.update.mockClear();
+  it("PUT without a run persists Course Edition and does not create, update, or delete a pedagogical run", async () => {
+    resetPedagogicalRunMutationSpies();
     const { app, student, courseEdition } = createIsolationApp();
     const token = await login(app, "demo.analyste@nordhabitat.ca");
 
@@ -146,16 +157,13 @@ describe("Course Edition persistence isolation from PedagogicalCourseRun", () =>
     const stored = await courseEdition.findByEmployeeAndModule(student.id, "M1");
     expect(stored?.connectionLabPassed).toBe(true);
 
-    expect(pedagogicalCourseRun.create).not.toHaveBeenCalled();
-    expect(pedagogicalCourseRun.update).not.toHaveBeenCalled();
+    expectNoPedagogicalRunMutation();
   });
 
   it.each(["ACTIVE", "PLANNED"] as const)(
     "GET/PUT with official %s James Run 1 leave the run byte-for-byte identical",
     async (status) => {
-      pedagogicalCourseRun.create.mockClear();
-      pedagogicalCourseRun.update.mockClear();
-      pedagogicalCourseRun.delete.mockClear();
+      resetPedagogicalRunMutationSpies();
 
       const jamesRun = buildJamesRun1(status);
       const before = fingerprint(jamesRun);
@@ -185,9 +193,7 @@ describe("Course Edition persistence isolation from PedagogicalCourseRun", () =>
 
       expect(fingerprint(held)).toBe(before);
       expect(fingerprint(jamesRun)).toBe(before);
-      expect(pedagogicalCourseRun.create).not.toHaveBeenCalled();
-      expect(pedagogicalCourseRun.update).not.toHaveBeenCalled();
-      expect(pedagogicalCourseRun.delete).not.toHaveBeenCalled();
+      expectNoPedagogicalRunMutation();
     },
   );
 
@@ -221,7 +227,7 @@ describe("Course Edition persistence isolation from PedagogicalCourseRun", () =>
 
 describe("Course Edition isolation is structural, not a lab-run name filter", () => {
   it("stores progress by employeeId + moduleCode without creating any pedagogical run", async () => {
-    pedagogicalCourseRun.create.mockClear();
+    resetPedagogicalRunMutationSpies();
     const repo = createInMemoryCourseEditionProgressRepository();
     const service = createPedagogicalRunService({ courseEditionProgressRepository: repo });
     await service.upsertCourseEditionProgress({
@@ -231,6 +237,6 @@ describe("Course Edition isolation is structural, not a lab-run name filter", ()
     });
     const stored = await repo.findByEmployeeAndModule("emp_any_student", "M3");
     expect(stored?.moduleCode).toBe("M3");
-    expect(pedagogicalCourseRun.create).not.toHaveBeenCalled();
+    expectNoPedagogicalRunMutation();
   });
 });

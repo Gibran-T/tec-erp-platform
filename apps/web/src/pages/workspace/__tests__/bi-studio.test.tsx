@@ -1,5 +1,5 @@
 import type { AuthenticatedEmployee } from "@tec-platform/contracts";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { AuthProvider } from "../../../auth/AuthContext.js";

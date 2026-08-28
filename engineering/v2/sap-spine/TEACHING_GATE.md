@@ -65,4 +65,6 @@ Recorded from SHA `c78b69c` review. Left unfixed until the owner accepts impact.
 
 **James isolation slice:** Course Edition uses table `course_edition_progress` (`employeeId` + `moduleCode`). GET is read-only. PUT never writes `PedagogicalCourseRun`. James Run 1 is not created or mutated by Course Edition.
 
+**`ON DELETE RESTRICT` (confirmed):** `course_edition_progress.employeeId` follows the same employee-owned pattern as `sap_iee2e_self_report` and `pedagogical_course_run` — not CASCADE. Employee cleanup must delete Course Edition progress rows first, then the employee.
+
 **Verdict this session:** **CORRECTION SLICE — NOT MERGE-AUTHORIZED — NOT CLASSROOM-OPEN**.

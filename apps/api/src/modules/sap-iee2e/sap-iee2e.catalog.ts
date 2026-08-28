@@ -31,7 +31,7 @@ export function buildProgressionLabel(
   return `${completed}/${SAP_IEE2E_UNIT_COUNT} unités déclarées terminées · unité ${currentUnit}`;
 }
 
-export function formatDeclarationLabel(declaredAt: Date | null, now: Date): string {
+export function formatDeclarationLabel(declaredAt: Date | null, _now: Date): string {
   if (!declaredAt) {
     return "Jamais déclarée";
   }

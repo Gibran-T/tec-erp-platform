@@ -20,7 +20,6 @@ import {
 import { normalizeCourseEditionProgress } from "./course-edition-progress.js";
 import { createPrismaCourseEditionProgressRepository } from "./course-edition-progress.repository.js";
 import type { CourseEditionProgressRepository } from "./course-edition-progress.types.js";
-import { resolveOfficialRunIdForEmployee } from "../analytics/official-run-policy.js";
 
 type PrismaRun = {
   id: string;

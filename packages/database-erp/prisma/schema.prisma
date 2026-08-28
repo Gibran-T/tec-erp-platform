@@ -155,7 +155,9 @@ model CourseEditionProgress {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  employee Employee @relation(fields: [employeeId], references: [id])
+  /// ON DELETE RESTRICT — same as sap_iee2e_self_report and pedagogical_course_run.
+  /// Employee cleanup must delete course_edition_progress rows first. Not CASCADE.
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict)
 
   @@unique([employeeId, moduleCode])
   @@index([employeeId])
