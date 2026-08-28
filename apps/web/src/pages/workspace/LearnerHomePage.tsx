@@ -13,6 +13,7 @@ import { useLocale } from "../../i18n/LocaleProvider.js";
 import { ProgressBar } from "../../living-erp/components/Badges.js";
 import { EmptyState, ErrorState, SkeletonBlock } from "../../living-erp/components/States.js";
 import { StatusChip, toneForStatus, type StatusTone } from "../../living-erp/components/StatusChip.js";
+import { SapIee2eDiscoveryCard } from "../../poc/sap-iee2e/SapIee2eDiscoveryCard.js";
 import { getAppPath } from "../../workspace/appRegistry.js";
 import {
   buildHistoricalWelcomeMessage,
@@ -158,6 +159,18 @@ export function LearnerHomePage(): ReactNode {
             : buildWelcomeMessage(employee.displayName)}
         </p>
       </header>
+
+      <SapIee2eDiscoveryCard />
+
+      <section className="living-home-section" data-testid="learner-home-sofa">
+        <h2 className="living-type-section">{t("home.sofa.title")}</h2>
+        <p className="living-lede">{t("home.sofa.body")}</p>
+        <p>
+          <Link to={getAppPath("parcours-sap-iee2e")}>{t("home.sofa.parcours")}</Link>
+          {" · "}
+          <Link to="/workspace/teaching-deck/S1">{t("home.sofa.deck")}</Link>
+        </p>
+      </section>
 
       {loading ? <SkeletonBlock testId="learner-home-loading" /> : null}
       {error ? <ErrorState message={error} /> : null}

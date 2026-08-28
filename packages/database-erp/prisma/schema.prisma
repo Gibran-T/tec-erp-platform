@@ -101,9 +101,48 @@ model Employee {
   professorInterventions     ProfessorIntervention[]
   studentMissionReflections  StudentMissionReflection[]
   pedagogicalRunAudits       PedagogicalCourseRunAudit[] @relation("PedagogicalRunAuditActor")
+  sapIee2eSelfReport         SapIee2eSelfReport?
+  sapIee2eTeachingCalendar   SapIee2eTeachingCalendar?
 
   @@index([companyId])
   @@map("employee")
+}
+
+/// Student-declared accompaniment of the official SAP IEE2E path.
+/// TEC.ERP does not read, scrape, or certify SAP Learning progress.
+model SapIee2eSelfReport {
+  id              String   @id @default(cuid())
+  employeeId      String   @unique
+  currentUnit     Int
+  sessionNumber   Int
+  sapAccess       String
+  difficulty      String   @default("")
+  needsSupport    Boolean  @default(false)
+  note            String   @default("")
+  achievement     String
+  unitsJson       Json
+  semaineZeroJson Json     @default("{}")
+  lastDeclaredAt  DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  @@index([needsSupport])
+  @@map("sap_iee2e_self_report")
+}
+
+/// Professor-declared Collège session 1 date — opens the Semaine Zéro window.
+model SapIee2eTeachingCalendar {
+  id          String   @id @default(cuid())
+  professorId String   @unique
+  session1At  DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  professor Employee @relation(fields: [professorId], references: [id])
+
+  @@map("sap_iee2e_teaching_calendar")
 }
 
 /// Per-employee read state for a static inbox message (content lives in code).

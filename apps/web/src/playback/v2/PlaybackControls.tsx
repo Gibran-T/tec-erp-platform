@@ -184,11 +184,15 @@ export function PlaybackControls(): ReactNode {
                 if (value === "portal") navigate("/playback/v2/portal");
                 if (value === "login") navigate("/playback/v2/login");
                 if (value === "cockpit") navigate("/playback/v2/orientation");
+                if (value === "mission-entry") navigate("/playback/v2/mission-entry");
               }}
             >
               <option value="portal">{copy.controls.pages.portal}</option>
               <option value="login">{copy.controls.pages.login}</option>
               <option value="cockpit">{copy.controls.pages.cockpit}</option>
+              <option value="mission-entry">
+                {locale === "fr" ? "Entrée mission SO-1048" : "SO-1048 mission entry"}
+              </option>
             </select>
           </label>
         </div>

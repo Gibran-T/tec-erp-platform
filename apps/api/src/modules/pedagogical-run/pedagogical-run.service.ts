@@ -3,17 +3,26 @@ import {
   CurriculumVersionLabelFr,
   PedagogicalRunStatusLabelFr,
   PedagogicalRunTypeLabelFr,
+  type CourseEditionProgressRecord,
   type CreatePedagogicalCourseRunRequest,
   type PedagogicalCourseRun,
   type PedagogicalRunComparison,
   type PedagogicalRunStatus,
   type TransitionPedagogicalCourseRunRequest,
+  type UpsertCourseEditionProgressRequest,
 } from "@tec-platform/contracts";
 import { getPrismaClient } from "@tec-platform/database-erp";
 import {
   CURRENT_CURRICULUM_VERSION,
   parseCurriculumVersion,
 } from "@tec-platform/mission-catalog";
+
+import {
+  mergeCourseEditionIntoMetadata,
+  normalizeCourseEditionProgress,
+  readCourseEditionFromMetadata,
+} from "./course-edition-progress.js";
+import { resolveOfficialRunIdForEmployee } from "../analytics/official-run-policy.js";
 
 type PrismaRun = {
   id: string;
@@ -85,6 +94,65 @@ function mapRun(run: PrismaRun): PedagogicalCourseRun {
   };
 }
 
+async function resolveWritableRunForEmployee(employeeId: string) {
+  const prisma = getPrismaClient();
+  const officialRunId = await resolveOfficialRunIdForEmployee(employeeId);
+  if (officialRunId) {
+    const official = await prisma.pedagogicalCourseRun.findUnique({ where: { id: officialRunId } });
+    if (official && (official.status === "ACTIVE" || official.status === "PLANNED")) {
+      return official;
+    }
+  }
+  const existing = await prisma.pedagogicalCourseRun.findFirst({
+    where: {
+      employeeId,
+      status: { in: ["ACTIVE", "PLANNED"] },
+      runType: { not: "DEMONSTRATION" },
+    },
+    orderBy: [{ status: "asc" }, { updatedAt: "desc" }],
+  });
+  if (existing) {
+    return existing;
+  }
+
+  // Mirror mission-path bootstrap: create a thin ACTIVE autonomous run for CE persistence.
+  const employee = await prisma.employee.findUnique({ where: { id: employeeId } });
+  const course = await prisma.course.findUnique({ where: { code: "TEC_ERP_V1" } });
+  if (!employee || !course) {
+    return null;
+  }
+  try {
+    return await prisma.pedagogicalCourseRun.create({
+      data: {
+        companyId: employee.companyId,
+        employeeId: employee.id,
+        courseId: course.id,
+        runCode: `${employee.employeeNumber}-RUN1`,
+        runSequence: 1,
+        runType: "AUTONOMOUS",
+        runLabel: `${employee.displayName} — Run 1 — Autonomous`,
+        language: "fr",
+        status: "ACTIVE",
+        startedAt: new Date(),
+        createdById: employee.id,
+        completionPercent: 0,
+        reflectionsEnabled: false,
+        curriculumVersion: CURRENT_CURRICULUM_VERSION,
+        metadataJson: { bootstrap: true, courseEditionBootstrap: true },
+      },
+    });
+  } catch {
+    return prisma.pedagogicalCourseRun.findFirst({
+      where: {
+        employeeId,
+        status: { in: ["ACTIVE", "PLANNED"] },
+        runType: { not: "DEMONSTRATION" },
+      },
+      orderBy: [{ updatedAt: "desc" }],
+    });
+  }
+}
+
 export function createPedagogicalRunService() {
   return {
     async listForEmployee(employeeId: string): Promise<ResultType<readonly PedagogicalCourseRun[]>> {
@@ -94,6 +162,54 @@ export function createPedagogicalRunService() {
         orderBy: [{ runSequence: "asc" }],
       });
       return Result.ok(rows.map(mapRun));
+    },
+
+    async getCourseEditionProgress(
+      employeeId: string,
+      moduleCode: string,
+    ): Promise<ResultType<CourseEditionProgressRecord | null>> {
+      const run = await resolveWritableRunForEmployee(employeeId);
+      if (!run) {
+        return Result.ok(null);
+      }
+      return Result.ok(readCourseEditionFromMetadata(run.metadataJson, moduleCode));
+    },
+
+    async upsertCourseEditionProgress(input: {
+      readonly employeeId: string;
+      readonly moduleCode: string;
+      readonly body: UpsertCourseEditionProgressRequest;
+    }): Promise<ResultType<CourseEditionProgressRecord>> {
+      const prisma = getPrismaClient();
+      const run = await resolveWritableRunForEmployee(input.employeeId);
+      if (!run) {
+        return Result.fail(
+          DomainError.conflict(
+            "Aucun parcours pédagogique actif pour persister la progression Course Edition.",
+          ),
+        );
+      }
+      if (run.status !== "ACTIVE" && run.status !== "PLANNED") {
+        return Result.fail(DomainError.forbidden("Parcours non modifiable."));
+      }
+
+      const normalized = normalizeCourseEditionProgress(input.moduleCode, {
+        ...input.body,
+        moduleCode: input.moduleCode.toUpperCase(),
+        updatedAt: new Date().toISOString(),
+      });
+      const nextMetadata = mergeCourseEditionIntoMetadata(run.metadataJson, normalized);
+      const updated = await prisma.pedagogicalCourseRun.update({
+        where: { id: run.id },
+        data: {
+          metadataJson: JSON.parse(JSON.stringify(nextMetadata)) as object,
+        },
+      });
+      const saved = readCourseEditionFromMetadata(updated.metadataJson, input.moduleCode);
+      if (!saved) {
+        return Result.fail(DomainError.validation("Progression Course Edition invalide."));
+      }
+      return Result.ok(saved);
     },
 
     async listForCompany(companyId: string, filters?: {

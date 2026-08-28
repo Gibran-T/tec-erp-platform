@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ReactElement } from "react";
+import { Link } from "react-router-dom";
 
 import {
   EMPTY_PROFESSOR_COMPETENCIES,
@@ -31,6 +32,7 @@ import {
 import { useAuth } from "../../auth/AuthContext.js";
 import { useLocale } from "../../i18n/LocaleProvider.js";
 import { StatusChip, toneForStatus } from "../../living-erp/components/StatusChip.js";
+import { TEACHING_SESSION_CODES } from "../../sofa/sapCollegeCalendar.js";
 import { EmptyState, ErrorState, SkeletonBlock } from "../../living-erp/components/States.js";
 import { ProfessorPortalPage } from "./ProfessorPortalPage.js";
 
@@ -52,6 +54,25 @@ type CommandSection =
   | "presentation"
   | "legacy";
 
+const PROFESSOR_SIMULATION_FREEZE_KEY = "tec-erp.professor.simulation-freeze";
+const PROFESSOR_ELE_M3_SUPPRESS_KEY = "tec-erp.professor.ele-m3-suppress";
+
+function readProfessorToggle(key: string): boolean {
+  try {
+    return localStorage.getItem(key) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function writeProfessorToggle(key: string, value: boolean): void {
+  try {
+    localStorage.setItem(key, value ? "true" : "false");
+  } catch {
+    // ignore storage failures
+  }
+}
+
 function labelOf(value: unknown, fallback = "Non précisé"): string {
   if (value === null || value === undefined || value === "") {
     return fallback;
@@ -60,6 +81,33 @@ function labelOf(value: unknown, fallback = "Non précisé"): string {
     return String(value);
   }
   return fallback;
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function courseEditionStatusFr(value: string): string {
+  switch (value) {
+    case "completed":
+      return "Terminé";
+    case "in_progress":
+      return "En cours";
+    case "passed":
+      return "Réussi";
+    case "failed":
+      return "À reprendre";
+    case "viewed":
+      return "Consulté";
+    case "not_started":
+      return "Non commencé";
+    case "needs_review":
+      return "À revoir";
+    default:
+      return value;
+  }
 }
 
 export function ProfessorCommandCenterPage(): ReactElement {
@@ -90,6 +138,14 @@ export function ProfessorCommandCenterPage(): ReactElement {
   const [interventionMessage, setInterventionMessage] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [presentationOpen, setPresentationOpen] = useState(false);
+  const [simulationFrozen, setSimulationFrozen] = useState(() =>
+    readProfessorToggle(PROFESSOR_SIMULATION_FREEZE_KEY),
+  );
+  const [eleM3Suppress, setEleM3Suppress] = useState(() =>
+    readProfessorToggle(PROFESSOR_ELE_M3_SUPPRESS_KEY),
+  );
+  const [pedagogicalCompareLeft, setPedagogicalCompareLeft] = useState("");
+  const [pedagogicalCompareRight, setPedagogicalCompareRight] = useState("");
 
   const sections: Array<{ id: CommandSection; label: string }> = [
     { id: "overview", label: t("professor.overview") },
@@ -276,6 +332,109 @@ export function ProfessorCommandCenterPage(): ReactElement {
         ))}
       </nav>
 
+      <section
+        data-testid="professor-pedagogical-control"
+        className="living-home-section professor-pedagogical-control"
+        aria-label={t("professor.pedagogicalControl")}
+      >
+        <h2>{t("professor.pedagogicalControl")}</h2>
+        <p className="professor-pedagogical-control__hint">{t("professor.freezeSimulationHint")}</p>
+
+        <label className="professor-pedagogical-control__row">
+          <input
+            type="checkbox"
+            data-testid="professor-freeze-simulation"
+            checked={simulationFrozen}
+            onChange={(event) => {
+              const next = event.target.checked;
+              setSimulationFrozen(next);
+              writeProfessorToggle(PROFESSOR_SIMULATION_FREEZE_KEY, next);
+              setStatus(next ? "Simulation gelée (état local)." : "Simulation reprise (état local).");
+            }}
+          />
+          {t("professor.freezeSimulation")}
+        </label>
+
+        <div className="professor-pedagogical-control__compare">
+          <h3>{t("professor.compareGroups")}</h3>
+          <p>{t("professor.compareGroupsHint")}</p>
+          <div className="professor-pedagogical-control__compare-row">
+            <label>
+              Groupe A
+              <select
+                data-testid="professor-compare-group-a"
+                value={pedagogicalCompareLeft}
+                onChange={(event) => setPedagogicalCompareLeft(event.target.value)}
+              >
+                <option value="">— cohorte A —</option>
+                {cohorts.map((cohort) => (
+                  <option key={`pa-${labelOf(cohort.id)}`} value={labelOf(cohort.id)}>
+                    {labelOf(cohort.name)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <span aria-hidden="true">vs</span>
+            <label>
+              Groupe B
+              <select
+                data-testid="professor-compare-group-b"
+                value={pedagogicalCompareRight}
+                onChange={(event) => setPedagogicalCompareRight(event.target.value)}
+              >
+                <option value="">— cohorte B —</option>
+                {cohorts.map((cohort) => (
+                  <option key={`pb-${labelOf(cohort.id)}`} value={labelOf(cohort.id)}>
+                    {labelOf(cohort.name)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <p data-testid="professor-compare-placeholder">
+            {pedagogicalCompareLeft && pedagogicalCompareRight
+              ? `Comparaison A vs B : ${labelOf(cohorts.find((c) => labelOf(c.id) === pedagogicalCompareLeft)?.name)} vs ${labelOf(cohorts.find((c) => labelOf(c.id) === pedagogicalCompareRight)?.name)} (aperçu local).`
+              : "Sélectionnez deux cohortes pour un aperçu A vs B."}
+          </p>
+        </div>
+
+        <label className="professor-pedagogical-control__row">
+          <input
+            type="checkbox"
+            data-testid="professor-ele-m3-suppress"
+            checked={eleM3Suppress}
+            onChange={(event) => {
+              const next = event.target.checked;
+              setEleM3Suppress(next);
+              writeProfessorToggle(PROFESSOR_ELE_M3_SUPPRESS_KEY, next);
+            }}
+          />
+          {t("professor.eleM3Suppress")}
+        </label>
+        <p data-testid="professor-ele-m3-suppress-note">{t("professor.eleM3SuppressNote")}</p>
+
+        <div className="professor-pedagogical-control__decks">
+          <h3>{t("professor.openTeachingDeck")}</h3>
+          <p data-testid="professor-teaching-deck-note">
+            Comfort Pack S1–S10 (séances Collège) — pas le calendrier des modules lab M1–M10.
+          </p>
+          <ul className="professor-pedagogical-control__deck-links">
+            {TEACHING_SESSION_CODES.map((code) => (
+              <li key={code}>
+                <Link
+                  to={`/workspace/teaching-deck/${code}?professor=1`}
+                  data-testid={`professor-teaching-deck-link-${code}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Séance {code.slice(1)}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       {error ? <ErrorState message={error} /> : null}
       {status ? <p role="status">{status}</p> : null}
       {loading ? <SkeletonBlock testId="professor-cc-loading" /> : null}
@@ -306,6 +465,83 @@ export function ProfessorCommandCenterPage(): ReactElement {
               ))}
             </ul>
           )}
+          <h3>Course Edition M1 — visibilité coussin lab</h3>
+          <p>
+            Coussin optionnel S1 (pas une séance Collège). Progression packaging M1 (surfaces,
+            Connection Lab, quiz) combinée aux missions existantes — sans nouveau centre professeur.
+          </p>
+          <div style={{ overflowX: "auto" }}>
+            <table data-testid="professor-ce-m1-visibility">
+              <thead>
+                <tr>
+                  <th>Étudiant</th>
+                  <th>Statut CE M1</th>
+                  <th>Surface A</th>
+                  <th>Connection Lab</th>
+                  <th>Missions M1</th>
+                  <th>Bilan</th>
+                  <th>Quiz</th>
+                  <th>Réponse ouverte</th>
+                  <th>Complétion</th>
+                </tr>
+              </thead>
+              <tbody>
+                {students.length === 0 ? (
+                  <tr>
+                    <td colSpan={9}>Aucun apprenant assigné.</td>
+                  </tr>
+                ) : (
+                  students.map((student) => {
+                    const ce = asRecord(student.courseEditionM1);
+                    const missions = Array.isArray(ce?.missions)
+                      ? (ce?.missions as Array<Record<string, unknown>>)
+                      : [];
+                    const missionSummary =
+                      missions.length === 0
+                        ? "—"
+                        : missions
+                            .map(
+                              (mission) =>
+                                `${labelOf(mission.missionCode)}:${courseEditionStatusFr(labelOf(mission.status, "not_started"))}`,
+                            )
+                            .join(" · ");
+                    const openReview = Number(ce?.openResponsesNeedingReview ?? 0);
+                    return (
+                      <tr key={labelOf(student.employeeId)}>
+                        <td>{labelOf(ce?.studentName ?? student.displayName, "Apprenant")}</td>
+                        <td>
+                          {courseEditionStatusFr(labelOf(ce?.courseEditionStatus, "not_started"))}
+                        </td>
+                        <td>
+                          {courseEditionStatusFr(labelOf(ce?.surfaceApprendre, "not_started"))}
+                        </td>
+                        <td>
+                          {courseEditionStatusFr(labelOf(ce?.connectionLabStatus, "not_started"))}
+                          {typeof ce?.connectionLabScorePercent === "number"
+                            ? ` (${ce.connectionLabScorePercent} %)`
+                            : ""}
+                        </td>
+                        <td>{missionSummary}</td>
+                        <td>{courseEditionStatusFr(labelOf(ce?.bilanStatus, "not_started"))}</td>
+                        <td>
+                          {courseEditionStatusFr(labelOf(ce?.quizStatus, "not_started"))}
+                          {typeof ce?.quizPercent === "number" ? ` (${ce.quizPercent} %)` : ""}
+                        </td>
+                        <td data-testid={`professor-ce-m1-open-review-${labelOf(student.employeeId)}`}>
+                          {openReview > 0 ? `${openReview} à revoir` : "Aucune"}
+                        </td>
+                        <td>
+                          {ce?.overallComplete
+                            ? "M1 Course Edition complète"
+                            : `${labelOf(ce?.progressPercent, "0")} %`}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
           <h3>Activité récente</h3>
           <ul>
             {audit.slice(0, 8).map((event, index) => (
@@ -353,10 +589,74 @@ export function ProfessorCommandCenterPage(): ReactElement {
                     label={statusLabel(labelOf(student360.runStatus ?? student360.status))}
                     tone={toneForStatus(labelOf(student360.runStatus ?? student360.status))}
                   />
+                  {asRecord(student360.courseEditionM1) ? (
+                    <section
+                      className="living-home-section"
+                      data-testid="professor-student-360-course-edition-m1"
+                      style={{ marginTop: "1rem" }}
+                    >
+                      <h4>Course Edition M1</h4>
+                      <ul>
+                        <li>
+                          Statut CE :{" "}
+                          {courseEditionStatusFr(
+                            labelOf(
+                              asRecord(student360.courseEditionM1)?.courseEditionStatus,
+                              "not_started",
+                            ),
+                          )}
+                        </li>
+                        <li>
+                          Surface A :{" "}
+                          {courseEditionStatusFr(
+                            labelOf(
+                              asRecord(student360.courseEditionM1)?.surfaceApprendre,
+                              "not_started",
+                            ),
+                          )}
+                        </li>
+                        <li>
+                          Connection Lab :{" "}
+                          {courseEditionStatusFr(
+                            labelOf(
+                              asRecord(student360.courseEditionM1)?.connectionLabStatus,
+                              "not_started",
+                            ),
+                          )}
+                        </li>
+                        <li>
+                          Bilan :{" "}
+                          {courseEditionStatusFr(
+                            labelOf(asRecord(student360.courseEditionM1)?.bilanStatus, "not_started"),
+                          )}
+                        </li>
+                        <li>
+                          Quiz :{" "}
+                          {courseEditionStatusFr(
+                            labelOf(asRecord(student360.courseEditionM1)?.quizStatus, "not_started"),
+                          )}
+                        </li>
+                        <li>
+                          Réponses ouvertes à revoir :{" "}
+                          {labelOf(
+                            asRecord(student360.courseEditionM1)?.openResponsesNeedingReview,
+                            "0",
+                          )}
+                        </li>
+                        <li>
+                          Complétion globale :{" "}
+                          {asRecord(student360.courseEditionM1)?.overallComplete
+                            ? "Oui"
+                            : "Non"}
+                        </li>
+                      </ul>
+                    </section>
+                  ) : null}
                   <pre style={{ whiteSpace: "pre-wrap", fontSize: "0.85rem" }}>
                     {JSON.stringify(
                       {
                         progress: student360.progress ?? student360.modules,
+                        courseEditionM1: student360.courseEditionM1,
                         assessments: student360.assessments,
                         competencies: student360.competencies,
                         capstone: student360.capstone,
@@ -653,6 +953,19 @@ export function ProfessorCommandCenterPage(): ReactElement {
               Interface agrandie pour salle de classe. Données personnelles et notes professeur
               masquées. Clés de réponses absentes sauf mode correction explicite.
             </p>
+            <h3>{t("professor.openTeachingDeck")}</h3>
+            <ul>
+              {TEACHING_SESSION_CODES.map((code) => (
+                <li key={`pres-${code}`}>
+                  <Link
+                    to={`/workspace/teaching-deck/${code}?professor=1`}
+                    onClick={() => setPresentationOpen(false)}
+                  >
+                    Séance {code.slice(1)} — Teaching Deck SAP
+                  </Link>
+                </li>
+              ))}
+            </ul>
             <h3>Carte de processus</h3>
             <div className="living-flow">
               {["Besoin", "Transaction", "Document", "Contrôle", "KPI"].map((node, index, arr) => (

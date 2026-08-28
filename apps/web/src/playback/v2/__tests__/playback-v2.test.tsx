@@ -126,13 +126,12 @@ describe("Wave 2A Playback Zero — Revision 2", () => {
     fetchSpy.mockRestore();
   });
 
-  it("mission cockpit has one primary CTA opening safe mission preview", () => {
+  it("mission cockpit primary CTA opens SO-1048 mission entry", async () => {
     renderPlayback("/playback/v2/orientation");
     const cta = screen.getByTestId("cockpit-primary-cta");
     expect(cta).toBeInTheDocument();
     fireEvent.click(cta);
-    expect(screen.getByTestId("mission-preview")).toBeInTheDocument();
-    expect(screen.getByTestId("mission-preview").textContent).not.toMatch(/Wave 3/i);
+    expect(await screen.findByTestId("mission-entry")).toBeInTheDocument();
   });
 
   it("can switch institutional branding between College and independent", () => {

@@ -1,4 +1,5 @@
 @import "./living-erp/living-erp.css";
+@import "./course-edition/course-edition.css";
 
 @tailwind base;
 @tailwind components;

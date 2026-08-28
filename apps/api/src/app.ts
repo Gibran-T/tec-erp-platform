@@ -73,6 +73,10 @@ import {
   createPedagogicalRunProfessorRouter,
 } from "./modules/pedagogical-run/pedagogical-run.routes.js";
 import { createPedagogicalRunService } from "./modules/pedagogical-run/pedagogical-run.service.js";
+import { createSapIee2eMeRouter, createSapIee2eProfessorRouter } from "./modules/sap-iee2e/sap-iee2e.routes.js";
+import { createPrismaSapIee2eSelfReportRepository } from "./modules/sap-iee2e/sap-iee2e.repository.js";
+import { createSapIee2eService } from "./modules/sap-iee2e/sap-iee2e.service.js";
+import type { SapIee2eSelfReportRepository } from "./modules/sap-iee2e/sap-iee2e.types.js";
 import { createApiV1Router } from "./routes/api-v1.js";
 import { createOperationalRouter } from "./routes/operational.js";
 
@@ -87,6 +91,7 @@ export interface AppDependencies {
   readonly missionAttemptRepository?: MissionAttemptRepository;
   readonly unlockStateRepository?: UnlockStateRepository;
   readonly courseProgressRepository?: CourseProgressRepository;
+  readonly sapIee2eSelfReportRepository?: SapIee2eSelfReportRepository;
 }
 
 const defaultDependencies: AppDependencies = {
@@ -180,10 +185,14 @@ export function createApp(
   const integrationService = createIntegrationService();
   const automationService = createAutomationService();
   const pedagogicalRunService = createPedagogicalRunService();
+  const sapIee2eSelfReportRepository =
+    dependencies.sapIee2eSelfReportRepository ?? createPrismaSapIee2eSelfReportRepository();
+  const sapIee2eService = createSapIee2eService({ repository: sapIee2eSelfReportRepository });
 
   app.use(createOperationalRouter(dependencies));
   app.use("/api/v1/auth", createAuthRouter(authService));
   app.use("/api/v1/me", requireEmployee, createMeRouter(firstDayService));
+  app.use("/api/v1/me", requireEmployee, createSapIee2eMeRouter(sapIee2eService));
   app.use("/api/v1/me", requireEmployee, createPedagogicalRunMeRouter(pedagogicalRunService));
   app.use("/api/v1/me", requireEmployee, createMissionMeRouter(missionService));
   app.use("/api/v1/me", requireEmployee, createCourseMeRouter(courseService));
@@ -200,6 +209,12 @@ export function createApp(
     requireEmployee,
     requireProfessor,
     createProfessorRouter(professorService),
+  );
+  app.use(
+    "/api/v1/professor",
+    requireEmployee,
+    requireProfessor,
+    createSapIee2eProfessorRouter(sapIee2eService),
   );
   app.use(
     "/api/v1/professor",

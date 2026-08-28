@@ -6,6 +6,8 @@ import { describe, expect, it } from "vitest";
 import { AppRoutes } from "../App.js";
 import { AuthProvider } from "../auth/AuthContext.js";
 import { ErrorBoundary } from "../components/ErrorBoundary.js";
+import { LocaleProvider } from "../i18n/LocaleProvider.js";
+import { ThemeProvider } from "../theme/ThemeProvider.js";
 
 const demoEmployee: AuthenticatedEmployee = {
   id: "emp_demo",
@@ -22,11 +24,15 @@ function renderApp(
 ): void {
   render(
     <ErrorBoundary>
-      <AuthProvider skipRestore initialEmployee={initialEmployee}>
-        <MemoryRouter initialEntries={[initialEntry]}>
-          <AppRoutes />
-        </MemoryRouter>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider skipRestore initialEmployee={initialEmployee}>
+          <LocaleProvider>
+            <MemoryRouter initialEntries={[initialEntry]}>
+              <AppRoutes />
+            </MemoryRouter>
+          </LocaleProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </ErrorBoundary>,
   );
 }
@@ -44,12 +50,25 @@ describe("App routing", () => {
     });
   });
 
-  it("redirects root to workspace for authenticated employees", async () => {
+  it("renders the academic portal at root for authenticated employees", async () => {
     renderApp("/", demoEmployee);
 
     await waitFor(() => {
-      expect(screen.getByTestId("workspace-home-page")).toBeInTheDocument();
+      expect(screen.getByTestId("academic-portal")).toBeInTheDocument();
     });
+
+    expect(screen.getByTestId("portal-authenticated-banner")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Aller au poste de travail" })).toHaveAttribute(
+      "href",
+      "/workspace",
+    );
+  });
+
+  it("renders the academic portal at root when unauthenticated", () => {
+    renderApp("/", null);
+
+    expect(screen.getByTestId("academic-portal")).toBeInTheDocument();
+    expect(screen.queryByTestId("portal-authenticated-banner")).not.toBeInTheDocument();
   });
 
   it("redirects to the sign-in page when unauthenticated", () => {
