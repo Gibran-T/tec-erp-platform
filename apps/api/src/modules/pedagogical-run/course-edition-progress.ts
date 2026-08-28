@@ -11,14 +11,6 @@ const SURFACE_ORDER: readonly CourseEditionSurfaceId[] = [
   "bilan",
 ];
 
-type MetadataBag = Record<string, unknown>;
-
-function asRecord(value: unknown): MetadataBag {
-  return value !== null && typeof value === "object" && !Array.isArray(value)
-    ? (value as MetadataBag)
-    : {};
-}
-
 function uniqueSurfaces(values: readonly string[]): CourseEditionSurfaceId[] {
   const allowed = new Set<string>(SURFACE_ORDER);
   const out: CourseEditionSurfaceId[] = [];
@@ -71,17 +63,16 @@ export function normalizeCourseEditionProgress(
   };
 }
 
-export function readCourseEditionFromMetadata(
-  metadataJson: unknown,
+export function parseStoredCourseEditionProgress(
+  progressJson: unknown,
   moduleCode: string,
 ): CourseEditionProgressRecord | null {
-  const root = asRecord(metadataJson);
-  const courseEdition = asRecord(root.courseEdition);
-  const moduleRecord = courseEdition[moduleCode.toUpperCase()];
-  if (!moduleRecord || typeof moduleRecord !== "object") {
+  if (!progressJson || typeof progressJson !== "object" || Array.isArray(progressJson)) {
     return null;
   }
-  const raw = moduleRecord as UpsertCourseEditionProgressRequest;
+  const raw = progressJson as UpsertCourseEditionProgressRequest & {
+    updatedAt?: string;
+  };
   if (!Array.isArray(raw.completedSurfaces)) {
     return null;
   }
@@ -101,22 +92,6 @@ export function readCourseEditionFromMetadata(
       : [],
     progressPercent: typeof raw.progressPercent === "number" ? raw.progressPercent : undefined,
     moduleComplete: typeof raw.moduleComplete === "boolean" ? raw.moduleComplete : undefined,
-    updatedAt:
-      typeof raw.updatedAt === "string" ? raw.updatedAt : new Date(0).toISOString(),
+    updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : new Date(0).toISOString(),
   });
-}
-
-export function mergeCourseEditionIntoMetadata(
-  metadataJson: unknown,
-  record: CourseEditionProgressRecord,
-): MetadataBag {
-  const root = asRecord(metadataJson);
-  const courseEdition = asRecord(root.courseEdition);
-  return {
-    ...root,
-    courseEdition: {
-      ...courseEdition,
-      [record.moduleCode.toUpperCase()]: record,
-    },
-  };
 }

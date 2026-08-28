@@ -12,4 +12,7 @@ Harvested into this line:
 
 Then implemented Waves 2–7 on the same branch: production portal, CE M2–M10 (optional lab cushions), BI Studio, AI Decision Workspace, ELE M3 authored pilot, Teaching Decks **S1–S10** (Comfort Pack séances Collège — not M1–M10), professor freeze/compare UI.
 
-**Not done (by design this session):** LOS closure, git commit (owner may request), merge, production migrate/deploy, Thiago professor creation, `docs/` edits.
+**PR:** [#35](https://github.com/Gibran-T/tec-erp-platform/pull/35)  
+**Isolation slice:** Course Edition progress is stored in `course_edition_progress` (`employeeId` + `moduleCode`). It does not create or mutate `PedagogicalCourseRun` (James Run 1 included).
+
+**Not done:** merge, production migrate/deploy, Thiago professor creation, official `docs/` edits. SHA `c78b69c` was not merge-authorized.

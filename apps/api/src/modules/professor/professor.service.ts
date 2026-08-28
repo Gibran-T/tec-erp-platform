@@ -1,6 +1,7 @@
 import { DomainError, Result, type ResultType } from "@tec-platform/core";
 import type {
   CourseEditionProfessorVisibility,
+  CourseEditionProgressRecord,
   ProfessorOverrideRequest,
 } from "@tec-platform/contracts";
 import { getPrismaClient, type Prisma } from "@tec-platform/database-erp";
@@ -13,7 +14,7 @@ import {
 } from "@tec-platform/mission-catalog";
 
 import { createAssessmentService } from "../assessment/assessment.service.js";
-import { readCourseEditionFromMetadata } from "../pedagogical-run/course-edition-progress.js";
+import { parseStoredCourseEditionProgress } from "../pedagogical-run/course-edition-progress.js";
 
 const M1_COURSE_EDITION_MISSIONS = [
   {
@@ -30,18 +31,18 @@ const M1_COURSE_EDITION_MISSIONS = [
   },
 ] as const;
 
-function buildCourseEditionM1Visibility(input: {
+export function buildCourseEditionM1Visibility(input: {
   readonly employeeId: string;
   readonly studentName: string;
   readonly officialRunId: string | null;
-  readonly metadataJson: unknown;
+  readonly progress: CourseEditionProgressRecord | null;
   readonly missionAttempts: ReadonlyArray<{
     readonly missionKey: string;
     readonly status: string;
     readonly scorePercent: number | null;
   }>;
 }): CourseEditionProfessorVisibility {
-  const ce = readCourseEditionFromMetadata(input.metadataJson, "M1");
+  const ce = input.progress;
   const completedSurfaces = ce?.completedSurfaces ?? [];
   const framesViewed = ce?.framesViewed ?? [];
   const surfaceApprendre = completedSurfaces.includes("apprendre")
@@ -202,6 +203,19 @@ export function createProfessorService(client = getPrismaClient()) {
         }
       }
 
+      const ceRows = await client.courseEditionProgress.findMany({
+        where: {
+          employeeId: { in: [...uniqueByEmployee.keys()] },
+          moduleCode: "M1",
+        },
+      });
+      const ceByEmployee = new Map(
+        ceRows.map((row) => [
+          row.employeeId,
+          parseStoredCourseEditionProgress(row.progressJson, row.moduleCode),
+        ]),
+      );
+
       const result = [];
       for (const student of uniqueByEmployee.values()) {
         const officialRunId = await resolveOfficialRunIdForEmployee(student.employeeId);
@@ -273,7 +287,7 @@ export function createProfessorService(client = getPrismaClient()) {
           employeeId: student.employeeId,
           studentName: student.employee.displayName,
           officialRunId,
-          metadataJson: officialRun?.metadataJson ?? {},
+          progress: ceByEmployee.get(student.employeeId) ?? null,
           missionAttempts: m1Attempts.map((attempt) => ({
             missionKey: attempt.missionDefinition.missionKey,
             status: attempt.status,
@@ -556,11 +570,18 @@ export function createProfessorService(client = getPrismaClient()) {
             where: { employeeId: studentId, status: { in: ["ACTIVE", "COMPLETED"] } },
             orderBy: [{ status: "asc" }, { runSequence: "desc" }],
           });
+      const ceRow = await client.courseEditionProgress.findUnique({
+        where: {
+          employeeId_moduleCode: { employeeId: studentId, moduleCode: "M1" },
+        },
+      });
       const courseEditionM1 = buildCourseEditionM1Visibility({
         employeeId: employee.id,
         studentName: employee.displayName,
         officialRunId: officialRun?.id ?? null,
-        metadataJson: officialRun?.metadataJson ?? {},
+        progress: ceRow
+          ? parseStoredCourseEditionProgress(ceRow.progressJson, ceRow.moduleCode)
+          : null,
         missionAttempts: missionAttempts.map((attempt) => ({
           missionKey: attempt.missionDefinition.missionKey,
           status: attempt.status,

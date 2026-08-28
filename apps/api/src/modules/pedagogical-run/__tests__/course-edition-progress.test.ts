@@ -2,9 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   computeCourseEditionProgressPercent,
-  mergeCourseEditionIntoMetadata,
   normalizeCourseEditionProgress,
-  readCourseEditionFromMetadata,
+  parseStoredCourseEditionProgress,
 } from "../course-edition-progress.js";
 
 describe("course-edition-progress helpers", () => {
@@ -26,52 +25,21 @@ describe("course-edition-progress helpers", () => {
     expect(record.moduleComplete).toBe(true);
   });
 
-  it("merges into metadataJson without dropping existing keys", () => {
-    const merged = mergeCourseEditionIntoMetadata(
-      { reason: "cohort-start", bootstrap: true },
-      normalizeCourseEditionProgress("M1", {
-        moduleCode: "M1",
-        completedSurfaces: ["apprendre"],
-        connectionLabPassed: false,
-        connectionLabScorePercent: null,
-        quizPassed: false,
-        quizPercent: null,
-        framesViewed: ["frame-01-enterprise-integrated"],
-        documentsOpened: [],
-      }),
-    );
-
-    expect(merged.reason).toBe("cohort-start");
-    expect(merged.bootstrap).toBe(true);
-    const ce = merged.courseEdition as Record<string, unknown>;
-    expect(ce.M1).toMatchObject({
+  it("parses stored JSON without reading PedagogicalCourseRun metadata", () => {
+    const stored = normalizeCourseEditionProgress("M1", {
       moduleCode: "M1",
-      progressPercent: 25,
+      completedSurfaces: ["apprendre"],
       connectionLabPassed: false,
+      connectionLabScorePercent: null,
+      quizPassed: false,
+      quizPercent: null,
+      framesViewed: ["frame-01-enterprise-integrated"],
+      documentsOpened: [],
     });
-  });
 
-  it("reads namespaced Course Edition progress from metadata", () => {
-    const progress = readCourseEditionFromMetadata(
-      {
-        courseEdition: {
-          M1: {
-            moduleCode: "M1",
-            completedSurfaces: ["apprendre", "connecter"],
-            connectionLabPassed: true,
-            connectionLabScorePercent: 75,
-            quizPassed: false,
-            quizPercent: null,
-            framesViewed: [],
-            documentsOpened: [],
-            updatedAt: "2026-07-24T12:00:00.000Z",
-          },
-        },
-      },
-      "M1",
-    );
-
-    expect(progress?.connectionLabPassed).toBe(true);
-    expect(computeCourseEditionProgressPercent(progress!.completedSurfaces)).toBe(50);
+    const parsed = parseStoredCourseEditionProgress(stored, "M1");
+    expect(parsed?.connectionLabPassed).toBe(false);
+    expect(computeCourseEditionProgressPercent(parsed!.completedSurfaces)).toBe(25);
+    expect(parseStoredCourseEditionProgress({ poison: true }, "M1")).toBeNull();
   });
 });

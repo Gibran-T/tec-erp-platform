@@ -20,7 +20,8 @@ Cross-links: [PROFESSOR_ACCOUNT_AND_ASSIGNMENT_RUNBOOK.md](../../v1/remediation/
 3. Deploy **API** image containing this branch’s migrations:
    - existing V2 curriculum migration if still absent on prod
    - `20260820160000_sap_iee2e_self_report`
-   - `20260820170000_sap_iee2e_semaine_zero`  
+   - `20260820170000_sap_iee2e_semaine_zero`
+   - `20260828200000_course_edition_progress`  
 4. Confirm `pnpm migrate:deploy` success in API logs.  
 5. SQL check: James Run 1 intact; `runSequence >= 2` still 0 unless owner authorized.  
 6. Deploy **Web**.  

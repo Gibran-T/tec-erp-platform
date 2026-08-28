@@ -44,11 +44,25 @@ Still **owner / production** before claiming full LOS GREEN:
 
 | Step | Status |
 |------|--------|
-| Merge this branch | Not done (no commit required by owner yet) |
+| Merge this branch | Not done — SHA `c78b69c` blocked on CE/James isolation; correction slice awaiting re-review |
 | Backup Postgres | Not done |
-| `migrate deploy` including `20260725120000_v2_curriculum_version` + SAP self-report | Not done |
+| `migrate deploy` including `20260725120000_v2_curriculum_version` + SAP self-report + `20260828200000_course_edition_progress` | Not done |
 | Railway API + Web deploy of Teaching Gate SHA | Not done |
 | Thiago professor + cohort (real emails) | Not done — runbook only |
 | James Run 2 | Forbidden until Wave 9 owner auth |
 
-**Verdict this session:** **ENGINEERING BRANCH READY FOR OWNER REVIEW** — **NOT CLASSROOM-OPEN**.
+## PR review pendencies (not in the James isolation slice)
+
+Recorded from SHA `c78b69c` review. Left unfixed until the owner accepts impact. They do not change the SAP S1–S10 calendar.
+
+| Severity | Item | Impact if unfixed before first class |
+|----------|------|--------------------------------------|
+| Medium | Public portal footer links to `/playback/v2/portal` | Students can enter the isolated playback prototype from the academic front door. Label says prototype; still mixed navigation. |
+| Medium | `/poc/sap-iee2e` and `/playback/v2/*` are unauthenticated | Demo/PoC surfaces reachable without Collège login. |
+| Low | Teaching Deck `?professor=1` | Speaker notes visible to any authenticated user who has the URL (notes do not contain SAP quiz answers). |
+| Low | SAP séance 1 calendar keyed by `professorId` only | One professor with two cohorts would publish a single Semaine Zéro date. |
+| Low | Professor freeze/compare is `localStorage` | Honest UI (“état local”); not server-authoritative cohort control. |
+
+**James isolation slice:** Course Edition uses table `course_edition_progress` (`employeeId` + `moduleCode`). GET is read-only. PUT never writes `PedagogicalCourseRun`. James Run 1 is not created or mutated by Course Edition.
+
+**Verdict this session:** **CORRECTION SLICE — NOT MERGE-AUTHORIZED — NOT CLASSROOM-OPEN**.

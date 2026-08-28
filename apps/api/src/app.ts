@@ -73,6 +73,8 @@ import {
   createPedagogicalRunProfessorRouter,
 } from "./modules/pedagogical-run/pedagogical-run.routes.js";
 import { createPedagogicalRunService } from "./modules/pedagogical-run/pedagogical-run.service.js";
+import { createPrismaCourseEditionProgressRepository } from "./modules/pedagogical-run/course-edition-progress.repository.js";
+import type { CourseEditionProgressRepository } from "./modules/pedagogical-run/course-edition-progress.types.js";
 import { createSapIee2eMeRouter, createSapIee2eProfessorRouter } from "./modules/sap-iee2e/sap-iee2e.routes.js";
 import { createPrismaSapIee2eSelfReportRepository } from "./modules/sap-iee2e/sap-iee2e.repository.js";
 import { createSapIee2eService } from "./modules/sap-iee2e/sap-iee2e.service.js";
@@ -92,6 +94,7 @@ export interface AppDependencies {
   readonly unlockStateRepository?: UnlockStateRepository;
   readonly courseProgressRepository?: CourseProgressRepository;
   readonly sapIee2eSelfReportRepository?: SapIee2eSelfReportRepository;
+  readonly courseEditionProgressRepository?: CourseEditionProgressRepository;
 }
 
 const defaultDependencies: AppDependencies = {
@@ -184,7 +187,11 @@ export function createApp(
   const scenarioService = createScenarioService();
   const integrationService = createIntegrationService();
   const automationService = createAutomationService();
-  const pedagogicalRunService = createPedagogicalRunService();
+  const courseEditionProgressRepository =
+    dependencies.courseEditionProgressRepository ?? createPrismaCourseEditionProgressRepository();
+  const pedagogicalRunService = createPedagogicalRunService({
+    courseEditionProgressRepository,
+  });
   const sapIee2eSelfReportRepository =
     dependencies.sapIee2eSelfReportRepository ?? createPrismaSapIee2eSelfReportRepository();
   const sapIee2eService = createSapIee2eService({ repository: sapIee2eSelfReportRepository });
