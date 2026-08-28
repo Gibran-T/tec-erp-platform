@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { LoginPlaybackPage } from "./LoginPlaybackPage.js";
+import { MissionEntryPage } from "./MissionEntryPage.js";
 import { OrientationPage } from "./OrientationPage.js";
 import { PlaybackControls } from "./PlaybackControls.js";
 import { PlaybackProvider, usePlayback } from "./PlaybackProvider.js";
@@ -29,6 +30,7 @@ function PlaybackShell(): ReactNode {
         <Route path="portal" element={<PortalPage />} />
         <Route path="login" element={<LoginPlaybackPage />} />
         <Route path="orientation" element={<OrientationPage />} />
+        <Route path="mission-entry" element={<MissionEntryPage />} />
         <Route path="*" element={<Navigate to="portal" replace />} />
       </Routes>
       <PlaybackControls />

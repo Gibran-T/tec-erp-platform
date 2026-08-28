@@ -3,17 +3,23 @@ import {
   CurriculumVersionLabelFr,
   PedagogicalRunStatusLabelFr,
   PedagogicalRunTypeLabelFr,
+  type CourseEditionProgressRecord,
   type CreatePedagogicalCourseRunRequest,
   type PedagogicalCourseRun,
   type PedagogicalRunComparison,
   type PedagogicalRunStatus,
   type TransitionPedagogicalCourseRunRequest,
+  type UpsertCourseEditionProgressRequest,
 } from "@tec-platform/contracts";
 import { getPrismaClient } from "@tec-platform/database-erp";
 import {
   CURRENT_CURRICULUM_VERSION,
   parseCurriculumVersion,
 } from "@tec-platform/mission-catalog";
+
+import { normalizeCourseEditionProgress } from "./course-edition-progress.js";
+import { createPrismaCourseEditionProgressRepository } from "./course-edition-progress.repository.js";
+import type { CourseEditionProgressRepository } from "./course-edition-progress.types.js";
 
 type PrismaRun = {
   id: string;
@@ -85,7 +91,16 @@ function mapRun(run: PrismaRun): PedagogicalCourseRun {
   };
 }
 
-export function createPedagogicalRunService() {
+export interface PedagogicalRunServiceDependencies {
+  readonly courseEditionProgressRepository?: CourseEditionProgressRepository;
+}
+
+export function createPedagogicalRunService(
+  dependencies: PedagogicalRunServiceDependencies = {},
+) {
+  const courseEditionProgressRepository =
+    dependencies.courseEditionProgressRepository ?? createPrismaCourseEditionProgressRepository();
+
   return {
     async listForEmployee(employeeId: string): Promise<ResultType<readonly PedagogicalCourseRun[]>> {
       const prisma = getPrismaClient();
@@ -94,6 +109,34 @@ export function createPedagogicalRunService() {
         orderBy: [{ runSequence: "asc" }],
       });
       return Result.ok(rows.map(mapRun));
+    },
+
+    async getCourseEditionProgress(
+      employeeId: string,
+      moduleCode: string,
+    ): Promise<ResultType<CourseEditionProgressRecord | null>> {
+      const progress = await courseEditionProgressRepository.findByEmployeeAndModule(
+        employeeId,
+        moduleCode,
+      );
+      return Result.ok(progress);
+    },
+
+    async upsertCourseEditionProgress(input: {
+      readonly employeeId: string;
+      readonly moduleCode: string;
+      readonly body: UpsertCourseEditionProgressRequest;
+    }): Promise<ResultType<CourseEditionProgressRecord>> {
+      const normalized = normalizeCourseEditionProgress(input.moduleCode, {
+        ...input.body,
+        moduleCode: input.moduleCode.toUpperCase(),
+        updatedAt: new Date().toISOString(),
+      });
+      const saved = await courseEditionProgressRepository.upsert({
+        employeeId: input.employeeId,
+        progress: normalized,
+      });
+      return Result.ok(saved);
     },
 
     async listForCompany(companyId: string, filters?: {

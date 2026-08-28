@@ -10,15 +10,16 @@ import {
 } from "../../workspace/workspaceCopy.js";
 import { AdminPortalPage } from "../admin/AdminPortalPage.js";
 import { ProfessorCommandCenterPage } from "../professor/ProfessorCommandCenterPage.js";
-import { AiCoachPage } from "./AiCoachPage.js";
+import { AiDecisionWorkspacePage } from "./AiDecisionWorkspacePage.js";
 import { AssessmentCenterPage } from "./AssessmentCenterPage.js";
+import { BiStudioPage } from "./BiStudioPage.js";
 import { CapstonePage } from "./CapstonePage.js";
 import { CertificatesPage } from "./CertificatesPage.js";
-import { DashboardPage } from "./DashboardPage.js";
 import { EmployeeProfilePage } from "./EmployeeProfilePage.js";
 import { InboxAppPage } from "./InboxAppPage.js";
 import { MissionCenterPage } from "./MissionCenterPage.js";
 import { OrganizationalErpPage } from "./OrganizationalErpPage.js";
+import { SapIee2eWorkspacePage } from "./SapIee2eWorkspacePage.js";
 import { TasksAppPage } from "./TasksAppPage.js";
 import { TransactionWorkspacePage } from "./transactions/TransactionWorkspacePage.js";
 
@@ -57,16 +58,20 @@ export function WorkspaceAppPage(): ReactNode {
     return <OrganizationalErpPage />;
   }
 
+  if (appId === "parcours-sap-iee2e") {
+    return <SapIee2eWorkspacePage />;
+  }
+
   if (appId === "documents") {
     return <TransactionWorkspacePage />;
   }
 
-  if (appId === "tableaux-bord") {
-    return <DashboardPage />;
+  if (appId === "tableaux-bord" || appId === "bi-studio") {
+    return <BiStudioPage />;
   }
 
   if (appId === "coach-ia") {
-    return <AiCoachPage />;
+    return <AiDecisionWorkspacePage />;
   }
 
   if (appId === "capstone") {

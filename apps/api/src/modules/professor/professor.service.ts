@@ -1,5 +1,9 @@
 import { DomainError, Result, type ResultType } from "@tec-platform/core";
-import type { ProfessorOverrideRequest } from "@tec-platform/contracts";
+import type {
+  CourseEditionProfessorVisibility,
+  CourseEditionProgressRecord,
+  ProfessorOverrideRequest,
+} from "@tec-platform/contracts";
 import { getPrismaClient, type Prisma } from "@tec-platform/database-erp";
 import {
   DEFAULT_CURRICULUM_VERSION,
@@ -10,6 +14,108 @@ import {
 } from "@tec-platform/mission-catalog";
 
 import { createAssessmentService } from "../assessment/assessment.service.js";
+import { parseStoredCourseEditionProgress } from "../pedagogical-run/course-edition-progress.js";
+
+const M1_COURSE_EDITION_MISSIONS = [
+  {
+    missionKey: "m1-m01-decouvrir-entreprise",
+    missionCode: "M1-M01",
+  },
+  {
+    missionKey: "m1-m02-connecter-departements",
+    missionCode: "M1-M02",
+  },
+  {
+    missionKey: "m1-m03-diagnostiquer-preparation",
+    missionCode: "M1-M03",
+  },
+] as const;
+
+export function buildCourseEditionM1Visibility(input: {
+  readonly employeeId: string;
+  readonly studentName: string;
+  readonly officialRunId: string | null;
+  readonly progress: CourseEditionProgressRecord | null;
+  readonly missionAttempts: ReadonlyArray<{
+    readonly missionKey: string;
+    readonly status: string;
+    readonly scorePercent: number | null;
+  }>;
+}): CourseEditionProfessorVisibility {
+  const ce = input.progress;
+  const completedSurfaces = ce?.completedSurfaces ?? [];
+  const framesViewed = ce?.framesViewed ?? [];
+  const surfaceApprendre = completedSurfaces.includes("apprendre")
+    ? "completed"
+    : framesViewed.length > 0
+      ? "viewed"
+      : "not_started";
+  const bilanStatus = completedSurfaces.includes("bilan")
+    ? "completed"
+    : completedSurfaces.includes("missions") || Boolean(ce)
+      ? "viewed"
+      : "not_started";
+
+  let connectionLabStatus: CourseEditionProfessorVisibility["connectionLabStatus"] = "not_started";
+  if (ce?.connectionLabPassed) {
+    connectionLabStatus = "passed";
+  } else if (typeof ce?.connectionLabScorePercent === "number") {
+    connectionLabStatus = "failed";
+  } else if (completedSurfaces.includes("connecter")) {
+    connectionLabStatus = "in_progress";
+  }
+
+  let quizStatus: CourseEditionProfessorVisibility["quizStatus"] = "not_started";
+  if (ce?.quizPassed) {
+    quizStatus = "passed";
+  } else if (typeof ce?.quizPercent === "number") {
+    quizStatus = "failed";
+  }
+
+  const missions = M1_COURSE_EDITION_MISSIONS.map((mission) => {
+    const attempts = input.missionAttempts.filter((item) => item.missionKey === mission.missionKey);
+    const completed = attempts.find((item) => item.status === "completed");
+    const needsReview = attempts.find((item) => item.status === "needs_review");
+    const latest = completed ?? needsReview ?? attempts[0];
+    return {
+      missionCode: mission.missionCode,
+      missionKey: mission.missionKey,
+      status: latest?.status ?? "not_started",
+      scorePercent: latest?.scorePercent ?? null,
+      needsReview: latest?.status === "needs_review",
+    };
+  });
+  const missionsComplete = missions.every((mission) => mission.status === "completed");
+  const openResponsesNeedingReview = missions.filter((mission) => mission.needsReview).length;
+  const progressPercent = ce?.progressPercent ?? 0;
+  const overallComplete = Boolean(ce?.moduleComplete) && missionsComplete;
+  let courseEditionStatus: CourseEditionProfessorVisibility["courseEditionStatus"] = "not_started";
+  if (overallComplete) {
+    courseEditionStatus = "completed";
+  } else if (ce || missions.some((mission) => mission.status !== "not_started")) {
+    courseEditionStatus = "in_progress";
+  }
+
+  return {
+    moduleCode: "M1",
+    studentName: input.studentName,
+    employeeId: input.employeeId,
+    courseEditionStatus,
+    surfaceApprendre,
+    connectionLabStatus,
+    connectionLabScorePercent: ce?.connectionLabScorePercent ?? null,
+    missions,
+    missionsComplete,
+    bilanStatus: overallComplete ? "completed" : bilanStatus,
+    quizStatus,
+    quizPercent: ce?.quizPercent ?? null,
+    openResponsesNeedingReview,
+    overallComplete,
+    progressPercent,
+    updatedAt: ce?.updatedAt ?? null,
+    pedagogicalCourseRunId: input.officialRunId,
+  };
+}
 
 function toInputJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
@@ -97,6 +203,19 @@ export function createProfessorService(client = getPrismaClient()) {
         }
       }
 
+      const ceRows = await client.courseEditionProgress.findMany({
+        where: {
+          employeeId: { in: [...uniqueByEmployee.keys()] },
+          moduleCode: "M1",
+        },
+      });
+      const ceByEmployee = new Map(
+        ceRows.map((row) => [
+          row.employeeId,
+          parseStoredCourseEditionProgress(row.progressJson, row.moduleCode),
+        ]),
+      );
+
       const result = [];
       for (const student of uniqueByEmployee.values()) {
         const officialRunId = await resolveOfficialRunIdForEmployee(student.employeeId);
@@ -117,6 +236,17 @@ export function createProfessorService(client = getPrismaClient()) {
             status: "completed",
             ...(officialRunId ? { pedagogicalCourseRunId: officialRunId } : { pedagogicalCourseRunId: "__none__" }),
           },
+        });
+        const m1Attempts = await client.missionAttempt.findMany({
+          where: {
+            employeeId: student.employeeId,
+            missionDefinition: {
+              missionKey: { in: M1_COURSE_EDITION_MISSIONS.map((item) => item.missionKey) },
+            },
+            ...(officialRunId ? { pedagogicalCourseRunId: officialRunId } : {}),
+          },
+          include: { missionDefinition: true },
+          orderBy: { updatedAt: "desc" },
         });
         const certificate = await client.certificate.findFirst({
           where: { employeeId: student.employeeId, certificateType: "silver" },
@@ -153,6 +283,17 @@ export function createProfessorService(client = getPrismaClient()) {
             capstoneStatus = "draft";
           }
         }
+        const courseEditionM1 = buildCourseEditionM1Visibility({
+          employeeId: student.employeeId,
+          studentName: student.employee.displayName,
+          officialRunId,
+          progress: ceByEmployee.get(student.employeeId) ?? null,
+          missionAttempts: m1Attempts.map((attempt) => ({
+            missionKey: attempt.missionDefinition.missionKey,
+            status: attempt.status,
+            scorePercent: attempt.scorePercent,
+          })),
+        });
         result.push({
           employeeId: student.employeeId,
           employeeNumber: student.employee.employeeNumber,
@@ -170,6 +311,7 @@ export function createProfessorService(client = getPrismaClient()) {
           ),
           silverStatus,
           capstoneStatus,
+          courseEditionM1,
         });
       }
       return result;
@@ -420,6 +562,33 @@ export function createProfessorService(client = getPrismaClient()) {
         ),
       ];
 
+      const { resolveOfficialRunIdForEmployee } = await import("../analytics/official-run-policy.js");
+      const officialRunId = await resolveOfficialRunIdForEmployee(studentId);
+      const officialRun = officialRunId
+        ? await client.pedagogicalCourseRun.findUnique({ where: { id: officialRunId } })
+        : await client.pedagogicalCourseRun.findFirst({
+            where: { employeeId: studentId, status: { in: ["ACTIVE", "COMPLETED"] } },
+            orderBy: [{ status: "asc" }, { runSequence: "desc" }],
+          });
+      const ceRow = await client.courseEditionProgress.findUnique({
+        where: {
+          employeeId_moduleCode: { employeeId: studentId, moduleCode: "M1" },
+        },
+      });
+      const courseEditionM1 = buildCourseEditionM1Visibility({
+        employeeId: employee.id,
+        studentName: employee.displayName,
+        officialRunId: officialRun?.id ?? null,
+        progress: ceRow
+          ? parseStoredCourseEditionProgress(ceRow.progressJson, ceRow.moduleCode)
+          : null,
+        missionAttempts: missionAttempts.map((attempt) => ({
+          missionKey: attempt.missionDefinition.missionKey,
+          status: attempt.status,
+          scorePercent: attempt.scorePercent,
+        })),
+      });
+
       return Result.ok({
         employeeId: employee.id,
         employeeNumber: employee.employeeNumber,
@@ -431,15 +600,9 @@ export function createProfessorService(client = getPrismaClient()) {
             status: item.status,
             percentComplete: item.percentComplete,
           })),
-          parseCurriculumVersion(
-            (
-              await client.pedagogicalCourseRun.findFirst({
-                where: { employeeId: studentId, status: { in: ["ACTIVE", "COMPLETED"] } },
-                orderBy: [{ status: "asc" }, { runSequence: "desc" }],
-              })
-            )?.curriculumVersion,
-          ),
+          parseCurriculumVersion(officialRun?.curriculumVersion),
         ),
+        courseEditionM1,
         capstone: capstone
           ? {
               status: capstone.status,

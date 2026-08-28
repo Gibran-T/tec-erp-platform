@@ -413,6 +413,9 @@ describe("workspace vocabulary", () => {
       expect(screen.getByTestId("workspace-home-page")).toBeInTheDocument();
     });
 
-    expect(document.body.textContent ?? "").not.toMatch(FORBIDDEN_VOCABULARY);
+    const sofa = screen.getByTestId("learner-home-sofa");
+    expect(sofa).toHaveTextContent(/SAP/);
+    const rest = (document.body.textContent ?? "").replace(sofa.textContent ?? "", "");
+    expect(rest).not.toMatch(FORBIDDEN_VOCABULARY);
   });
 });

@@ -5,8 +5,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { AppRoutes } from "../App.js";
 import { AuthProvider } from "../auth/AuthContext.js";
+import { LocaleProvider } from "../i18n/LocaleProvider.js";
+import { ThemeProvider } from "../theme/ThemeProvider.js";
 
-const FORBIDDEN_VOCABULARY =
+const WORKSPACE_FORBIDDEN_VOCABULARY =
   /\b(course|cours|lms|simulation|learner|apprenant|student|étudiant|leçon|module)\b/i;
 
 const demoEmployee: AuthenticatedEmployee = {
@@ -36,16 +38,22 @@ afterEach(() => {
 describe("sign-in experience", () => {
   it("renders the employee sign-in page", () => {
     render(
-      <AuthProvider skipRestore initialEmployee={null}>
-        <MemoryRouter initialEntries={["/login"]}>
-          <AppRoutes />
-        </MemoryRouter>
-      </AuthProvider>,
+      <ThemeProvider>
+        <AuthProvider skipRestore initialEmployee={null}>
+          <LocaleProvider>
+            <MemoryRouter initialEntries={["/login"]}>
+              <AppRoutes />
+            </MemoryRouter>
+          </LocaleProvider>
+        </AuthProvider>
+      </ThemeProvider>,
     );
 
     expect(screen.getByTestId("login-page")).toBeInTheDocument();
     expect(screen.getByLabelText("Courriel professionnel")).toBeInTheDocument();
     expect(screen.getByLabelText("Mot de passe")).toBeInTheDocument();
+    expect(screen.getByTestId("login-dual-reminder")).toHaveTextContent(/SAP Learning Hub/i);
+    expect(screen.getByTestId("login-dual-reminder")).toHaveTextContent(/TEC\.ERP/i);
   });
 
   it("signs the employee in and lands on the enterprise workspace", async () => {
@@ -61,11 +69,15 @@ describe("sign-in experience", () => {
     );
 
     render(
-      <AuthProvider skipRestore initialEmployee={null}>
-        <MemoryRouter initialEntries={["/login"]}>
-          <AppRoutes />
-        </MemoryRouter>
-      </AuthProvider>,
+      <ThemeProvider>
+        <AuthProvider skipRestore initialEmployee={null}>
+          <LocaleProvider>
+            <MemoryRouter initialEntries={["/login"]}>
+              <AppRoutes />
+            </MemoryRouter>
+          </LocaleProvider>
+        </AuthProvider>
+      </ThemeProvider>,
     );
 
     fireEvent.change(screen.getByLabelText("Courriel professionnel"), {
@@ -88,31 +100,26 @@ describe("sign-in experience", () => {
 });
 
 describe("employee-facing vocabulary", () => {
-  it("keeps the sign-in page free of academic / LMS vocabulary", () => {
-    render(
-      <AuthProvider skipRestore initialEmployee={null}>
-        <MemoryRouter initialEntries={["/login"]}>
-          <AppRoutes />
-        </MemoryRouter>
-      </AuthProvider>,
-    );
-
-    expect(document.body.textContent ?? "").not.toMatch(FORBIDDEN_VOCABULARY);
-  });
-
   it("keeps the authenticated workspace free of academic / LMS vocabulary", async () => {
     render(
-      <AuthProvider skipRestore initialEmployee={demoEmployee}>
-        <MemoryRouter initialEntries={["/workspace"]}>
-          <AppRoutes />
-        </MemoryRouter>
-      </AuthProvider>,
+      <ThemeProvider>
+        <AuthProvider skipRestore initialEmployee={demoEmployee}>
+          <LocaleProvider>
+            <MemoryRouter initialEntries={["/workspace"]}>
+              <AppRoutes />
+            </MemoryRouter>
+          </LocaleProvider>
+        </AuthProvider>
+      </ThemeProvider>,
     );
 
     await waitFor(() => {
       expect(screen.getByTestId("workspace-home-page")).toBeInTheDocument();
     });
 
-    expect(document.body.textContent ?? "").not.toMatch(FORBIDDEN_VOCABULARY);
+    const sofa = screen.getByTestId("learner-home-sofa");
+    expect(sofa).toHaveTextContent(/SAP/);
+    const rest = (document.body.textContent ?? "").replace(sofa.textContent ?? "", "");
+    expect(rest).not.toMatch(WORKSPACE_FORBIDDEN_VOCABULARY);
   });
 });

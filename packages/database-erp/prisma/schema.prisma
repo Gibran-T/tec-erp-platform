@@ -101,9 +101,67 @@ model Employee {
   professorInterventions     ProfessorIntervention[]
   studentMissionReflections  StudentMissionReflection[]
   pedagogicalRunAudits       PedagogicalCourseRunAudit[] @relation("PedagogicalRunAuditActor")
+  sapIee2eSelfReport         SapIee2eSelfReport?
+  sapIee2eTeachingCalendar   SapIee2eTeachingCalendar?
+  courseEditionProgress      CourseEditionProgress[]
 
   @@index([companyId])
   @@map("employee")
+}
+
+/// Student-declared accompaniment of the official SAP IEE2E path.
+/// TEC.ERP does not read, scrape, or certify SAP Learning progress.
+model SapIee2eSelfReport {
+  id              String   @id @default(cuid())
+  employeeId      String   @unique
+  currentUnit     Int
+  sessionNumber   Int
+  sapAccess       String
+  difficulty      String   @default("")
+  needsSupport    Boolean  @default(false)
+  note            String   @default("")
+  achievement     String
+  unitsJson       Json
+  semaineZeroJson Json     @default("{}")
+  lastDeclaredAt  DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  @@index([needsSupport])
+  @@map("sap_iee2e_self_report")
+}
+
+/// Professor-declared Collège session 1 date — opens the Semaine Zéro window.
+model SapIee2eTeachingCalendar {
+  id          String   @id @default(cuid())
+  professorId String   @unique
+  session1At  DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  professor Employee @relation(fields: [professorId], references: [id])
+
+  @@map("sap_iee2e_teaching_calendar")
+}
+
+/// Isolated Course Edition lab progress. Never stored on PedagogicalCourseRun.
+model CourseEditionProgress {
+  id           String   @id @default(cuid())
+  employeeId   String
+  moduleCode   String
+  progressJson Json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  /// ON DELETE RESTRICT — same as sap_iee2e_self_report and pedagogical_course_run.
+  /// Employee cleanup must delete course_edition_progress rows first. Not CASCADE.
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict)
+
+  @@unique([employeeId, moduleCode])
+  @@index([employeeId])
+  @@map("course_edition_progress")
 }
 
 /// Per-employee read state for a static inbox message (content lives in code).

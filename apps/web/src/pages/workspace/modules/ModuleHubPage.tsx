@@ -8,6 +8,8 @@ import { useLocale } from "../../../i18n/LocaleProvider.js";
 import { CurriculumBadge, ProgressBar, RunBadge } from "../../../living-erp/components/Badges.js";
 import { EmptyState, ErrorState, SkeletonBlock } from "../../../living-erp/components/States.js";
 import { StatusChip, toneForStatus } from "../../../living-erp/components/StatusChip.js";
+import { getEleM3PilotEvents } from "../../../simulation/ele-m3-pilot.js";
+import { getCourseEditionPack } from "../../../course-edition/content/index.js";
 import { getAppPath } from "../../../workspace/appRegistry.js";
 
 const MODULE_WHY: Record<string, { purpose: string; process: string; impact: string }> = {
@@ -162,6 +164,45 @@ export function ModuleHubPage(): ReactNode {
           <strong>Impact aval :</strong> {why.impact}
         </p>
       </section>
+
+      {module.moduleCode === "M3" ? (
+        <section className="living-home-section" data-testid="module-hub-ele-m3-pilot">
+          <h2>{t("ele.m3.title")}</h2>
+          <p data-testid="module-hub-ele-m3-note">{t("ele.m3.pilotNote")}</p>
+          <StatusChip label={t("ele.m3.ambientAi")} tone="purple" testId="module-hub-ele-ambient" />
+          {historical ? (
+            <p role="note" data-testid="module-hub-ele-historical-note">
+              {t("ele.m3.historicalNote")}
+            </p>
+          ) : null}
+          <ul data-testid="module-hub-ele-m3-events">
+            {getEleM3PilotEvents(module.moduleCode).map((event) => (
+              <li key={event.id} data-testid={`module-hub-ele-event-${event.id}`}>
+                <strong>{event.stakeholder}</strong> — {event.note}
+              </li>
+            ))}
+          </ul>
+          <Link to={getAppPath("tableaux-bord")} data-testid="module-hub-open-bi-studio">
+            {t("biStudio.title")}
+          </Link>
+        </section>
+      ) : null}
+
+      {getCourseEditionPack(module.moduleCode) ? (
+        <section className="living-home-section" data-testid="module-hub-course-edition">
+          <h2>Coussin de lab — Course Edition {module.moduleCode}</h2>
+          <p>
+            Optionnel. Le cours appliqué reste SAP Learning. Ce parcours NordHabitat (APPRENDRE →
+            LAB → MISSIONS → BILAN) est un sofa pour penser — pas le calendrier de séance.
+          </p>
+          <Link
+            to={`/workspace/modules/${module.moduleCode}/course-edition/apprendre`}
+            data-testid="module-hub-open-course-edition"
+          >
+            Ouvrir Course Edition {module.moduleCode}
+          </Link>
+        </section>
+      ) : null}
 
       <section className="living-home-section" data-testid="module-hub-process-map">
         <h2>{t("module.processMap")}</h2>

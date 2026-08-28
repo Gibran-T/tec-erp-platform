@@ -68,14 +68,13 @@ export function OrientationPage(): ReactNode {
               {fr ? "Marc Tremblay · Directeur commercial" : "Marc Tremblay · Sales director"}
             </div>
           </div>
-          <button
-            type="button"
+          <Link
             className="playback-btn"
+            to="/playback/v2/mission-entry"
             data-testid="cockpit-primary-cta"
-            onClick={() => setMissionPreviewOpen(true)}
           >
             {c.cta}
-          </button>
+          </Link>
         </section>
 
         <aside className="pb-cockpit-side">

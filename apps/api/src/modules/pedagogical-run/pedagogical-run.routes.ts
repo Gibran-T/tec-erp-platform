@@ -6,6 +6,7 @@ import {
   CreateStudentMissionReflectionRequestSchema,
   TransitionPedagogicalCourseRunRequestSchema,
   UpdateStudentMissionReflectionRequestSchema,
+  UpsertCourseEditionProgressRequestSchema,
 } from "@tec-platform/contracts";
 
 import { getPrismaClient } from "@tec-platform/database-erp";
@@ -50,6 +51,50 @@ export function createPedagogicalRunMeRouter(service: PedagogicalRunService): Ro
     try {
       const employee = getAuthenticatedEmployee(req);
       const result = await service.listForEmployee(employee.id);
+      sendResult(res, result);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get("/course-edition/:moduleCode", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      const moduleCode = String(req.params.moduleCode ?? "").toUpperCase();
+      if (!moduleCode) {
+        res.status(400).json({ error: { code: "VALIDATION", message: "moduleCode requis." } });
+        return;
+      }
+      const result = await service.getCourseEditionProgress(employee.id, moduleCode);
+      if (!result.ok) {
+        sendResult(res, result);
+        return;
+      }
+      res.status(200).json({ progress: result.value });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.put("/course-edition/:moduleCode", async (req, res, next) => {
+    try {
+      const employee = getAuthenticatedEmployee(req);
+      const moduleCode = String(req.params.moduleCode ?? "").toUpperCase();
+      const parsed = UpsertCourseEditionProgressRequestSchema.safeParse({
+        ...req.body,
+        moduleCode,
+      });
+      if (!parsed.success) {
+        res.status(400).json({
+          error: { code: "VALIDATION", message: "Progression Course Edition invalide." },
+        });
+        return;
+      }
+      const result = await service.upsertCourseEditionProgress({
+        employeeId: employee.id,
+        moduleCode,
+        body: parsed.data,
+      });
       sendResult(res, result);
     } catch (error) {
       next(error);

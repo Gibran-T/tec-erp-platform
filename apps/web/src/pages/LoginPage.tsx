@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../auth/AuthContext.js";
 import { useLocale } from "../i18n/LocaleProvider.js";
+import { useTheme } from "../theme/ThemeProvider.js";
 
 export function LoginPage(): ReactNode {
   const { status, login } = useAuth();
   const navigate = useNavigate();
   const { t, locale, setLocale, localizeLoginError } = useLocale();
+  const { preference, setPreference } = useTheme();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -54,14 +56,34 @@ export function LoginPage(): ReactNode {
             data-testid="login-locale-switch"
             value={locale}
             onChange={(event) => setLocale(event.target.value === "en" ? "en" : "fr")}
+            aria-label={t("shell.language")}
           >
             <option value="fr">FR</option>
             <option value="en">EN</option>
           </select>
         </label>
+        <label>
+          {t("shell.theme")}
+          <select
+            data-testid="login-theme-switch"
+            value={preference}
+            onChange={(event) => {
+              const value = event.target.value;
+              if (value === "light" || value === "dark" || value === "system") {
+                setPreference(value);
+              }
+            }}
+            aria-label={t("shell.theme")}
+          >
+            <option value="light">{t("shell.theme.light")}</option>
+            <option value="dark">{t("shell.theme.dark")}</option>
+            <option value="system">{t("shell.theme.system")}</option>
+          </select>
+        </label>
       </div>
       <h1>{t("login.title")}</h1>
       <p>{t("login.subtitle")}</p>
+      <p data-testid="login-dual-reminder">{t("login.reminder")}</p>
 
       <form onSubmit={(event) => void handleSubmit(event)} aria-label={t("login.submit")} noValidate>
         <div>

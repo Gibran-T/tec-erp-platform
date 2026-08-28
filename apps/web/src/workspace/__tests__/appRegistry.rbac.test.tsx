@@ -13,6 +13,7 @@ describe("Z1-001 workspace app RBAC", () => {
     expect(ids).not.toContain("administration");
     expect(ids).not.toContain("portail-professeur");
     expect(ids).toContain("centre-mission");
+    expect(ids).toContain("parcours-sap-iee2e");
     expect(ids).toContain("capstone");
   });
 

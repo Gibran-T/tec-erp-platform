@@ -1571,3 +1571,101 @@
 .playback-v2[data-pb-viewport="mobile"] .pb-pulse-map {
   min-height: 280px;
 }
+
+/* Wave 2B — SO-1048 mission entry (playback thin UI) */
+.pb-mission-entry-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.pb-mission-recovery {
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--pb-radius);
+  border: 1px solid var(--pb-yellow);
+  background: color-mix(in srgb, var(--pb-yellow) 12%, var(--pb-surface));
+}
+
+.pb-mission-evidence-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.pb-mission-evidence-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--pb-line);
+}
+
+.pb-mission-evidence-list p {
+  margin: 0.2rem 0 0;
+  color: var(--pb-muted);
+  font-size: 0.9rem;
+}
+
+.pb-mission-decision-grid {
+  display: grid;
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+
+.pb-decision-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 0.25rem;
+}
+
+.pb-decision-option--selected {
+  border-color: var(--pb-blue);
+  background: color-mix(in srgb, var(--pb-blue) 8%, var(--pb-surface));
+}
+
+.pb-mission-debrief-actions,
+.pb-mission-session-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.pb-mission-ledger-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+  max-height: 280px;
+  overflow: auto;
+  font-size: 0.82rem;
+}
+
+.pb-mission-ledger-list li {
+  display: grid;
+  grid-template-columns: minmax(9rem, 1.2fr) minmax(4rem, 0.6fr) 1fr;
+  gap: 0.35rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px dashed var(--pb-line);
+}
+
+.pb-mission-ledger-list code {
+  font-family: ui-monospace, monospace;
+  color: var(--pb-blue-deep);
+}
+
+@media (min-width: 900px) {
+  .pb-mission-entry-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pb-mission-ledger {
+    grid-column: 1 / -1;
+  }
+}

@@ -58,8 +58,11 @@ export const frMessages = {
     "Parcours historique en lecture seule — aucun redémarrage actif.",
   "home.attention.capstoneLocked": "Capstone verrouillé — missions régulières requises.",
   "home.attention.capstoneRevision": "Révision Capstone demandée par le professeur.",
-  "login.title": "NordHabitat",
-  "login.subtitle": "Espace employé — connectez-vous pour accéder à votre poste de travail.",
+  "login.title": "TEC.ERP — Laboratoire académique",
+  "login.subtitle":
+    "Identifiant Collège — accédez à votre poste de travail NordHabitat (sofa TEC.ERP).",
+  "login.reminder":
+    "Après connexion, vous entrez le laboratoire TEC.ERP (simulation NordHabitat). Le cours officiel reste sur SAP Learning Hub — ne confondez pas les deux portes.",
   "login.email": "Courriel professionnel",
   "login.password": "Mot de passe",
   "login.submit": "Se connecter",
@@ -67,6 +70,33 @@ export const frMessages = {
   "login.error.invalidCredentials": "Courriel ou mot de passe invalide.",
   "login.error.generic": "Échec de la connexion. Veuillez réessayer.",
   "login.error.invalidEmail": "Saisissez une adresse courriel valide.",
+  "portal.hero.kicker": "Collège · Parcours SAP intégré",
+  "portal.hero.title": "TEC.ERP — portail académique",
+  "portal.hero.subtitle":
+    "Deux portes complémentaires : SAP Learning Hub enseigne le cours ; TEC.ERP est le sofa où vous pensez, reliez et prouvez avec NordHabitat.",
+  "portal.doors.title": "Deux portes d'entrée",
+  "portal.doors.sap.tag": "Cours officiel",
+  "portal.doors.sap.title": "Cours SAP (Learning Hub)",
+  "portal.doors.sap.description":
+    "Référence, unités, quiz et systèmes de pratique SAP. Utilisez votre compte Hub individuel — jamais partagé.",
+  "portal.doors.sap.cta": "Ouvrir SAP Learning Hub (étudiants)",
+  "portal.doors.tec.tag": "Laboratoire",
+  "portal.doors.tec.title": "Laboratoire TEC.ERP (sofa)",
+  "portal.doors.tec.description":
+    "Simulation NordHabitat : missions, preuves et décisions — sans copier les écrans SAP.",
+  "portal.doors.tec.cta": "Connexion poste de travail TEC.ERP",
+  "portal.rule.title": "Règle des cinq secondes",
+  "portal.rule.body":
+    "SAP enseigne le contenu du cours. TEC.ERP vous fait réfléchir, relier les départements et documenter vos preuves.",
+  "portal.semaineZero.title": "Rappel Semaine Zéro",
+  "portal.semaineZero.body":
+    "Chaque étudiant possède un compte SAP Learning Hub individuel. Ne partagez jamais identifiants ni accès — la traçabilité pédagogique en dépend.",
+  "portal.notSapClone":
+    "TEC.ERP n'est pas un clone SAP. NordHabitat est une entreprise pédagogique distincte de l'entreprise de vos exercices SAP.",
+  "portal.footer.login": "Connexion laboratoire TEC.ERP",
+  "portal.footer.prototype": "Prototype visuel uniquement (Playback v2)",
+  "portal.authenticated.hint": "Vous êtes connecté au laboratoire TEC.ERP.",
+  "portal.authenticated.workstation": "Aller au poste de travail",
   "status.locked": "Verrouillé",
   "status.available": "Disponible",
   "status.in_progress": "En activité",
@@ -126,8 +156,85 @@ export const frMessages = {
   "ai.mode.reflect": "Réfléchir",
   "ai.disclaimer":
     "Assistance pédagogique IA — cette réponse ne modifie jamais vos scores, ne débloque aucune mission et ne remplace pas votre jugement professionnel.",
+  "biStudio.title": "BI Studio",
+  "biStudio.subtitle":
+    "Interpréter les indicateurs NordHabitat et les parcours SAP — observer, filtrer, comparer, expliquer, diagnostiquer, recommander.",
+  "biStudio.interpretationPath": "Chemin d'interprétation",
+  "biStudio.step.observe": "Observer",
+  "biStudio.step.observe.detail":
+    "Repérer les indicateurs, exceptions et tendances visibles sans conclure trop vite.",
+  "biStudio.step.filter": "Filtrer",
+  "biStudio.step.filter.detail":
+    "Restreindre la lecture au module, au processus ou à la période pertinente pour la décision.",
+  "biStudio.step.compare": "Comparer",
+  "biStudio.step.compare.detail":
+    "Confronter réel, cible et périodes précédentes — distinguer bruit et signal.",
+  "biStudio.step.explain": "Expliquer",
+  "biStudio.step.explain.detail":
+    "Relier chaque chiffre à sa définition, sa source et son contexte processus.",
+  "biStudio.step.diagnose": "Diagnostiquer",
+  "biStudio.step.diagnose.detail":
+    "Identifier causes plausibles, risques et limites de données avant d'agir.",
+  "biStudio.step.recommend": "Recommander",
+  "biStudio.step.recommend.detail":
+    "Formuler une action métier argumentée — sans confondre prévision et fait établi.",
+  "biStudio.source.nordHabitat": "Lab NordHabitat (données pédagogiques)",
+  "biStudio.source.sapCourse": "Parcours SAP (cours officiel)",
+  "biStudio.dashboardSummary": "Résumé analytique",
+  "biStudio.kpis": "Indicateurs expliqués",
+  "biStudio.visualization": "Visualisation",
+  "biStudio.demoSeries": "Série pédagogique NordHabitat (lab, pas SAP)",
+  "biStudio.forecast.label": "Prévisions",
+  "biStudio.forecast.badge": "Prévision — pas un fait",
+  "biStudio.forecast.disclaimer":
+    "Les points ci-dessous sont des prévisions pédagogiques — ils ne remplacent pas les faits ERP enregistrés.",
+  "biStudio.exceptions": "Exceptions détectées",
+  "biStudio.noExceptions": "Aucune exception active.",
+  "biStudio.exceptionCategory": "Catégorie",
+  "biStudio.exceptionSeverity": "Sévérité",
+  "biStudio.exceptionSummary": "Résumé",
+  "biStudio.exceptionSource": "Source",
+  "biStudio.exceptionDetected": "Détectée le",
+  "ele.m3.title": "Pilot ELE M3 — événements rédigés",
+  "ele.m3.pilotNote":
+    "Événements parties prenantes rédigés pour le module M3 P2P — IA ambiante (ELE), pas une IA visible de coaching.",
+  "ele.m3.ambientAi": "IA ambiante (ELE)",
+  "ele.m3.historicalNote":
+    "Parcours historique : aucun nouvel événement parties prenantes n'est généré sur les runs terminés.",
+  "aiDecision.title": "Espace décision IA",
+  "aiDecision.visibleAiBanner":
+    "IA visible — n'altère pas les scores, déblocages ni certificats. Votre synthèse reste la preuve principale.",
+  "aiDecision.ambientAiNote":
+    "IA ambiante (ELE) : signaux contextuels rédigés dans BI Studio / module M3 — distincts de ce fil coach visible.",
+  "aiDecision.visibleAiBadge": "IA visible",
+  "aiDecision.evidencePanel": "Preuves et notes",
+  "aiDecision.evidenceHint":
+    "Collez extraits de documents, constats d'écran ou notes de mission avant d'interroger le coach.",
+  "aiDecision.evidenceLabel": "Vos preuves / notes",
+  "aiDecision.coachThread": "Fil coach",
+  "aiDecision.emptyThread": "Posez une question pour démarrer le fil coach.",
+  "aiDecision.moduleOptional": "Module (optionnel)",
+  "aiDecision.questionLabel": "Votre question",
+  "aiDecision.questionTooShort": "Posez une question d'au moins 4 caractères.",
+  "aiDecision.sending": "Envoi…",
+  "aiDecision.askCoach": "Demander au coach",
+  "aiDecision.you": "Vous",
+  "aiDecision.synthesisLabel": "Synthèse apprenant",
+  "aiDecision.synthesisHint":
+    "Rédigez votre synthèse avant de clore la réflexion — elle ne peut pas être ignorée.",
+  "aiDecision.synthesisPlaceholder": "Qu'avez-vous compris, décidé et retenu ?",
+  "aiDecision.synthesisRequired":
+    "La synthèse est obligatoire (au moins 20 caractères) avant de clore la réflexion.",
+  "aiDecision.closeReflection": "Clore la réflexion",
+  "aiDecision.reflectionClosed": "Réflexion close",
+  "aiDecision.reflectionComplete": "Réflexion enregistrée — aucun impact sur score ou déblocage.",
   "home.currentState": "État d’apprentissage actuel",
   "home.journey": "Trajet d’apprentissage",
+  "home.sofa.title": "Sofa TEC.ERP — le cours est SAP",
+  "home.sofa.body":
+    "SAP Learning Hub est le fondement du cours (unités, quiz, Achievement). TEC.ERP organise la séance, la cohorte et le confort. Les modules NordHabitat sont des coussins optionnels — pas le calendrier.",
+  "home.sofa.parcours": "Ouvrir Parcours SAP",
+  "home.sofa.deck": "Teaching Deck séance 1",
   "home.recent": "Activité récente",
   "home.attention": "Attention requise",
   "home.competencies": "Instantané de compétences",
@@ -160,6 +267,26 @@ export const frMessages = {
   "certificate.silver": "Argent",
   "certificate.gold": "Or",
   "capstone.lockedSubmit": "Soumission indisponible tant que le Capstone est verrouillé.",
+  "teachingDeck.prev": "Précédent",
+  "teachingDeck.next": "Suivant",
+  "teachingDeck.slideProgress": "{module} — diapositive {current} / {total}",
+  "teachingDeck.speakerNotes": "Notes professeur",
+  "teachingDeck.professorMode": "Mode professeur",
+  "teachingDeck.learnerMode": "Mode apprenant",
+  "teachingDeck.toggleLocale": "Changer la langue de navigation",
+  "teachingDeck.backWorkspace": "Retour au poste de travail",
+  "teachingDeck.notFound": "Séance Teaching Deck introuvable (S1–S10)",
+  "teachingDeck.keyboardHint": "Navigation : flèches gauche/droite, Page Up/Down, Espace",
+  "professor.pedagogicalControl": "Contrôle pédagogique",
+  "professor.freezeSimulation": "Geler la simulation",
+  "professor.freezeSimulationHint":
+    "État local uniquement — pas encore autoritaire côté serveur.",
+  "professor.compareGroups": "Comparer les groupes",
+  "professor.compareGroupsHint": "Sélectionnez deux cohortes pour un repère A vs B.",
+  "professor.eleM3Suppress": "Supprimer les événements ELE (M3)",
+  "professor.eleM3SuppressNote":
+    "Pilote M3 : masquer les événements Enterprise Life Engine en salle si distraction. Aucune écriture dans James Run 1.",
+  "professor.openTeachingDeck": "Ouvrir le Teaching Deck",
 } as const;
 
 export type MessageKey = keyof typeof frMessages;
