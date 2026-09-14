@@ -134,6 +134,10 @@ export function SapIee2ePocApp({
 }: SapIee2ePocAppProps = {}): ReactNode {
   const [view, setView] = useState<SapIee2ePocView>(initialView);
   const [theme, setTheme] = useState<PocTheme>("light");
+
+  useEffect(() => {
+    setView(initialView);
+  }, [initialView]);
   const [selectedSessionNumber, setSelectedSessionNumber] = useState(
     initialReport?.sessionNumber ?? 3,
   );

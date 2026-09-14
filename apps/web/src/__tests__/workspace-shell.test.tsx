@@ -545,6 +545,30 @@ describe("navigation and placeholders", () => {
     expect(screen.queryByRole("button", { name: "Suivi professeur" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Mon parcours SAP" })).toBeInTheDocument();
   });
+
+  it("opens professor Suivi KPIs after arriving from Parcours SAP", async () => {
+    const professor: AuthenticatedEmployee = {
+      ...demoEmployee,
+      id: "emp_professor",
+      employeeNumber: "TECERP-2026-PILOT-001",
+      displayName: "James Timothy",
+      role: "PROFESSOR",
+    };
+    renderWorkspace("/workspace/apps/parcours-sap-iee2e", professor);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("sap-iee2e-poc-root")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId("workspace-sidebar-link-suivi-professeur"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("poc-kpi-strip")).toBeInTheDocument();
+    });
+    expect(screen.getByTestId("sap-professor-stage-grid")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Préparation de séance" })).toBeInTheDocument();
+    expect(screen.getByTestId("poc-filter-support")).toBeInTheDocument();
+  });
 });
 
 describe("workspace session controls", () => {
