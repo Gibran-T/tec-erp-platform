@@ -340,18 +340,158 @@ export const INSTITUTIONAL_STATUS_LABEL_FR: Record<SapSuiteInstitutionalStatus, 
   accompaniment_completed: "Accompagnement conclu",
 };
 
-export const SAP_SUITE_E2E_STAGES: readonly SapSuiteProgramStage[] = SAP_SUITE_E2E_STAGE_CODES.map(
-  (code, index) => ({
-    code,
-    sortOrder: index + 1,
-    title: `Étape ${code}`,
-    shortDescription: "Titre institutionnel configurable — à confirmer par le Collège.",
-    administrativeObjective:
-      "Accompagner l’étudiant et enregistrer le suivi institutionnel. Le contenu officiel reste sur SAP Learning.",
-    officialPathHint: "Correspondance au parcours officiel SAP à confirmer (aucune leçon SAP copiée).",
-    titleStatus: "placeholder",
-  }),
-);
+const SAP_SUITE_E2E_ADMIN_OBJECTIVE =
+  "Accompagner la cohorte Collège et enregistrer le suivi institutionnel. Le contenu, les évaluations, la progression officielle et les achievements demeurent sur SAP Learning.";
+
+function sapPublicUnitHint(
+  unitNumber: number,
+  publicTitle: string,
+  extra?: string,
+): string {
+  const base = `Unité publique SAP ${unitNumber} — ${publicTitle}. Identification uniquement ; aucune leçon SAP copiée.`;
+  return extra ? `${base} ${extra}` : base;
+}
+
+/**
+ * S1–S10 = séances institutionnelles Collège. Neuf unités publiques SAP Learning
+ * (identificationOnly). S4 et S5 partagent l’unité publique 4 ; S10 correspond à
+ * l’unité 9 — aucune dixième unité SAP n’est inventée.
+ */
+export const SAP_SUITE_E2E_STAGES: readonly SapSuiteProgramStage[] = [
+  {
+    code: "S1",
+    sortOrder: 1,
+    title:
+      "Identifier les processus de gestion de bout en bout et leur défi en matière d'intégration",
+    shortDescription:
+      "Séance Collège 1. Identification de l’unité publique SAP 1. TEC.ERP n’enseigne pas ce contenu.",
+    administrativeObjective: SAP_SUITE_E2E_ADMIN_OBJECTIVE,
+    officialPathHint: sapPublicUnitHint(
+      1,
+      "Identifier les processus de gestion de bout en bout et leur défi en matière d'intégration",
+    ),
+    titleStatus: "institutionally_confirmed",
+  },
+  {
+    code: "S2",
+    sortOrder: 2,
+    title: "Description de SAP Business Suite",
+    shortDescription:
+      "Séance Collège 2. Identification de l’unité publique SAP 2. TEC.ERP n’enseigne pas ce contenu.",
+    administrativeObjective: SAP_SUITE_E2E_ADMIN_OBJECTIVE,
+    officialPathHint: sapPublicUnitHint(2, "Description de SAP Business Suite"),
+    titleStatus: "institutionally_confirmed",
+  },
+  {
+    code: "S3",
+    sortOrder: 3,
+    title: "Discussion sur les concepts et objets centraux dans SAP Business Suite",
+    shortDescription:
+      "Séance Collège 3. Identification de l’unité publique SAP 3. TEC.ERP n’enseigne pas ce contenu.",
+    administrativeObjective: SAP_SUITE_E2E_ADMIN_OBJECTIVE,
+    officialPathHint: sapPublicUnitHint(
+      3,
+      "Discussion sur les concepts et objets centraux dans SAP Business Suite",
+    ),
+    titleStatus: "institutionally_confirmed",
+  },
+  {
+    code: "S4",
+    sortOrder: 4,
+    title:
+      "Exécution du processus de l'enregistrement au reporting : accent mis sur la comptabilité financière et le contrôle de gestion",
+    shortDescription:
+      "Séance Collège 4 (1/2 sur l’unité publique 4). Identification uniquement — pas une unité SAP distincte de S5.",
+    administrativeObjective: SAP_SUITE_E2E_ADMIN_OBJECTIVE,
+    officialPathHint: sapPublicUnitHint(
+      4,
+      "Exécution du processus de l'enregistrement au reporting : accent mis sur la comptabilité financière et le contrôle de gestion",
+      "Première séance Collège sur cette unité publique.",
+    ),
+    titleStatus: "institutionally_confirmed",
+  },
+  {
+    code: "S5",
+    sortOrder: 5,
+    title: "Contrôler les coûts et intégrer (enregistrement au reporting — II)",
+    shortDescription:
+      "Séance Collège 5 (2/2). Poursuite institutionnelle de la même unité publique SAP 4 — pas une dixième unité SAP.",
+    administrativeObjective: SAP_SUITE_E2E_ADMIN_OBJECTIVE,
+    officialPathHint: sapPublicUnitHint(
+      4,
+      "Exécution du processus de l'enregistrement au reporting : accent mis sur la comptabilité financière et le contrôle de gestion",
+      "Deuxième séance Collège sur la même unité publique. Titre de séance institutionnel, pas un titre SAP distinct.",
+    ),
+    titleStatus: "institutionally_confirmed",
+  },
+  {
+    code: "S6",
+    sortOrder: 6,
+    title:
+      "Exécution du processus du recrutement à la retraite : focus sur le pilotage de l'expérience humaine",
+    shortDescription:
+      "Séance Collège 6. Identification de l’unité publique SAP 5. TEC.ERP n’enseigne pas ce contenu.",
+    administrativeObjective: SAP_SUITE_E2E_ADMIN_OBJECTIVE,
+    officialPathHint: sapPublicUnitHint(
+      5,
+      "Exécution du processus du recrutement à la retraite : focus sur le pilotage de l'expérience humaine",
+    ),
+    titleStatus: "institutionally_confirmed",
+  },
+  {
+    code: "S7",
+    sortOrder: 7,
+    title: "Exécution du processus d'approvisionnement : focalisation sur l'approvisionnement",
+    shortDescription:
+      "Séance Collège 7. Identification de l’unité publique SAP 6. TEC.ERP n’enseigne pas ce contenu.",
+    administrativeObjective: SAP_SUITE_E2E_ADMIN_OBJECTIVE,
+    officialPathHint: sapPublicUnitHint(
+      6,
+      "Exécution du processus d'approvisionnement : focalisation sur l'approvisionnement",
+    ),
+    titleStatus: "institutionally_confirmed",
+  },
+  {
+    code: "S8",
+    sortOrder: 8,
+    title: "Exécution du processus de la conception aux opérations : accent mis sur la production",
+    shortDescription:
+      "Séance Collège 8. Identification de l’unité publique SAP 7. TEC.ERP n’enseigne pas ce contenu.",
+    administrativeObjective: SAP_SUITE_E2E_ADMIN_OBJECTIVE,
+    officialPathHint: sapPublicUnitHint(
+      7,
+      "Exécution du processus de la conception aux opérations : accent mis sur la production",
+    ),
+    titleStatus: "institutionally_confirmed",
+  },
+  {
+    code: "S9",
+    sortOrder: 9,
+    title: "Exécution du processus Lead-to-Cash : accent mis sur les ventes",
+    shortDescription:
+      "Séance Collège 9. Identification de l’unité publique SAP 8. TEC.ERP n’enseigne pas ce contenu.",
+    administrativeObjective: SAP_SUITE_E2E_ADMIN_OBJECTIVE,
+    officialPathHint: sapPublicUnitHint(
+      8,
+      "Exécution du processus Lead-to-Cash : accent mis sur les ventes",
+    ),
+    titleStatus: "institutionally_confirmed",
+  },
+  {
+    code: "S10",
+    sortOrder: 10,
+    title: "Exécution du processus Lead-to-Cash : focalisation sur le service",
+    shortDescription:
+      "Séance Collège 10. Identification de l’unité publique SAP 9. Synthèse institutionnelle — pas une dixième unité SAP.",
+    administrativeObjective: SAP_SUITE_E2E_ADMIN_OBJECTIVE,
+    officialPathHint: sapPublicUnitHint(
+      9,
+      "Exécution du processus Lead-to-Cash : focalisation sur le service",
+      "Clôture Collège / synthèse. Le SAP Achievement n’est pas émis par TEC.ERP.",
+    ),
+    titleStatus: "institutionally_confirmed",
+  },
+];
 
 export const SAP_SUITE_E2E_OFFICIAL_PATH_UNITS: readonly SapSuiteOfficialPathUnit[] = [
   {

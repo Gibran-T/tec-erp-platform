@@ -35,9 +35,11 @@ describe("PoC SAP IEE2E (Étape A)", () => {
     renderPoc();
     fireEvent.click(screen.getByRole("button", { name: "Mon parcours SAP" }));
     const stages = screen.getByTestId("sap-suite-stages");
-    expect(stages).toHaveTextContent("Étape S1");
-    expect(stages).toHaveTextContent("Étape S10");
-    expect(stages).toHaveTextContent(/titre institutionnel configurable/i);
+    expect(stages).toHaveTextContent("S1");
+    expect(stages).toHaveTextContent("S10");
+    expect(stages).toHaveTextContent(/Description de SAP Business Suite/i);
+    expect(stages).toHaveTextContent(/focalisation sur le service/i);
+    expect(stages).toHaveTextContent(/pas une dixième unité SAP/i);
     expect(screen.getByTestId("sap-suite-evidence")).toHaveTextContent(/Aucun mot de passe/i);
   });
 

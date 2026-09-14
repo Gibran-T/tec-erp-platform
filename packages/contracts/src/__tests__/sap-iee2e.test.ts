@@ -16,8 +16,16 @@ describe("sap-iee2e contracts", () => {
   it("exposes a configurable S1–S10 institutional program without inventing official SAP results", () => {
     expect(SAP_SUITE_E2E_TITLE).toBe("SAP Suite End to End");
     expect(SAP_SUITE_E2E_STAGE_CODES).toHaveLength(10);
-    expect(SAP_SUITE_E2E_STAGES.every((stage) => stage.titleStatus === "placeholder")).toBe(true);
+    expect(SAP_SUITE_E2E_STAGES.every((stage) => stage.titleStatus === "institutionally_confirmed")).toBe(
+      true,
+    );
+    expect(SAP_SUITE_E2E_STAGES[0]?.title).toBe(SAP_SUITE_E2E_OFFICIAL_PATH_UNITS[0]?.publicTitle);
+    expect(SAP_SUITE_E2E_STAGES[3]?.officialPathHint).toMatch(/Unité publique SAP 4/);
+    expect(SAP_SUITE_E2E_STAGES[4]?.officialPathHint).toMatch(/Unité publique SAP 4/);
+    expect(SAP_SUITE_E2E_STAGES[4]?.title).not.toBe(SAP_SUITE_E2E_STAGES[3]?.title);
+    expect(SAP_SUITE_E2E_STAGES[9]?.title).toBe(SAP_SUITE_E2E_OFFICIAL_PATH_UNITS[8]?.publicTitle);
     expect(SAP_SUITE_E2E_OFFICIAL_PATH_UNITS).toHaveLength(9);
+    expect(new Set(SAP_SUITE_E2E_OFFICIAL_PATH_UNITS.map((unit) => unit.publicTitle)).size).toBe(9);
     expect(INSTITUTIONAL_STATUS_LABEL_FR.progress_declared).toBe("Progrès déclaré");
   });
 

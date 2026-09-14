@@ -400,8 +400,9 @@ export function SapIee2ePocApp({
                 <div className="sap-iee2e-poc__card" data-testid="sap-suite-stages" style={{ marginBottom: "1rem" }}>
                   <h2 className="sap-iee2e-poc__h2">Étapes institutionnelles S1–S10</h2>
                   <p className="sap-iee2e-poc__muted">
-                    Structure TEC.ERP configurable. Titres provisoires — le contenu officiel n’est
-                    pas copié. Statut actuel :{" "}
+                    Dix séances Collège S1–S10. Neuf unités publiques SAP Learning (identification
+                    uniquement). S4 et S5 partagent l’unité 4 ; S10 correspond à l’unité 9. Le
+                    contenu officiel n’est pas copié. Statut actuel :{" "}
                     <strong>{INSTITUTIONAL_STATUS_LABEL_FR[report.institutionalStatus]}</strong>
                     . Ce n’est pas un résultat officiellement validé par SAP.
                   </p>

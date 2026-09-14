@@ -97,6 +97,9 @@ describe("sap-iee2e self-report routes", () => {
     expect(response.body.programCode).toBe("SAP_SUITE_E2E");
     expect(response.body.stages).toHaveLength(10);
     expect(response.body.stages[0].code).toBe("S1");
+    expect(response.body.stages[0].titleStatus).toBe("institutionally_confirmed");
+    expect(response.body.stages[4].officialPathHint).toMatch(/Unité publique SAP 4/);
+    expect(response.body.officialPathUnits).toHaveLength(9);
     expect(response.body.officialUrlOpensInNewTab).toBe(true);
     expect(response.body.iframeForbidden).toBe(true);
     expect(response.body.emitsSapAchievement).toBe(false);
