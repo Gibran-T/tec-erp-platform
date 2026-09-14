@@ -64,4 +64,5 @@ Objectif administratif commun : accompagner la cohorte Collège et enregistrer l
 ## Traçabilité git
 
 - PR #36 merge SHA : `652841c2a1aae27558057beb483378fed9d074f0` (catalogue encore placeholders).
-- SHA catalogue titres officiels : renseigné dans `PRODUCTION_DEPLOYMENT_EVIDENCE.md` après merge.
+- PR #37 squash SHA (titres officiels + backup rehearsal) : `cdd10ec9ccb8512e777364613a92be91c9847d22`.
+- Déploiement production : voir `PRODUCTION_DEPLOYMENT_EVIDENCE.md`.
