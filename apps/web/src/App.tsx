@@ -12,6 +12,7 @@ import { CertificateVerifyPage } from "./pages/public/CertificateVerifyPage.js";
 import { LearnerHomePage } from "./pages/workspace/LearnerHomePage.js";
 import { ModuleHubPage } from "./pages/workspace/modules/ModuleHubPage.js";
 import { WorkspaceAppPage } from "./pages/workspace/WorkspaceAppPage.js";
+import { SapIee2ePocApp } from "./poc/sap-iee2e/SapIee2ePocApp.js";
 import { ThemeProvider } from "./theme/ThemeProvider.js";
 
 export function AppRoutes(): ReactNode {
@@ -19,6 +20,9 @@ export function AppRoutes(): ReactNode {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/verify/:token" element={<CertificateVerifyPage />} />
+      {/* PoC visuelle isolée Étape A — hors shell production / hors auth */}
+      <Route path="/poc/sap-iee2e" element={<SapIee2ePocApp />} />
+      <Route path="/poc/sap-iee2e/*" element={<SapIee2ePocApp />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<WorkspaceLayout />}>
           <Route index element={<Navigate to="/workspace" replace />} />

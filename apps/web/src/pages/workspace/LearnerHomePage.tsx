@@ -13,6 +13,7 @@ import { useLocale } from "../../i18n/LocaleProvider.js";
 import { CurriculumBadge, ProgressBar } from "../../living-erp/components/Badges.js";
 import { EmptyState, ErrorState, SkeletonBlock } from "../../living-erp/components/States.js";
 import { StatusChip, toneForStatus, type StatusTone } from "../../living-erp/components/StatusChip.js";
+import { SapIee2eDiscoveryCard } from "../../poc/sap-iee2e/SapIee2eDiscoveryCard.js";
 import { getAppPath } from "../../workspace/appRegistry.js";
 import {
   buildHistoricalWelcomeMessage,
@@ -168,6 +169,8 @@ export function LearnerHomePage(): ReactNode {
       </header>
 
       <AppLauncherGrid />
+
+      <SapIee2eDiscoveryCard />
 
       {loading ? <SkeletonBlock testId="learner-home-loading" /> : null}
       {error ? <ErrorState message={error} /> : null}
