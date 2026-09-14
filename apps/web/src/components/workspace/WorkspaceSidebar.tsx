@@ -33,6 +33,7 @@ export function WorkspaceSidebar(): ReactNode {
   const parcours: NavItem[] = [
     appNav("accueil"),
     { id: "modules", label: t("shell.nav.modules"), path: "/workspace/modules/M1" },
+    appNav("parcours-sap-iee2e"),
     appNav("evaluations"),
     appNav("capstone", t("shell.capstone")),
   ].filter((item): item is NavItem => item !== null);

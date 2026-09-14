@@ -27,3 +27,6 @@ Thumbs.db
 # Cache
 .cache/
 .turbo/
+# Local operational evidence (backups, dumps, private logs)
+.ops-evidence/
+

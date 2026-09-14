@@ -179,6 +179,166 @@ function renderWorkspace(
           } as Response;
         }
 
+        if (url.endsWith("/api/v1/me/sap-iee2e/program") && method === "GET") {
+          return {
+            ok: true,
+            json: async () => ({
+              programCode: "SAP_SUITE_E2E",
+              title: "SAP Suite End to End",
+              subtitle: "Accompagnement institutionnel",
+              officialUrl:
+                "https://learning.sap.com/courses/exploring-end-to-end-business-processes-in-sap-business-suite-fr",
+              officialUrlOpensInNewTab: true,
+              iframeForbidden: true,
+              emitsSapAchievement: false,
+              emitsSapCertification: false,
+              officialSourceRemainsSap: true,
+              disclaimer: "TEC.ERP n’émet pas et ne valide pas le SAP Achievement.",
+              certificationDisclaimer:
+                "TEC.ERP n’émet pas de certification SAP et ne promet aucune équivalence professionnelle.",
+              sourceDisclaimer: "Le contenu officiel demeure sur SAP Learning.",
+              stages: Array.from({ length: 10 }, (_, index) => ({
+                code: `S${index + 1}`,
+                sortOrder: index + 1,
+                title: `Étape S${index + 1}`,
+                shortDescription: "Placeholder",
+                administrativeObjective: "Suivi institutionnel",
+                officialPathHint: "À confirmer",
+                titleStatus: "placeholder",
+              })),
+              officialPathUnits: Array.from({ length: 9 }, (_, index) => ({
+                unitNumber: index + 1,
+                publicTitle: `Unité ${index + 1}`,
+                identificationOnly: true,
+              })),
+            }),
+          } as Response;
+        }
+
+        if (url.endsWith("/api/v1/professor/sap-iee2e/assignments") && method === "GET") {
+          return {
+            ok: true,
+            json: async () => ({ assignments: [] }),
+          } as Response;
+        }
+
+        if (url.endsWith("/api/v1/professor/sap-iee2e/cohort") && method === "GET") {
+          return {
+            ok: true,
+            json: async () => ({
+              students: [],
+              disclaimer: "TEC.ERP n’émet pas et ne valide pas le SAP Achievement.",
+              certificationDisclaimer:
+                "TEC.ERP n’émet pas de certification SAP et ne promet aucune équivalence professionnelle.",
+              officialUrl:
+                "https://learning.sap.com/courses/exploring-end-to-end-business-processes-in-sap-business-suite-fr",
+              calendar: {
+                session1Date: null,
+                session1At: null,
+                semaineZeroOpensAt: null,
+                daysUntilSession1: null,
+                windowLabel:
+                  "Date de séance 1 non fixée — Semaine Zéro à planifier (14 à 21 jours avant).",
+              },
+              semaineZero: { readyCount: 0, pendingCount: 0, totalCount: 0 },
+            }),
+          } as Response;
+        }
+
+        if (url.endsWith("/api/v1/me/sap-iee2e-self-report") && method === "GET") {
+          return {
+            ok: true,
+            json: async () => ({
+              currentUnit: 1,
+              sessionNumber: 1,
+              currentStageCode: "S1",
+              institutionalStatus: "not_started",
+              sapAccess: "non_confirme",
+              difficulty: "",
+              needsSupport: false,
+              note: "",
+              achievement: "non_declare",
+              lastDeclaredAt: null,
+              lastUpdateLabel: "Jamais déclarée",
+              progressionLabel: "0/9 unités déclarées terminées · unité 1",
+              persisted: false,
+              units: Array.from({ length: 9 }, (_, index) => ({
+                unitNumber: index + 1,
+                status: "a_decouvrir",
+              })),
+              stages: Array.from({ length: 10 }, (_, index) => ({
+                stageCode: `S${index + 1}`,
+                status: "not_started",
+              })),
+              evidence: [],
+              semaineZero: {
+                universalId: false,
+                learningHub: false,
+                iee2eOpened: false,
+                noSharedAccount: false,
+                contingencyAck: false,
+              },
+              semaineZeroReady: false,
+              calendar: {
+                session1Date: null,
+                session1At: null,
+                semaineZeroOpensAt: null,
+                daysUntilSession1: null,
+                windowLabel:
+                  "Date de séance 1 non fixée — Semaine Zéro à planifier (14 à 21 jours avant).",
+              },
+              officialUrl:
+                "https://learning.sap.com/courses/exploring-end-to-end-business-processes-in-sap-business-suite-fr",
+              sapResultOfficial: false,
+            }),
+          } as Response;
+        }
+
+        if (url.endsWith("/api/v1/me/sap-iee2e-self-report") && method === "PUT") {
+          const body = typeof init?.body === "string" ? JSON.parse(init.body) : {};
+          const semaineZero = body.semaineZero ?? {
+            universalId: false,
+            learningHub: false,
+            iee2eOpened: false,
+            noSharedAccount: false,
+            contingencyAck: false,
+          };
+          return {
+            ok: true,
+            json: async () => ({
+              ...body,
+              lastDeclaredAt: "2026-08-20T15:00:00.000Z",
+              lastUpdateLabel: "À l’instant",
+              progressionLabel: "0/9 unités déclarées terminées · unité 1",
+              persisted: true,
+              semaineZero,
+              semaineZeroReady: Object.values(semaineZero).every(Boolean),
+              calendar: {
+                session1Date: null,
+                session1At: null,
+                semaineZeroOpensAt: null,
+                daysUntilSession1: null,
+                windowLabel:
+                  "Date de séance 1 non fixée — Semaine Zéro à planifier (14 à 21 jours avant).",
+              },
+            }),
+          } as Response;
+        }
+
+        if (url.endsWith("/api/v1/professor/sap-iee2e/calendar") && method === "PUT") {
+          const body = typeof init?.body === "string" ? JSON.parse(init.body) : {};
+          return {
+            ok: true,
+            json: async () => ({
+              session1Date: body.session1Date,
+              session1At: `${body.session1Date}T12:00:00.000Z`,
+              semaineZeroOpensAt: "2026-08-18T12:00:00.000Z",
+              daysUntilSession1: 19,
+              windowLabel: `Séance 1 dans 19 j — confirmer l’accès SAP avant le cours.`,
+            }),
+          } as Response;
+        }
+
         if (url.includes("/api/v1/me/analytics/exceptions") && method === "GET") {
           return {
             ok: true,
@@ -341,6 +501,10 @@ describe("navigation and placeholders", () => {
     expect(screen.getByTestId("workspace-nav-account")).toBeInTheDocument();
     expect(screen.queryByTestId("workspace-sidebar-link-administration")).not.toBeInTheDocument();
     expect(screen.queryByTestId("workspace-sidebar-link-portail-professeur")).not.toBeInTheDocument();
+    expect(screen.getByTestId("workspace-sidebar-link-parcours-sap-iee2e")).toHaveTextContent(
+      "Parcours SAP",
+    );
+    expect(screen.getByTestId("learner-home-sap-iee2e")).toBeInTheDocument();
     expect(screen.queryByText("Accès actif")).not.toBeInTheDocument();
     expect(screen.queryByText("Accès en préparation")).not.toBeInTheDocument();
 
@@ -380,6 +544,21 @@ describe("navigation and placeholders", () => {
     });
 
     expect(screen.queryByTestId("workspace-empty-state-badge")).not.toBeInTheDocument();
+  });
+
+  it("opens the SAP IEE2E accompaniment app inside the workspace shell", async () => {
+    renderWorkspace("/workspace/apps/parcours-sap-iee2e");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("sap-iee2e-poc-root")).toBeInTheDocument();
+    });
+
+    expect(screen.getByTestId("sap-iee2e-poc-root")).toHaveAttribute("data-embedded", "true");
+    expect(screen.getByText("Exploring End-to-End Business Processes in SAP Business Suite")).toBeInTheDocument();
+    expect(screen.getByTestId("poc-semaine-zero")).toHaveTextContent(/Semaine Zéro incomplète/i);
+    expect(screen.queryByTestId("workspace-empty-state-badge")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Suivi professeur" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Mon parcours SAP" })).toBeInTheDocument();
   });
 });
 

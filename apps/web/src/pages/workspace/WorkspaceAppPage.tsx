@@ -19,6 +19,7 @@ import { EmployeeProfilePage } from "./EmployeeProfilePage.js";
 import { InboxAppPage } from "./InboxAppPage.js";
 import { MissionCenterPage } from "./MissionCenterPage.js";
 import { OrganizationalErpPage } from "./OrganizationalErpPage.js";
+import { SapIee2eWorkspacePage } from "./SapIee2eWorkspacePage.js";
 import { TasksAppPage } from "./TasksAppPage.js";
 import { TransactionWorkspacePage } from "./transactions/TransactionWorkspacePage.js";
 
@@ -55,6 +56,10 @@ export function WorkspaceAppPage(): ReactNode {
 
   if (appId === "erp") {
     return <OrganizationalErpPage />;
+  }
+
+  if (appId === "parcours-sap-iee2e") {
+    return <SapIee2eWorkspacePage />;
   }
 
   if (appId === "documents") {

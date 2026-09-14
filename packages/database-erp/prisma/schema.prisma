@@ -101,9 +101,91 @@ model Employee {
   professorInterventions     ProfessorIntervention[]
   studentMissionReflections  StudentMissionReflection[]
   pedagogicalRunAudits       PedagogicalCourseRunAudit[] @relation("PedagogicalRunAuditActor")
+  sapIee2eSelfReport         SapIee2eSelfReport?
+  sapIee2eTeachingCalendar   SapIee2eTeachingCalendar?
+  sapIee2eNotesAuthored      SapIee2eProfessorNote[]     @relation("SapIee2eNoteAuthor")
+  sapIee2eNotesReceived      SapIee2eProfessorNote[]     @relation("SapIee2eNoteStudent")
 
   @@index([companyId])
   @@map("employee")
+}
+
+/// Student-declared accompaniment of the official SAP Suite End to End path.
+/// TEC.ERP does not read, scrape, or certify SAP Learning progress.
+model SapIee2eSelfReport {
+  id                   String    @id @default(cuid())
+  employeeId           String    @unique
+  currentUnit          Int
+  sessionNumber        Int
+  currentStageCode     String    @default("S1")
+  institutionalStatus  String    @default("not_started")
+  sapAccess            String
+  difficulty           String    @default("")
+  needsSupport         Boolean   @default(false)
+  note                 String    @default("")
+  achievement          String
+  unitsJson            Json
+  stagesJson           Json      @default("[]")
+  evidenceJson         Json      @default("[]")
+  semaineZeroJson      Json      @default("{}")
+  startedAt            DateTime?
+  lastDeclaredAt       DateTime
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  @@index([needsSupport])
+  @@index([institutionalStatus])
+  @@map("sap_iee2e_self_report")
+}
+
+/// Internal professor observation — never an official SAP result.
+model SapIee2eProfessorNote {
+  id                String   @id @default(cuid())
+  professorId       String
+  studentEmployeeId String
+  stageCode         String?
+  note              String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  professor Employee @relation("SapIee2eNoteAuthor", fields: [professorId], references: [id])
+  student   Employee @relation("SapIee2eNoteStudent", fields: [studentEmployeeId], references: [id])
+
+  @@index([studentEmployeeId])
+  @@index([professorId])
+  @@map("sap_iee2e_professor_note")
+}
+
+/// Associates an existing TEC.ERP cohort with an external institutional program.
+model ExternalProgramAssignment {
+  id                   String   @id @default(cuid())
+  cohortId             String
+  programCode          String
+  language             String   @default("fr")
+  institutionalStatus  String   @default("active")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  cohort Cohort @relation(fields: [cohortId], references: [id])
+
+  @@unique([cohortId, programCode])
+  @@index([programCode])
+  @@map("external_program_assignment")
+}
+
+/// Professor-declared Collège session 1 date — opens the Semaine Zéro window.
+model SapIee2eTeachingCalendar {
+  id          String   @id @default(cuid())
+  professorId String   @unique
+  session1At  DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  professor Employee @relation(fields: [professorId], references: [id])
+
+  @@map("sap_iee2e_teaching_calendar")
 }
 
 /// Per-employee read state for a static inbox message (content lives in code).
@@ -508,9 +590,10 @@ model Cohort {
   updatedAt DateTime @updatedAt
 
   company               Company                @relation(fields: [companyId], references: [id])
-  memberships           CohortMembership[]
-  certificates          Certificate[]
-  pedagogicalCourseRuns PedagogicalCourseRun[]
+  memberships                  CohortMembership[]
+  certificates                 Certificate[]
+  pedagogicalCourseRuns        PedagogicalCourseRun[]
+  externalProgramAssignments   ExternalProgramAssignment[]
 
   @@index([companyId])
   @@map("cohort")
