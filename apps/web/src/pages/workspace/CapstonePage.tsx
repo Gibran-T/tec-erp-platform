@@ -180,7 +180,7 @@ export function CapstonePage(): ReactElement {
 
   return (
     <main className="workspace-page living-capstone" data-testid="capstone-page">
-      <h1>MCapstone — Projet intégrateur Equinoxe</h1>
+      <h1>Capstone — Projet intégrateur Equinoxe</h1>
       {runContext ? (
         <p data-testid="capstone-run-context">
           {runContext}

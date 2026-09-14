@@ -8,9 +8,15 @@ import { ROLE_LABELS } from "../../workspace/workspaceCopy.js";
 export interface EmployeeBadgeMenuProps {
   readonly employee: AuthenticatedEmployee;
   readonly onLogout: () => void;
+  /** Avatar-only trigger; identity is shown elsewhere in the compact shell. */
+  readonly compact?: boolean;
 }
 
-export function EmployeeBadgeMenu({ employee, onLogout }: EmployeeBadgeMenuProps): ReactNode {
+export function EmployeeBadgeMenu({
+  employee,
+  onLogout,
+  compact = false,
+}: EmployeeBadgeMenuProps): ReactNode {
   const [open, setOpen] = useState(false);
   const initials = getEmployeeInitials(employee.displayName);
 
@@ -18,16 +24,21 @@ export function EmployeeBadgeMenu({ employee, onLogout }: EmployeeBadgeMenuProps
     <div className="workspace-employee-badge" data-testid="employee-badge-menu">
       <button
         type="button"
-        className="workspace-employee-badge__trigger"
+        className={`workspace-employee-badge__trigger${compact ? " workspace-employee-badge__trigger--compact" : ""}`}
         aria-expanded={open}
         aria-haspopup="menu"
+        aria-label={`${employee.displayName} — ${ROLE_LABELS[employee.role]}`}
         onClick={() => setOpen((current) => !current)}
         data-testid="employee-badge-trigger"
       >
         <span className="workspace-employee-badge__avatar" aria-hidden="true">
           {initials}
         </span>
-        <span className="workspace-employee-badge__identity" data-testid="employee-identity">
+        <span
+          className="workspace-employee-badge__identity"
+          data-testid="employee-identity"
+          hidden={compact}
+        >
           <span className="workspace-employee-badge__name">{employee.displayName}</span>
           <span className="workspace-employee-badge__meta">
             {employee.employeeNumber} · {ROLE_LABELS[employee.role]}

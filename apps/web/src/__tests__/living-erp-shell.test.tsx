@@ -111,7 +111,7 @@ describe("Living ERP shell and preferences", () => {
     });
   });
 
-  it("collapses the context panel from the top bar", async () => {
+  it("defaults the context panel collapsed and expands from the top bar", async () => {
     stubWorkspaceFetches();
     render(
       <ThemeProvider>
@@ -129,10 +129,13 @@ describe("Living ERP shell and preferences", () => {
       </ThemeProvider>,
     );
 
-    expect(screen.getByTestId("tec-app-shell-right-panel")).toBeVisible();
-    fireEvent.click(screen.getByTestId("toggle-context-panel"));
     await waitFor(() => {
       expect(screen.getByTestId("tec-app-shell")).toHaveClass("tec-app-shell--context-collapsed");
+    });
+    fireEvent.click(screen.getByTestId("toggle-context-panel"));
+    await waitFor(() => {
+      expect(screen.getByTestId("tec-app-shell")).not.toHaveClass("tec-app-shell--context-collapsed");
+      expect(screen.getByTestId("tec-app-shell-right-panel")).toBeVisible();
     });
   });
 

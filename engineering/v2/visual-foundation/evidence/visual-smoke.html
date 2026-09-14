@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>TEC.ERP Visual Foundation Smoke</title>
+  <link rel="stylesheet" href="./living-erp-built.css" />
+  <style>
+    body { margin: 0; }
+    .smoke-root { min-height: 100vh; }
+    .smoke-grid { display: grid; gap: 0.75rem; padding: 1rem; }
+    .signal-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  </style>
+</head>
+<body>
+  <div class="tec-app-shell smoke-root" id="shell">
+    <header class="tec-app-shell__top-nav">
+      <div class="workspace-topbar">
+        <div class="workspace-topbar__left">
+          <div class="workspace-topbar__brand">
+            <span class="workspace-topbar__logo">NordHabitat</span>
+            <span class="workspace-topbar__tagline">Centre d'excellence ERP</span>
+          </div>
+          <div class="workspace-topbar__identity">
+            <span class="workspace-topbar__identity-name">James Timothy</span>
+            <span class="workspace-topbar__identity-meta">#NHE-JAMES</span>
+          </div>
+        </div>
+        <p class="workspace-topbar__context"><strong>James Timothy</strong> · Run 1 · V1 · Historique · 30/30</p>
+        <div class="workspace-topbar__actions">
+          <select aria-label="Langue"><option>FR</option></select>
+          <select aria-label="Thème" id="themeSelect"><option value="light">Clair</option><option value="dark">Sombre</option><option value="system">Système</option></select>
+          <button type="button" id="toggleContext">Afficher le contexte</button>
+        </div>
+      </div>
+    </header>
+    <div class="tec-app-shell__body">
+      <aside class="tec-app-shell__sidebar">
+        <p class="workspace-sidebar__section-title">Parcours</p>
+        <ul class="workspace-sidebar__list">
+          <li><a class="workspace-sidebar__link workspace-sidebar__link--active" href="#">Accueil</a></li>
+          <li><a class="workspace-sidebar__link" href="#">Évaluations</a></li>
+          <li><a class="workspace-sidebar__link" href="#">Capstone</a></li>
+        </ul>
+        <p class="workspace-sidebar__section-title">Opérations ERP</p>
+        <ul class="workspace-sidebar__list">
+          <li><a class="workspace-sidebar__link" href="#">Documents</a></li>
+          <li><a class="workspace-sidebar__link" href="#">Transactions / ERP</a></li>
+        </ul>
+        <p class="workspace-sidebar__section-title">Résultats</p>
+        <ul class="workspace-sidebar__list">
+          <li><a class="workspace-sidebar__link" href="#">Certificats</a></li>
+        </ul>
+      </aside>
+      <main class="tec-app-shell__main">
+        <div class="smoke-grid">
+          <section class="living-home-section living-home-section--primary">
+            <h1 class="living-type-page">Poste de travail</h1>
+            <p class="living-lede">Parcours historique en lecture seule. Consultez vos missions, preuves et Capstone.</p>
+            <div class="signal-row">
+              <span class="living-status-chip living-status-chip--green"><span class="living-status-chip__icon"></span><span>Parcours terminé</span></span>
+              <span class="living-status-chip living-status-chip--green"><span class="living-status-chip__icon"></span><span>30/30</span></span>
+              <span class="living-status-chip living-status-chip--gold"><span class="living-status-chip__icon"></span><span>Certificat Or</span></span>
+              <span class="living-status-chip living-status-chip--gray"><span class="living-status-chip__icon"></span><span>Lecture seule</span></span>
+            </div>
+          </section>
+          <section class="living-home-section living-card--l2">
+            <h2 class="living-type-section">Signaux vivants</h2>
+            <div class="signal-row">
+              <span class="living-signal living-signal--green"><span class="living-signal__light"></span><span>Terminé</span></span>
+              <span class="living-signal living-signal--yellow"><span class="living-signal__light"></span><span>Révision requise</span></span>
+              <span class="living-signal living-signal--red"><span class="living-signal__light"></span><span>Bloqué</span></span>
+              <span class="living-signal living-signal--blue"><span class="living-signal__light"></span><span>Actif</span></span>
+              <span class="living-signal living-signal--purple"><span class="living-signal__light"></span><span>Coach IA</span></span>
+              <span class="living-signal living-signal--gold"><span class="living-signal__light"></span><span>Certifié</span></span>
+            </div>
+          </section>
+          <section class="workspace-app-launcher workspace-app-launcher--compact living-card living-card--l3">
+            <h2>Accès rapide</h2>
+            <div class="workspace-app-launcher__grid">
+              <a class="workspace-app-tile workspace-app-tile--day1" href="#"><span class="workspace-app-tile__label">Documents</span></a>
+              <a class="workspace-app-tile workspace-app-tile--day1" href="#"><span class="workspace-app-tile__label">ERP</span></a>
+              <a class="workspace-app-tile workspace-app-tile--day1" href="#"><span class="workspace-app-tile__label">Coach IA</span></a>
+            </div>
+          </section>
+        </div>
+      </main>
+      <aside class="tec-app-shell__right-panel" id="contextPanel">
+        <div class="workspace-context-panel">
+          <h2>Intégration initiale (historique)</h2>
+          <ul class="workspace-context-panel__checklist">
+            <li>Parcours historique — lecture seule</li>
+            <li>Preuves et chronologie disponibles</li>
+            <li>Capstone et certificats consultables</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <script>
+    const shell = document.getElementById('shell');
+    const panel = document.getElementById('contextPanel');
+    const select = document.getElementById('themeSelect');
+    const toggle = document.getElementById('toggleContext');
+    let collapsed = false;
+    function applyTheme(value) {
+      let resolved = value;
+      if (value === 'system') {
+        resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.dataset.theme = resolved;
+      document.documentElement.style.colorScheme = resolved;
+    }
+    select.addEventListener('change', (e) => applyTheme(e.target.value));
+    toggle.addEventListener('click', () => {
+      collapsed = !collapsed;
+      shell.classList.toggle('tec-app-shell--context-collapsed', collapsed);
+      panel.hidden = collapsed;
+      toggle.textContent = collapsed ? 'Afficher le contexte' : 'Réduire le contexte';
+    });
+    applyTheme('light');
+  </script>
+</body>
+</html>

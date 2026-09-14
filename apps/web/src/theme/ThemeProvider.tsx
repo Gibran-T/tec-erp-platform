@@ -61,8 +61,10 @@ export function ThemeProvider({ children }: { readonly children: ReactNode }): R
     }
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     const onChange = (): void => {
-      setResolved(systemTheme());
-      document.documentElement.dataset.theme = systemTheme();
+      const next = systemTheme();
+      setResolved(next);
+      document.documentElement.dataset.theme = next;
+      document.documentElement.style.colorScheme = next;
     };
     media.addEventListener("change", onChange);
     return () => media.removeEventListener("change", onChange);
