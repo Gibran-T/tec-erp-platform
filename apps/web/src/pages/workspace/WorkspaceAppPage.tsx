@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
 import { EmptyStateCard } from "../../components/workspace/EmptyStateCard.js";
-import { getWorkspaceApp } from "../../workspace/appRegistry.js";
+import { getAppPath, getWorkspaceApp } from "../../workspace/appRegistry.js";
+import { isSapAnalysteSofaApp } from "../../workspace/sapAnalysteProduct.js";
 import {
   ACCESS_PREPARING_LABEL,
   EMPTY_STATE_COPY,
@@ -28,6 +29,10 @@ export function WorkspaceAppPage(): ReactNode {
 
   if (!appId) {
     return <Navigate to="/workspace" replace />;
+  }
+
+  if (!isSapAnalysteSofaApp(appId)) {
+    return <Navigate to={getAppPath("parcours-sap-iee2e")} replace />;
   }
 
   if (appId === "profil") {

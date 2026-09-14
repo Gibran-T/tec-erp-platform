@@ -3,9 +3,11 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { AppRoutes } from "../App.js";
 import { AuthProvider } from "../auth/AuthContext.js";
 import { saveStoredTokens } from "../api/auth.js";
+import { WorkspaceLayout } from "../layouts/WorkspaceLayout.js";
+import { MissionCenterPage } from "../pages/workspace/MissionCenterPage.js";
+import { Route, Routes } from "react-router-dom";
 
 const FORBIDDEN_VOCABULARY =
   /\b(course|cours|lms|simulation|learner|apprenant|student|étudiant|leçon|module|quiz|score|certification|points)\b/i;
@@ -679,7 +681,11 @@ function renderWorkspace(initialEntry: string): void {
   render(
     <AuthProvider skipRestore initialEmployee={demoEmployee}>
       <MemoryRouter initialEntries={[initialEntry]}>
-        <AppRoutes />
+        <Routes>
+          <Route element={<WorkspaceLayout />}>
+            <Route path="workspace/apps/centre-mission" element={<MissionCenterPage />} />
+          </Route>
+        </Routes>
       </MemoryRouter>
     </AuthProvider>,
   );
@@ -774,15 +780,17 @@ describe("mission center experience", () => {
 
   it("keeps Mission actuelle separate from the Day-1 checklist", async () => {
     mockMissionWorkspace({ unlocked: true, status: "available" });
-    renderWorkspace("/workspace");
+    renderWorkspace("/workspace/apps/centre-mission");
 
     await waitFor(() => {
       expect(screen.getByTestId("workspace-context-mission")).toBeInTheDocument();
     });
 
     const checklist = screen.getByTestId("workspace-context-checklist");
-    expect(checklist.textContent).not.toContain("Mission disponible");
-    expect(within(screen.getByTestId("workspace-context-mission")).getByText("Mission disponible")).toBeInTheDocument();
+    expect(checklist.textContent).not.toContain("Analyste ERP SAP");
+    expect(
+      within(screen.getByTestId("workspace-context-mission")).getByText("Analyste ERP SAP"),
+    ).toBeInTheDocument();
   });
 
   it("shows backend validation errors on submit", async () => {

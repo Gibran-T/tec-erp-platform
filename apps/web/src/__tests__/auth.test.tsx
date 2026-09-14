@@ -81,7 +81,7 @@ describe("sign-in experience", () => {
     });
 
     expect(screen.getByTestId("workspace-welcome-message")).toHaveTextContent(
-      "Bienvenue chez NordHabitat, Analyste Démo.",
+      "Bienvenue, Analyste Démo.",
     );
     expect(screen.getByTestId("employee-identity")).toHaveTextContent("#NHE-DEMO");
   });

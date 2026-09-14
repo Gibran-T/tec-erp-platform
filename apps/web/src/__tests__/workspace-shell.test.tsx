@@ -468,7 +468,8 @@ describe("employee identity from session", () => {
     const occurrences = (unified.textContent?.match(/Analyste Démo/g) ?? []).length;
     expect(occurrences).toBe(1);
     expect(screen.queryByText("MCapstone")).not.toBeInTheDocument();
-    expect(screen.getByTestId("workspace-sidebar-link-capstone")).toHaveTextContent("Capstone");
+    expect(screen.queryByTestId("workspace-sidebar-link-capstone")).not.toBeInTheDocument();
+    expect(screen.getByTestId("workspace-sidebar-link-parcours-sap-iee2e")).toBeInTheDocument();
   });
 
   it("renders session data on the employee profile page", async () => {
@@ -496,8 +497,8 @@ describe("navigation and placeholders", () => {
     });
 
     expect(screen.getByTestId("workspace-nav-parcours")).toBeInTheDocument();
-    expect(screen.getByTestId("workspace-nav-operations")).toBeInTheDocument();
-    expect(screen.getByTestId("workspace-nav-results")).toBeInTheDocument();
+    expect(screen.queryByTestId("workspace-nav-operations")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("workspace-nav-results")).not.toBeInTheDocument();
     expect(screen.getByTestId("workspace-nav-account")).toBeInTheDocument();
     expect(screen.queryByTestId("workspace-sidebar-link-administration")).not.toBeInTheDocument();
     expect(screen.queryByTestId("workspace-sidebar-link-portail-professeur")).not.toBeInTheDocument();
@@ -514,36 +515,20 @@ describe("navigation and placeholders", () => {
     }
   });
 
-  it("renders the manager inbox on the boîte de réception app page", async () => {
+  it("redirects retired NordHabitat apps to the SAP sofa", async () => {
     renderWorkspace("/workspace/apps/boite-reception");
 
     await waitFor(() => {
-      expect(screen.getByTestId("inbox-app-page")).toBeInTheDocument();
-    });
-
-    expect(screen.getByTestId("inbox-message-premier-message-gestionnaire")).toHaveTextContent(
-      "Claire Fontaine",
-    );
-  });
-
-  it("shows preparing access badge for restricted apps", async () => {
-    renderWorkspace("/workspace/apps/calendrier");
-
-    await waitFor(() => {
-      expect(screen.getByTestId("workspace-empty-state-badge")).toHaveTextContent(
-        "Accès en préparation",
-      );
+      expect(screen.getByTestId("sap-iee2e-poc-root")).toBeInTheDocument();
     });
   });
 
-  it("routes the Day-1-gated ERP app to the organizational ERP page, not the preparing fallback", async () => {
+  it("redirects the former ERP simulation app to the SAP sofa", async () => {
     renderWorkspace("/workspace/apps/erp");
 
     await waitFor(() => {
-      expect(screen.getByTestId("organization-erp-page")).toBeInTheDocument();
+      expect(screen.getByTestId("sap-iee2e-poc-root")).toBeInTheDocument();
     });
-
-    expect(screen.queryByTestId("workspace-empty-state-badge")).not.toBeInTheDocument();
   });
 
   it("opens the SAP IEE2E accompaniment app inside the workspace shell", async () => {

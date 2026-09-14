@@ -1,5 +1,7 @@
 import type { EmployeeRole } from "@tec-platform/contracts";
 
+import { isSapAnalysteSofaApp } from "./sapAnalysteProduct.js";
+
 export type WorkspaceAppAccess = "day1" | "preparing";
 
 export interface WorkspaceAppDefinition {
@@ -35,10 +37,10 @@ export const WORKSPACE_APPS: readonly WorkspaceAppDefinition[] = [
   },
   {
     id: "parcours-sap-iee2e",
-    label: "Parcours SAP",
+    label: "Mon parcours SAP",
     access: "day1",
-    sidebarOrder: 6,
-    launcherOrder: 6,
+    sidebarOrder: 2,
+    launcherOrder: 2,
   },
   { id: "erp", label: "ERP", access: "day1", sidebarOrder: 7, launcherOrder: 7 },
   {
@@ -120,6 +122,7 @@ export function getWorkspaceApp(appId: string): WorkspaceAppDefinition | undefin
 export function getSidebarApps(role?: EmployeeRole): WorkspaceAppDefinition[] {
   return [...WORKSPACE_APPS]
     .filter((app) => app.access === "day1")
+    .filter((app) => isSapAnalysteSofaApp(app.id))
     .filter((app) => (role ? isWorkspaceAppVisibleToRole(app, role) : true))
     .sort((left, right) => left.sidebarOrder - right.sidebarOrder);
 }
@@ -127,6 +130,7 @@ export function getSidebarApps(role?: EmployeeRole): WorkspaceAppDefinition[] {
 export function getLauncherApps(role?: EmployeeRole): WorkspaceAppDefinition[] {
   return [...WORKSPACE_APPS]
     .filter((app) => app.access === "day1")
+    .filter((app) => isSapAnalysteSofaApp(app.id))
     .filter((app) => (role ? isWorkspaceAppVisibleToRole(app, role) : true))
     .sort((left, right) => left.launcherOrder - right.launcherOrder);
 }

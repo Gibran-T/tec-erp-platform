@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useSearchParams } from "react-router-dom";
 import type {
   SapIee2eCalendarView,
   SapIee2eSelfReport,
@@ -49,7 +50,10 @@ function toUiReport(report: SapIee2eSelfReport): StudentSelfReport {
 
 export function SapIee2eWorkspacePage(): ReactNode {
   const { employee } = useAuth();
-  const professorView = employee?.role === "PROFESSOR" || employee?.role === "ADMIN";
+  const [searchParams, setSearchParams] = useSearchParams();
+  const canTeach = employee?.role === "PROFESSOR" || employee?.role === "ADMIN";
+  const professorView = canTeach && searchParams.get("vue") === "professeur";
+  const previewAsStudent = canTeach && !professorView;
   const [report, setReport] = useState<StudentSelfReport | null>(null);
   const [calendar, setCalendar] = useState<SapIee2eCalendarView | undefined>(undefined);
   const [cohortRows, setCohortRows] = useState<CohortStudentRow[] | undefined>(undefined);
@@ -65,14 +69,16 @@ export function SapIee2eWorkspacePage(): ReactNode {
         const program = await getSapSuiteProgramCatalog();
         if (cancelled) return;
         setCatalog(program);
-        if (professorView) {
-          const [cohort, assignmentList] = await Promise.all([
+        if (canTeach) {
+          const [cohort, assignmentList, ownReport] = await Promise.all([
             getProfessorSapIee2eCohort(),
             getProfessorProgramAssignments(),
+            getMySapIee2eSelfReport(),
           ]);
           if (cancelled) return;
           setCalendar(cohort.calendar);
           setAssignments(assignmentList.assignments);
+          setReport(toUiReport(ownReport));
           setCohortRows(
             cohort.students.map((student) => ({
               id: student.employeeId,
@@ -110,7 +116,7 @@ export function SapIee2eWorkspacePage(): ReactNode {
     return () => {
       cancelled = true;
     };
-  }, [professorView]);
+  }, [canTeach]);
 
   const persistReport = useCallback(async (next: StudentSelfReport) => {
     const saved = await saveMySapIee2eSelfReport({
@@ -218,6 +224,10 @@ export function SapIee2eWorkspacePage(): ReactNode {
       cohortRows={professorView ? (cohortRows ?? []) : undefined}
       assignments={assignments}
       officialUrl={catalog.officialUrl}
+      liveCohort={canTeach}
+      allowStudentPreview={professorView}
+      onPreviewStudent={professorView ? () => setSearchParams({}) : undefined}
+      onReturnProfessor={previewAsStudent ? () => setSearchParams({ vue: "professeur" }) : undefined}
       onPersistReport={professorView ? undefined : persistReport}
       onPersistCalendar={professorView ? persistCalendar : undefined}
       onPersistNote={professorView ? persistNote : undefined}

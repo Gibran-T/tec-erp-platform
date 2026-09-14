@@ -10,7 +10,6 @@ import { LoginPage } from "./pages/LoginPage.js";
 import { NotFoundPage } from "./pages/NotFoundPage.js";
 import { CertificateVerifyPage } from "./pages/public/CertificateVerifyPage.js";
 import { LearnerHomePage } from "./pages/workspace/LearnerHomePage.js";
-import { ModuleHubPage } from "./pages/workspace/modules/ModuleHubPage.js";
 import { WorkspaceAppPage } from "./pages/workspace/WorkspaceAppPage.js";
 import { PlaybackV2Root } from "./playback/v2/PlaybackV2Root.js";
 import { SapIee2ePocApp } from "./poc/sap-iee2e/SapIee2ePocApp.js";
@@ -30,7 +29,10 @@ export function AppRoutes(): ReactNode {
         <Route element={<WorkspaceLayout />}>
           <Route index element={<Navigate to="/workspace" replace />} />
           <Route path="workspace" element={<LearnerHomePage />} />
-          <Route path="workspace/modules/:moduleCode" element={<ModuleHubPage />} />
+          <Route
+            path="workspace/modules/:moduleCode"
+            element={<Navigate to="/workspace/apps/parcours-sap-iee2e" replace />}
+          />
           <Route path="workspace/apps/:appId" element={<WorkspaceAppPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>

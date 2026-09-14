@@ -1,11 +1,12 @@
 import type { AuthenticatedEmployee } from "@tec-platform/contracts";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 
-import { listMyPedagogicalRuns } from "../../api/pedagogical-runs.js";
 import { useLocale } from "../../i18n/LocaleProvider.js";
-import type { MessageKey } from "../../i18n/messages/fr.js";
 import { useTheme } from "../../theme/ThemeProvider.js";
-import { NORDHABITAT_TAGLINE } from "../../workspace/workspaceCopy.js";
+import {
+  SAP_ANALYSTE_PROGRAM_SUBTITLE,
+  SAP_ANALYSTE_PROGRAM_TITLE,
+} from "../../workspace/sapAnalysteProduct.js";
 import { EmployeeBadgeMenu } from "./EmployeeBadgeMenu.js";
 
 export interface WorkspaceTopBarProps {
@@ -15,95 +16,25 @@ export interface WorkspaceTopBarProps {
   readonly contextCollapsed?: boolean;
 }
 
-function localizedRunType(
-  run: Record<string, unknown>,
-  t: (key: MessageKey) => string,
-): string {
-  const runType = String(run.runType ?? "");
-  if (runType === "AUTONOMOUS") return t("run.type.AUTONOMOUS");
-  if (runType === "COHORT") return t("run.type.COHORT");
-  if (runType === "REMEDIATION") return t("run.type.REMEDIATION");
-  const label = typeof run.runTypeLabel === "string" ? run.runTypeLabel : "";
-  if (label && !/autonomous zero1/i.test(label)) return label;
-  return "";
-}
-
 export function WorkspaceTopBar({
   employee,
   onLogout,
   onToggleContext,
   contextCollapsed = false,
 }: WorkspaceTopBarProps): ReactNode {
-  const { t, locale, setLocale, statusLabel } = useLocale();
+  const { t, locale, setLocale } = useLocale();
   const { preference, setPreference, resolved } = useTheme();
-  const [runSequence, setRunSequence] = useState("1");
-  const [curriculum, setCurriculum] = useState("—");
-  const [stateLabel, setStateLabel] = useState("—");
-  const [progress, setProgress] = useState<string | null>(null);
-  const [runTypeLabel, setRunTypeLabel] = useState("");
-  const [technicalTitle, setTechnicalTitle] = useState("");
-
-  useEffect(() => {
-    let cancelled = false;
-    void listMyPedagogicalRuns()
-      .then((runs) => {
-        if (cancelled) return;
-        const active = runs.find((run) => run.status === "ACTIVE") ?? runs[runs.length - 1];
-        if (!active) return;
-        const sequence = Number(active.runSequence ?? 1);
-        setRunSequence(String(Number.isFinite(sequence) ? sequence : 1));
-        const curriculumRaw = String(
-          active.curriculumVersionLabel ?? active.curriculumVersion ?? "—",
-        );
-        setCurriculum(curriculumRaw.replace(/^Curriculum\s+/i, "").trim() || curriculumRaw);
-        const historical =
-          Boolean(active.isHistorical) ||
-          active.status === "COMPLETED" ||
-          active.isWritable === false;
-        setStateLabel(
-          historical ? t("status.historical") : statusLabel(String(active.status ?? "ACTIVE")),
-        );
-        if (typeof active.completionPercent === "number") {
-          const completed = Math.round((active.completionPercent / 100) * 30);
-          setProgress(`${completed}/30`);
-        } else {
-          setProgress(null);
-        }
-        setRunTypeLabel(localizedRunType(active as Record<string, unknown>, t));
-        setTechnicalTitle(
-          String(active.runLabel ?? active.runCode ?? `Run ${sequence}`),
-        );
-      })
-      .catch(() => undefined);
-    return () => {
-      cancelled = true;
-    };
-  }, [statusLabel, t]);
 
   const contextLine = useMemo(() => {
-    const curriculumLooksHistorical = /historique|historical/i.test(curriculum);
-    const parts = [
-      employee.displayName,
-      `Run ${runSequence}`,
-      curriculum,
-      curriculumLooksHistorical && /historique|historical/i.test(stateLabel)
-        ? null
-        : stateLabel,
-    ].filter((part): part is string => Boolean(part && part !== "—"));
-    if (progress) parts.push(progress);
-    return parts.join(" · ");
-  }, [curriculum, employee.displayName, progress, runSequence, stateLabel]);
-
-  const contextTitle = [technicalTitle, runTypeLabel, curriculum, stateLabel]
-    .filter(Boolean)
-    .join(" · ");
+    return [employee.displayName, SAP_ANALYSTE_PROGRAM_TITLE].join(" · ");
+  }, [employee.displayName]);
 
   return (
     <div className="workspace-topbar" data-testid="workplace-topbar" data-resolved-theme={resolved}>
       <div className="workspace-topbar__left">
         <div className="workspace-topbar__brand">
-          <span className="workspace-topbar__logo">NordHabitat</span>
-          <span className="workspace-topbar__tagline">{NORDHABITAT_TAGLINE}</span>
+          <span className="workspace-topbar__logo">{SAP_ANALYSTE_PROGRAM_TITLE}</span>
+          <span className="workspace-topbar__tagline">{SAP_ANALYSTE_PROGRAM_SUBTITLE}</span>
         </div>
         <div className="workspace-topbar__identity" data-testid="shell-learner-identity">
           <span className="workspace-topbar__identity-name">{employee.displayName}</span>
@@ -114,7 +45,7 @@ export function WorkspaceTopBar({
       <p
         className="workspace-topbar__context"
         data-testid="shell-unified-context"
-        title={contextTitle}
+        title={contextLine}
         aria-label={contextLine}
       >
         {contextLine}

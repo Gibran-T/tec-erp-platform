@@ -60,7 +60,7 @@ export const enMessages: Record<MessageKey, string> = {
     "Historical journey in read-only mode — no active restart.",
   "home.attention.capstoneLocked": "Capstone locked — regular missions required.",
   "home.attention.capstoneRevision": "Capstone revision requested by the professor.",
-  "login.title": "NordHabitat",
+  "login.title": "Analyste ERP SAP",
   "login.subtitle": "Employee workspace — sign in to open your workstation.",
   "login.email": "Work email",
   "login.password": "Password",

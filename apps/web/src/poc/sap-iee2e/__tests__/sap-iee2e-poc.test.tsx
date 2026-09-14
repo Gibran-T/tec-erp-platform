@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { SapIee2ePocApp } from "../SapIee2ePocApp.js";
 import {
@@ -56,6 +56,8 @@ describe("PoC SAP IEE2E (Étape A)", () => {
     expect(screen.getByTestId("poc-unit-timeline").querySelectorAll("li")).toHaveLength(
       OFFICIAL_UNIT_COUNT,
     );
+    expect(screen.getByTestId("sap-sofa-orientation")).toHaveTextContent(/Trois preuves/i);
+    expect(screen.getByTestId("sap-sofa-orientation")).toHaveTextContent(/Deux tentatives/i);
     expect(
       screen.getByText(/gérés par SAP Learning/i),
     ).toBeInTheDocument();
@@ -156,12 +158,47 @@ describe("PoC SAP IEE2E (Étape A)", () => {
         </Routes>
       </MemoryRouter>,
     );
-    expect(screen.getByRole("heading", { name: "Suivi SAP IEE2E" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Suivi de la cohorte/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Préparation de séance" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Espace de travail" })).not.toBeInTheDocument();
     expect(screen.getByTestId("poc-semaine-zero")).toBeInTheDocument();
     expect(screen.getByTestId("poc-session1-date")).toBeInTheDocument();
     expect(screen.getByTestId("poc-semaine-zero-pending")).toHaveTextContent("Sofia Benali");
+  });
+
+  it("affiche la grille S1–S10 et le filtre accès non confirmé", () => {
+    renderPoc();
+    fireEvent.click(screen.getByRole("button", { name: "Suivi professeur" }));
+    expect(screen.getByTestId("sap-professor-stage-grid")).toHaveTextContent("S1");
+    expect(screen.getByTestId("sap-professor-stage-grid")).toHaveTextContent("S10");
+    fireEvent.click(screen.getByTestId("poc-filter-no-access"));
+    const table = screen.getByRole("table");
+    expect(within(table).getAllByText("Sofia Benali").length).toBeGreaterThan(0);
+    expect(within(table).queryAllByText("Camille Tremblay")).toHaveLength(0);
+  });
+
+  it("permet au professeur de basculer vers l’aperçu du parcours", () => {
+    const onPreview = vi.fn();
+    render(
+      <MemoryRouter initialEntries={["/workspace/apps/parcours-sap-iee2e"]}>
+        <Routes>
+          <Route
+            path="/workspace/apps/parcours-sap-iee2e"
+            element={
+              <SapIee2ePocApp
+                embedded
+                audience="professor"
+                initialView="professeur"
+                allowStudentPreview
+                onPreviewStudent={onPreview}
+              />
+            }
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+    fireEvent.click(screen.getByTestId("sap-professor-preview-student"));
+    expect(onPreview).toHaveBeenCalledTimes(1);
   });
 
   it("affiche la Semaine Zéro dans le parcours étudiant", () => {

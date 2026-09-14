@@ -36,6 +36,7 @@ import {
   SAP_ACHIEVEMENT_LABEL_FR,
 } from "./officialCourse.js";
 import { getSessionTeachingGuide, TEACHING_GOLDEN_RULES } from "./professorCoaching.js";
+import { SapIee2eOrientation } from "./SapIee2eOrientation.js";
 import { SapIee2eReception } from "./SapIee2eReception.js";
 import { SapIee2eSemaineZeroPanel } from "./SapIee2eSemaineZero.js";
 import { getSessionPlan, SESSION_PLANS } from "./sessionPlans.js";
@@ -43,7 +44,13 @@ import "./sap-iee2e-poc.css";
 
 export type SapIee2ePocView = "workspace" | "parcours" | "professeur" | "preparation";
 export type SapIee2eAudience = "demo" | "student" | "professor";
-type CohortFilter = "tous" | "a_accompagner" | "sans_maj" | "non_commence" | "achievement";
+type CohortFilter =
+  | "tous"
+  | "a_accompagner"
+  | "sans_maj"
+  | "non_commence"
+  | "acces_non_confirme"
+  | "achievement";
 type PocTheme = "light" | "dark";
 
 export interface SapIee2ePocAppProps {
@@ -74,6 +81,10 @@ export interface SapIee2ePocAppProps {
     institutionalStatus: SapSuiteProgramAssignment["institutionalStatus"];
     assigned: boolean;
   }) => Promise<void>;
+  readonly liveCohort?: boolean;
+  readonly allowStudentPreview?: boolean;
+  readonly onPreviewStudent?: () => void;
+  readonly onReturnProfessor?: () => void;
 }
 
 function shortUnitTitle(title: string): string {
@@ -116,6 +127,10 @@ export function SapIee2ePocApp({
   onPersistNote,
   onPersistStageReview,
   onPersistAssignment,
+  liveCohort = false,
+  allowStudentPreview = false,
+  onPreviewStudent,
+  onReturnProfessor,
 }: SapIee2ePocAppProps = {}): ReactNode {
   const [view, setView] = useState<SapIee2ePocView>(initialView);
   const [theme, setTheme] = useState<PocTheme>("light");
@@ -218,6 +233,7 @@ export function SapIee2ePocApp({
       if (filter === "a_accompagner" && !row.needsSupport) return false;
       if (filter === "sans_maj" && !row.staleUpdate) return false;
       if (filter === "non_commence" && !row.notStarted) return false;
+      if (filter === "acces_non_confirme" && row.access !== "non_confirme") return false;
       if (filter === "achievement" && row.achievement !== "obtenu_declare") return false;
       if (search.trim() && !row.name.toLowerCase().includes(search.trim().toLowerCase())) {
         return false;
@@ -280,7 +296,11 @@ export function SapIee2ePocApp({
       <div className="sap-iee2e-poc__shell">
         <header className="sap-iee2e-poc__topbar">
           <div className="sap-iee2e-poc__brand">
-            <strong>{embedded ? `TEC.ERP · ${SAP_SUITE_E2E_TITLE}` : "TEC.ERP · PoC visuelle"}</strong>
+            <strong>
+              {embedded
+                ? `Analyste ERP SAP · ${SAP_SUITE_E2E_TITLE}`
+                : "TEC.ERP · PoC visuelle"}
+            </strong>
             <span>Accompagnement institutionnel — le contenu officiel demeure sur SAP Learning</span>
           </div>
           <nav className="sap-iee2e-poc__nav" aria-label="Navigation du parcours SAP">
@@ -300,6 +320,11 @@ export function SapIee2ePocApp({
             >
               Mon parcours SAP
             </button>
+            {onReturnProfessor ? (
+              <button type="button" data-testid="sap-return-professor" onClick={onReturnProfessor}>
+                Retour au suivi professeur
+              </button>
+            ) : null}
             {showProfessorTools ? (
               <>
                 <button
@@ -316,6 +341,15 @@ export function SapIee2ePocApp({
                 >
                   Préparation de séance
                 </button>
+                {allowStudentPreview && onPreviewStudent ? (
+                  <button
+                    type="button"
+                    data-testid="sap-professor-preview-student"
+                    onClick={onPreviewStudent}
+                  >
+                    Voir comme l’étudiant
+                  </button>
+                ) : null}
               </>
             ) : null}
           </nav>
@@ -393,6 +427,10 @@ export function SapIee2ePocApp({
                 urgent={!report.semaineZeroReady}
                 onToggle={toggleSemaineZero}
               />
+            </div>
+
+            <div style={{ marginTop: "1rem" }}>
+              <SapIee2eOrientation />
             </div>
 
             <div className="sap-iee2e-poc__grid-2" style={{ marginTop: "1rem" }}>
@@ -782,10 +820,12 @@ export function SapIee2ePocApp({
         {view === "professeur" && showProfessorTools ? (
           <section data-testid="poc-professor-pack" aria-labelledby="poc-prof-title">
             <h1 id="poc-prof-title" className="sap-iee2e-poc__h1">
-              Suivi SAP IEE2E
+              Suivi de la cohorte — Analyste ERP SAP
             </h1>
             <p className="sap-iee2e-poc__muted">
-              Comfort Pack professeur — cockpit de conduite pédagogique. Données cohorte : MOCK.
+              {liveCohort || cohortRows
+                ? "Données déclarées par les étudiants de votre cohorte. La vérité officielle demeure sur SAP Learning."
+                : "Comfort Pack professeur — données de démonstration (MOCK)."}
             </p>
 
             <article className="sap-iee2e-poc__card sap-iee2e-poc__teach" data-testid="poc-golden-rules">
@@ -822,9 +862,16 @@ export function SapIee2ePocApp({
               <KpiButton
                 label="Accès non confirmé"
                 value={cohortStats.accesNonConfirme}
-                pressed={filter === "non_commence"}
+                pressed={filter === "acces_non_confirme"}
                 title="Étudiants sans confirmation d’accès SAP Learning"
-                onClick={() => setFilter("non_commence")}
+                onClick={() => setFilter("acces_non_confirme")}
+              />
+              <KpiButton
+                label="Semaine Zéro prête"
+                value={cohortStats.semaineZeroReady}
+                pressed={filter === "tous"}
+                title="Semaine Zéro déclarée complète"
+                onClick={() => setFilter("tous")}
               />
               <KpiButton
                 label="Parcours commencé"
@@ -858,6 +905,25 @@ export function SapIee2ePocApp({
             <p className="sap-iee2e-poc__demo-tag">
               Retard estimé selon la dernière déclaration de l’étudiant.
             </p>
+
+            <article className="sap-iee2e-poc__card" data-testid="sap-professor-stage-grid">
+              <h2 className="sap-iee2e-poc__h2">Où en est la cohorte (S1–S10)</h2>
+              <p className="sap-iee2e-poc__muted">
+                Étape institutionnelle déclarée — ce n’est pas le résultat officiel SAP.
+              </p>
+              <div className="sap-iee2e-poc__heat">
+                {SAP_SUITE_E2E_STAGES.map((stage) => {
+                  const count = cohortSource.filter((row) => row.currentStageCode === stage.code)
+                    .length;
+                  return (
+                    <div key={stage.code} className="sap-iee2e-poc__heat-cell">
+                      <strong>{stage.code}</strong>
+                      <span>{count}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </article>
 
             <article className="sap-iee2e-poc__card" data-testid="poc-priorities">
               <h2 className="sap-iee2e-poc__h2">Priorités du professeur</h2>
@@ -937,6 +1003,7 @@ export function SapIee2ePocApp({
                     ["a_accompagner", "À accompagner"],
                     ["sans_maj", "Sans mise à jour"],
                     ["non_commence", "Non commencé"],
+                    ["acces_non_confirme", "Accès non confirmé"],
                     ["achievement", "Achievement obtenu"],
                   ] as const
                 ).map(([id, label]) => (
@@ -944,7 +1011,13 @@ export function SapIee2ePocApp({
                     key={id}
                     type="button"
                     aria-pressed={filter === id}
-                    data-testid={id === "a_accompagner" ? "poc-filter-support" : undefined}
+                    data-testid={
+                      id === "a_accompagner"
+                        ? "poc-filter-support"
+                        : id === "acces_non_confirme"
+                          ? "poc-filter-no-access"
+                          : undefined
+                    }
                     onClick={() => setFilter(id)}
                   >
                     {label}

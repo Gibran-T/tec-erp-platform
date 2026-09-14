@@ -3,9 +3,12 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { AppRoutes } from "../App.js";
 import { AuthProvider } from "../auth/AuthContext.js";
 import { saveStoredTokens } from "../api/auth.js";
+import { WorkspaceLayout } from "../layouts/WorkspaceLayout.js";
+import { InboxAppPage } from "../pages/workspace/InboxAppPage.js";
+import { TasksAppPage } from "../pages/workspace/TasksAppPage.js";
+import { Route, Routes } from "react-router-dom";
 import {
   formatUnreadCountMessage,
   MESSAGE_READ_SUCCESS_FEEDBACK,
@@ -280,12 +283,17 @@ function mockFirstDayFetch(options: MockOptions = {}): ReturnType<typeof vi.fn> 
   return fetchMock;
 }
 
-function renderWorkspace(initialEntry: string): void {
+function renderWorkspace(initialEntry: string): ReturnType<typeof render> {
   seedAuthTokens();
-  render(
+  return render(
     <AuthProvider skipRestore initialEmployee={demoEmployee}>
       <MemoryRouter initialEntries={[initialEntry]}>
-        <AppRoutes />
+        <Routes>
+          <Route element={<WorkspaceLayout />}>
+            <Route path="workspace/apps/boite-reception" element={<InboxAppPage />} />
+            <Route path="workspace/apps/taches" element={<TasksAppPage />} />
+          </Route>
+        </Routes>
       </MemoryRouter>
     </AuthProvider>,
   );
@@ -334,7 +342,7 @@ describe("first-day inbox experience", () => {
     });
 
     expect(screen.getByTestId("workspace-context-checklist")).toHaveTextContent(
-      "En attente : premier message de Claire Fontaine",
+      "Confirmer l’accès SAP Learning",
     );
 
     fireEvent.click(screen.getByTestId("inbox-mark-read-button"));
@@ -346,10 +354,7 @@ describe("first-day inbox experience", () => {
     });
 
     expect(screen.getByTestId("workspace-context-checklist")).toHaveTextContent(
-      "Premier message de Claire Fontaine consulté",
-    );
-    expect(screen.getByTestId("workspace-context-checklist")).toHaveTextContent(
-      "Première responsabilité opérationnelle assignée",
+      "Préparer la Semaine Zéro",
     );
     expect(screen.getByTestId("inbox-unread-summary")).toHaveTextContent(
       "Aucun message professionnel en attente de lecture.",
@@ -505,7 +510,7 @@ describe("first-day tasks experience", () => {
     });
 
     expect(screen.getByTestId("workspace-context-checklist")).toHaveTextContent(
-      "Première responsabilité opérationnelle complétée",
+      "Déclarer votre progression",
     );
     expect(screen.queryByTestId("tasks-initial-loading")).not.toBeInTheDocument();
   });
@@ -612,7 +617,7 @@ describe("first-day shared state and vocabulary", () => {
   it("unlocks tasks in shared state after reading Claire's message", async () => {
     mockFirstDayFetch();
 
-    renderWorkspace("/workspace/apps/boite-reception");
+    const { unmount } = renderWorkspace("/workspace/apps/boite-reception");
 
     await waitFor(() => {
       expect(screen.getByTestId("inbox-mark-read-button")).toBeInTheDocument();
@@ -621,12 +626,11 @@ describe("first-day shared state and vocabulary", () => {
     fireEvent.click(screen.getByTestId("inbox-mark-read-button"));
 
     await waitFor(() => {
-      expect(screen.getByTestId("workspace-context-checklist")).toHaveTextContent(
-        "Première responsabilité opérationnelle assignée",
-      );
+      expect(screen.getByTestId("inbox-read-confirmation")).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByTestId("workspace-sidebar-link-taches"));
+    unmount();
+    renderWorkspace("/workspace/apps/taches");
 
     await waitFor(() => {
       expect(screen.getByTestId("task-card-decouvrir-nordhabitat")).toBeInTheDocument();
