@@ -1,0 +1,349 @@
+/* Analyste ERP SAP — institutional workstation entrance.
+   Fiori-like shell language. No SAP trademarks or copied assets. */
+
+.living-login {
+  --login-navy: #071422;
+  --login-navy-mid: #0c243c;
+  --login-horizon: #0a6ed1;
+  --login-horizon-deep: #0854a0;
+  --login-card: #ffffff;
+  --login-card-text: #12263a;
+  --login-card-muted: #5b6b7c;
+  --login-card-border: #d5e1ec;
+  --login-field-bg: #f7fafc;
+  --login-brief-text: #f3f7fb;
+  --login-brief-muted: rgba(243, 247, 251, 0.72);
+  --login-chrome: #061018;
+  --login-shadow: 0 1px 2px rgba(7, 20, 34, 0.08), 0 18px 40px rgba(7, 20, 34, 0.22);
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  color: var(--login-brief-text);
+  font-family: var(--font-ui, "Segoe UI", "Helvetica Neue", Arial, sans-serif);
+  background:
+    radial-gradient(ellipse 80% 55% at 12% 18%, rgba(10, 110, 209, 0.28), transparent 58%),
+    radial-gradient(ellipse 50% 40% at 88% 88%, rgba(8, 84, 160, 0.2), transparent 55%),
+    linear-gradient(165deg, var(--login-navy) 0%, var(--login-navy-mid) 52%, #0a1c30 100%);
+}
+
+[data-theme="light"] .living-login,
+.living-login[data-resolved-theme="light"] {
+  --login-card: #ffffff;
+  --login-card-text: #12263a;
+  --login-card-muted: #5b6b7c;
+  --login-card-border: #d5e1ec;
+  --login-field-bg: #f4f8fb;
+}
+
+[data-theme="dark"] .living-login,
+.living-login[data-resolved-theme="dark"] {
+  --login-card: #152333;
+  --login-card-text: #e8eef4;
+  --login-card-muted: #9aa8b5;
+  --login-card-border: #2c4054;
+  --login-field-bg: #101c28;
+  --login-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 18px 40px rgba(0, 0, 0, 0.35);
+  background:
+    radial-gradient(ellipse 80% 55% at 12% 18%, rgba(77, 163, 255, 0.16), transparent 58%),
+    radial-gradient(ellipse 50% 40% at 88% 88%, rgba(10, 110, 209, 0.14), transparent 55%),
+    linear-gradient(165deg, #050b12 0%, #0a1622 52%, #0b1a28 100%);
+}
+
+.living-login__horizon {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 20%, transparent 78%);
+}
+
+.living-login__chrome {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 3.25rem;
+  padding: 0.65rem 1.25rem;
+  background: #061018;
+  border-bottom: 2px solid var(--login-horizon);
+}
+
+.living-login__lockup {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.living-login__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.35rem;
+  background: var(--login-horizon);
+  color: #f7fbff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.living-login__lockup-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.living-login__institution {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(243, 247, 251, 0.68);
+}
+
+.living-login__chrome-product {
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: #f7fbff;
+}
+
+.living-login__controls {
+  flex-wrap: nowrap;
+}
+
+.living-login .living-login__controls select {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: #102033;
+  color: #f7fbff;
+  border-radius: 0.3rem;
+}
+
+.living-login__stage {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(20rem, 24.5rem);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  align-items: center;
+  width: min(72rem, calc(100% - 2.5rem));
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vh, 3rem) 0 clamp(2rem, 5vh, 3.5rem);
+}
+
+.living-login__brief h1 {
+  margin: 0.2rem 0 0.45rem;
+  font-size: clamp(2rem, 4vw, 2.85rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  color: #ffffff;
+}
+
+.living-login__kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8ec5ff;
+}
+
+.living-login__program {
+  margin: 0 0 1.1rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: rgba(243, 247, 251, 0.92);
+}
+
+.living-login__orientation {
+  margin: 0;
+  max-width: 36rem;
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: var(--login-brief-muted);
+}
+
+.living-login__suite {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 1.6rem 0 0;
+  padding: 0;
+}
+
+.living-login__suite li {
+  min-width: 2.4rem;
+  padding: 0.28rem 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.3rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(243, 247, 251, 0.62);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.living-login__panel {
+  min-width: 0;
+}
+
+.living-login__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+  padding: 1.45rem 1.4rem 1.35rem;
+  border: 1px solid var(--login-card-border);
+  border-left: 3px solid var(--login-horizon);
+  border-radius: 0.5rem;
+  background: var(--login-card);
+  box-shadow: var(--login-shadow);
+  color: var(--login-card-text);
+}
+
+.living-login__form-kicker {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--login-horizon);
+}
+
+.living-login__form-lead {
+  margin: -0.45rem 0 0.1rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--login-card-text);
+}
+
+.living-login__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.living-login__field label {
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--login-card-muted);
+}
+
+.living-login__field input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #8fa6b8;
+  border-radius: 0.35rem;
+  background: var(--login-field-bg);
+  color: var(--login-card-text);
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+[data-theme="dark"] .living-login__field input,
+.living-login[data-resolved-theme="dark"] .living-login__field input {
+  border-color: #4a6276;
+}
+
+.living-login__field input:focus-visible {
+  outline: 2px solid var(--login-horizon);
+  outline-offset: 2px;
+  border-color: var(--login-horizon);
+}
+
+.living-login__error {
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.4rem;
+  background: rgba(187, 0, 0, 0.1);
+  color: #bb0000;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .living-login__error,
+.living-login[data-resolved-theme="dark"] .living-login__error {
+  background: rgba(255, 107, 107, 0.14);
+  color: #ff8a8a;
+}
+
+.living-login__submit {
+  appearance: none;
+  margin-top: 0.15rem;
+  min-height: 2.85rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: var(--login-horizon);
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.living-login__submit:hover:not(:disabled) {
+  background: var(--login-horizon-deep);
+}
+
+.living-login__submit:focus-visible {
+  outline: 2px solid var(--login-horizon);
+  outline-offset: 3px;
+}
+
+.living-login__submit:disabled {
+  opacity: 0.72;
+  cursor: wait;
+}
+
+.living-login__footnote {
+  margin: 0.85rem 0.15rem 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--login-brief-muted);
+}
+
+@media (max-width: 52rem) {
+  .living-login__stage {
+    grid-template-columns: minmax(0, 1fr);
+    width: min(26.5rem, calc(100% - 1.5rem));
+    align-items: start;
+    padding-top: 1.25rem;
+  }
+
+  .living-login__brief h1 {
+    font-size: 1.85rem;
+  }
+
+  .living-login__orientation {
+    font-size: 0.95rem;
+  }
+
+  .living-login__suite {
+    margin-top: 1.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .living-login,
+  .living-login * {
+    transition: none !important;
+  }
+}

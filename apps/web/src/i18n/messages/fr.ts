@@ -59,7 +59,12 @@ export const frMessages = {
   "home.attention.capstoneLocked": "Capstone verrouillé — missions régulières requises.",
   "home.attention.capstoneRevision": "Révision Capstone demandée par le professeur.",
   "login.title": "Analyste ERP SAP",
-  "login.subtitle": "Programme Analyste ERP SAP — connectez-vous pour ouvrir votre parcours.",
+  "login.subtitle": "Parcours SAP Suite End to End",
+  "login.institution": "Collège",
+  "login.orientation":
+    "Vous entrez dans le poste de travail institutionnel. Vous apprenez sur SAP Learning.",
+  "login.access": "Accès au poste de travail",
+  "login.footnote": "TEC.ERP organise le poste de travail. Le contenu officiel demeure sur SAP Learning.",
   "login.email": "Courriel professionnel",
   "login.password": "Mot de passe",
   "login.submit": "Se connecter",

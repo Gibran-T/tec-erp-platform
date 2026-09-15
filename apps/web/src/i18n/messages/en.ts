@@ -61,7 +61,12 @@ export const enMessages: Record<MessageKey, string> = {
   "home.attention.capstoneLocked": "Capstone locked — regular missions required.",
   "home.attention.capstoneRevision": "Capstone revision requested by the professor.",
   "login.title": "Analyste ERP SAP",
-  "login.subtitle": "Employee workspace — sign in to open your workstation.",
+  "login.subtitle": "SAP Suite End to End path",
+  "login.institution": "College",
+  "login.orientation":
+    "You are entering the institutional workstation. You learn on SAP Learning.",
+  "login.access": "Workstation access",
+  "login.footnote": "TEC.ERP organizes the workstation. Official content remains on SAP Learning.",
   "login.email": "Work email",
   "login.password": "Password",
   "login.submit": "Sign in",

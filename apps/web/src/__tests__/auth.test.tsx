@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { AppRoutes } from "../App.js";
 import { AuthProvider } from "../auth/AuthContext.js";
+import { LocaleProvider } from "../i18n/LocaleProvider.js";
 
 const FORBIDDEN_VOCABULARY =
   /\b(course|cours|lms|simulation|learner|apprenant|student|étudiant|leçon|module)\b/i;
@@ -44,8 +45,16 @@ describe("sign-in experience", () => {
     );
 
     expect(screen.getByTestId("login-page")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Analyste ERP SAP" })).toBeInTheDocument();
+    expect(screen.getAllByText("Parcours SAP Suite End to End").length).toBeGreaterThan(0);
+    expect(
+      screen.getByText(
+        "Vous entrez dans le poste de travail institutionnel. Vous apprenez sur SAP Learning.",
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText("Courriel professionnel")).toBeInTheDocument();
     expect(screen.getByLabelText("Mot de passe")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Se connecter" })).toBeInTheDocument();
   });
 
   it("signs the employee in and lands on the enterprise workspace", async () => {
@@ -97,6 +106,24 @@ describe("employee-facing vocabulary", () => {
       </AuthProvider>,
     );
 
+    expect(document.body.textContent ?? "").not.toMatch(FORBIDDEN_VOCABULARY);
+  });
+
+  it("keeps the English sign-in page free of academic / LMS vocabulary", () => {
+    render(
+      <AuthProvider skipRestore initialEmployee={null}>
+        <LocaleProvider>
+          <MemoryRouter initialEntries={["/login"]}>
+            <AppRoutes />
+          </MemoryRouter>
+        </LocaleProvider>
+      </AuthProvider>,
+    );
+
+    fireEvent.change(screen.getByTestId("login-locale-switch"), { target: { value: "en" } });
+
+    expect(screen.getByRole("heading", { name: "Analyste ERP SAP" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Work email")).toBeInTheDocument();
     expect(document.body.textContent ?? "").not.toMatch(FORBIDDEN_VOCABULARY);
   });
 
