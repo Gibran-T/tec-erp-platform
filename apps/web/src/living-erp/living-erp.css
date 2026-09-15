@@ -750,6 +750,12 @@ body {
   color: var(--living-text-secondary);
   font-size: var(--type-body);
   border-left: 2px solid transparent;
+  min-width: 0;
+}
+
+.workspace-sidebar__link span {
+  overflow-wrap: anywhere;
+  line-height: 1.25;
 }
 
 .workspace-sidebar__link--active {
@@ -982,7 +988,7 @@ body {
 
 @media (max-width: 1024px) {
   .tec-app-shell__body {
-    grid-template-columns: 4.5rem minmax(0, 1fr);
+    grid-template-columns: minmax(10.5rem, 12.5rem) minmax(0, 1fr);
   }
 
   .workspace-sidebar__heading,
@@ -1018,8 +1024,11 @@ body {
 }
 
 @media (max-width: 768px) {
-  .tec-app-shell__body {
-    grid-template-columns: 1fr;
+  .tec-app-shell__body,
+  .tec-app-shell--context-collapsed .tec-app-shell__body,
+  .tec-app-shell--nav-collapsed .tec-app-shell__body,
+  .tec-app-shell--nav-collapsed.tec-app-shell--context-collapsed .tec-app-shell__body {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .tec-app-shell__sidebar {
@@ -1028,7 +1037,7 @@ body {
 
   .living-bottom-nav {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
     gap: 0.25rem;
     position: sticky;
     bottom: 0;
@@ -1036,6 +1045,7 @@ body {
     background: var(--living-surface);
     border-top: 1px solid var(--living-border);
     padding: 0.35rem;
+    overflow-x: hidden;
   }
 
   .living-bottom-nav a {
@@ -1043,7 +1053,11 @@ body {
     text-decoration: none;
     color: var(--living-text);
     font-size: 0.65rem;
-    padding: 0.3rem 0.1rem;
+    padding: 0.3rem 0.15rem;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.15;
+    min-width: 0;
   }
 
   .tec-app-shell__main {

@@ -504,6 +504,7 @@ describe("navigation and placeholders", () => {
     expect(screen.getByTestId("workspace-nav-account")).toBeInTheDocument();
     expect(screen.queryByTestId("workspace-sidebar-link-administration")).not.toBeInTheDocument();
     expect(screen.queryByTestId("workspace-sidebar-link-portail-professeur")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("workspace-sidebar-link-suivi-professeur")).not.toBeInTheDocument();
     expect(screen.getByTestId("workspace-sidebar-link-parcours-sap-iee2e")).toHaveTextContent(
       "Parcours SAP",
     );
@@ -545,10 +546,12 @@ describe("navigation and placeholders", () => {
     expect(screen.getByTestId("poc-semaine-zero")).toHaveTextContent(/Semaine Zéro incomplète/i);
     expect(screen.queryByTestId("workspace-empty-state-badge")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Suivi professeur" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Tableau de bord professeur" })).not.toBeInTheDocument();
+    expect(screen.queryByTestId("workspace-sidebar-link-suivi-professeur")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Mon parcours SAP" })).toBeInTheDocument();
   });
 
-  it("opens professor Suivi KPIs after arriving from Parcours SAP", async () => {
+  it("opens professor dashboard KPIs after arriving from Parcours SAP", async () => {
     const professor: AuthenticatedEmployee = {
       ...demoEmployee,
       id: "emp_professor",
@@ -561,6 +564,15 @@ describe("navigation and placeholders", () => {
     await waitFor(() => {
       expect(screen.getByTestId("sap-iee2e-poc-root")).toBeInTheDocument();
     });
+
+    expect(screen.getByTestId("workspace-sidebar-link-suivi-professeur")).toHaveTextContent(
+      "Tableau de bord professeur",
+    );
+    expect(screen.getByTestId("workspace-sidebar-link-accueil")).toHaveTextContent("Accueil");
+    expect(screen.getByTestId("workspace-sidebar-link-parcours-sap-iee2e")).toHaveTextContent(
+      "Parcours SAP",
+    );
+    expect(screen.getByTestId("workspace-sidebar-link-profil")).toHaveTextContent("Mon profil");
 
     fireEvent.click(screen.getByTestId("workspace-sidebar-link-suivi-professeur"));
 

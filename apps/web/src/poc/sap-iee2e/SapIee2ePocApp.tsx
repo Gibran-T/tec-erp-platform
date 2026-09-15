@@ -329,7 +329,7 @@ export function SapIee2ePocApp({
             </button>
             {onReturnProfessor ? (
               <button type="button" data-testid="sap-return-professor" onClick={onReturnProfessor}>
-                Retour au suivi professeur
+                Retour au tableau de bord professeur
               </button>
             ) : null}
             {showProfessorTools ? (
@@ -339,7 +339,7 @@ export function SapIee2ePocApp({
                   aria-current={view === "professeur" ? "page" : undefined}
                   onClick={() => setView("professeur")}
                 >
-                  Suivi professeur
+                  Tableau de bord professeur
                 </button>
                 <button
                   type="button"

@@ -49,7 +49,9 @@ export function WorkspaceLayout(): ReactNode {
             <Link to="/workspace">{t("shell.home")}</Link>
             <Link to={getAppPath("parcours-sap-iee2e")}>Parcours SAP</Link>
             {canTeach ? (
-              <Link to={`${getAppPath("parcours-sap-iee2e")}?vue=professeur`}>Suivi</Link>
+              <Link to={`${getAppPath("parcours-sap-iee2e")}?vue=professeur`}>
+                {t("shell.professorDashboard")}
+              </Link>
             ) : null}
             <Link to={getAppPath("profil")}>{t("shell.profile")}</Link>
           </nav>

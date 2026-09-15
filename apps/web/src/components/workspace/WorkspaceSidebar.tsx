@@ -37,7 +37,7 @@ export function WorkspaceSidebar(): ReactNode {
   if (canTeach) {
     parcours.push({
       id: "suivi-professeur",
-      label: "Suivi",
+      label: t("shell.professorDashboard"),
       path: `${getAppPath("parcours-sap-iee2e")}?vue=professeur`,
     });
   }

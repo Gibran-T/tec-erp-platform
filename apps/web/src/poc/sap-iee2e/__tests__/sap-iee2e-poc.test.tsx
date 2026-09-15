@@ -81,7 +81,7 @@ describe("PoC SAP IEE2E (Étape A)", () => {
 
   it("expose le Comfort Pack professeur avec filtre À accompagner", () => {
     renderPoc();
-    fireEvent.click(screen.getByRole("button", { name: "Suivi professeur" }));
+    fireEvent.click(screen.getByRole("button", { name: "Tableau de bord professeur" }));
     expect(screen.getByTestId("poc-kpi-strip")).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("poc-filter-support"));
     const table = screen.getByRole("table");
@@ -118,7 +118,7 @@ describe("PoC SAP IEE2E (Étape A)", () => {
 
   it("expose les règles d’or pour enseigner le parcours SAP", () => {
     renderPoc();
-    fireEvent.click(screen.getByRole("button", { name: "Suivi professeur" }));
+    fireEvent.click(screen.getByRole("button", { name: "Tableau de bord professeur" }));
     expect(screen.getByTestId("poc-golden-rules")).toHaveTextContent(
       "SAP enseigne (contenu, quiz, Achievement). Vous médiez la cohorte.",
     );
@@ -150,7 +150,7 @@ describe("PoC SAP IEE2E (Étape A)", () => {
     expect(screen.getByRole("heading", { name: SAP_IEE2E_OFFICIAL_TITLE })).toBeInTheDocument();
     expect(screen.getByTestId("poc-sap-reception")).toBeInTheDocument();
     expect(screen.getAllByText(/vérité officielle sur SAP Learning/i).length).toBeGreaterThan(0);
-    expect(screen.queryByRole("button", { name: "Suivi professeur" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Tableau de bord professeur" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Préparation de séance" })).not.toBeInTheDocument();
   });
 
@@ -200,7 +200,7 @@ describe("PoC SAP IEE2E (Étape A)", () => {
 
   it("affiche la grille S1–S10 et le filtre accès non confirmé", () => {
     renderPoc();
-    fireEvent.click(screen.getByRole("button", { name: "Suivi professeur" }));
+    fireEvent.click(screen.getByRole("button", { name: "Tableau de bord professeur" }));
     expect(screen.getByTestId("sap-professor-stage-grid")).toHaveTextContent("S1");
     expect(screen.getByTestId("sap-professor-stage-grid")).toHaveTextContent("S10");
     fireEvent.click(screen.getByTestId("poc-filter-no-access"));
