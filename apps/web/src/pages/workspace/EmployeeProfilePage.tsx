@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { useAuth } from "../../auth/AuthContext.js";
 import { getEmployeeInitials } from "../../workspace/employeeDisplay.js";
+import { displayInstitutionalAffiliation } from "../../workspace/sapAnalysteProduct.js";
 import { ROLE_LABELS } from "../../workspace/workspaceCopy.js";
 
 function ProfileField({ label, value }: { label: string; value: string }): ReactNode {
@@ -25,7 +26,7 @@ function ProfileContent({ employee }: { employee: AuthenticatedEmployee }): Reac
         </span>
         <div>
           <h1>{employee.displayName}</h1>
-          <p>{employee.companyName}</p>
+          <p>{displayInstitutionalAffiliation(employee.companyName)}</p>
         </div>
       </header>
 
@@ -33,7 +34,7 @@ function ProfileContent({ employee }: { employee: AuthenticatedEmployee }): Reac
         <ProfileField label="nom" value={employee.displayName} />
         <ProfileField label="matricule" value={employee.employeeNumber} />
         <ProfileField label="role" value={ROLE_LABELS[employee.role]} />
-        <ProfileField label="entreprise" value={employee.companyName} />
+        <ProfileField label="entreprise" value={displayInstitutionalAffiliation(employee.companyName)} />
         <ProfileField label="courriel" value={employee.email} />
       </dl>
     </section>

@@ -36,10 +36,10 @@ export function SapIee2eReception({
   const greeting = displayName
     ? `Bienvenue, ${displayName}.`
     : "Bienvenue dans votre parcours SAP.";
-  const officialTileTitle = accueilSafe ? "Parcours officiel SAP" : "Cours officiel SAP";
+  const officialTileTitle = "Parcours officiel SAP";
   const progressNote = accueilSafe
     ? "Progression déclarée — vérité officielle sur SAP Learning"
-    : "Progression déclarée par l’étudiant — vérité officielle sur SAP Learning";
+    : "Progression déclarée — vérité officielle sur SAP Learning";
   const achievementTitle = accueilSafe ? "SAP Achievement" : SAP_ACHIEVEMENT_LABEL_FR;
 
   return (
@@ -127,7 +127,7 @@ export function SapIee2eReception({
             <span className="sap-iee2e-poc__tile-kicker">Suivi</span>
             <span className="sap-iee2e-poc__tile-title">Ma progression</span>
             <span className="sap-iee2e-poc__tile-meta">
-              {currentUnit ? `Unité ${currentUnit} déclarée` : "Déclaration étudiante"}
+              {currentUnit ? `Unité ${currentUnit} déclarée` : "Progression déclarée"}
             </span>
           </a>
         ) : null}

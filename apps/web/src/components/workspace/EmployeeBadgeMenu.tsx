@@ -3,6 +3,7 @@ import { useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 
 import { getEmployeeInitials } from "../../workspace/employeeDisplay.js";
+import { displayInstitutionalAffiliation } from "../../workspace/sapAnalysteProduct.js";
 import { ROLE_LABELS } from "../../workspace/workspaceCopy.js";
 
 export interface EmployeeBadgeMenuProps {
@@ -48,7 +49,9 @@ export function EmployeeBadgeMenu({
 
       {open ? (
         <div className="workspace-employee-badge__menu" role="menu" data-testid="employee-badge-dropdown">
-          <p className="workspace-employee-badge__company">{employee.companyName}</p>
+          <p className="workspace-employee-badge__company">
+            {displayInstitutionalAffiliation(employee.companyName)}
+          </p>
           <Link
             to="/workspace/apps/profil"
             role="menuitem"

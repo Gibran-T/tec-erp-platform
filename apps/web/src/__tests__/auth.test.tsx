@@ -46,15 +46,20 @@ describe("sign-in experience", () => {
 
     expect(screen.getByTestId("login-page")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Analyste ERP SAP" })).toBeInTheDocument();
+    expect(screen.getAllByText("Collège de la Concorde").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Parcours SAP Suite End to End").length).toBeGreaterThan(0);
     expect(
+      screen.getByRole("heading", { name: "Accès à l’espace institutionnel" }),
+    ).toBeInTheDocument();
+    expect(
       screen.getByText(
-        "Vous entrez dans le poste de travail institutionnel. Vous apprenez sur SAP Learning.",
+        "Vous apprenez sur SAP Learning. Le TEC.ERP organise et accompagne votre parcours.",
       ),
     ).toBeInTheDocument();
     expect(screen.getByLabelText("Courriel professionnel")).toBeInTheDocument();
     expect(screen.getByLabelText("Mot de passe")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Se connecter" })).toBeInTheDocument();
+    expect(document.body.textContent ?? "").not.toMatch(/NordHabitat|M1–M10|30 missions/i);
   });
 
   it("signs the employee in and lands on the enterprise workspace", async () => {
@@ -124,7 +129,9 @@ describe("employee-facing vocabulary", () => {
 
     expect(screen.getByRole("heading", { name: "Analyste ERP SAP" })).toBeInTheDocument();
     expect(screen.getByLabelText("Work email")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Institutional workspace access" })).toBeInTheDocument();
     expect(document.body.textContent ?? "").not.toMatch(FORBIDDEN_VOCABULARY);
+    expect(document.body.textContent ?? "").not.toMatch(/NordHabitat|M1–M10|30 missions/i);
   });
 
   it("keeps the authenticated workspace free of academic / LMS vocabulary", async () => {

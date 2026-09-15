@@ -357,7 +357,7 @@ export function SapIee2ePocApp({
               </>
             ) : null}
           </nav>
-          <div className="sap-iee2e-poc__theme" aria-label="Thème de démonstration">
+          <div className="sap-iee2e-poc__theme" aria-label="Thème">
             <button
               type="button"
               aria-pressed={theme === "light"}
@@ -393,7 +393,7 @@ export function SapIee2ePocApp({
               Accueil de l’espace de travail
             </h1>
             <p className="sap-iee2e-poc__muted">
-              Aperçu institutionnel — le parcours SAP apparaît hors des modules M1–M10.
+              Accueil institutionnel — Analyste ERP SAP · Parcours SAP Suite End to End.
             </p>
 
             <SapIee2eReception
@@ -405,10 +405,6 @@ export function SapIee2ePocApp({
               achievement={report.achievement}
               onOpenParcours={() => setView("parcours")}
             />
-
-            <div className="sap-iee2e-poc__module-ghost">
-              Modules TEC.ERP M1–M10 (inchangés — hors portée de cette démonstration)
-            </div>
           </section>
         ) : null}
 
@@ -828,12 +824,29 @@ export function SapIee2ePocApp({
             </h1>
             <p className="sap-iee2e-poc__muted">
               {liveCohort || cohortRows
-                ? "Données déclarées par les étudiants de votre cohorte. La vérité officielle demeure sur SAP Learning."
+                ? "Suivi institutionnel à partir des déclarations. TEC.ERP n’importe pas la progression officielle SAP."
                 : "Comfort Pack professeur — données de démonstration (MOCK)."}
             </p>
 
+            {liveCohort && cohortSource.length === 0 ? (
+              <article
+                className="sap-iee2e-poc__card sap-iee2e-poc__empty-cohort"
+                data-testid="sap-professor-empty-cohort"
+              >
+                <h2 className="sap-iee2e-poc__h2">Aucune personne inscrite pour le moment</h2>
+                <p>
+                  Le suivi institutionnel est prêt. Les accès SAP déclarés, la progression
+                  déclarée, les besoins d’accompagnement et la dernière activité enregistrée
+                  apparaîtront ici dès qu’une personne sera associée à votre cohorte.
+                </p>
+                <p className="sap-iee2e-poc__muted">
+                  Une cohorte vide est un état institutionnel normal avant l’inscription.
+                </p>
+              </article>
+            ) : null}
+
             <article className="sap-iee2e-poc__card sap-iee2e-poc__teach" data-testid="poc-golden-rules">
-              <div className="sap-iee2e-poc__ribbon">Comment enseigner ce cours</div>
+              <div className="sap-iee2e-poc__ribbon">Comment enseigner ce parcours</div>
               <h2 className="sap-iee2e-poc__h2">Règles d’or</h2>
               <ol className="sap-iee2e-poc__gold-rules">
                 {TEACHING_GOLDEN_RULES.map((rule) => (
@@ -864,10 +877,10 @@ export function SapIee2ePocApp({
               style={{ margin: "1rem 0" }}
             >
               <KpiButton
-                label="Accès non confirmé"
+                label="Sans accès SAP déclaré"
                 value={cohortStats.accesNonConfirme}
                 pressed={filter === "acces_non_confirme"}
-                title="Étudiants sans confirmation d’accès SAP Learning"
+                title="Aucun accès SAP Learning déclaré dans TEC.ERP"
                 onClick={() => setFilter("acces_non_confirme")}
               />
               <KpiButton
@@ -892,10 +905,10 @@ export function SapIee2ePocApp({
                 onClick={() => setFilter("sans_maj")}
               />
               <KpiButton
-                label="À accompagner"
+                label="Besoin d’accompagnement"
                 value={cohortStats.aAccompagner}
                 pressed={filter === "a_accompagner"}
-                title="Demandes d’accompagnement déclarées"
+                title="Besoin d’accompagnement déclaré"
                 onClick={() => setFilter("a_accompagner")}
               />
               <KpiButton
@@ -907,7 +920,7 @@ export function SapIee2ePocApp({
               />
             </div>
             <p className="sap-iee2e-poc__demo-tag">
-              Retard estimé selon la dernière déclaration de l’étudiant.
+              Retard estimé selon la dernière activité enregistrée.
             </p>
 
             <article className="sap-iee2e-poc__card" data-testid="sap-professor-stage-grid">
@@ -971,21 +984,23 @@ export function SapIee2ePocApp({
                     </strong>
                     <p className="sap-iee2e-poc__muted">
                       Compte individuel obligatoire — jamais un compte de camarade.
+                      {liveCohort
+                        ? " La relance se fait hors de TEC.ERP, sur le canal institutionnel."
+                        : ""}
                     </p>
                   </div>
-                  <button type="button" className="sap-iee2e-poc__btn sap-iee2e-poc__btn--ghost">
-                    Relancer l’accès (sans envoi réel)
-                  </button>
                 </li>
-                <li>
-                  <div>
-                    <strong>Relancer les accès non confirmés</strong>
-                    <p className="sap-iee2e-poc__muted">Action démonstrative — sans envoi réel.</p>
-                  </div>
-                  <button type="button" className="sap-iee2e-poc__btn sap-iee2e-poc__btn--ghost">
-                    Relancer l’étudiant (démo)
-                  </button>
-                </li>
+                {liveCohort ? null : (
+                  <li>
+                    <div>
+                      <strong>Relancer les accès non confirmés</strong>
+                      <p className="sap-iee2e-poc__muted">Action démonstrative — sans envoi réel.</p>
+                    </div>
+                    <button type="button" className="sap-iee2e-poc__btn sap-iee2e-poc__btn--ghost">
+                      Relancer (démo)
+                    </button>
+                  </li>
+                )}
               </ul>
             </article>
 
@@ -1039,7 +1054,7 @@ export function SapIee2ePocApp({
                       <th scope="col">Statut institutionnel</th>
                       <th scope="col">Unité déclarée</th>
                       <th scope="col">Progression déclarée</th>
-                      <th scope="col">Dernière mise à jour</th>
+                      <th scope="col">Dernière activité enregistrée</th>
                       <th scope="col">Difficulté</th>
                       <th scope="col">Accompagnement</th>
                       <th scope="col">Achievement informé</th>
@@ -1047,14 +1062,24 @@ export function SapIee2ePocApp({
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredCohort.map((row) => (
-                      <CohortRow
-                        key={row.id}
-                        row={row}
-                        selected={selectedStudentId === row.id}
-                        onSelect={() => setSelectedStudentId(row.id)}
-                      />
-                    ))}
+                    {filteredCohort.length === 0 ? (
+                      <tr>
+                        <td colSpan={11}>
+                          {liveCohort && cohortSource.length === 0
+                            ? "Aucune personne associée à la cohorte pour le moment."
+                            : "Aucun résultat pour ce filtre."}
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredCohort.map((row) => (
+                        <CohortRow
+                          key={row.id}
+                          row={row}
+                          selected={selectedStudentId === row.id}
+                          onSelect={() => setSelectedStudentId(row.id)}
+                        />
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>

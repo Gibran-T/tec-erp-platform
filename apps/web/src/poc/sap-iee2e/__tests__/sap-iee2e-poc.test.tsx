@@ -26,7 +26,7 @@ describe("PoC SAP IEE2E (Étape A)", () => {
     expect(screen.getByTestId("sap-iee2e-poc-root")).toBeInTheDocument();
     expect(screen.getByTestId("poc-discovery-card")).toHaveTextContent("Réception SAP");
     expect(screen.getByText(SAP_IEE2E_OFFICIAL_TITLE)).toBeInTheDocument();
-    expect(screen.getByText(/Progression déclarée par l’étudiant/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Progression déclarée/i).length).toBeGreaterThan(0);
     expect(screen.getByTestId("poc-sap-launchpad")).toBeInTheDocument();
     expect(screen.queryByTestId("poc-semaine-zero")).not.toBeInTheDocument();
   });
@@ -145,6 +145,31 @@ describe("PoC SAP IEE2E (Étape A)", () => {
     expect(screen.getAllByText(/vérité officielle sur SAP Learning/i).length).toBeGreaterThan(0);
     expect(screen.queryByRole("button", { name: "Suivi professeur" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Préparation de séance" })).not.toBeInTheDocument();
+  });
+
+  it("en mode professeur intégré avec cohorte vide, affiche l’état institutionnel", () => {
+    render(
+      <MemoryRouter initialEntries={["/workspace/apps/parcours-sap-iee2e"]}>
+        <Routes>
+          <Route
+            path="/workspace/apps/parcours-sap-iee2e"
+            element={
+              <SapIee2ePocApp
+                embedded
+                audience="professor"
+                initialView="professeur"
+                liveCohort
+                cohortRows={[]}
+              />
+            }
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(screen.getByTestId("sap-professor-empty-cohort")).toHaveTextContent(
+      /Aucune personne inscrite/i,
+    );
+    expect(screen.queryByText(/NordHabitat|M1–M10|30 missions/i)).not.toBeInTheDocument();
   });
 
   it("en mode professeur intégré, ouvre le suivi de cohorte", () => {

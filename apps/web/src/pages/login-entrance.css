@@ -72,10 +72,28 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  min-height: 3.25rem;
-  padding: 0.65rem 1.25rem;
+  min-height: 3.5rem;
+  padding: 0.75rem 1.5rem;
   background: #061018;
   border-bottom: 2px solid var(--login-horizon);
+}
+
+.living-login__system-strip {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.7rem;
+  margin: 0;
+  padding: 0.45rem 1.5rem;
+  background: rgba(10, 110, 209, 0.14);
+  border-bottom: 1px solid rgba(142, 197, 255, 0.22);
+  color: #d6e8fb;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .living-login__lockup {
@@ -136,12 +154,12 @@
   z-index: 1;
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(20rem, 24.5rem);
-  gap: clamp(1.5rem, 4vw, 3.5rem);
+  grid-template-columns: minmax(0, 1.2fr) minmax(22rem, 26rem);
+  gap: clamp(1.75rem, 4.5vw, 4rem);
   align-items: center;
-  width: min(72rem, calc(100% - 2.5rem));
+  width: min(76rem, calc(100% - 2.5rem));
   margin: 0 auto;
-  padding: clamp(1.5rem, 4vh, 3rem) 0 clamp(2rem, 5vh, 3.5rem);
+  padding: clamp(1.75rem, 5vh, 3.5rem) 0 clamp(2.25rem, 6vh, 4rem);
 }
 
 .living-login__brief h1 {
@@ -172,9 +190,29 @@
 .living-login__orientation {
   margin: 0;
   max-width: 36rem;
-  font-size: 1.02rem;
-  line-height: 1.55;
+  font-size: 1.05rem;
+  line-height: 1.6;
   color: var(--login-brief-muted);
+}
+
+.living-login__principles {
+  margin: 1.25rem 0 0;
+  padding: 0;
+  max-width: 36rem;
+  list-style: none;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.living-login__principles li {
+  padding: 0.7rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 3px solid var(--login-horizon);
+  border-radius: 0.35rem;
+  background: rgba(7, 20, 34, 0.35);
+  color: rgba(243, 247, 251, 0.88);
+  font-size: 0.95rem;
+  line-height: 1.45;
 }
 
 .living-login__suite {
@@ -206,14 +244,21 @@
 .living-login__form {
   display: flex;
   flex-direction: column;
-  gap: 0.95rem;
-  padding: 1.45rem 1.4rem 1.35rem;
+  gap: 1rem;
+  padding: 1.7rem 1.55rem 1.5rem;
   border: 1px solid var(--login-card-border);
   border-left: 3px solid var(--login-horizon);
-  border-radius: 0.5rem;
+  border-radius: 0.55rem;
   background: var(--login-card);
   box-shadow: var(--login-shadow);
   color: var(--login-card-text);
+}
+
+.living-login__form-help {
+  margin: -0.35rem 0 0.15rem;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: var(--login-card-muted);
 }
 
 .living-login__form-kicker {
@@ -269,6 +314,11 @@
   border-color: var(--login-horizon);
 }
 
+.living-login__field[data-invalid="true"] input {
+  border-color: #bb0000;
+  box-shadow: 0 0 0 1px rgba(187, 0, 0, 0.18);
+}
+
 .living-login__error {
   margin: 0;
   padding: 0.55rem 0.7rem;
@@ -279,10 +329,31 @@
   font-weight: 600;
 }
 
+.living-login__success {
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.4rem;
+  background: rgba(16, 126, 62, 0.12);
+  color: #107e3e;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
 [data-theme="dark"] .living-login__error,
 .living-login[data-resolved-theme="dark"] .living-login__error {
   background: rgba(255, 107, 107, 0.14);
   color: #ff8a8a;
+}
+
+[data-theme="dark"] .living-login__success,
+.living-login[data-resolved-theme="dark"] .living-login__success {
+  background: rgba(61, 184, 112, 0.16);
+  color: #7ee0a4;
+}
+
+[data-theme="dark"] .living-login__field[data-invalid="true"] input,
+.living-login[data-resolved-theme="dark"] .living-login__field[data-invalid="true"] input {
+  border-color: #ff8a8a;
 }
 
 .living-login__submit {
@@ -321,9 +392,15 @@
 }
 
 @media (max-width: 52rem) {
+  .living-login__chrome,
+  .living-login__system-strip {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
   .living-login__stage {
     grid-template-columns: minmax(0, 1fr);
-    width: min(26.5rem, calc(100% - 1.5rem));
+    width: min(28rem, calc(100% - 1.5rem));
     align-items: start;
     padding-top: 1.25rem;
   }
@@ -338,6 +415,20 @@
 
   .living-login__suite {
     margin-top: 1.1rem;
+  }
+
+  .living-login__form {
+    padding: 1.35rem 1.15rem 1.25rem;
+  }
+}
+
+@media (max-width: 28rem) {
+  .living-login__chrome {
+    flex-wrap: wrap;
+  }
+
+  .living-login__system-strip {
+    letter-spacing: 0.03em;
   }
 }
 

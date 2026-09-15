@@ -615,14 +615,13 @@
   gap: 1rem;
 }
 
-.sap-iee2e-poc__module-ghost {
-  opacity: 0.55;
-  border: 1px dashed var(--poc-border);
-  border-radius: 12px;
-  padding: 0.85rem;
-  background: var(--poc-surface);
-  font-size: 0.85rem;
-  color: var(--poc-muted);
+.sap-iee2e-poc__empty-cohort {
+  margin-top: 1rem;
+  border-left: 3px solid var(--poc-blue);
+}
+
+.sap-iee2e-poc__empty-cohort h2 {
+  margin-bottom: 0.45rem;
 }
 
 .sap-iee2e-poc__footer-note {

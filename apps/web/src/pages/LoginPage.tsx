@@ -19,7 +19,10 @@ export function LoginPage(): ReactNode {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [emailInvalid, setEmailInvalid] = useState(false);
+  const [passwordInvalid, setPasswordInvalid] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -30,16 +33,29 @@ export function LoginPage(): ReactNode {
   async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     setError(null);
+    setSuccess(false);
 
-    if (!email.trim() || !email.includes("@")) {
+    const trimmedEmail = email.trim();
+    const emailOk = Boolean(trimmedEmail) && trimmedEmail.includes("@");
+    const passwordOk = password.length > 0;
+    setEmailInvalid(!emailOk);
+    setPasswordInvalid(!passwordOk);
+
+    if (!emailOk) {
       setError(t("login.error.invalidEmail"));
+      return;
+    }
+
+    if (!passwordOk) {
+      setError(t("login.error.generic"));
       return;
     }
 
     setSubmitting(true);
 
     try {
-      await login(email, password);
+      await login(trimmedEmail, password);
+      setSuccess(true);
       navigate("/workspace", { replace: true });
     } catch (submitError) {
       const message =
@@ -47,6 +63,7 @@ export function LoginPage(): ReactNode {
           ? localizeLoginError(submitError.message)
           : t("login.error.generic");
       setError(message);
+      setPasswordInvalid(true);
     } finally {
       setSubmitting(false);
     }
@@ -101,13 +118,26 @@ export function LoginPage(): ReactNode {
         </div>
       </header>
 
+      <p className="living-login__system-strip" aria-label={t("login.system")}>
+        <span>{t("login.institution")}</span>
+        <span aria-hidden="true">·</span>
+        <span>{t("login.title")}</span>
+        <span aria-hidden="true">·</span>
+        <span>{t("login.subtitle")}</span>
+      </p>
+
       <div className="living-login__stage">
         <section className="living-login__brief" aria-labelledby="login-title">
           <p className="living-login__kicker">{t("login.institution")}</p>
           <h1 id="login-title">{t("login.title")}</h1>
           <p className="living-login__program">{t("login.subtitle")}</p>
           <p className="living-login__orientation">{t("login.orientation")}</p>
-          <ol className="living-login__suite" aria-hidden="true">
+          <ul className="living-login__principles">
+            <li>{t("login.principle.learn")}</li>
+            <li>{t("login.principle.organize")}</li>
+            <li>{t("login.principle.attest")}</li>
+          </ul>
+          <ol className="living-login__suite" aria-label="S1–S10">
             {SUITE_MARKERS.map((marker) => (
               <li key={marker}>{marker}</li>
             ))}
@@ -118,13 +148,15 @@ export function LoginPage(): ReactNode {
           <form
             className="living-login__form"
             onSubmit={(event) => void handleSubmit(event)}
-            aria-label={t("login.submit")}
+            aria-label={t("login.access")}
+            aria-busy={submitting}
             noValidate
           >
-            <p className="living-login__form-kicker">{t("login.subtitle")}</p>
+            <p className="living-login__form-kicker">{t("login.system")}</p>
             <h2 className="living-login__form-lead">{t("login.access")}</h2>
+            <p className="living-login__form-help">{t("login.subtitle")}</p>
 
-            <div className="living-login__field">
+            <div className="living-login__field" data-invalid={emailInvalid ? "true" : "false"}>
               <label htmlFor="email">{t("login.email")}</label>
               <input
                 id="email"
@@ -132,12 +164,17 @@ export function LoginPage(): ReactNode {
                 type="email"
                 autoComplete="username"
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  setEmailInvalid(false);
+                }}
                 required
+                aria-invalid={emailInvalid}
+                aria-describedby={error ? "login-error" : undefined}
               />
             </div>
 
-            <div className="living-login__field">
+            <div className="living-login__field" data-invalid={passwordInvalid ? "true" : "false"}>
               <label htmlFor="password">{t("login.password")}</label>
               <input
                 id="password"
@@ -145,18 +182,29 @@ export function LoginPage(): ReactNode {
                 type="password"
                 autoComplete="current-password"
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={(event) => {
+                  setPassword(event.target.value);
+                  setPasswordInvalid(false);
+                }}
                 required
+                aria-invalid={passwordInvalid}
+                aria-describedby={error ? "login-error" : undefined}
               />
             </div>
 
             {error ? (
-              <p role="alert" data-testid="login-error" className="living-login__error">
+              <p role="alert" id="login-error" data-testid="login-error" className="living-login__error">
                 {error}
               </p>
             ) : null}
 
-            <button className="living-login__submit" type="submit" disabled={submitting}>
+            {success ? (
+              <p role="status" className="living-login__success">
+                {t("login.success")}
+              </p>
+            ) : null}
+
+            <button className="living-login__submit" type="submit" disabled={submitting || success}>
               {submitting ? t("login.submitting") : t("login.submit")}
             </button>
           </form>

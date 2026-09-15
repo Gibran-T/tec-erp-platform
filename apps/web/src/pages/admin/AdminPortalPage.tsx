@@ -219,7 +219,7 @@ export function AdminPortalPage(): ReactElement {
   return (
     <main className="workspace-page" data-testid="admin-portal-page">
       <h1>Administration</h1>
-      <p>Gestion institutionnelle NordHabitat — opérations auditées.</p>
+      <p>Gestion institutionnelle Analyste ERP SAP — opérations auditées.</p>
       {error ? (
         <p role="alert" data-testid="admin-error">
           {error}

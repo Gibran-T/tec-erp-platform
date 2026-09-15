@@ -6,7 +6,7 @@
 export const TEACHING_GOLDEN_RULES: readonly string[] = [
   "SAP enseigne (contenu, quiz, Achievement). Vous médiez la cohorte.",
   "N’expliquez pas SAP en recopiant l’écran. Faites vivre une décision d’analyste.",
-  "Ne mélangez pas NordHabitat (simulation TEC.ERP) et l’entreprise de formation SAP.",
+  "Ne mélangez pas l’accompagnement institutionnel TEC.ERP et le contenu officiel de SAP Learning.",
   "Les 32 h 43 min officielles ne tiennent pas dans dix séances de 3 h. Distinguez salle et individuel.",
   "L’Achievement est émis par SAP. Le certificat est émis par le Collège. Deux preuves, deux émetteurs.",
   "Dans TEC.ERP, la progression est déclarée par l’étudiant. La vérité officielle reste sur SAP Learning.",

@@ -11,8 +11,6 @@ import { NotFoundPage } from "./pages/NotFoundPage.js";
 import { CertificateVerifyPage } from "./pages/public/CertificateVerifyPage.js";
 import { LearnerHomePage } from "./pages/workspace/LearnerHomePage.js";
 import { WorkspaceAppPage } from "./pages/workspace/WorkspaceAppPage.js";
-import { PlaybackV2Root } from "./playback/v2/PlaybackV2Root.js";
-import { SapIee2ePocApp } from "./poc/sap-iee2e/SapIee2ePocApp.js";
 import { ThemeProvider } from "./theme/ThemeProvider.js";
 
 export function AppRoutes(): ReactNode {
@@ -20,11 +18,9 @@ export function AppRoutes(): ReactNode {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/verify/:token" element={<CertificateVerifyPage />} />
-      {/* Wave 2A Playback Zero — isolated prototype, not production navigation */}
-      <Route path="/playback/v2/*" element={<PlaybackV2Root />} />
-      {/* Accompagnement SAP Suite End to End — hors shell production / hors auth */}
-      <Route path="/poc/sap-iee2e" element={<SapIee2ePocApp />} />
-      <Route path="/poc/sap-iee2e/*" element={<SapIee2ePocApp />} />
+      <Route path="/playback/v2/*" element={<Navigate to="/login" replace />} />
+      <Route path="/poc/sap-iee2e" element={<Navigate to="/login" replace />} />
+      <Route path="/poc/sap-iee2e/*" element={<Navigate to="/login" replace />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<WorkspaceLayout />}>
           <Route index element={<Navigate to="/workspace" replace />} />

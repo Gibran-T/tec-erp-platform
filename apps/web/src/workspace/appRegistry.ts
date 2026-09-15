@@ -30,7 +30,7 @@ export const WORKSPACE_APPS: readonly WorkspaceAppDefinition[] = [
   { id: "documents", label: "Documents", access: "day1", sidebarOrder: 4, launcherOrder: 4 },
   {
     id: "centre-mission",
-    label: "Centre de mission",
+    label: "Parcours",
     access: "day1",
     sidebarOrder: 5,
     launcherOrder: 5,
@@ -45,7 +45,7 @@ export const WORKSPACE_APPS: readonly WorkspaceAppDefinition[] = [
   { id: "erp", label: "ERP", access: "day1", sidebarOrder: 7, launcherOrder: 7 },
   {
     id: "evaluations",
-    label: "Évaluations",
+    label: "Suivi",
     access: "day1",
     sidebarOrder: 8,
     launcherOrder: 8,
@@ -67,14 +67,14 @@ export const WORKSPACE_APPS: readonly WorkspaceAppDefinition[] = [
   },
   {
     id: "coach-ia",
-    label: "Coach IA",
+    label: "Orientation",
     access: "day1",
     sidebarOrder: 11,
     launcherOrder: 11,
   },
   {
     id: "capstone",
-    label: "Capstone",
+    label: "Synthèse",
     access: "day1",
     sidebarOrder: 12,
     launcherOrder: 12,

@@ -481,7 +481,9 @@ describe("employee identity from session", () => {
 
     expect(screen.getByTestId("profile-field-nom")).toHaveTextContent("Analyste Démo");
     expect(screen.getByTestId("profile-field-matricule")).toHaveTextContent("#NHE-DEMO");
-    expect(screen.getByTestId("profile-field-entreprise")).toHaveTextContent("NordHabitat");
+    expect(screen.getByTestId("profile-field-entreprise")).toHaveTextContent(
+      "Collège de la Concorde",
+    );
     expect(screen.getByTestId("profile-field-courriel")).toHaveTextContent(
       "demo.analyste@nordhabitat.ca",
     );
@@ -602,5 +604,6 @@ describe("workspace vocabulary", () => {
     });
 
     expect(document.body.textContent ?? "").not.toMatch(FORBIDDEN_VOCABULARY);
+    expect(document.body.textContent ?? "").not.toMatch(/NordHabitat|M1–M10|30 missions/i);
   });
 });
