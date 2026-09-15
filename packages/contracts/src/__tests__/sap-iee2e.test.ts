@@ -10,6 +10,8 @@ import {
   SAP_SUITE_E2E_STAGES,
   SAP_SUITE_E2E_TITLE,
   isOfficialSapSuiteCourseUrl,
+  safeOfficialSapLearningHref,
+  sapLearningHrefIsNullish,
   SapIee2eSelfReportSchema,
   UpdateSapIee2eSelfReportRequestSchema,
 } from "../sap-iee2e.js";
@@ -31,9 +33,18 @@ describe("sap-iee2e contracts", () => {
     expect(INSTITUTIONAL_STATUS_LABEL_FR.progress_declared).toBe("Progrès déclaré");
     expect(isOfficialSapSuiteCourseUrl(SAP_SUITE_E2E_OFFICIAL_URL)).toBe(true);
     expect(SAP_SUITE_E2E_OFFICIAL_URL).not.toMatch(/\/null/);
+    expect(SAP_SUITE_E2E_OFFICIAL_URL).not.toMatch(/\/undefined/);
     expect(
       isOfficialSapSuiteCourseUrl(`${SAP_SUITE_E2E_OFFICIAL_URL}/null`),
     ).toBe(false);
+    expect(safeOfficialSapLearningHref(null)).toBe(SAP_SUITE_E2E_OFFICIAL_URL);
+    expect(safeOfficialSapLearningHref(`${SAP_SUITE_E2E_OFFICIAL_URL}/undefined`)).toBe(
+      SAP_SUITE_E2E_OFFICIAL_URL,
+    );
+    expect(sapLearningHrefIsNullish(`${SAP_SUITE_E2E_OFFICIAL_URL}/null`)).toBe(true);
+    expect(safeOfficialSapLearningHref("https://learning.sap.com/courses/other")).not.toMatch(
+      /\/null|\/undefined/,
+    );
   });
 
   it("accepts a declared self-report without treating Achievement as issued by TEC.ERP", () => {

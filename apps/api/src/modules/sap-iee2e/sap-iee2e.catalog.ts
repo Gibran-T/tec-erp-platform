@@ -12,6 +12,7 @@ import {
   SAP_SUITE_E2E_STAGE_CODES,
   SAP_SUITE_E2E_STAGES,
   SAP_SUITE_E2E_TITLE,
+  safeOfficialSapLearningHref,
   SapSuiteInstitutionalStatusSchema,
   SapSuiteStageCodeSchema,
   STUDENT_WRITABLE_INSTITUTIONAL_STATUSES,
@@ -143,7 +144,7 @@ export function buildProgramCatalog(): SapSuiteProgramCatalog {
     subtitle:
       "Accompagnement institutionnel des 10 étapes S1–S10. Le contenu officiel demeure sur SAP Learning.",
     // TEC.ERP never interpolates SAP lesson/unit identifiers into this URL.
-    officialUrl: SAP_SUITE_E2E_OFFICIAL_URL,
+    officialUrl: safeOfficialSapLearningHref(SAP_SUITE_E2E_OFFICIAL_URL),
     officialUrlOpensInNewTab: true,
     iframeForbidden: true,
     emitsSapAchievement: false,
@@ -273,7 +274,7 @@ export function createDefaultSelfReportView(): Omit<SapIee2eSelfReport, "lastUpd
     semaineZero: { ...EMPTY_SAP_IEE2E_SEMAINE_ZERO },
     semaineZeroReady: false,
     calendar: buildCalendarView(null, new Date()),
-    officialUrl: SAP_SUITE_E2E_OFFICIAL_URL,
+    officialUrl: safeOfficialSapLearningHref(SAP_SUITE_E2E_OFFICIAL_URL),
     sapResultOfficial: false,
   };
 }

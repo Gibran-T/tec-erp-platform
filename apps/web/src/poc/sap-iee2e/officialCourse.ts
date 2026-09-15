@@ -1,4 +1,9 @@
-import { SAP_SUITE_E2E_OFFICIAL_URL } from "@tec-platform/contracts";
+import {
+  SAP_SUITE_E2E_OFFICIAL_URL,
+  sapLearningHrefIsNullish,
+  safeOfficialSapLearningHref as resolveOfficialSapLearningHref,
+  type OfficialSapLearningHref,
+} from "@tec-platform/contracts";
 
 /**
  * Métadonnées publiques confirmées — SAP Learning (version FR).
@@ -116,13 +121,46 @@ export const OFFICIAL_UNIT_COUNT = OFFICIAL_UNITS_FR.length;
 export const SAP_ACHIEVEMENT_LABEL_FR =
   "SAP Achievement — Course Completion (niveau Intermediate)" as const;
 
-export type OfficialSapLearningHref = typeof SAP_IEE2E_OFFICIAL_FR_URL;
+export type { OfficialSapLearningHref };
 
 export interface SapInternalIdentifierAttempt {
   readonly slug?: string | null;
   readonly lessonId?: string | null;
   readonly unitId?: string | null;
 }
+
+/** Official SAP resources already confirmed in the institutional sofa — never invented. */
+export const SAP_OFFICIAL_EXTERNAL_RESOURCES = [
+  {
+    id: "learning",
+    labelFr: "Parcours officiel SAP Learning",
+    href: SAP_IEE2E_OFFICIAL_FR_URL,
+  },
+  {
+    id: "student-edition",
+    labelFr: "Édition étudiante SAP Learning",
+    href: "https://learning.sap.com/free-student-edition",
+  },
+  {
+    id: "help",
+    labelFr: "Aide — SAP Learning Hub, student edition",
+    href: "https://learning.sap.com/helpcenter/learninghub-student-edition",
+  },
+  {
+    id: "get-certified",
+    labelFr: "Obtenir une certification SAP",
+    href: "https://learning.sap.com/get-certified",
+  },
+  {
+    id: "certifications",
+    labelFr: "Catalogue des certifications SAP",
+    href: "https://learning.sap.com/certifications",
+  },
+] as const;
+
+const ALLOWED_EXTERNAL_SAP_HREFS: ReadonlySet<string> = new Set(
+  SAP_OFFICIAL_EXTERNAL_RESOURCES.map((item) => item.href),
+);
 
 function summarizeDiscardedCandidate(value: unknown): string {
   if (value == null) {
@@ -135,33 +173,28 @@ function summarizeDiscardedCandidate(value: unknown): string {
   return trimmed.length > 180 ? `${trimmed.slice(0, 180)}…` : trimmed;
 }
 
+function diagnosticsEnabled(): boolean {
+  return import.meta.env.DEV === true;
+}
+
 function logDiscardedSapLaunch(reason: string, candidate: unknown): void {
+  if (!diagnosticsEnabled()) {
+    return;
+  }
   console.warn("[tec-erp][sap-learning-launch] discarded non-official SAP target", {
     reason,
     candidate: summarizeDiscardedCandidate(candidate),
   });
 }
 
-function isUnusableSapIdentifier(value: unknown): boolean {
-  if (value == null) {
-    return true;
-  }
-  if (typeof value !== "string") {
-    return true;
-  }
-  const trimmed = value.trim().toLowerCase();
-  return trimmed === "" || trimmed === "null" || trimmed === "undefined";
-}
-
 function looksLikeSapInternalOrNullRoute(value: string): boolean {
-  const normalized = value.trim();
-  if (/\/null(?:\/|$|\?|#)/i.test(normalized) || /(?:\?|&|#)[^=]*=null(?:&|#|$)/i.test(normalized)) {
+  if (sapLearningHrefIsNullish(value)) {
     return true;
   }
   try {
-    const parsed = new URL(normalized);
+    const parsed = new URL(value.trim());
     if (parsed.hostname !== "learning.sap.com") {
-      return false;
+      return true;
     }
     const path = parsed.pathname.replace(/\/+$/, "");
     return path !== "/courses/exploring-end-to-end-business-processes-in-sap-business-suite-fr";
@@ -170,32 +203,51 @@ function looksLikeSapInternalOrNullRoute(value: string): boolean {
   }
 }
 
-/** Unique href TEC.ERP may open for SAP Learning. Never concatenates identifiers. */
+function assertSafeOfficialHref(href: string): OfficialSapLearningHref {
+  if (sapLearningHrefIsNullish(href) || /\/(?:null|undefined)(?:\/|$|\?|#)/i.test(href)) {
+    logDiscardedSapLaunch("guard-rejected-nullish-result", href);
+    return SAP_IEE2E_OFFICIAL_FR_URL;
+  }
+  return resolveOfficialSapLearningHref(href);
+}
+
+/** Unique href TEC.ERP may open for the official SAP Learning course. Never concatenates identifiers. */
 export function officialSapLearningLaunchHref(): OfficialSapLearningHref {
-  return SAP_IEE2E_OFFICIAL_FR_URL;
+  return assertSafeOfficialHref(resolveOfficialSapLearningHref());
 }
 
 /**
- * If a candidate is missing, null, `/null`, or any SAP internal/deep link, keep
- * the official course URL. Students never see a technical error.
+ * If a candidate is missing, null, `/null`, `/undefined`, or any SAP internal/deep link,
+ * keep the official course URL. Students never see a stack trace.
  */
-export function sanitizeOfficialSapLearningHref(candidate?: unknown): OfficialSapLearningHref {
-  if (candidate === undefined) {
-    return SAP_IEE2E_OFFICIAL_FR_URL;
+export function safeOfficialSapLearningHref(candidate?: unknown): OfficialSapLearningHref {
+  if (candidate === undefined || candidate === SAP_SUITE_E2E_OFFICIAL_URL) {
+    return officialSapLearningLaunchHref();
   }
-  if (candidate === SAP_SUITE_E2E_OFFICIAL_URL) {
-    return SAP_IEE2E_OFFICIAL_FR_URL;
-  }
-  if (isUnusableSapIdentifier(candidate)) {
+  if (sapLearningHrefIsNullish(candidate)) {
     logDiscardedSapLaunch("absent-or-null", candidate);
-    return SAP_IEE2E_OFFICIAL_FR_URL;
+    return officialSapLearningLaunchHref();
   }
   if (typeof candidate === "string" && looksLikeSapInternalOrNullRoute(candidate)) {
     logDiscardedSapLaunch("internal-or-null-route", candidate);
-    return SAP_IEE2E_OFFICIAL_FR_URL;
+    return officialSapLearningLaunchHref();
   }
   logDiscardedSapLaunch("non-official", candidate);
-  return SAP_IEE2E_OFFICIAL_FR_URL;
+  return officialSapLearningLaunchHref();
+}
+
+export const sanitizeOfficialSapLearningHref = safeOfficialSapLearningHref;
+
+export function safeExternalSapHref(candidate?: unknown): string {
+  if (typeof candidate === "string" && ALLOWED_EXTERNAL_SAP_HREFS.has(candidate)) {
+    if (sapLearningHrefIsNullish(candidate)) {
+      logDiscardedSapLaunch("allowlist-nullish", candidate);
+      return officialSapLearningLaunchHref();
+    }
+    return candidate;
+  }
+  logDiscardedSapLaunch("external-not-allowlisted", candidate);
+  return officialSapLearningLaunchHref();
 }
 
 /**
@@ -208,7 +260,7 @@ export function officialSapLearningHrefIgnoringIdentifiers(
   if (identifiers !== undefined) {
     const attempted = [identifiers.slug, identifiers.lessonId, identifiers.unitId];
     const hasInvalid = attempted.some(
-      (value) => value !== undefined && isUnusableSapIdentifier(value),
+      (value) => value !== undefined && sapLearningHrefIsNullish(value),
     );
     logDiscardedSapLaunch(hasInvalid ? "identifiers-absent-or-null" : "deep-link-refused", {
       slug: identifiers.slug ?? null,
@@ -216,5 +268,5 @@ export function officialSapLearningHrefIgnoringIdentifiers(
       unitId: identifiers.unitId ?? null,
     });
   }
-  return SAP_IEE2E_OFFICIAL_FR_URL;
+  return officialSapLearningLaunchHref();
 }

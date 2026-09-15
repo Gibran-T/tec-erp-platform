@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Link } from "react-router-dom";
 
 import type {
   SapIee2eCalendarView,
@@ -255,7 +256,20 @@ export function SapIee2ePocApp({
     OFFICIAL_UNITS_FR.find((unit) => unit.unitNumber === selectedPlan.relatedUnit) ??
     OFFICIAL_UNITS_FR[0];
   if (!selectedUnit) {
-    throw new Error("PoC: unité officielle liée à la séance introuvable.");
+    return (
+      <section data-testid="sap-iee2e-institutional-fallback" className="living-home-section" role="status">
+        <h1 className="living-type-page">Parcours institutionnel</h1>
+        <p className="living-lede">
+          Cette étape n’a pas pu être résolue dans TEC.ERP. Le contenu officiel demeure sur SAP
+          Learning.
+        </p>
+        <p>
+          <SapOfficialLaunchLink />
+          {" · "}
+          <Link to="/workspace">Retour à l’accueil</Link>
+        </p>
+      </section>
+    );
   }
 
   function openSession(sessionNumber: number): void {

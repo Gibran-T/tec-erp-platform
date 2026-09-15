@@ -14,10 +14,18 @@ describe("NotFoundPage", () => {
 
     const page = screen.getByTestId("not-found-page");
     expect(page).toHaveTextContent("Page introuvable");
-    expect(page).toHaveTextContent("La page demandée n’existe pas");
+    expect(page).toHaveTextContent("n’existe pas dans l’espace institutionnel");
     expect(page.textContent ?? "").not.toMatch(/page not found|does not exist|return home/i);
+    expect(page.textContent ?? "").not.toMatch(/The learning content has been updated/i);
 
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    expect(screen.getByRole("link", { name: "Revenir à l’accueil" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "Retour au parcours" })).toHaveAttribute(
+      "href",
+      "/workspace/apps/parcours-sap-iee2e",
+    );
+    expect(screen.getByRole("link", { name: "Retour à l’accueil" })).toHaveAttribute(
+      "href",
+      "/workspace",
+    );
   });
 });

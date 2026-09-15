@@ -35,6 +35,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             <p>
               Une erreur inattendue est survenue. Veuillez actualiser la page, puis réessayer.
             </p>
+            <p>
+              <a href="/workspace/apps/parcours-sap-iee2e">Retour au parcours</a>
+              {" · "}
+              <a href="/workspace">Retour à l’accueil</a>
+            </p>
           </div>
         )
       );

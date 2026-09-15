@@ -1,16 +1,17 @@
-import type {
-  SapIee2eCalendarView,
-  SapIee2eCohortResponse,
-  SapIee2eProfessorNote,
-  SapIee2eSelfReport,
-  SapIee2eStudentAccompaniment,
-  SapSuiteProgramAssignmentList,
-  SapSuiteProgramCatalog,
-  UpdateSapIee2eCalendarRequest,
-  UpdateSapIee2eProfessorNoteRequest,
-  UpdateSapIee2eSelfReportRequest,
-  UpdateSapSuiteProgramAssignmentRequest,
-  UpdateSapSuiteStageReviewRequest,
+import {
+  safeOfficialSapLearningHref,
+  type SapIee2eCalendarView,
+  type SapIee2eCohortResponse,
+  type SapIee2eProfessorNote,
+  type SapIee2eSelfReport,
+  type SapIee2eStudentAccompaniment,
+  type SapSuiteProgramAssignmentList,
+  type SapSuiteProgramCatalog,
+  type UpdateSapIee2eCalendarRequest,
+  type UpdateSapIee2eProfessorNoteRequest,
+  type UpdateSapIee2eSelfReportRequest,
+  type UpdateSapSuiteProgramAssignmentRequest,
+  type UpdateSapSuiteStageReviewRequest,
 } from "@tec-platform/contracts";
 
 import { loadStoredTokens } from "./auth.js";
@@ -35,7 +36,11 @@ export async function getSapSuiteProgramCatalog(): Promise<SapSuiteProgramCatalo
   if (!response.ok) {
     throw new Error("Impossible de charger le programme SAP Suite End to End.");
   }
-  return (await response.json()) as SapSuiteProgramCatalog;
+  const payload = (await response.json()) as SapSuiteProgramCatalog;
+  return {
+    ...payload,
+    officialUrl: safeOfficialSapLearningHref(payload.officialUrl),
+  };
 }
 
 export async function getMySapIee2eSelfReport(): Promise<SapIee2eSelfReport> {
@@ -45,7 +50,11 @@ export async function getMySapIee2eSelfReport(): Promise<SapIee2eSelfReport> {
   if (!response.ok) {
     throw new Error("Impossible de charger la déclaration institutionnelle SAP.");
   }
-  return (await response.json()) as SapIee2eSelfReport;
+  const payload = (await response.json()) as SapIee2eSelfReport;
+  return {
+    ...payload,
+    officialUrl: safeOfficialSapLearningHref(payload.officialUrl),
+  };
 }
 
 export async function saveMySapIee2eSelfReport(

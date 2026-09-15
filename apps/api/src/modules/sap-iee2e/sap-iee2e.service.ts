@@ -5,6 +5,7 @@ import {
   SAP_SUITE_E2E_CERTIFICATION_DISCLAIMER,
   SAP_SUITE_E2E_OFFICIAL_URL,
   SAP_SUITE_E2E_PROGRAM_CODE,
+  safeOfficialSapLearningHref,
   stageCodeFromSessionNumber,
   type SapIee2eCalendarView,
   type SapIee2eCohortResponse,
@@ -118,7 +119,7 @@ function toView(
     semaineZero,
     semaineZeroReady: isSemaineZeroReady(semaineZero),
     calendar,
-    officialUrl: SAP_SUITE_E2E_OFFICIAL_URL,
+    officialUrl: safeOfficialSapLearningHref(SAP_SUITE_E2E_OFFICIAL_URL),
     sapResultOfficial: false,
   };
 }
@@ -270,7 +271,7 @@ export function createSapIee2eService(dependencies: SapIee2eServiceDependencies)
         disclaimer: SAP_IEE2E_ACHIEVEMENT_DISCLAIMER,
         certificationDisclaimer: SAP_SUITE_E2E_CERTIFICATION_DISCLAIMER,
         calendar,
-        officialUrl: SAP_SUITE_E2E_OFFICIAL_URL,
+        officialUrl: safeOfficialSapLearningHref(SAP_SUITE_E2E_OFFICIAL_URL),
         students: mapped,
         semaineZero: {
           readyCount: mapped.filter((row) => row.semaineZeroReady).length,

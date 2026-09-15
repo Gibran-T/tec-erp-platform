@@ -17,6 +17,8 @@ export function AppRoutes(): ReactNode {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/null" element={<NotFoundPage />} />
+      <Route path="/undefined" element={<NotFoundPage />} />
       <Route path="/verify/:token" element={<CertificateVerifyPage />} />
       <Route path="/playback/v2/*" element={<Navigate to="/login" replace />} />
       <Route path="/poc/sap-iee2e" element={<Navigate to="/login" replace />} />

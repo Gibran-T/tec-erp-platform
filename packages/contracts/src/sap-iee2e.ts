@@ -10,10 +10,39 @@ export const SAP_SUITE_E2E_TITLE = "SAP Suite End to End" as const;
 export const SAP_SUITE_E2E_OFFICIAL_URL =
   "https://learning.sap.com/courses/exploring-end-to-end-business-processes-in-sap-business-suite-fr" as const;
 
+export type OfficialSapLearningHref = typeof SAP_SUITE_E2E_OFFICIAL_URL;
+
+const NULLISH_PATH_SEGMENT = /\/(?:null|undefined)(?:\/|$|\?|#)/i;
+const NULLISH_QUERY_VALUE = /(?:\?|&|#)[^=]*=(?:null|undefined)(?:&|#|$)/i;
+
+export function sapLearningHrefIsNullish(value: unknown): boolean {
+  if (value == null) {
+    return true;
+  }
+  if (typeof value !== "string") {
+    return true;
+  }
+  const trimmed = value.trim();
+  if (trimmed === "" || trimmed.toLowerCase() === "null" || trimmed.toLowerCase() === "undefined") {
+    return true;
+  }
+  return NULLISH_PATH_SEGMENT.test(trimmed) || NULLISH_QUERY_VALUE.test(trimmed);
+}
+
 export function isOfficialSapSuiteCourseUrl(
   value: unknown,
 ): value is typeof SAP_SUITE_E2E_OFFICIAL_URL {
   return value === SAP_SUITE_E2E_OFFICIAL_URL;
+}
+
+/**
+ * TEC.ERP never interpolates SAP lesson/unit identifiers into a Learning URL.
+ * Missing, dirty, `/null`, or `/undefined` candidates are discarded.
+ */
+export function safeOfficialSapLearningHref(
+  _candidate?: unknown,
+): OfficialSapLearningHref {
+  return SAP_SUITE_E2E_OFFICIAL_URL;
 }
 
 export const SAP_SUITE_E2E_STAGE_CODES = [

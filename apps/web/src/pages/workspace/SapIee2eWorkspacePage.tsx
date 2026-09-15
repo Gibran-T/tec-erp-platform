@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import type {
   SapIee2eCalendarView,
   SapIee2eSelfReport,
@@ -22,6 +22,7 @@ import { useAuth } from "../../auth/AuthContext.js";
 import { sanitizeOfficialSapLearningHref } from "../../poc/sap-iee2e/officialCourse.js";
 import { SapIee2ePocApp } from "../../poc/sap-iee2e/SapIee2ePocApp.js";
 import type { CohortStudentRow, StudentSelfReport } from "../../poc/sap-iee2e/fixtures.js";
+import { getAppPath } from "../../workspace/appRegistry.js";
 
 function toUiReport(report: SapIee2eSelfReport): StudentSelfReport {
   return {
@@ -199,10 +200,18 @@ export function SapIee2eWorkspacePage(): ReactNode {
 
   if (loadError) {
     return (
-      <p role="alert">
-        {loadError} Les données de démonstration ne sont pas affichées afin de protéger la
-        confidentialité.
-      </p>
+      <section role="alert" data-testid="sap-iee2e-load-error" className="living-home-section">
+        <h1 className="living-type-page">Parcours momentanément indisponible</h1>
+        <p className="living-lede">
+          L’accompagnement institutionnel n’a pas pu être chargé. Les données de démonstration
+          ne sont pas affichées afin de protéger la confidentialité.
+        </p>
+        <p>
+          <Link to={getAppPath("parcours-sap-iee2e")}>Retour au parcours</Link>
+          {" · "}
+          <Link to="/workspace">Retour à l’accueil</Link>
+        </p>
+      </section>
     );
   }
 

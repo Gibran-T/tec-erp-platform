@@ -8,6 +8,7 @@ import {
   OFFICIAL_UNIT_COUNT,
   SAP_IEE2E_OFFICIAL_FR_URL,
   SAP_IEE2E_OFFICIAL_TITLE,
+  SAP_OFFICIAL_EXTERNAL_RESOURCES,
   SAP_OFFICIAL_LAUNCH_LABEL,
 } from "../officialCourse.js";
 
@@ -304,8 +305,43 @@ describe("PoC SAP IEE2E (Étape A)", () => {
     const sapHrefs = [...screen.getAllByRole("link")]
       .map((link) => link.getAttribute("href") ?? "")
       .filter((href) => href.includes("learning.sap.com"));
-    expect(sapHrefs.every((href) => href === SAP_IEE2E_OFFICIAL_FR_URL)).toBe(true);
+    const allowed = new Set([
+      SAP_IEE2E_OFFICIAL_FR_URL,
+      ...SAP_OFFICIAL_EXTERNAL_RESOURCES.map((item) => item.href),
+    ]);
+    expect(sapHrefs.every((href) => allowed.has(href))).toBe(true);
+    expect(sapHrefs.every((href) => !/\/null|\/undefined/.test(href))).toBe(true);
+    expect(document.body.textContent ?? "").not.toMatch(
+      /The learning content has been updated|Refresh the page to reload/i,
+    );
+    expect(document.querySelector("iframe")).toBeNull();
     expect(warn).toHaveBeenCalled();
     warn.mockRestore();
+  });
+
+  it("garde S1–S10 institutionnelles et n’expose que des hrefs SAP allowlistés", () => {
+    renderPoc();
+    fireEvent.click(screen.getByRole("button", { name: "Mon parcours SAP" }));
+    const stages = screen.getByTestId("sap-suite-stages");
+    expect(stages).toHaveTextContent("S1");
+    expect(stages).toHaveTextContent("S10");
+    expect(screen.getByTestId("sap-stage-s1-official-launch")).toHaveAttribute(
+      "href",
+      SAP_IEE2E_OFFICIAL_FR_URL,
+    );
+    expect(screen.queryByTestId("sap-cloned-lesson")).not.toBeInTheDocument();
+
+    const resources = screen.getByTestId("sap-official-external-resources");
+    const resourceLinks = resources.querySelectorAll("a");
+    expect(resourceLinks).toHaveLength(SAP_OFFICIAL_EXTERNAL_RESOURCES.length);
+    for (const link of resourceLinks) {
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
+      expect(link.getAttribute("href")).not.toMatch(/\/null|\/undefined/);
+    }
+    expect(screen.getByTestId("sap-external-learning")).toHaveAttribute(
+      "href",
+      SAP_IEE2E_OFFICIAL_FR_URL,
+    );
   });
 });

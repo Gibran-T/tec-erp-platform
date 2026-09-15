@@ -36,6 +36,15 @@ describe("ErrorBoundary", () => {
     expect(fallback).toHaveTextContent("Une erreur inattendue est survenue");
     expect(fallback).toHaveTextContent("Veuillez actualiser la page");
     expect(fallback.textContent ?? "").not.toMatch(/something went wrong|please refresh|test failure/i);
+    expect(fallback.textContent ?? "").not.toMatch(/The learning content has been updated/i);
+    expect(screen.getByRole("link", { name: "Retour au parcours" })).toHaveAttribute(
+      "href",
+      "/workspace/apps/parcours-sap-iee2e",
+    );
+    expect(screen.getByRole("link", { name: "Retour à l’accueil" })).toHaveAttribute(
+      "href",
+      "/workspace",
+    );
     consoleError.mockRestore();
   });
 });

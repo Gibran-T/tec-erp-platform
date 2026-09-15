@@ -105,6 +105,7 @@ describe("sap-iee2e self-report routes", () => {
       "https://learning.sap.com/courses/exploring-end-to-end-business-processes-in-sap-business-suite-fr",
     );
     expect(response.body.officialUrl).not.toMatch(/\/null/);
+    expect(response.body.officialUrl).not.toMatch(/\/undefined/);
     expect(response.body.iframeForbidden).toBe(true);
     expect(response.body.emitsSapAchievement).toBe(false);
     expect(response.body.emitsSapCertification).toBe(false);

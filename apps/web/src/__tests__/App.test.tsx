@@ -63,4 +63,24 @@ describe("App routing", () => {
 
     expect(screen.getByTestId("not-found-page")).toBeInTheDocument();
   });
+
+  it("shows the institutional fallback for /null without cloning SAP", () => {
+    renderApp("/null", demoEmployee);
+    const page = screen.getByTestId("not-found-page");
+    expect(page).toHaveTextContent("Page introuvable");
+    expect(page.textContent ?? "").not.toMatch(/The learning content has been updated/i);
+    expect(screen.getByRole("link", { name: "Retour au parcours" })).toBeInTheDocument();
+  });
+
+  it("shows the institutional fallback for /undefined", () => {
+    renderApp("/undefined", demoEmployee);
+    expect(screen.getByTestId("not-found-page")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Retour à l’accueil" })).toBeInTheDocument();
+  });
+
+  it("does not expose cloned SAP lesson routes", () => {
+    renderApp("/tec-erp/course/sap/unit/1/lesson/bike-company", demoEmployee);
+    expect(screen.getByTestId("not-found-page")).toBeInTheDocument();
+    expect(screen.queryByTestId("sap-cloned-lesson")).not.toBeInTheDocument();
+  });
 });
