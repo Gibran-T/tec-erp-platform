@@ -8,7 +8,14 @@ import {
   OFFICIAL_UNIT_COUNT,
   SAP_IEE2E_OFFICIAL_FR_URL,
   SAP_IEE2E_OFFICIAL_TITLE,
+  SAP_OFFICIAL_LAUNCH_LABEL,
 } from "../officialCourse.js";
+
+const SAP_UNIT1_LESSON_TITLES = [
+  "Identification des processus de gestion à l’aide de l’exemple d’une société Bike Company",
+  "Mappage des solutions SAP aux processus de gestion",
+  "Alignement des processus de gestion avec SAP Best Practices",
+] as const;
 
 function renderPoc(): void {
   render(
@@ -239,5 +246,66 @@ describe("PoC SAP IEE2E (Étape A)", () => {
     );
     expect(panel).toHaveAttribute("data-urgent", "true");
     expect(panel).toHaveTextContent(/Semaine Zéro incomplète/i);
+  });
+
+  it("n’ouvre que l’URL officielle SAP Learning, y compris depuis S1 et l’unité 1", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    render(
+      <MemoryRouter initialEntries={["/workspace/apps/parcours-sap-iee2e"]}>
+        <Routes>
+          <Route
+            path="/workspace/apps/parcours-sap-iee2e"
+            element={
+              <SapIee2ePocApp
+                embedded
+                audience="student"
+                initialView="parcours"
+                officialUrl={`${SAP_IEE2E_OFFICIAL_FR_URL}/${null as unknown as string}`}
+              />
+            }
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    const launches = screen.getAllByRole("link").filter((node) =>
+      node.getAttribute("data-sap-official-launch"),
+    );
+    expect(launches.length).toBeGreaterThan(10);
+    for (const link of launches) {
+      expect(link).toHaveAttribute("href", SAP_IEE2E_OFFICIAL_FR_URL);
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
+      expect(link.getAttribute("href")).not.toMatch(/\/null/);
+    }
+
+    const s1Launch = screen.getByTestId("sap-stage-s1-official-launch");
+    expect(s1Launch).toHaveTextContent(SAP_OFFICIAL_LAUNCH_LABEL);
+    expect(s1Launch).toHaveAttribute("href", SAP_IEE2E_OFFICIAL_FR_URL);
+
+    const unit1 = screen.getByTestId("sap-official-unit-1");
+    expect(unit1).toHaveTextContent(/Unité 1/i);
+    expect(screen.getByTestId("sap-unit-1-official-launch")).toHaveAttribute(
+      "href",
+      SAP_IEE2E_OFFICIAL_FR_URL,
+    );
+
+    for (const title of SAP_UNIT1_LESSON_TITLES) {
+      const hits = screen.queryAllByText(title);
+      for (const hit of hits) {
+        const anchor = hit.closest("a");
+        if (anchor) {
+          expect(anchor).toHaveAttribute("href", SAP_IEE2E_OFFICIAL_FR_URL);
+          expect(anchor.getAttribute("href")).not.toMatch(/\/null/);
+        }
+      }
+    }
+
+    const sapHrefs = [...screen.getAllByRole("link")]
+      .map((link) => link.getAttribute("href") ?? "")
+      .filter((href) => href.includes("learning.sap.com"));
+    expect(sapHrefs.every((href) => href === SAP_IEE2E_OFFICIAL_FR_URL)).toBe(true);
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
   });
 });

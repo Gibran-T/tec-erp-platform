@@ -101,6 +101,10 @@ describe("sap-iee2e self-report routes", () => {
     expect(response.body.stages[4].officialPathHint).toMatch(/Unité publique SAP 4/);
     expect(response.body.officialPathUnits).toHaveLength(9);
     expect(response.body.officialUrlOpensInNewTab).toBe(true);
+    expect(response.body.officialUrl).toBe(
+      "https://learning.sap.com/courses/exploring-end-to-end-business-processes-in-sap-business-suite-fr",
+    );
+    expect(response.body.officialUrl).not.toMatch(/\/null/);
     expect(response.body.iframeForbidden).toBe(true);
     expect(response.body.emitsSapAchievement).toBe(false);
     expect(response.body.emitsSapCertification).toBe(false);

@@ -19,6 +19,7 @@ import {
   saveProfessorStudentNote,
 } from "../../api/sap-iee2e.js";
 import { useAuth } from "../../auth/AuthContext.js";
+import { sanitizeOfficialSapLearningHref } from "../../poc/sap-iee2e/officialCourse.js";
 import { SapIee2ePocApp } from "../../poc/sap-iee2e/SapIee2ePocApp.js";
 import type { CohortStudentRow, StudentSelfReport } from "../../poc/sap-iee2e/fixtures.js";
 
@@ -223,7 +224,7 @@ export function SapIee2eWorkspacePage(): ReactNode {
       initialCalendar={calendar}
       cohortRows={professorView ? (cohortRows ?? []) : undefined}
       assignments={assignments}
-      officialUrl={catalog.officialUrl}
+      officialUrl={sanitizeOfficialSapLearningHref(catalog.officialUrl)}
       liveCohort={canTeach}
       allowStudentPreview={professorView}
       onPreviewStudent={professorView ? () => setSearchParams({}) : undefined}

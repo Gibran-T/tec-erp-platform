@@ -7,9 +7,11 @@ import {
   OFFICIAL_TOTAL_DURATION_LABEL,
   OFFICIAL_UNIT_COUNT,
   SAP_ACHIEVEMENT_LABEL_FR,
-  SAP_IEE2E_OFFICIAL_FR_URL,
   SAP_IEE2E_OFFICIAL_TITLE,
+  SAP_OFFICIAL_LAUNCH_HINT,
+  SAP_OFFICIAL_LAUNCH_LABEL,
 } from "./officialCourse.js";
+import { SapOfficialLaunchLink } from "./SapOfficialLaunchLink.js";
 
 export interface SapIee2eReceptionProps {
   readonly compact?: boolean;
@@ -89,17 +91,14 @@ export function SapIee2eReception({
       </p>
 
       <div className="sap-iee2e-poc__launchpad" data-testid="poc-sap-launchpad">
-        <a
+        <SapOfficialLaunchLink
           className="sap-iee2e-poc__tile sap-iee2e-poc__tile--primary"
-          href={SAP_IEE2E_OFFICIAL_FR_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          data-testid={parcoursTo ? "learner-home-sap-iee2e-official" : "poc-official-sap-link"}
+          testId={parcoursTo ? "learner-home-sap-iee2e-official" : "poc-official-sap-link"}
         >
-          <span className="sap-iee2e-poc__tile-kicker">Continuer</span>
+          <span className="sap-iee2e-poc__tile-kicker">{SAP_OFFICIAL_LAUNCH_LABEL}</span>
           <span className="sap-iee2e-poc__tile-title">{officialTileTitle}</span>
-          <span className="sap-iee2e-poc__tile-meta">learning.sap.com · FR</span>
-        </a>
+          <span className="sap-iee2e-poc__tile-meta">learning.sap.com · FR · {SAP_OFFICIAL_LAUNCH_HINT}</span>
+        </SapOfficialLaunchLink>
 
         {parcoursTo ? (
           <Link className="sap-iee2e-poc__tile" to={parcoursTo} data-testid="learner-home-sap-iee2e-open">

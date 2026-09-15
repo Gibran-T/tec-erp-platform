@@ -9,6 +9,13 @@ export const SAP_SUITE_E2E_PROGRAM_CODE = "SAP_SUITE_E2E" as const;
 export const SAP_SUITE_E2E_TITLE = "SAP Suite End to End" as const;
 export const SAP_SUITE_E2E_OFFICIAL_URL =
   "https://learning.sap.com/courses/exploring-end-to-end-business-processes-in-sap-business-suite-fr" as const;
+
+export function isOfficialSapSuiteCourseUrl(
+  value: unknown,
+): value is typeof SAP_SUITE_E2E_OFFICIAL_URL {
+  return value === SAP_SUITE_E2E_OFFICIAL_URL;
+}
+
 export const SAP_SUITE_E2E_STAGE_CODES = [
   "S1",
   "S2",

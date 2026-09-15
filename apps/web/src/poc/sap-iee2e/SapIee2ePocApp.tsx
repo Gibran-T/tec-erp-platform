@@ -8,7 +8,6 @@ import type {
 } from "@tec-platform/contracts";
 import {
   INSTITUTIONAL_STATUS_LABEL_FR,
-  SAP_SUITE_E2E_OFFICIAL_URL,
   SAP_SUITE_E2E_STAGES,
   SAP_SUITE_E2E_TITLE,
   STUDENT_WRITABLE_INSTITUTIONAL_STATUSES,
@@ -34,7 +33,11 @@ import {
   OFFICIAL_TOTAL_DURATION_LABEL,
   OFFICIAL_UNITS_FR,
   SAP_ACHIEVEMENT_LABEL_FR,
+  SAP_OFFICIAL_LAUNCH_HINT,
+  officialSapLearningLaunchHref,
+  sanitizeOfficialSapLearningHref,
 } from "./officialCourse.js";
+import { SapOfficialLaunchLink } from "./SapOfficialLaunchLink.js";
 import { getSessionTeachingGuide, TEACHING_GOLDEN_RULES } from "./professorCoaching.js";
 import { SapIee2eOrientation } from "./SapIee2eOrientation.js";
 import { SapIee2eReception } from "./SapIee2eReception.js";
@@ -121,7 +124,7 @@ export function SapIee2ePocApp({
   initialCalendar,
   cohortRows,
   assignments = [],
-  officialUrl = SAP_SUITE_E2E_OFFICIAL_URL,
+  officialUrl = officialSapLearningLaunchHref(),
   onPersistReport,
   onPersistCalendar,
   onPersistNote,
@@ -152,7 +155,7 @@ export function SapIee2ePocApp({
     initialCalendar ?? MOCK_CALENDAR,
   );
   const stamp = persistEnabled ? "À l’instant" : "À l’instant (démonstration)";
-  const sapOfficialHref = officialUrl;
+  sanitizeOfficialSapLearningHref(officialUrl);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [professorNoteDraft, setProfessorNoteDraft] = useState("");
   const [evidenceLabel, setEvidenceLabel] = useState("");
@@ -459,7 +462,12 @@ export function SapIee2ePocApp({
                             </span>
                           </div>
                           <p className="sap-iee2e-poc__muted">{stage.shortDescription}</p>
+                          <p className="sap-iee2e-poc__muted">{SAP_OFFICIAL_LAUNCH_HINT}</p>
                           <div className="sap-iee2e-poc__actions">
+                            <SapOfficialLaunchLink
+                              className="sap-iee2e-poc__btn sap-iee2e-poc__btn--secondary"
+                              testId={`sap-stage-${stage.code.toLowerCase()}-official-launch`}
+                            />
                             {STUDENT_WRITABLE_INSTITUTIONAL_STATUSES.map((nextStatus) => (
                               <button
                                 key={nextStatus}
@@ -505,6 +513,9 @@ export function SapIee2ePocApp({
                         key={unit.unitNumber}
                         className="sap-iee2e-poc__unit"
                         data-status={status}
+                        data-testid={
+                          unit.unitNumber === 1 ? "sap-official-unit-1" : undefined
+                        }
                       >
                         <div className="sap-iee2e-poc__unit-head">
                           <strong>
@@ -523,15 +534,12 @@ export function SapIee2ePocApp({
                           <span>MAJ : {progress?.lastUpdateLabel ?? "—"}</span>
                         </div>
                         <p className="sap-iee2e-poc__muted">{progress?.professorHint}</p>
+                        <p className="sap-iee2e-poc__muted">{SAP_OFFICIAL_LAUNCH_HINT}</p>
                         <div className="sap-iee2e-poc__actions">
-                          <a
+                          <SapOfficialLaunchLink
                             className="sap-iee2e-poc__btn sap-iee2e-poc__btn--secondary"
-                            href={sapOfficialHref}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Continuer sur SAP
-                          </a>
+                            testId={`sap-unit-${unit.unitNumber}-official-launch`}
+                          />
                           <button
                             type="button"
                             className="sap-iee2e-poc__btn sap-iee2e-poc__btn--ghost"
@@ -1292,9 +1300,7 @@ export function SapIee2ePocApp({
                 </p>
                 <p>
                   <strong>Lien officiel :</strong>{" "}
-                  <a href={sapOfficialHref} target="_blank" rel="noopener noreferrer">
-                    SAP Learning — version FR
-                  </a>
+                  <SapOfficialLaunchLink testId="sap-prep-official-launch" />
                 </p>
                 <h3 className="sap-iee2e-poc__h3">Séquence recommandée</h3>
                 <ol>

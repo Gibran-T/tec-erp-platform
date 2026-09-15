@@ -142,6 +142,7 @@ export function buildProgramCatalog(): SapSuiteProgramCatalog {
     title: SAP_SUITE_E2E_TITLE,
     subtitle:
       "Accompagnement institutionnel des 10 étapes S1–S10. Le contenu officiel demeure sur SAP Learning.",
+    // TEC.ERP never interpolates SAP lesson/unit identifiers into this URL.
     officialUrl: SAP_SUITE_E2E_OFFICIAL_URL,
     officialUrlOpensInNewTab: true,
     iframeForbidden: true,

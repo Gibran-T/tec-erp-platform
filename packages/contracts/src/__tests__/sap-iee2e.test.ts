@@ -5,9 +5,11 @@ import {
   SAP_IEE2E_ACHIEVEMENT_DISCLAIMER,
   SAP_IEE2E_UNIT_COUNT,
   SAP_SUITE_E2E_OFFICIAL_PATH_UNITS,
+  SAP_SUITE_E2E_OFFICIAL_URL,
   SAP_SUITE_E2E_STAGE_CODES,
   SAP_SUITE_E2E_STAGES,
   SAP_SUITE_E2E_TITLE,
+  isOfficialSapSuiteCourseUrl,
   SapIee2eSelfReportSchema,
   UpdateSapIee2eSelfReportRequestSchema,
 } from "../sap-iee2e.js";
@@ -27,6 +29,11 @@ describe("sap-iee2e contracts", () => {
     expect(SAP_SUITE_E2E_OFFICIAL_PATH_UNITS).toHaveLength(9);
     expect(new Set(SAP_SUITE_E2E_OFFICIAL_PATH_UNITS.map((unit) => unit.publicTitle)).size).toBe(9);
     expect(INSTITUTIONAL_STATUS_LABEL_FR.progress_declared).toBe("Progrès déclaré");
+    expect(isOfficialSapSuiteCourseUrl(SAP_SUITE_E2E_OFFICIAL_URL)).toBe(true);
+    expect(SAP_SUITE_E2E_OFFICIAL_URL).not.toMatch(/\/null/);
+    expect(
+      isOfficialSapSuiteCourseUrl(`${SAP_SUITE_E2E_OFFICIAL_URL}/null`),
+    ).toBe(false);
   });
 
   it("accepts a declared self-report without treating Achievement as issued by TEC.ERP", () => {
